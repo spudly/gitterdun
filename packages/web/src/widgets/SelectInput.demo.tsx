@@ -1,6 +1,6 @@
 import {FC, useState} from 'react';
-import SelectInput from './SelectInput.js';
-import FormField from './FormField.js';
+import {SelectInput} from './SelectInput.js';
+import {FormField} from './FormField.js';
 
 const SelectInputDemo: FC = () => {
   const [v, setV] = useState('');

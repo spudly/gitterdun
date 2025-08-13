@@ -1,6 +1,6 @@
 import {FC, useState} from 'react';
-import TextInput from './TextInput.js';
-import FormField from './FormField.js';
+import {TextInput} from './TextInput.js';
+import {FormField} from './FormField.js';
 
 const TextInputDemo: FC = () => {
   const [value, setValue] = useState('');

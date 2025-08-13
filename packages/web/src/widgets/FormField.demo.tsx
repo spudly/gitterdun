@@ -1,6 +1,6 @@
 import {FC} from 'react';
-import FormField from './FormField.js';
-import TextInput from './TextInput.js';
+import {FormField} from './FormField.js';
+import {TextInput} from './TextInput.js';
 
 const FormFieldDemo: FC = () => {
   return (

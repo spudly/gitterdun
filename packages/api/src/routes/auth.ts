@@ -8,20 +8,30 @@ import {
   ResetPasswordSchema,
 } from '@gitterdun/shared';
 import {z} from 'zod';
+import crypto from 'crypto';
 import db from '../lib/db';
 import {logger} from '../utils/logger';
-import crypto from 'crypto';
 
 const router = express.Router();
 
 const getCookie = (req: express.Request, name: string): string | undefined => {
-  const cookieHeader = req.headers['cookie'];
-  if (!cookieHeader) return undefined;
-  const cookies = cookieHeader
+  const cookieHeader = req.headers.cookie;
+  if (!cookieHeader) {
+    return undefined;
+  }
+  const cookieString = Array.isArray(cookieHeader)
+    ? cookieHeader.join(';')
+    : cookieHeader;
+  const cookies = cookieString
     .split(';')
     .reduce<Record<string, string>>((acc, part) => {
-      const [k, ...rest] = part.trim().split('=');
-      acc[decodeURIComponent(k)] = decodeURIComponent(rest.join('='));
+      const [rawKey, ...rest] = part.trim().split('=');
+      if (!rawKey) {
+        return acc;
+      }
+      const key = decodeURIComponent(rawKey);
+      const value = decodeURIComponent(rest.join('=') || '');
+      acc[key] = value;
       return acc;
     }, {});
   return cookies[name];

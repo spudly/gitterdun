@@ -1,6 +1,6 @@
 import {FC} from 'react';
-import PageHeader from './PageHeader.js';
-import Button from './Button.js';
+import {PageHeader} from './PageHeader.js';
+import {Button} from './Button.js';
 
 const PageHeaderDemo: FC = () => {
   return (

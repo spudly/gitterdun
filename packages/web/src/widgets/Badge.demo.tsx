@@ -1,5 +1,5 @@
 import {FC} from 'react';
-import Badge from './Badge.js';
+import {Badge} from './Badge.js';
 
 const BadgeDemo: FC = () => {
   return (

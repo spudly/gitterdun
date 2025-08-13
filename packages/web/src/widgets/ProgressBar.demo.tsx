@@ -1,5 +1,5 @@
 import {FC, useState} from 'react';
-import ProgressBar from './ProgressBar.js';
+import {ProgressBar} from './ProgressBar.js';
 
 const ProgressBarDemo: FC = () => {
   const [v, setV] = useState(40);

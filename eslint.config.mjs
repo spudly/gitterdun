@@ -24,14 +24,14 @@ const __dirname = dirname(__filename);
 const compat = new FlatCompat({baseDirectory: __dirname});
 
 const eslintConfig = [
-  ...compat.extends('airbnb', 'airbnb/hooks', 'plugin:prettier/recommended'),
+  ...compat.extends('airbnb', 'airbnb/hooks'),
   {
     plugins: {'@typescript-eslint': typescriptEslint},
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
     languageOptions: {
       parser: typescriptEslintParser,
       parserOptions: {
-        project: ['./tsconfig.json', './packages/*/tsconfig.json'],
+        project: ['./tsconfig.base.json'],
         tsconfigRootDir: __dirname,
         warnOnUnsupportedTypeScriptVersion: false,
       },
@@ -39,12 +39,8 @@ const eslintConfig = [
     settings: {
       react: {version: 'detect'},
       'import/resolver': {
-        typescript: {
-          project: ['./tsconfig.json', './packages/*/tsconfig.json'],
-        },
-        node: {
-          extensions: ['.mjs', '.js', '.jsx', '.json', '.ts', '.tsx', '.d.ts'],
-        },
+        typescript: {project: ['./tsconfig.base.json']},
+        node: {extensions: ['.mjs', '.js', '.jsx', '.ts', '.tsx', '.d.ts']},
       },
       'import/parsers': {'@typescript-eslint/parser': ['.ts', '.tsx', '.d.ts']},
       'import/extensions': [
@@ -300,24 +296,34 @@ const eslintConfig = [
         },
       ],
 
-      // Append 'ts' and 'tsx' extensions to Airbnb 'import/no-extraneous-dependencies' rule
-      // https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-extraneous-dependencies.md
       'import/no-extraneous-dependencies': [
-        baseImportsRules['import/no-extraneous-dependencies'][0],
+        'error',
         {
-          // @ts-expect-error -- we're in a js file so we can't just cast this to fix the type
-          ...baseImportsRules['import/no-extraneous-dependencies'][1],
-          devDependencies: baseImportsRules[
-            'import/no-extraneous-dependencies'
-            // @ts-expect-error -- we're in a js file so we can't just cast this to fix the type
-          ][1].devDependencies.reduce((result, devDep) => {
-            const toAppend = [devDep];
-            const devDepWithTs = devDep.replace(/\bjs(x?)\b/g, 'ts$1');
-            if (devDepWithTs !== devDep) {
-              toAppend.push(devDepWithTs);
-            }
-            return [...result, ...toAppend];
-          }, []),
+          devDependencies: [
+            '**/test/**', // tape, common npm pattern
+            '**/tests/**', // also common npm pattern
+            '**/spec/**', // mocha, rspec-like pattern
+            '**/__tests__/**', // jest pattern
+            '**/__mocks__/**', // jest pattern
+            '**/test.{js,jsx,ts,tsx}', // repos with a single test file
+            '**/test-*.{js,jsx,ts,tsx}', // repos with multiple top-level test files
+            '**/*{.,_}{test,spec}.{js,jsx,ts,tsx}', // tests where the extension or filename suffix denotes that it is a test
+            '**/jest.config.{js,jsx,ts,tsx}', // jest config
+            '**/jest.setup.{js,jsx,ts,tsx}', // jest setup
+            '**/vue.config.{js,jsx,ts,tsx}', // vue-cli config
+            '**/webpack.config.{js,jsx,ts,tsx}', // webpack config
+            '**/webpack.config.*.{js,jsx,ts,tsx}', // webpack config
+            '**/rollup.config.{js,jsx,ts,tsx}', // rollup config
+            '**/rollup.config.*.{js,jsx,ts,tsx}', // rollup config
+            '**/gulpfile.{js,jsx,ts,tsx}', // gulp config
+            '**/gulpfile.*.{js,jsx,ts,tsx}', // gulp config
+            '**/Gruntfile{,.{js,jsx,ts,tsx}}', // grunt config
+            '**/protractor.conf.{js,jsx,ts,tsx}', // protractor config
+            '**/protractor.conf.*.{js,jsx,ts,tsx}', // protractor config
+            '**/karma.conf.{js,jsx,ts,tsx}', // karma config
+            '**/.eslintrc.{js,jsx,ts,tsx}', // eslint config
+          ],
+          optionalDependencies: false,
         },
       ],
       'react/function-component-definition': [
@@ -327,15 +333,32 @@ const eslintConfig = [
           unnamedComponents: 'arrow-function',
         },
       ],
-      curly: ['error', 'all'],
+      curly: ['off'],
       'no-nested-ternary': 'off',
       'import/prefer-default-export': 'off',
       'react/react-in-jsx-scope': 'off',
       'no-underscore-dangle': 'off',
+      // Project conventions
+      'react/jsx-props-no-spreading': 'off',
+      'react/require-default-props': 'off',
+      'arrow-parens': 'off',
+      'object-curly-newline': 'off',
+      'operator-linebreak': 'off',
+      'arrow-body-style': 'off',
+      'react/jsx-one-expression-per-line': 'off',
+      'react/jsx-wrap-multilines': 'off',
+      'no-multiple-empty-lines': 'off',
+      'function-paren-newline': 'off',
+      'implicit-arrow-linebreak': 'off',
+      'newline-per-chained-call': 'off',
+      'nonblock-statement-body-position': 'off',
+      'react/jsx-curly-newline': 'off',
+      'no-confusing-arrow': 'off', // not confusing to me
+      'import/newline-after-import': 'off',
     },
   },
   {
-    files: ['*.ts', '*.tsx'],
+    files: ['**/*.ts', '**/*.tsx'],
     rules: {
       // The following rules are enabled in Airbnb config, but are already checked (more thoroughly) by the TypeScript compiler
       // Some of the rules also fail in TypeScript files, for example: https://github.com/typescript-eslint/typescript-eslint/issues/662#issuecomment-507081586
@@ -364,6 +387,10 @@ const eslintConfig = [
       // Disable `import/no-unresolved`, see README.md for details
       'import/no-unresolved': 'off',
     },
+  },
+  {
+    files: ['**/*.spec.ts', '**/*.spec.tsx', '**/*.test.ts', '**/*.test.tsx'],
+    rules: {'no-restricted-syntax': 'off', 'no-await-in-loop': 'off'},
   },
 ];
 

@@ -1,5 +1,4 @@
 import express from 'express';
-import db from '../lib/db';
 import {z} from 'zod';
 import {
   CreateFamilySchema,
@@ -8,18 +7,29 @@ import {
   FamilyMemberSchema,
 } from '@gitterdun/shared';
 import bcrypt from 'bcryptjs';
+import db from '../lib/db';
 
 const router = express.Router();
 
 // Helper: require auth via session cookie
 const getCookie = (req: express.Request, name: string): string | undefined => {
-  const cookieHeader = req.headers['cookie'];
-  if (!cookieHeader) return undefined;
-  const cookies = cookieHeader
+  const cookieHeader = req.headers.cookie;
+  if (!cookieHeader) {
+    return undefined;
+  }
+  const cookieString = Array.isArray(cookieHeader)
+    ? cookieHeader.join(';')
+    : cookieHeader;
+  const cookies = cookieString
     .split(';')
     .reduce<Record<string, string>>((acc, part) => {
-      const [k, ...rest] = part.trim().split('=');
-      acc[decodeURIComponent(k)] = decodeURIComponent(rest.join('='));
+      const [rawKey, ...rest] = part.trim().split('=');
+      if (!rawKey) {
+        return acc;
+      }
+      const key = decodeURIComponent(rawKey);
+      const value = decodeURIComponent(rest.join('=') || '');
+      acc[key] = value;
       return acc;
     }, {});
   return cookies[name];
@@ -31,7 +41,8 @@ const requireUserId = (req: express.Request): number => {
   const session = db
     .prepare('SELECT user_id, expires_at FROM sessions WHERE id = ?')
     .get(sid) as {user_id: number; expires_at: string} | undefined;
-  if (!session) throw Object.assign(new Error('Not authenticated'), {status: 401});
+  if (!session)
+    throw Object.assign(new Error('Not authenticated'), {status: 401});
   if (new Date(session.expires_at).getTime() < Date.now()) {
     db.prepare('DELETE FROM sessions WHERE id = ?').run(sid);
     throw Object.assign(new Error('Session expired'), {status: 401});
@@ -51,11 +62,9 @@ router.post('/', (req, res) => {
       )
       .get(name, userId) as any;
 
-    db.prepare('INSERT INTO family_members (family_id, user_id, role) VALUES (?, ?, ?)').run(
-      result.id,
-      userId,
-      'parent',
-    );
+    db.prepare(
+      'INSERT INTO family_members (family_id, user_id, role) VALUES (?, ?, ?)',
+    ).run(result.id, userId, 'parent');
 
     const family = FamilySchema.parse(result);
     return res.status(201).json({success: true, data: family});
@@ -73,17 +82,20 @@ router.post('/', (req, res) => {
 router.get('/:id/members', (req, res) => {
   try {
     const userId = requireUserId(req);
-    const familyId = Number(req.params['id']);
+    const familyId = Number(req.params.id);
     const isMember = db
-      .prepare('SELECT 1 FROM family_members WHERE family_id = ? AND user_id = ?')
+      .prepare(
+        'SELECT 1 FROM family_members WHERE family_id = ? AND user_id = ?',
+      )
       .get(familyId, userId);
-    if (!isMember) return res.status(403).json({success: false, error: 'Forbidden'});
+    if (!isMember)
+      return res.status(403).json({success: false, error: 'Forbidden'});
 
     const rows = db
       .prepare(
         `SELECT fm.family_id, fm.user_id, fm.role, u.username, u.email
          FROM family_members fm JOIN users u ON u.id = fm.user_id
-         WHERE fm.family_id = ?`
+         WHERE fm.family_id = ?`,
       )
       .all(familyId) as any[];
     const data = rows.map(r => FamilyMemberSchema.parse(r));
@@ -99,11 +111,13 @@ router.get('/:id/members', (req, res) => {
 router.post('/:id/children', async (req, res) => {
   try {
     const userId = requireUserId(req);
-    const familyId = Number(req.params['id']);
+    const familyId = Number(req.params.id);
     const {username, email, password} = CreateChildSchema.parse(req.body);
 
     const membership = db
-      .prepare('SELECT role FROM family_members WHERE family_id = ? AND user_id = ?')
+      .prepare(
+        'SELECT role FROM family_members WHERE family_id = ? AND user_id = ?',
+      )
       .get(familyId, userId) as {role: 'parent' | 'child'} | undefined;
     if (!membership || membership.role !== 'parent') {
       return res.status(403).json({success: false, error: 'Forbidden'});
@@ -112,7 +126,8 @@ router.post('/:id/children', async (req, res) => {
     const existing = db
       .prepare('SELECT 1 FROM users WHERE email = ? OR username = ?')
       .get(email, username);
-    if (existing) return res.status(409).json({success: false, error: 'User exists'});
+    if (existing)
+      return res.status(409).json({success: false, error: 'User exists'});
 
     const passwordHash = await bcrypt.hash(password, 12);
     const user = db
@@ -121,11 +136,9 @@ router.post('/:id/children', async (req, res) => {
       )
       .get(username, email, passwordHash) as {id: number};
 
-    db.prepare('INSERT INTO family_members (family_id, user_id, role) VALUES (?, ?, ?)').run(
-      familyId,
-      user.id,
-      'child',
-    );
+    db.prepare(
+      'INSERT INTO family_members (family_id, user_id, role) VALUES (?, ?, ?)',
+    ).run(familyId, user.id, 'child');
 
     return res.status(201).json({success: true, message: 'Child created'});
   } catch (error) {
@@ -160,4 +173,3 @@ router.get('/mine', (req, res) => {
       .json({success: false, error: (error as any).message || 'Server error'});
   }
 });
-

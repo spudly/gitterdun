@@ -54,6 +54,7 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
               </div>
               {user ? (
                 <button
+                  type="button"
                   onClick={() => logout()}
                   className="text-sm text-red-600 border px-2 py-1 rounded"
                 >

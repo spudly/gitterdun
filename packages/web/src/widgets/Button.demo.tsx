@@ -1,5 +1,5 @@
 import {FC, useState} from 'react';
-import Button from './Button.js';
+import {Button} from './Button.js';
 
 const ButtonDemo: FC = () => {
   const [loading, setLoading] = useState(false);

@@ -1,6 +1,6 @@
 import {FC} from 'react';
-import EmptyState from './EmptyState.js';
-import Button from './Button.js';
+import {EmptyState} from './EmptyState.js';
+import {Button} from './Button.js';
 
 const EmptyStateDemo: FC = () => {
   return (

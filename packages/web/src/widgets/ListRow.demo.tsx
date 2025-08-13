@@ -1,8 +1,8 @@
 import {FC} from 'react';
-import ListRow from './ListRow.js';
-import StatusDot from './StatusDot.js';
-import Badge from './Badge.js';
-import Button from './Button.js';
+import {ListRow} from './ListRow.js';
+import {StatusDot} from './StatusDot.js';
+import {Badge} from './Badge.js';
+import {Button} from './Button.js';
 
 const ListRowDemo: FC = () => {
   return (

@@ -1,5 +1,5 @@
 import {FC} from 'react';
-import AvatarCircle from './AvatarCircle.js';
+import {AvatarCircle} from './AvatarCircle.js';
 
 const AvatarCircleDemo: FC = () => {
   return (

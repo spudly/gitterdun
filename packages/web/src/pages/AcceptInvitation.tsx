@@ -5,13 +5,12 @@ import {invitationsApi} from '../lib/api.js';
 const AcceptInvitation: FC = () => {
   const [params] = useSearchParams();
   const token = params.get('token') || '';
-  const emailHint = '';
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage(null);
     try {
@@ -22,7 +21,7 @@ const AcceptInvitation: FC = () => {
       } else {
         setMessage('Failed to accept');
       }
-    } catch (err) {
+    } catch (_err) {
       setMessage('Failed to accept');
     }
   };
@@ -36,28 +35,36 @@ const AcceptInvitation: FC = () => {
       <h2 className="text-2xl font-semibold mb-4">Accept Invitation</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Username
+          <label
+            className="block text-sm font-medium text-gray-700"
+            htmlFor="username"
+          >
+            <span>Username</span>
+            <input
+              id="username"
+              className="mt-1 w-full border rounded px-3 py-2"
+              value={username}
+              onChange={e => setUsername(e.target.value)}
+              required
+            />
           </label>
-          <input
-            className="mt-1 w-full border rounded px-3 py-2"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
-            required
-          />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Password
+          <label
+            className="block text-sm font-medium text-gray-700"
+            htmlFor="password"
+          >
+            <span>Password</span>
+            <input
+              id="password"
+              type="password"
+              className="mt-1 w-full border rounded px-3 py-2"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+              minLength={6}
+            />
           </label>
-          <input
-            type="password"
-            className="mt-1 w-full border rounded px-3 py-2"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-            minLength={6}
-          />
         </div>
         {message && <div className="text-sm text-gray-600">{message}</div>}
         <button

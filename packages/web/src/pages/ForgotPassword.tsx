@@ -6,7 +6,7 @@ const ForgotPassword: FC = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage(null);
     try {
@@ -24,16 +24,20 @@ const ForgotPassword: FC = () => {
       <h2 className="text-2xl font-semibold mb-4">Forgot Password</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Email
+          <label
+            className="block text-sm font-medium text-gray-700"
+            htmlFor="email"
+          >
+            <span>Email</span>
+            <input
+              id="email"
+              type="email"
+              className="mt-1 w-full border rounded px-3 py-2"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+            />
           </label>
-          <input
-            type="email"
-            className="mt-1 w-full border rounded px-3 py-2"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-          />
         </div>
         <button
           type="submit"

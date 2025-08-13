@@ -1,5 +1,5 @@
 import {FC} from 'react';
-import StatusDot from './StatusDot.js';
+import {StatusDot} from './StatusDot.js';
 
 const StatusDotDemo: FC = () => {
   return (

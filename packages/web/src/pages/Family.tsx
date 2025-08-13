@@ -1,4 +1,4 @@
-import {FC, useEffect, useMemo, useState} from 'react';
+import {FC, useEffect, useState} from 'react';
 import {useQuery, useMutation} from '@tanstack/react-query';
 import {familiesApi, invitationsApi} from '../lib/api.js';
 import {useUser} from '../hooks/useUser.js';
@@ -92,6 +92,7 @@ const Family: FC = () => {
             onChange={e => setNewFamilyName(e.target.value)}
           />
           <button
+            type="button"
             className="bg-indigo-600 text-white px-3 py-1 rounded"
             onClick={() => {
               if (!newFamilyName.trim()) {
@@ -146,6 +147,7 @@ const Family: FC = () => {
                   onChange={e => setChildPassword(e.target.value)}
                 />
                 <button
+                  type="button"
                   className="bg-indigo-600 text-white px-3 py-1 rounded"
                   onClick={() => {
                     if (!childUsername || !childEmail || !childPassword) {
@@ -187,6 +189,7 @@ const Family: FC = () => {
                   <option value="child">Child</option>
                 </select>
                 <button
+                  type="button"
                   className="bg-indigo-600 text-white px-3 py-1 rounded"
                   onClick={() => {
                     if (!inviteEmail) {

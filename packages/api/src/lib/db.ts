@@ -1,4 +1,5 @@
 import Database from 'better-sqlite3';
+import type * as BetterSqlite3 from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 
@@ -14,7 +15,7 @@ if (!fs.existsSync(dataDir)) {
 }
 
 // Create database connection
-const db = new Database(resolvedDbPath);
+const db: BetterSqlite3.Database = new Database(resolvedDbPath);
 
 // Enable foreign keys
 db.pragma('foreign_keys = ON');

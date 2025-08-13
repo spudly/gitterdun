@@ -9,7 +9,7 @@ const Login: FC = () => {
   const [message, setMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage(null);
     try {
@@ -25,28 +25,36 @@ const Login: FC = () => {
       <h2 className="text-2xl font-semibold mb-4">Login</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Email
+          <label
+            className="block text-sm font-medium text-gray-700"
+            htmlFor="email"
+          >
+            <span>Email</span>
+            <input
+              id="email"
+              type="email"
+              className="mt-1 w-full border rounded px-3 py-2"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+            />
           </label>
-          <input
-            type="email"
-            className="mt-1 w-full border rounded px-3 py-2"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-          />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Password
+          <label
+            className="block text-sm font-medium text-gray-700"
+            htmlFor="password"
+          >
+            <span>Password</span>
+            <input
+              id="password"
+              type="password"
+              className="mt-1 w-full border rounded px-3 py-2"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+            />
           </label>
-          <input
-            type="password"
-            className="mt-1 w-full border rounded px-3 py-2"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-          />
         </div>
         {message && (
           <div className="text-sm text-red-600" role="alert">

@@ -17,12 +17,10 @@ test.describe('Family page', () => {
     // Select first actual family if options exist
     const familySelect = page.locator('select');
     if (await familySelect.count()) {
-      const options = await familySelect.first().locator('option').all();
-      if (options.length > 1) {
-        const val = await options[1].getAttribute('value');
-        if (val) {
-          await familySelect.first().selectOption(val);
-        }
+      const firstSelect = familySelect.first();
+      const optionCount = await firstSelect.locator('option').count();
+      if (optionCount > 1) {
+        await firstSelect.selectOption({index: 1});
       }
     }
     const membersPanel = page.getByText('Members');

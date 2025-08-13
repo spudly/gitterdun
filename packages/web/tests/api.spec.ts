@@ -1,19 +1,24 @@
-import { test, expect } from '@playwright/test';
+import {test, expect} from '@playwright/test';
 
 test.describe('API wrappers (browser, real server)', () => {
-  test('covers auth, families, leaderboard, goals, chores APIs', async ({ page }) => {
+  test('covers auth, families, leaderboard, goals, chores APIs', async ({
+    page,
+  }) => {
     // Load app and expose api module from source via Vite dev server
     await page.goto('/');
     await page.evaluate(async () => {
-      // @ts-ignore
-      (window as any).__api = await import('/src/lib/api.ts');
+      // @ts-expect-error Vite serves TS modules in the browser at this path
+      (window as any).__api = await import('/src/lib/api.ts'); // eslint-disable-line import/extensions, import/no-absolute-path
     });
     await page.waitForFunction(() => !!(window as any).__api);
 
     // Login as seeded admin
     const loginRes = await page.evaluate(async () => {
       // @ts-ignore
-      return await (window as any).__api.authApi.login({ email: 'admin@gitterdun.com', password: 'admin123' });
+      return await (window as any).__api.authApi.login({
+        email: 'admin@gitterdun.com',
+        password: 'admin123',
+      });
     });
     expect(loginRes.success).toBeTruthy();
 
@@ -42,24 +47,45 @@ test.describe('API wrappers (browser, real server)', () => {
     // Leaderboard
     const lb = await page.evaluate(async () => {
       // @ts-ignore
-      return await (window as any).__api.leaderboardApi.get({ limit: 5, sortBy: 'points' });
+      return await (window as any).__api.leaderboardApi.get({
+        limit: 5,
+        sortBy: 'points',
+      });
     });
     expect(lb.success).toBeTruthy();
 
     // Exercise api.ts error branches safely to cover functions
-    const results = await page.evaluate(async (uid: number) => {
+    const results = await page.evaluate(async (_uid: number) => {
       const out: Record<string, any> = {};
       const api = (window as any).__api;
       // Goals getAll missing uid -> 400
-      try { out.g_bad = await api.goalsApi.getAll({}); } catch(e){ out.g_bad = 'error'; }
+      try {
+        out['g_bad'] = await api.goalsApi.getAll({});
+      } catch (_e) {
+        out['g_bad'] = 'error';
+      }
       // Chores getById invalid -> 400/404
-      try { out.c_bad = await api.choresApi.getById(-1); } catch(e){ out.c_bad = 'error'; }
+      try {
+        out['c_bad'] = await api.choresApi.getById(-1);
+      } catch (_e) {
+        out['c_bad'] = 'error';
+      }
       // Auth forgot + reset invalids
-      try { out.forgot = await api.authApi.forgotPassword({ email: 'x@y.z' }); } catch(e){ out.forgot = 'error'; }
-      try { out.reset = await api.authApi.resetPassword({ token: '', password: 'abc123' }); } catch(e){ out.reset = 'error'; }
+      try {
+        out['forgot'] = await api.authApi.forgotPassword({email: 'x@y.z'});
+      } catch (_e) {
+        out['forgot'] = 'error';
+      }
+      try {
+        out['reset'] = await api.authApi.resetPassword({
+          token: '',
+          password: 'abc123',
+        });
+      } catch (_e) {
+        out['reset'] = 'error';
+      }
       return out;
     }, adminId);
     expect(results).toBeTruthy();
   });
 });
-

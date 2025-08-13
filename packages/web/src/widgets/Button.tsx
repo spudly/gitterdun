@@ -44,6 +44,7 @@ export const Button: FC<ButtonProps> = ({
 
   return (
     <button
+      type="button"
       className={`${base} ${VARIANT_CLASSNAMES[variant]} ${SIZE_CLASSNAMES[size]} ${width} ${className}`}
       disabled={disabled || loading}
       {...rest}

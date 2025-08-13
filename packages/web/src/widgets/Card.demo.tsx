@@ -1,5 +1,5 @@
 import {FC} from 'react';
-import Card from './Card.js';
+import {Card} from './Card.js';
 
 const CardDemo: FC = () => {
   return (

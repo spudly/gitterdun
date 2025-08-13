@@ -1,5 +1,4 @@
 import express from 'express';
-import db from '../lib/db';
 import crypto from 'crypto';
 import {z} from 'zod';
 import {
@@ -7,17 +6,28 @@ import {
   AcceptInvitationSchema,
 } from '@gitterdun/shared';
 import bcrypt from 'bcryptjs';
+import db from '../lib/db';
 
 const router = express.Router();
 
 const getCookie = (req: express.Request, name: string): string | undefined => {
-  const cookieHeader = req.headers['cookie'];
-  if (!cookieHeader) return undefined;
-  const cookies = cookieHeader
+  const cookieHeader = req.headers.cookie;
+  if (!cookieHeader) {
+    return undefined;
+  }
+  const cookieString = Array.isArray(cookieHeader)
+    ? cookieHeader.join(';')
+    : cookieHeader;
+  const cookies = cookieString
     .split(';')
     .reduce<Record<string, string>>((acc, part) => {
-      const [k, ...rest] = part.trim().split('=');
-      acc[decodeURIComponent(k)] = decodeURIComponent(rest.join('='));
+      const [rawKey, ...rest] = part.trim().split('=');
+      if (!rawKey) {
+        return acc;
+      }
+      const key = decodeURIComponent(rawKey);
+      const value = decodeURIComponent(rest.join('=') || '');
+      acc[key] = value;
       return acc;
     }, {});
   return cookies[name];
@@ -29,7 +39,8 @@ const requireUserId = (req: express.Request): number => {
   const session = db
     .prepare('SELECT user_id, expires_at FROM sessions WHERE id = ?')
     .get(sid) as {user_id: number; expires_at: string} | undefined;
-  if (!session) throw Object.assign(new Error('Not authenticated'), {status: 401});
+  if (!session)
+    throw Object.assign(new Error('Not authenticated'), {status: 401});
   if (new Date(session.expires_at).getTime() < Date.now()) {
     db.prepare('DELETE FROM sessions WHERE id = ?').run(sid);
     throw Object.assign(new Error('Session expired'), {status: 401});
@@ -41,11 +52,13 @@ const requireUserId = (req: express.Request): number => {
 router.post('/:familyId', (req, res) => {
   try {
     const inviterId = requireUserId(req);
-    const familyId = Number(req.params['familyId']);
+    const familyId = Number(req.params.familyId);
     const {email, role} = CreateInvitationSchema.parse(req.body);
 
     const membership = db
-      .prepare('SELECT role FROM family_members WHERE family_id = ? AND user_id = ?')
+      .prepare(
+        'SELECT role FROM family_members WHERE family_id = ? AND user_id = ?',
+      )
       .get(familyId, inviterId) as {role: 'parent' | 'child'} | undefined;
     if (!membership || membership.role !== 'parent') {
       return res.status(403).json({success: false, error: 'Forbidden'});
@@ -93,8 +106,10 @@ router.post('/accept', async (req, res) => {
         }
       | undefined;
 
-    if (!inv) return res.status(400).json({success: false, error: 'Invalid token'});
-    if (inv.accepted) return res.status(400).json({success: false, error: 'Already used'});
+    if (!inv)
+      return res.status(400).json({success: false, error: 'Invalid token'});
+    if (inv.accepted)
+      return res.status(400).json({success: false, error: 'Already used'});
     if (new Date(inv.expires_at).getTime() < Date.now()) {
       return res.status(400).json({success: false, error: 'Token expired'});
     }
@@ -107,7 +122,10 @@ router.post('/accept', async (req, res) => {
     let userId: number;
     if (existing) {
       const ok = await bcrypt.compare(password, existing.password_hash);
-      if (!ok) return res.status(401).json({success: false, error: 'Invalid credentials'});
+      if (!ok)
+        return res
+          .status(401)
+          .json({success: false, error: 'Invalid credentials'});
       userId = existing.id;
     } else {
       const hash = await bcrypt.hash(password, 12);
@@ -121,17 +139,19 @@ router.post('/accept', async (req, res) => {
 
     // Add membership if not already
     const member = db
-      .prepare('SELECT 1 FROM family_members WHERE family_id = ? AND user_id = ?')
+      .prepare(
+        'SELECT 1 FROM family_members WHERE family_id = ? AND user_id = ?',
+      )
       .get(inv.family_id, userId);
     if (!member) {
-      db.prepare('INSERT INTO family_members (family_id, user_id, role) VALUES (?, ?, ?)').run(
-        inv.family_id,
-        userId,
-        inv.role,
-      );
+      db.prepare(
+        'INSERT INTO family_members (family_id, user_id, role) VALUES (?, ?, ?)',
+      ).run(inv.family_id, userId, inv.role);
     }
 
-    db.prepare('UPDATE family_invitations SET accepted = 1 WHERE token = ?').run(token);
+    db.prepare(
+      'UPDATE family_invitations SET accepted = 1 WHERE token = ?',
+    ).run(token);
 
     return res.json({success: true, message: 'Invitation accepted'});
   } catch (error) {
@@ -143,4 +163,3 @@ router.post('/accept', async (req, res) => {
       .json({success: false, error: (error as any).message || 'Server error'});
   }
 });
-

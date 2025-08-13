@@ -10,7 +10,7 @@ const ResetPassword: FC = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage(null);
     const token = params.get('token') || '';
@@ -36,30 +36,38 @@ const ResetPassword: FC = () => {
       <h2 className="text-2xl font-semibold mb-4">Reset Password</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            New Password
+          <label
+            className="block text-sm font-medium text-gray-700"
+            htmlFor="new-password"
+          >
+            <span>New Password</span>
+            <input
+              id="new-password"
+              type="password"
+              className="mt-1 w-full border rounded px-3 py-2"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+              minLength={6}
+            />
           </label>
-          <input
-            type="password"
-            className="mt-1 w-full border rounded px-3 py-2"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-            minLength={6}
-          />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Confirm Password
+          <label
+            className="block text-sm font-medium text-gray-700"
+            htmlFor="confirm-password"
+          >
+            <span>Confirm Password</span>
+            <input
+              id="confirm-password"
+              type="password"
+              className="mt-1 w-full border rounded px-3 py-2"
+              value={confirm}
+              onChange={e => setConfirm(e.target.value)}
+              required
+              minLength={6}
+            />
           </label>
-          <input
-            type="password"
-            className="mt-1 w-full border rounded px-3 py-2"
-            value={confirm}
-            onChange={e => setConfirm(e.target.value)}
-            required
-            minLength={6}
-          />
         </div>
         {message && <div className="text-sm text-gray-600">{message}</div>}
         <button

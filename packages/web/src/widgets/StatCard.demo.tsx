@@ -1,5 +1,5 @@
 import {FC} from 'react';
-import StatCard from './StatCard.js';
+import {StatCard} from './StatCard.js';
 
 const StatCardDemo: FC = () => {
   return (

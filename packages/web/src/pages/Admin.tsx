@@ -1,6 +1,7 @@
 import {FC, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {ChoreWithUsername} from '@gitterdun/shared';
+import {useNavigate} from 'react-router-dom';
 import {choresApi, familiesApi, invitationsApi} from '../lib/api.js';
 import {useUser} from '../hooks/useUser.js';
 
@@ -14,6 +15,13 @@ const Admin: FC = () => {
   });
 
   const chores = choresResponse?.data || [];
+
+  const [familyName, setFamilyName] = useState('');
+  const [message, setMessage] = useState<string | null>(null);
+  const [messageType, setMessageType] = useState<'success' | 'error' | null>(
+    null,
+  );
+  const navigate = useNavigate();
 
   if (!user || user.role !== 'admin') {
     return (
@@ -51,26 +59,50 @@ const Admin: FC = () => {
           <h2 className="text-lg font-medium text-gray-900 mb-4">
             Family Management
           </h2>
+          {message && (
+            <div
+              className={`mb-3 text-sm ${
+                messageType === 'success' ? 'text-green-700' : 'text-red-700'
+              }`}
+              role="alert"
+            >
+              {message}
+            </div>
+          )}
           <div className="flex gap-2 mb-3">
             <input
               className="border px-2 py-1 rounded flex-1"
               placeholder="Family name"
-              value={(undefined as unknown as string) || ''}
-              onChange={() => {}}
+              value={familyName}
+              onChange={e => setFamilyName(e.target.value)}
             />
             <button
+              type="button"
               className="bg-indigo-600 text-white px-3 py-1 rounded"
               onClick={async () => {
-                // This is a stub UI; replace with controlled input when wiring fully
-                const name = prompt('Family name?') || '';
-                if (!name) {
+                if (!familyName.trim()) {
                   return;
                 }
                 try {
-                  await familiesApi.create({name});
-                  alert('Family created');
-                } catch (e) {
-                  alert('Failed to create family');
+                  setMessage(null);
+                  setMessageType(null);
+                  const res = await familiesApi.create({
+                    name: familyName.trim(),
+                  });
+                  if (res.success) {
+                    setMessage('Family created. Redirecting...');
+                    setMessageType('success');
+                    setFamilyName('');
+                    setTimeout(() => {
+                      navigate('/family');
+                    }, 1200);
+                  } else {
+                    setMessage(res.error || 'Failed to create family');
+                    setMessageType('error');
+                  }
+                } catch (_e) {
+                  setMessage('Failed to create family');
+                  setMessageType('error');
                 }
               }}
             >
@@ -91,12 +123,13 @@ const Admin: FC = () => {
               <option value="child">Child</option>
             </select>
             <button
+              type="button"
               className="bg-indigo-600 text-white px-3 py-1 rounded"
               onClick={async e => {
                 const wrap = e.currentTarget
                   .parentElement as HTMLElement | null;
                 if (!wrap) {
-                  return;
+                  return undefined;
                 }
                 const [famIdEl, emailEl, roleEl] = Array.from(
                   wrap.querySelectorAll('input, select'),
@@ -105,16 +138,23 @@ const Admin: FC = () => {
                 const email = emailEl.value;
                 const role = roleEl.value as 'parent' | 'child';
                 if (!famId || !email) {
-                  return alert('Enter family ID and email');
+                  setMessage('Enter family ID and email');
+                  setMessageType('error');
+                  return undefined;
                 }
                 try {
+                  setMessage(null);
+                  setMessageType(null);
                   await invitationsApi.create(famId, {email, role});
-                  alert(
+                  setMessage(
                     'Invitation created (see server logs for token in dev)',
                   );
-                } catch (err) {
-                  alert('Failed to invite');
+                  setMessageType('success');
+                } catch (_err) {
+                  setMessage('Failed to invite');
+                  setMessageType('error');
                 }
+                return undefined;
               }}
             >
               Invite
