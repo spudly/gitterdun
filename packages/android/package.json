@@ -7,7 +7,6 @@
     "build": "echo 'No build scripts for Android'",
     "preview": "echo 'No preview scripts for Android'",
     "lint": "echo 'No lint scripts for Android'",
-    "test": "echo 'No test scripts for Android'",
-    "test:ci": "echo 'No test:ci scripts for Android'"
+    "test": "echo 'No test scripts for Android'"
   }
 }

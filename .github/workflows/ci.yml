@@ -25,12 +25,10 @@ jobs:
         working-directory: packages/web
         run: npm run test:install --if-present
 
-      - name: Run checks and tests in parallel
+      - name: Run Prettier check
+        run: npm run prettier:check
+
+      - name: Run checks and tests (Turbo)
         env:
           CI: true
-        run: |
-          npx concurrently -n build,prettier,eslint,tests -c blue,green,magenta,yellow,cyan,red \
-            "npm run build" \
-            "npm run prettier:check" \
-            "npm run lint" \
-            "npm run test:ci"
+        run: npx turbo run ci:check

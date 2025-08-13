@@ -5,4 +5,4 @@
 npm run lint-staged || exit 1
 
 # Run tests for all packages
-npm run test:ci || exit 1
+npm run test || exit 1

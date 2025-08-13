@@ -12,8 +12,7 @@
     "type-check": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:ci": "echo 'no tests yet (jest --ci)'"
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@gitterdun/shared": "file:../shared",

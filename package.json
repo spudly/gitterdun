@@ -15,7 +15,6 @@
     "start": "npm run start --workspace=packages/api",
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
-    "test:ci": "npm run test:ci --workspaces --if-present",
     "type-check": "npm run type-check --workspaces --if-present",
     "prettier": "prettier --write .",
     "prettier:check": "prettier --check .",
