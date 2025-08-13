@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import {FC} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {ChoreWithUsername} from '@gitterdun/shared';
 import {choresApi} from '../lib/api.js';

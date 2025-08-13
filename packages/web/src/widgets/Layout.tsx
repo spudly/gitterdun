@@ -2,19 +2,22 @@ import {FC, ReactNode} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import {useUser} from '../hooks/useUser.js';
 
-interface LayoutProps {
-  children: ReactNode;
+export interface NavigationItem {
+  name: string;
+  path: string;
+  icon?: ReactNode;
 }
 
-const Layout: FC<LayoutProps> = ({children}) => {
-  const location = useLocation();
-  const {user} = useUser();
+interface LayoutProps {
+  children: ReactNode;
+  navigation: NavigationItem[];
+}
 
-  const navigation = [
-    {name: 'Dashboard', path: '/', icon: '🏠'},
-    {name: 'Chores', path: '/chores', icon: '📋'},
-    {name: 'Goals', path: '/goals', icon: '🎯'},
-    {name: 'Leaderboard', path: '/leaderboard', icon: '🏆'},
+const Layout: FC<LayoutProps> = ({children, navigation}) => {
+  const location = useLocation();
+  const {user, logout} = useUser();
+  const computedNavigation: NavigationItem[] = [
+    ...navigation,
     ...(user?.role === 'admin'
       ? [{name: 'Admin', path: '/admin', icon: '⚙️'}]
       : []),
@@ -49,6 +52,18 @@ const Layout: FC<LayoutProps> = ({children}) => {
                   {user?.username || 'User'}
                 </span>
               </div>
+              {user ? (
+                <button
+                  onClick={() => logout()}
+                  className="text-sm text-red-600 border px-2 py-1 rounded"
+                >
+                  Logout
+                </button>
+              ) : (
+                <Link className="text-sm text-indigo-600" to="/login">
+                  Login
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -59,7 +74,7 @@ const Layout: FC<LayoutProps> = ({children}) => {
           {/* Sidebar Navigation */}
           <div className="w-64 flex-shrink-0">
             <nav className="space-y-1">
-              {navigation.map(item => {
+              {computedNavigation.map(item => {
                 const isActive = location.pathname === item.path;
                 return (
                   <Link

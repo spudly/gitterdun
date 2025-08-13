@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import {FC} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {ChoreWithUsername} from '@gitterdun/shared';
 import {choresApi} from '../lib/api.js';
@@ -28,7 +28,9 @@ const Dashboard: FC = () => {
       .reduce((sum: number, c: ChoreWithUsername) => sum + c.point_reward, 0);
   const getDueSoonChoresCount = () =>
     chores.filter((c: ChoreWithUsername) => {
-      if (!c.due_date) return false;
+      if (!c.due_date) {
+        return false;
+      }
       const dueDate = new Date(c.due_date);
       const now = new Date();
       const diffTime = dueDate.getTime() - now.getTime();

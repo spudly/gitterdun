@@ -11,6 +11,8 @@ import authRoutes from './routes/auth';
 import choreRoutes from './routes/chores';
 import goalRoutes from './routes/goals';
 import leaderboardRoutes from './routes/leaderboard';
+import familyRoutes from './routes/families';
+import invitationRoutes from './routes/invitations';
 
 // Load environment variables
 dotenv.config();
@@ -59,6 +61,8 @@ async function createServer() {
     app.use('/api/chores', choreRoutes);
     app.use('/api/goals', goalRoutes);
     app.use('/api/leaderboard', leaderboardRoutes);
+    app.use('/api/families', familyRoutes);
+    app.use('/api/invitations', invitationRoutes);
 
     // Health check endpoint
     app.get('/api/health', (_req: express.Request, res: express.Response) => {

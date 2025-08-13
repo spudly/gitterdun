@@ -1,7 +1,7 @@
-import { FC } from 'react';
+import {FC, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {ChoreWithUsername} from '@gitterdun/shared';
-import {choresApi} from '../lib/api.js';
+import {choresApi, familiesApi, invitationsApi} from '../lib/api.js';
 import {useUser} from '../hooks/useUser.js';
 
 const Admin: FC = () => {
@@ -45,6 +45,82 @@ const Admin: FC = () => {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Admin Panel</h1>
+
+        {/* Family Management for Parents */}
+        <div className="bg-white rounded-lg shadow p-6 mb-8">
+          <h2 className="text-lg font-medium text-gray-900 mb-4">
+            Family Management
+          </h2>
+          <div className="flex gap-2 mb-3">
+            <input
+              className="border px-2 py-1 rounded flex-1"
+              placeholder="Family name"
+              value={(undefined as unknown as string) || ''}
+              onChange={() => {}}
+            />
+            <button
+              className="bg-indigo-600 text-white px-3 py-1 rounded"
+              onClick={async () => {
+                // This is a stub UI; replace with controlled input when wiring fully
+                const name = prompt('Family name?') || '';
+                if (!name) {
+                  return;
+                }
+                try {
+                  await familiesApi.create({name});
+                  alert('Family created');
+                } catch (e) {
+                  alert('Failed to create family');
+                }
+              }}
+            >
+              Create Family
+            </button>
+          </div>
+          <div className="flex gap-2 items-center">
+            <input
+              className="border px-2 py-1 rounded"
+              placeholder="Family ID"
+            />
+            <input
+              className="border px-2 py-1 rounded flex-1"
+              placeholder="Invite email"
+            />
+            <select className="border px-2 py-1 rounded">
+              <option value="parent">Parent</option>
+              <option value="child">Child</option>
+            </select>
+            <button
+              className="bg-indigo-600 text-white px-3 py-1 rounded"
+              onClick={async e => {
+                const wrap = e.currentTarget
+                  .parentElement as HTMLElement | null;
+                if (!wrap) {
+                  return;
+                }
+                const [famIdEl, emailEl, roleEl] = Array.from(
+                  wrap.querySelectorAll('input, select'),
+                ) as [HTMLInputElement, HTMLInputElement, HTMLSelectElement];
+                const famId = Number(famIdEl.value);
+                const email = emailEl.value;
+                const role = roleEl.value as 'parent' | 'child';
+                if (!famId || !email) {
+                  return alert('Enter family ID and email');
+                }
+                try {
+                  await invitationsApi.create(famId, {email, role});
+                  alert(
+                    'Invitation created (see server logs for token in dev)',
+                  );
+                } catch (err) {
+                  alert('Failed to invite');
+                }
+              }}
+            >
+              Invite
+            </button>
+          </div>
+        </div>
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">

@@ -13,14 +13,10 @@ export const useUser = () => {
     queryKey: ['user'],
     queryFn: async (): Promise<User | null> => {
       try {
-        // Check if user is logged in by trying to get user info
-        // This would typically be a /api/auth/me endpoint
-        // For now, we'll check localStorage or session
-        const token = localStorage.getItem('authToken');
-        if (!token) return null;
-
-        // In a real app, you'd validate the token with the server
-        // For now, return null to indicate no user
+        const res = await authApi.me();
+        if (res.success && res.data) {
+          return res.data as unknown as User;
+        }
         return null;
       } catch (_error) {
         return null;
@@ -34,8 +30,6 @@ export const useUser = () => {
     mutationFn: authApi.login,
     onSuccess: response => {
       if (response.success && response.data) {
-        // Store auth token (in a real app, this would come from the response)
-        localStorage.setItem('authToken', 'dummy-token');
         queryClient.setQueryData(['user'], response.data);
       }
     },
@@ -45,8 +39,6 @@ export const useUser = () => {
     mutationFn: authApi.register,
     onSuccess: response => {
       if (response.success && response.data) {
-        // Store auth token (in a real app, this would come from the response)
-        localStorage.setItem('authToken', 'dummy-token');
         queryClient.setQueryData(['user'], response.data);
       }
     },
@@ -55,14 +47,13 @@ export const useUser = () => {
   const logoutMutation = useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
-      localStorage.removeItem('authToken');
       queryClient.setQueryData(['user'], null);
       queryClient.clear();
     },
   });
 
   const login = (email: string, password: string) => {
-    return loginMutation.mutate({email, password});
+    return loginMutation.mutateAsync({email, password});
   };
 
   const register = (
@@ -71,7 +62,7 @@ export const useUser = () => {
     password: string,
     role?: string,
   ) => {
-    return registerMutation.mutate({
+    return registerMutation.mutateAsync({
       username,
       email,
       password,
@@ -80,7 +71,7 @@ export const useUser = () => {
   };
 
   const logout = () => {
-    return logoutMutation.mutate();
+    return logoutMutation.mutateAsync();
   };
 
   return {
@@ -90,6 +81,9 @@ export const useUser = () => {
     login,
     register,
     logout,
+    forgotPassword: (email: string) => authApi.forgotPassword({email}),
+    resetPassword: (token: string, password: string) =>
+      authApi.resetPassword({token, password}),
     isLoggingIn: loginMutation.isPending,
     isRegistering: registerMutation.isPending,
     isLoggingOut: logoutMutation.isPending,

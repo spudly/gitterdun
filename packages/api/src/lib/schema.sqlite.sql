@@ -4,11 +4,28 @@ CREATE TABLE IF NOT EXISTS users (
   username TEXT UNIQUE NOT NULL,
   email TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
-  role TEXT NOT NULL DEFAULT 'user', -- 'admin' or 'user'
+  role TEXT NOT NULL DEFAULT 'user', -- 'admin' or 'user' (system-level; not family roles)
   points INTEGER DEFAULT 0,
   streak_count INTEGER DEFAULT 0,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Sessions table
+CREATE TABLE IF NOT EXISTS sessions (
+  id TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  expires_at DATETIME NOT NULL
+);
+
+-- Password reset tokens
+CREATE TABLE IF NOT EXISTS password_resets (
+  token TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  expires_at DATETIME NOT NULL,
+  used INTEGER DEFAULT 0
 );
 
 -- Chores table
@@ -118,6 +135,34 @@ CREATE INDEX IF NOT EXISTS idx_chore_assignments_chore_id ON chore_assignments(c
 CREATE INDEX IF NOT EXISTS idx_goals_user_id ON goals(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_is_read ON notifications(is_read);
+
+-- Families: group of users managed by a parent (owner)
+CREATE TABLE IF NOT EXISTS families (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  owner_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Membership of users within a family with family-specific roles
+CREATE TABLE IF NOT EXISTS family_members (
+  family_id INTEGER NOT NULL REFERENCES families(id) ON DELETE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  role TEXT NOT NULL CHECK (role IN ('parent','child')),
+  PRIMARY KEY (family_id, user_id)
+);
+
+-- Invitations to join a family
+CREATE TABLE IF NOT EXISTS family_invitations (
+  token TEXT PRIMARY KEY,
+  family_id INTEGER NOT NULL REFERENCES families(id) ON DELETE CASCADE,
+  email TEXT NOT NULL,
+  role TEXT NOT NULL CHECK (role IN ('parent','child')),
+  invited_by INTEGER NOT NULL REFERENCES users(id),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  expires_at DATETIME NOT NULL,
+  accepted INTEGER DEFAULT 0
+);
 
 -- Insert default badges
 INSERT OR IGNORE INTO badges (name, description, icon, points_required, streak_required) VALUES

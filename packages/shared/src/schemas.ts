@@ -8,8 +8,9 @@ export const UserSchema = z.object({
   role: z.enum(['admin', 'user']),
   points: z.number().int().min(0),
   streak_count: z.number().int().min(0),
-  created_at: z.string().datetime(),
-  updated_at: z.string().datetime(),
+  // Accept SQLite DATETIME strings (e.g., 'YYYY-MM-DD HH:MM:SS') as well as ISO
+  created_at: z.string(),
+  updated_at: z.string(),
 });
 
 export const CreateUserSchema = z.object({
@@ -29,6 +30,53 @@ export const UpdateUserSchema = z.object({
 export const LoginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
+});
+
+// Auth helper schemas
+export const ForgotPasswordRequestSchema = z.object({
+  email: z.string().email(),
+});
+
+export const ResetPasswordSchema = z.object({
+  token: z.string().min(1),
+  password: z.string().min(6),
+});
+
+// Family schemas
+export const FamilySchema = z.object({
+  id: z.number(),
+  name: z.string().min(1).max(100),
+  owner_id: z.number(),
+  created_at: z.string().datetime(),
+});
+
+export const CreateFamilySchema = z.object({
+  name: z.string().min(1).max(100),
+});
+
+export const FamilyMemberSchema = z.object({
+  family_id: z.number(),
+  user_id: z.number(),
+  role: z.enum(['parent', 'child']),
+  username: z.string(),
+  email: z.string().email(),
+});
+
+export const CreateChildSchema = z.object({
+  username: z.string().min(1).max(50),
+  email: z.string().email().max(255),
+  password: z.string().min(6),
+});
+
+export const CreateInvitationSchema = z.object({
+  email: z.string().email().max(255),
+  role: z.enum(['parent', 'child']),
+});
+
+export const AcceptInvitationSchema = z.object({
+  token: z.string().min(1),
+  username: z.string().min(1).max(50),
+  password: z.string().min(6),
 });
 
 // Chore schemas
@@ -249,6 +297,14 @@ export type User = z.infer<typeof UserSchema>;
 export type CreateUser = z.infer<typeof CreateUserSchema>;
 export type UpdateUser = z.infer<typeof UpdateUserSchema>;
 export type Login = z.infer<typeof LoginSchema>;
+export type ForgotPasswordRequest = z.infer<typeof ForgotPasswordRequestSchema>;
+export type ResetPasswordRequest = z.infer<typeof ResetPasswordSchema>;
+export type Family = z.infer<typeof FamilySchema>;
+export type CreateFamily = z.infer<typeof CreateFamilySchema>;
+export type FamilyMember = z.infer<typeof FamilyMemberSchema>;
+export type CreateChild = z.infer<typeof CreateChildSchema>;
+export type CreateInvitation = z.infer<typeof CreateInvitationSchema>;
+export type AcceptInvitation = z.infer<typeof AcceptInvitationSchema>;
 
 export type Chore = z.infer<typeof ChoreSchema>;
 export type ChoreWithUsername = z.infer<typeof ChoreWithUsernameSchema>;

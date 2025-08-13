@@ -1,5 +1,6 @@
 import {defineConfig} from 'vite';
 import react from '@vitejs/plugin-react';
+import istanbulVite from 'vite-plugin-istanbul';
 import {resolve} from 'path';
 
 export default defineConfig({
@@ -11,7 +12,24 @@ export default defineConfig({
           ['@babel/plugin-transform-react-jsx', {runtime: 'automatic'}],
         ],
       },
+      // Conditionally instrument code via Babel Istanbul when coverage is enabled
+      ...(process.env['VITE_COVERAGE']
+        ? {
+            babel: {
+              plugins: [
+                ['@babel/plugin-transform-react-jsx', {runtime: 'automatic'}],
+                ['istanbul', {include: ['src/**/*.ts', 'src/**/*.tsx']}],
+              ],
+            },
+          }
+        : {}),
     }),
+    // Add Vite Istanbul plugin when coverage is enabled
+    istanbulVite({
+      include: ['src/**/*'],
+      exclude: ['tests/**/*', 'node_modules/**/*'],
+      requireEnv: false,
+    }) as unknown as any,
   ],
   resolve: {alias: {'@': resolve(__dirname, './src')}},
   server: {

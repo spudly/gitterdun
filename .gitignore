@@ -39,3 +39,8 @@ yarn-error.log*
 .vscode
 
 data
+
+coverage
+.nyc_output
+playwright-report
+test-results

@@ -140,6 +140,19 @@ export const authApi = {
     }>('/auth/register', userData),
 
   logout: () => api.post('/auth/logout'),
+  me: () =>
+    api.get<{
+      id: number;
+      username: string;
+      email: string;
+      role: string;
+      points: number;
+      streak_count: number;
+    }>('/auth/me'),
+  forgotPassword: (payload: {email: string}) =>
+    api.post('/auth/forgot', payload),
+  resetPassword: (payload: {token: string; password: string}) =>
+    api.post('/auth/reset', payload),
 };
 
 // Chores API functions
@@ -292,6 +305,36 @@ export const leaderboardApi = {
       sortBy: string;
       totalUsers: number;
     }>('/leaderboard', params),
+};
+
+// Families API
+export const familiesApi = {
+  create: (data: {name: string}) => api.post('/families', data),
+  myFamilies: () =>
+    api.get<
+      Array<{id: number; name: string; owner_id: number; created_at: string}>
+    >('/families/mine'),
+  listMembers: (familyId: number) =>
+    api.get<
+      Array<{
+        family_id: number;
+        user_id: number;
+        role: 'parent' | 'child';
+        username: string;
+        email: string;
+      }>
+    >(`/families/${familyId}/members`),
+  createChild: (
+    familyId: number,
+    data: {username: string; email: string; password: string},
+  ) => api.post(`/families/${familyId}/children`, data),
+};
+
+export const invitationsApi = {
+  create: (familyId: number, data: {email: string; role: 'parent' | 'child'}) =>
+    api.post(`/invitations/${familyId}`, data),
+  accept: (data: {token: string; username: string; password: string}) =>
+    api.post('/invitations/accept', data),
 };
 
 export {ApiError};

@@ -1,8 +1,8 @@
 import {useQuery} from '@tanstack/react-query';
 import {Goal} from '@gitterdun/shared';
+import {FC} from 'react';
 import {goalsApi} from '../lib/api.js';
 import {useUser} from '../hooks/useUser.js';
-import { FC } from 'react';
 
 const Goals: FC = () => {
   const {user} = useUser();

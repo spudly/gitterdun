@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import {FC} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {leaderboardApi} from '../lib/api.js';
 
