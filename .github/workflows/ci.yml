@@ -29,18 +29,8 @@ jobs:
         env:
           CI: true
         run: |
-          npx concurrently -n prettier,eslint,ts,api-jest,shared-jest,playwright -c blue,green,magenta,yellow,cyan,red \
+          npx concurrently -n build,prettier,eslint,tests -c blue,green,magenta,yellow,cyan,red \
+            "npm run build" \
             "npm run prettier:check" \
             "npm run lint" \
-            "npm run type-check" \
-            "npm run -w packages/api test:ci" \
-            "npm run -w packages/shared test:ci" \
-            "npm run -w packages/web test:ci"
-
-      - name: Upload Playwright report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: packages/web/playwright-report
-
+            "npm run test:ci"

@@ -6,10 +6,10 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+    "dev": "turbo run dev",
     "dev:api": "npm run dev --workspace=packages/api",
     "dev:web": "npm run dev --workspace=packages/web",
-    "build": "npm run build --workspaces --if-present",
+    "build": "turbo run build",
     "build:api": "npm run build --workspace=packages/api",
     "build:web": "npm run build --workspace=packages/web",
     "start": "npm run start --workspace=packages/api",
@@ -37,7 +37,8 @@
     "jest-environment-jsdom": "^30.0.5",
     "lint-staged": "^16.1.5",
     "prettier": "^3.3.3",
-    "ts-jest": "^29.4.1"
+    "ts-jest": "^29.4.1",
+    "turbo": "^2.5.5"
   },
   "lint-staged": {
     "**/*.{ts,tsx,js,jsx,css,md,json}": [
@@ -47,5 +48,6 @@
   },
   "engines": {
     "node": ">=20.11.1"
-  }
+  },
+  "packageManager": "npm@10.2.4"
 }
