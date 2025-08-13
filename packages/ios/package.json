@@ -1,0 +1,11 @@
+{
+  "name": "@gitterdun/ios",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'No development scripts for ios'",
+    "build": "echo 'No build scripts for ios'",
+    "preview": "echo 'No preview scripts for ios'",
+    "lint": "echo 'No lint scripts for ios'"
+  }
+}

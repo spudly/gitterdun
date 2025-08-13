@@ -1,0 +1,11 @@
+{
+  "name": "@gitterdun/android",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'No development scripts for Android'",
+    "build": "echo 'No build scripts for Android'",
+    "preview": "echo 'No preview scripts for Android'",
+    "lint": "echo 'No lint scripts for Android'"
+  }
+}

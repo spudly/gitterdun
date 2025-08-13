@@ -1,27 +1,53 @@
 {
-  "name": "giterdone",
+  "name": "gitterdun-monorepo",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "next": "15.4.6"
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api": "npm run dev --workspace=packages/api",
+    "dev:web": "npm run dev --workspace=packages/web",
+    "build": "npm run build --workspaces",
+    "build:api": "npm run build --workspace=packages/api",
+    "build:web": "npm run build --workspace=packages/web",
+    "start": "npm run start --workspace=packages/api",
+    "lint": "npm run lint --workspaces",
+    "type-check": "npm run type-check --workspaces",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint-staged": "lint-staged"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
-    "eslint": "^9",
-    "eslint-config-next": "15.4.6",
-    "@eslint/eslintrc": "^3"
+    "@types/jest": "^30.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "concurrently": "^9.2.0",
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-typescript": "^18.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "husky": "^9.1.6",
+    "jest": "^30.0.5",
+    "jest-environment-jsdom": "^30.0.5",
+    "lint-staged": "^16.1.5",
+    "prettier": "^3.3.3",
+    "ts-jest": "^29.4.1"
+  },
+  "lint-staged": {
+    "**/*.{ts,tsx,js,jsx,css,md,json}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
+  },
+  "engines": {
+    "node": ">=20.11.1"
   }
 }
