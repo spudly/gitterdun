@@ -17,6 +17,23 @@ const COLOR_MAP: Record<StatusColor, string> = {
   gray: 'bg-gray-300',
 };
 
+export const getDotColorClass = (color?: StatusColor): string => {
+  switch (color) {
+    case 'green':
+      return COLOR_MAP.green;
+    case 'blue':
+      return COLOR_MAP.blue;
+    case 'yellow':
+      return COLOR_MAP.yellow;
+    case 'red':
+      return COLOR_MAP.red;
+    case 'gray':
+      return COLOR_MAP.gray;
+    default:
+      return COLOR_MAP.gray;
+  }
+};
+
 export const StatusDot: FC<StatusDotProps> = ({
   color = 'gray',
   size = 12,
@@ -27,7 +44,7 @@ export const StatusDot: FC<StatusDotProps> = ({
     <span
       role={label ? 'img' : undefined}
       aria-label={label}
-      className={`inline-block rounded-full ${COLOR_MAP[color]} ${className}`}
+      className={`inline-block rounded-full ${getDotColorClass(color)} ${className}`}
       style={{width: size, height: size}}
     />
   );

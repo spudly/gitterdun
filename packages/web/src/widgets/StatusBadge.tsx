@@ -27,6 +27,27 @@ const STATUS_STYLES: Record<StatusType, string> = {
   approved: 'bg-blue-100 text-blue-800',
 };
 
+export const getStatusClass = (status: StatusType): string => {
+  switch (status) {
+    case 'success':
+      return STATUS_STYLES.success;
+    case 'error':
+      return STATUS_STYLES.error;
+    case 'warning':
+      return STATUS_STYLES.warning;
+    case 'info':
+      return STATUS_STYLES.info;
+    case 'pending':
+      return STATUS_STYLES.pending;
+    case 'completed':
+      return STATUS_STYLES.completed;
+    case 'approved':
+      return STATUS_STYLES.approved;
+    default:
+      return STATUS_STYLES.info;
+  }
+};
+
 const SIZE_STYLES = {
   sm: 'px-2 py-0.5 text-xs',
   md: 'px-2.5 py-0.5 text-sm',
@@ -41,7 +62,7 @@ export const StatusBadge: FC<StatusBadgeProps> = ({
 }) => {
   const baseStyles = clsx(
     'inline-flex items-center rounded-full font-medium',
-    STATUS_STYLES[status],
+    getStatusClass(status),
     SIZE_STYLES[size],
     className,
   );

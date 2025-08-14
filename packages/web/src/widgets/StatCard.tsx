@@ -13,6 +13,25 @@ const COLOR_BG: Record<StatColor, string> = {
   gray: 'bg-gray-100 text-gray-600',
 };
 
+export const getStatColorClass = (color?: StatColor): string => {
+  switch (color) {
+    case 'blue':
+      return COLOR_BG.blue;
+    case 'yellow':
+      return COLOR_BG.yellow;
+    case 'green':
+      return COLOR_BG.green;
+    case 'red':
+      return COLOR_BG.red;
+    case 'purple':
+      return COLOR_BG.purple;
+    case 'gray':
+      return COLOR_BG.gray;
+    default:
+      return COLOR_BG.gray;
+  }
+};
+
 export interface StatCardProps {
   icon?: ReactNode;
   label: ReactNode;
@@ -29,7 +48,9 @@ export const StatCard: FC<StatCardProps> = ({
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex items-center">
-        <div className={clsx('p-2 rounded-lg', COLOR_BG[color])}>{icon}</div>
+        <div className={clsx('p-2 rounded-lg', getStatColorClass(color))}>
+          {icon}
+        </div>
         <div className="ml-4">
           <Text as="p" size="sm" weight="medium" muted>
             {label}

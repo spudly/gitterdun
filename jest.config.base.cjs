@@ -13,7 +13,11 @@ module.exports = {
     '**/*.{ts,tsx,js,jsx}',
     '!**/node_modules/**',
     '!**/dist/**',
+    '!**/*.demo.*',
   ],
-  moduleNameMapper: {},
-  testMatch: ['<rootDir>/src/**/__tests__/**/*.(spec|test).(ts|js)'],
+  moduleNameMapper: {'^(\\.{1,2}/.*)\\.js$': '$1'},
+  testMatch: [
+    '<rootDir>/src/**/__tests__/**/*.(spec|test).(ts|tsx|js|jsx)',
+    '<rootDir>/src/**/*.(spec|test).(ts|tsx|js|jsx)',
+  ],
 };

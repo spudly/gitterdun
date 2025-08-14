@@ -20,6 +20,16 @@ const SIZE_STYLES = {
   full: 'max-w-full mx-4',
 };
 
+export const isOverlayKey = (key: string): boolean =>
+  key === 'Enter' || key === ' ';
+
+export const shouldCloseOnOverlayClick = (
+  closeOnOverlayClick: boolean,
+  isSelfTarget: boolean,
+): boolean => {
+  return closeOnOverlayClick && isSelfTarget;
+};
+
 export const Modal: FC<ModalProps> = ({
   isOpen,
   onClose,
@@ -53,7 +63,12 @@ export const Modal: FC<ModalProps> = ({
   }
 
   const handleOverlayClick = (e: React.MouseEvent) => {
-    if (closeOnOverlayClick && e.target === e.currentTarget) {
+    if (
+      shouldCloseOnOverlayClick(
+        closeOnOverlayClick,
+        e.target === e.currentTarget,
+      )
+    ) {
       onClose();
     }
   };
@@ -65,7 +80,7 @@ export const Modal: FC<ModalProps> = ({
           className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
           onClick={handleOverlayClick}
           onKeyDown={e => {
-            if (e.key === 'Enter' || e.key === ' ') {
+            if (isOverlayKey(e.key)) {
               handleOverlayClick(e as any);
             }
           }}

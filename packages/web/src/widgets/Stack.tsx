@@ -14,15 +14,10 @@ const GAP_MAP: Record<StackGap, string> = {
 export interface StackProps {
   children: ReactNode;
   gap?: StackGap;
-  className?: string;
 }
 
-export const Stack: FC<StackProps> = ({
-  children,
-  gap = 'md',
-  className = '',
-}) => {
-  return <div className={clsx(GAP_MAP[gap], className)}>{children}</div>;
+export const Stack: FC<StackProps> = ({children, gap = 'md'}) => {
+  return <div className={clsx(GAP_MAP[gap])}>{children}</div>;
 };
 
 export default Stack;

@@ -11,6 +11,30 @@ const DENSITY: Record<Density, string> = {
   normal: 'space-y-2',
 };
 
+export const getIndentClass = (indent?: Indent): string => {
+  switch (indent) {
+    case 'sm':
+      return INDENT.sm;
+    case 'md':
+      return INDENT.md;
+    case 'lg':
+      return INDENT.lg;
+    default:
+      return INDENT.md;
+  }
+};
+
+export const getDensityClass = (density?: Density): string => {
+  switch (density) {
+    case 'tight':
+      return DENSITY.tight;
+    case 'normal':
+      return DENSITY.normal;
+    default:
+      return DENSITY.tight;
+  }
+};
+
 export interface BulletListProps {
   children: ReactNode;
   indent?: Indent;
@@ -22,10 +46,10 @@ export const BulletList: FC<BulletListProps> = ({
   indent = 'md',
   density = 'tight',
 }) => {
+  const indentClass = getIndentClass(indent);
+  const densityClass = getDensityClass(density);
   return (
-    <ul className={clsx('list-disc', INDENT[indent], DENSITY[density])}>
-      {children}
-    </ul>
+    <ul className={clsx('list-disc', indentClass, densityClass)}>{children}</ul>
   );
 };
 

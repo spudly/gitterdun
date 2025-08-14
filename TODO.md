@@ -7,3 +7,4 @@
 - [ ] IconButton demo has duplicate code (SVGs). Clean that up and make sure
       other stuff isn't duplicated.
 - [ ] Use padding/gap. Do not use margins
+- [ ] Use `test` instead of `it` for jest tests
