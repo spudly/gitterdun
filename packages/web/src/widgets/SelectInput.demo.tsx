@@ -7,7 +7,12 @@ const SelectInputDemo: FC = () => {
   return (
     <div className="space-y-4" data-testid="SelectInputDemo">
       <FormField label="Role" htmlFor="role">
-        <SelectInput id="role" value={v} onChange={val => setV(val)}>
+        <SelectInput
+          id="role"
+          value={v}
+          onChange={val => setV(val)}
+          data-testid="roleSelect"
+        >
           <option value="">Select</option>
           <option value="parent">Parent</option>
           <option value="child">Child</option>

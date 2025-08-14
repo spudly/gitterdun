@@ -1,5 +1,6 @@
 import express from 'express';
 import compression from 'compression';
+import cors from 'cors';
 import helmet from 'helmet';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -48,6 +49,9 @@ async function createServer() {
     );
 
     app.use(compression());
+    if (!isProduction) {
+      app.use(cors({origin: [/^http:\/\/localhost:\d+$/], credentials: true}));
+    }
     app.use(express.json({limit: '10mb'}));
     app.use(express.urlencoded({extended: true, limit: '10mb'}));
 

@@ -14,4 +14,12 @@ test.describe('Button demo', () => {
     await expect(toggle).toBeDisabled();
     await toggle.click({force: true});
   });
+
+  test('fullWidth and size variants render correctly', async ({page}) => {
+    await page.goto('/__demos/Button');
+    await expect(page.getByRole('button', {name: 'Full width'})).toBeVisible();
+    await expect(page.getByRole('button', {name: 'Small'})).toBeVisible();
+    await expect(page.getByRole('button', {name: 'Medium'})).toBeVisible();
+    await expect(page.getByRole('button', {name: 'Large'})).toBeVisible();
+  });
 });

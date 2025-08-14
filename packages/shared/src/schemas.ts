@@ -47,7 +47,9 @@ export const FamilySchema = z.object({
   id: z.number(),
   name: z.string().min(1).max(100),
   owner_id: z.number(),
-  created_at: z.string().datetime(),
+  // Accept SQLite DATETIME strings (e.g., 'YYYY-MM-DD HH:MM:SS')
+  // Use plain string to be lenient for server responses
+  created_at: z.string(),
 });
 
 export const CreateFamilySchema = z.object({

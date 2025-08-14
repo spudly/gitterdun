@@ -12,6 +12,7 @@ const ProgressBarDemo: FC = () => {
         max="100"
         value={v}
         onChange={e => setV(Number(e.target.value))}
+        aria-label="Progress"
       />
     </div>
   );

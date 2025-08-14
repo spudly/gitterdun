@@ -1,5 +1,7 @@
 // API utility functions using native fetch
-const API_BASE_URL = '/api';
+// Prefer hitting the API server directly rather than relying on the Vite proxy
+const API_ORIGIN = (import.meta as any).env?.VITE_API_ORIGIN ?? 'http://localhost:3000';
+const API_BASE_URL = `${API_ORIGIN}/api`;
 
 interface ApiResponse<T = any> {
   success: boolean;
@@ -40,12 +42,7 @@ export const api = {
     endpoint: string,
     params?: Record<string, any>,
   ): Promise<ApiResponse<T>> {
-    const url = new URL(
-      `${API_BASE_URL}${endpoint}`,
-      typeof window !== 'undefined'
-        ? window.location.origin
-        : 'http://localhost:3000',
-    );
+    const url = new URL(`${API_BASE_URL}${endpoint}`);
 
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
