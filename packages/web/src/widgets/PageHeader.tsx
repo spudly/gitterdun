@@ -1,4 +1,5 @@
 import {FC, ReactNode} from 'react';
+import clsx from 'clsx';
 
 export interface PageHeaderProps {
   title: ReactNode;
@@ -14,7 +15,7 @@ export const PageHeader: FC<PageHeaderProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`mb-8 ${className}`}>
+    <div className={clsx('mb-8', className)}>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">{title}</h1>

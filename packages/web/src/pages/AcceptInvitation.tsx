@@ -1,6 +1,12 @@
 import {FC, useState} from 'react';
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import {invitationsApi} from '../lib/api.js';
+import {FormCard} from '../widgets/FormCard.js';
+import {FormField} from '../widgets/FormField.js';
+import {TextInput} from '../widgets/TextInput.js';
+import {Button} from '../widgets/Button.js';
+import {Alert} from '../widgets/Alert.js';
+import {Stack} from '../widgets/Stack.js';
 
 const AcceptInvitation: FC = () => {
   const [params] = useSearchParams();
@@ -31,50 +37,34 @@ const AcceptInvitation: FC = () => {
   }
 
   return (
-    <div className="max-w-md mx-auto bg-white rounded-lg shadow p-6">
-      <h2 className="text-2xl font-semibold mb-4">Accept Invitation</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label
-            className="block text-sm font-medium text-gray-700"
-            htmlFor="username"
-          >
-            <span>Username</span>
-            <input
+    <FormCard title="Accept Invitation">
+      <form onSubmit={handleSubmit}>
+        <Stack gap="md">
+          <FormField label="Username" htmlFor="username" required>
+            <TextInput
               id="username"
-              className="mt-1 w-full border rounded px-3 py-2"
               value={username}
-              onChange={e => setUsername(e.target.value)}
+              onChange={v => setUsername(v)}
               required
             />
-          </label>
-        </div>
-        <div>
-          <label
-            className="block text-sm font-medium text-gray-700"
-            htmlFor="password"
-          >
-            <span>Password</span>
-            <input
+          </FormField>
+          <FormField label="Password" htmlFor="password" required>
+            <TextInput
               id="password"
               type="password"
-              className="mt-1 w-full border rounded px-3 py-2"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={v => setPassword(v)}
               required
               minLength={6}
             />
-          </label>
-        </div>
-        {message && <div className="text-sm text-gray-600">{message}</div>}
-        <button
-          type="submit"
-          className="w-full bg-indigo-600 text-white py-2 rounded"
-        >
-          Accept Invitation
-        </button>
+          </FormField>
+          {message && <Alert type="info">{message}</Alert>}
+          <Button type="submit" fullWidth>
+            Accept Invitation
+          </Button>
+        </Stack>
       </form>
-    </div>
+    </FormCard>
   );
 };
 

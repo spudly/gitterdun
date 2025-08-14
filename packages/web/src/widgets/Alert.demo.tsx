@@ -1,0 +1,77 @@
+import {FC, useState} from 'react';
+import {Alert} from './Alert.js';
+
+const AlertDemo: FC = () => {
+  const [dismissibleAlert, setDismissibleAlert] = useState(true);
+
+  return (
+    <div className="space-y-4 p-4">
+      <h2 className="text-2xl font-bold">Alert Component</h2>
+
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">All Alert Types</h3>
+
+        <Alert type="success">
+          This is a success alert with a helpful message.
+        </Alert>
+
+        <Alert type="error">
+          This is an error alert showing something went wrong.
+        </Alert>
+
+        <Alert type="warning">This is a warning alert to draw attention.</Alert>
+
+        <Alert type="info">
+          This is an info alert with general information.
+        </Alert>
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">With Titles</h3>
+
+        <Alert type="success" title="Success!">
+          Your changes have been saved successfully.
+        </Alert>
+
+        <Alert type="error" title="Error Occurred">
+          There was a problem processing your request.
+        </Alert>
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Dismissible Alert</h3>
+
+        {dismissibleAlert && (
+          <Alert
+            type="info"
+            title="Dismissible Alert"
+            onDismiss={() => setDismissibleAlert(false)}
+          >
+            This alert can be dismissed by clicking the X button.
+          </Alert>
+        )}
+
+        <button
+          type="button"
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+          onClick={() => setDismissibleAlert(true)}
+        >
+          Show Alert Again
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Custom Styling</h3>
+
+        <Alert
+          type="warning"
+          className="border-2 border-yellow-400 bg-yellow-100"
+        >
+          This alert has custom styling applied.
+        </Alert>
+      </div>
+    </div>
+  );
+};
+
+export default AlertDemo;

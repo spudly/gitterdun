@@ -1,4 +1,6 @@
 import {FC, ReactNode} from 'react';
+import clsx from 'clsx';
+import {Text} from './Text.js';
 
 type StatColor = 'blue' | 'yellow' | 'green' | 'red' | 'purple' | 'gray';
 
@@ -27,10 +29,14 @@ export const StatCard: FC<StatCardProps> = ({
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex items-center">
-        <div className={`p-2 rounded-lg ${COLOR_BG[color]}`}>{icon}</div>
+        <div className={clsx('p-2 rounded-lg', COLOR_BG[color])}>{icon}</div>
         <div className="ml-4">
-          <p className="text-sm font-medium text-gray-600">{label}</p>
-          <p className="text-2xl font-semibold text-gray-900">{value}</p>
+          <Text as="p" size="sm" weight="medium" muted>
+            {label}
+          </Text>
+          <Text as="p" size="lg" weight="semibold">
+            {value}
+          </Text>
         </div>
       </div>
     </div>

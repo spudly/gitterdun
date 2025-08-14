@@ -1,5 +1,10 @@
 import {FC} from 'react';
-import {Link, useParams} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
+import {TextLink} from '../widgets/TextLink.js';
+import {Text} from '../widgets/Text.js';
+import {PageContainer} from '../widgets/PageContainer.js';
+import {Stack} from '../widgets/Stack.js';
+import {BulletList} from '../widgets/BulletList.js';
 import ButtonDemo from '../widgets/Button.demo.js';
 import CardDemo from '../widgets/Card.demo.js';
 import BadgeDemo from '../widgets/Badge.demo.js';
@@ -40,29 +45,27 @@ const Demos: FC = () => {
   if (name && registry[name]) {
     const Demo = registry[name];
     return (
-      <div className="max-w-5xl mx-auto p-6">
-        <div className="mb-4">
-          <Link className="text-indigo-600" to="/__demos">
-            ← All demos
-          </Link>
-        </div>
-        <Demo />
-      </div>
+      <PageContainer variant="wide">
+        <Stack gap="md">
+          <TextLink to="/__demos">← All demos</TextLink>
+          <Demo />
+        </Stack>
+      </PageContainer>
     );
   }
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-4">Widget Demos</h1>
-      <ul className="list-disc ml-6 space-y-1">
+    <PageContainer variant="wide">
+      <Text as="h1" size="2xl" weight="semibold">
+        Widget Demos
+      </Text>
+      <BulletList indent="md" density="tight">
         {Object.keys(registry).map(key => (
           <li key={key}>
-            <Link className="text-indigo-600" to={`/__demos/${key}`}>
-              {key}
-            </Link>
+            <TextLink to={`/__demos/${key}`}>{key}</TextLink>
           </li>
         ))}
-      </ul>
-    </div>
+      </BulletList>
+    </PageContainer>
   );
 };
 

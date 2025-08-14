@@ -4,6 +4,32 @@ import {ChoreWithUsername} from '@gitterdun/shared';
 import {useNavigate} from 'react-router-dom';
 import {choresApi, familiesApi, invitationsApi} from '../lib/api.js';
 import {useUser} from '../hooks/useUser.js';
+import {PageContainer} from '../widgets/PageContainer.js';
+import {PageHeader} from '../widgets/PageHeader.js';
+import {GridContainer} from '../widgets/GridContainer.js';
+import {StatCard} from '../widgets/StatCard.js';
+import {Card} from '../widgets/Card.js';
+import {List} from '../widgets/List.js';
+import {ListRow} from '../widgets/ListRow.js';
+import {StatusDot} from '../widgets/StatusDot.js';
+import {StatusBadge} from '../widgets/StatusBadge.js';
+import {Badge} from '../widgets/Badge.js';
+import {Button} from '../widgets/Button.js';
+import {FormSection} from '../widgets/FormSection.js';
+import {TextInput} from '../widgets/TextInput.js';
+import {SelectInput} from '../widgets/SelectInput.js';
+import {Alert} from '../widgets/Alert.js';
+import {PageLoading} from '../widgets/PageLoading.js';
+import {Text} from '../widgets/Text.js';
+import {Toolbar} from '../widgets/Toolbar.js';
+import {Stack} from '../widgets/Stack.js';
+import {InlineMeta} from '../widgets/InlineMeta.js';
+import {
+  DocIcon,
+  ClockIcon,
+  CheckCircleIcon,
+  SparklesIcon,
+} from '../widgets/icons.js';
 
 const Admin: FC = () => {
   const {user} = useUser();
@@ -22,63 +48,51 @@ const Admin: FC = () => {
     null,
   );
   const navigate = useNavigate();
+  const [inviteFamIdAdmin, setInviteFamIdAdmin] = useState<string>('');
+  const [inviteEmailAdmin, setInviteEmailAdmin] = useState<string>('');
+  const [inviteRoleAdmin, setInviteRoleAdmin] = useState<'parent' | 'child'>(
+    'parent',
+  );
 
   if (!user || user.role !== 'admin') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Access Denied
-          </h1>
-          <p className="text-gray-600">
-            You need admin privileges to view this page.
-          </p>
-        </div>
-      </div>
+      <PageContainer variant="centered">
+        <Card padded>
+          <PageHeader title="Access Denied" />
+          <Text muted>You need admin privileges to view this page.</Text>
+        </Card>
+      </PageContainer>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto" />
-          <p className="mt-4 text-gray-600">Loading admin panel...</p>
-        </div>
-      </div>
+      <PageContainer variant="centered">
+        <PageLoading message="Loading admin panel..." />
+      </PageContainer>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Admin Panel</h1>
+    <PageContainer>
+      <PageHeader title="Admin Panel" />
 
-        {/* Family Management for Parents */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">
-            Family Management
-          </h2>
+      <Stack gap="lg">
+        {/* Family Management */}
+        <FormSection title="Family Management">
           {message && (
-            <div
-              className={`mb-3 text-sm ${
-                messageType === 'success' ? 'text-green-700' : 'text-red-700'
-              }`}
-              role="alert"
-            >
+            <Alert type={messageType === 'success' ? 'success' : 'error'}>
               {message}
-            </div>
+            </Alert>
           )}
-          <div className="flex gap-2 mb-3">
-            <input
-              className="border px-2 py-1 rounded flex-1"
+          <Toolbar>
+            <TextInput
               placeholder="Family name"
               value={familyName}
-              onChange={e => setFamilyName(e.target.value)}
+              onChange={v => setFamilyName(v)}
             />
-            <button
+            <Button
               type="button"
-              className="bg-indigo-600 text-white px-3 py-1 rounded"
               onClick={async () => {
                 if (!familyName.trim()) {
                   return;
@@ -93,9 +107,7 @@ const Admin: FC = () => {
                     setMessage('Family created. Redirecting...');
                     setMessageType('success');
                     setFamilyName('');
-                    setTimeout(() => {
-                      navigate('/family');
-                    }, 1200);
+                    setTimeout(() => navigate('/family'), 1200);
                   } else {
                     setMessage(res.error || 'Failed to create family');
                     setMessageType('error');
@@ -107,281 +119,178 @@ const Admin: FC = () => {
               }}
             >
               Create Family
-            </button>
-          </div>
-          <div className="flex gap-2 items-center">
-            <input
-              className="border px-2 py-1 rounded"
+            </Button>
+          </Toolbar>
+          <Toolbar>
+            <TextInput
               placeholder="Family ID"
+              value={inviteFamIdAdmin}
+              onChange={v => setInviteFamIdAdmin(v)}
             />
-            <input
-              className="border px-2 py-1 rounded flex-1"
+            <TextInput
               placeholder="Invite email"
+              value={inviteEmailAdmin}
+              onChange={v => setInviteEmailAdmin(v)}
             />
-            <select className="border px-2 py-1 rounded">
+            <SelectInput
+              value={inviteRoleAdmin}
+              onChange={v => setInviteRoleAdmin(v as 'parent' | 'child')}
+            >
               <option value="parent">Parent</option>
               <option value="child">Child</option>
-            </select>
-            <button
+            </SelectInput>
+            <Button
               type="button"
-              className="bg-indigo-600 text-white px-3 py-1 rounded"
-              onClick={async e => {
-                const wrap = e.currentTarget
-                  .parentElement as HTMLElement | null;
-                if (!wrap) {
-                  return undefined;
-                }
-                const [famIdEl, emailEl, roleEl] = Array.from(
-                  wrap.querySelectorAll('input, select'),
-                ) as [HTMLInputElement, HTMLInputElement, HTMLSelectElement];
-                const famId = Number(famIdEl.value);
-                const email = emailEl.value;
-                const role = roleEl.value as 'parent' | 'child';
-                if (!famId || !email) {
+              onClick={async () => {
+                const famId = Number(inviteFamIdAdmin);
+                if (!famId || !inviteEmailAdmin) {
                   setMessage('Enter family ID and email');
                   setMessageType('error');
-                  return undefined;
+                  return;
                 }
                 try {
                   setMessage(null);
                   setMessageType(null);
-                  await invitationsApi.create(famId, {email, role});
+                  await invitationsApi.create(famId, {
+                    email: inviteEmailAdmin,
+                    role: inviteRoleAdmin,
+                  });
                   setMessage(
                     'Invitation created (see server logs for token in dev)',
                   );
                   setMessageType('success');
+                  setInviteEmailAdmin('');
                 } catch (_err) {
                   setMessage('Failed to invite');
                   setMessageType('error');
                 }
-                return undefined;
               }}
             >
               Invite
-            </button>
-          </div>
-        </div>
+            </Button>
+          </Toolbar>
+        </FormSection>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <svg
-                  className="w-6 h-6 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">
-                  Total Chores
-                </p>
-                <p className="text-2xl font-semibold text-gray-900">
-                  {chores.length}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <svg
-                  className="w-6 h-6 text-yellow-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">
-                  Pending Approval
-                </p>
-                <p className="text-2xl font-semibold text-gray-900">
-                  {
-                    chores.filter(
-                      (c: ChoreWithUsername) => c.status === 'completed',
-                    ).length
-                  }
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <svg
-                  className="w-6 h-6 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Approved</p>
-                <p className="text-2xl font-semibold text-gray-900">
-                  {
-                    chores.filter(
-                      (c: ChoreWithUsername) => c.status === 'approved',
-                    ).length
-                  }
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <svg
-                  className="w-6 h-6 text-purple-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-                  />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">
-                  Bonus Chores
-                </p>
-                <p className="text-2xl font-semibold text-gray-900">
-                  {
-                    chores.filter(
-                      (c: ChoreWithUsername) => c.chore_type === 'bonus',
-                    ).length
-                  }
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <GridContainer cols={4} gap="lg">
+          <StatCard
+            color="blue"
+            label="Total Chores"
+            value={chores.length}
+            icon={<DocIcon />}
+          />
+          <StatCard
+            color="yellow"
+            label="Pending Approval"
+            value={
+              chores.filter((c: ChoreWithUsername) => c.status === 'completed')
+                .length
+            }
+            icon={<ClockIcon />}
+          />
+          <StatCard
+            color="green"
+            label="Approved"
+            value={
+              chores.filter((c: ChoreWithUsername) => c.status === 'approved')
+                .length
+            }
+            icon={<CheckCircleIcon />}
+          />
+          <StatCard
+            color="purple"
+            label="Bonus Chores"
+            value={
+              chores.filter((c: ChoreWithUsername) => c.chore_type === 'bonus')
+                .length
+            }
+            icon={<SparklesIcon />}
+          />
+        </GridContainer>
 
         {/* Chores Management */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">
+        <Card
+          header={
+            <Text as="h2" size="lg" weight="medium">
               Chores Management
-            </h2>
-          </div>
-          <div className="divide-y divide-gray-200">
+            </Text>
+          }
+        >
+          <List>
             {chores.map((chore: ChoreWithUsername) => (
-              <div key={chore.id} className="px-6 py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div
-                      className={`w-3 h-3 rounded-full mr-3 ${
+              <ListRow
+                key={chore.id}
+                left={
+                  <StatusDot
+                    color={
+                      chore.status === 'completed'
+                        ? 'green'
+                        : chore.status === 'approved'
+                          ? 'blue'
+                          : 'yellow'
+                    }
+                    size={12}
+                  />
+                }
+                title={chore.title}
+                titleRight={
+                  <>
+                    <StatusBadge
+                      status={
                         chore.status === 'completed'
-                          ? 'bg-green-500'
+                          ? 'completed'
                           : chore.status === 'approved'
-                            ? 'bg-blue-500'
-                            : 'bg-yellow-500'
-                      }`}
-                    />
-                    <div>
-                      <div className="flex items-center">
-                        <h3 className="text-sm font-medium text-gray-900">
-                          {chore.title}
-                        </h3>
-                        <span
-                          className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            chore.status === 'completed'
-                              ? 'bg-green-100 text-green-800'
-                              : chore.status === 'approved'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-yellow-100 text-yellow-800'
-                          }`}
-                        >
-                          {chore.status}
-                        </span>
-                        {chore.chore_type === 'bonus' && (
-                          <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                            Bonus
-                          </span>
-                        )}
-                      </div>
-                      {chore.description && (
-                        <p className="text-sm text-gray-500 mt-1">
-                          {chore.description}
-                        </p>
-                      )}
-                      <div className="flex items-center mt-2 space-x-4 text-sm text-gray-500">
-                        <span>Points: {chore.point_reward}</span>
-                        {chore.bonus_points > 0 && (
-                          <span>Bonus: +{chore.bonus_points}</span>
-                        )}
-                        {chore.penalty_points > 0 && (
-                          <span>Penalty: -{chore.penalty_points}</span>
-                        )}
-                        {chore.due_date && (
-                          <span>
-                            Due: {new Date(chore.due_date).toLocaleDateString()}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
+                            ? 'approved'
+                            : 'pending'
+                      }
+                    >
+                      {chore.status}
+                    </StatusBadge>
+                    {chore.chore_type === 'bonus' && (
+                      <Badge variant="purple">Bonus</Badge>
+                    )}
+                  </>
+                }
+                description={chore.description}
+                right={
+                  <Toolbar>
                     {chore.status === 'completed' && (
                       <>
-                        <button
-                          type="button"
-                          className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
-                        >
+                        <Button size="sm" variant="primary">
                           Approve
-                        </button>
-                        <button
-                          type="button"
-                          className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
-                        >
+                        </Button>
+                        <Button size="sm" variant="danger">
                           Reject
-                        </button>
+                        </Button>
                       </>
                     )}
-                    <button
-                      type="button"
-                      className="inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                    >
+                    <Button size="sm" variant="secondary">
                       Edit
-                    </button>
-                  </div>
-                </div>
-              </div>
+                    </Button>
+                  </Toolbar>
+                }
+                meta={
+                  <InlineMeta>
+                    <span>Points: {chore.point_reward}</span>
+                    {chore.bonus_points > 0 && (
+                      <span>Bonus: +{chore.bonus_points}</span>
+                    )}
+                    {chore.penalty_points > 0 && (
+                      <span>Penalty: -{chore.penalty_points}</span>
+                    )}
+                    {chore.due_date && (
+                      <span>
+                        Due: {new Date(chore.due_date).toLocaleDateString()}
+                      </span>
+                    )}
+                  </InlineMeta>
+                }
+              />
             ))}
-          </div>
-        </div>
-      </div>
-    </div>
+          </List>
+        </Card>
+      </Stack>
+    </PageContainer>
   );
 };
 

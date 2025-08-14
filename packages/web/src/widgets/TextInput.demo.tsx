@@ -9,7 +9,7 @@ const TextInputDemo: FC = () => {
       <FormField
         label="Email"
         htmlFor="email"
-        help="We'll never share your email."
+        helpText="We'll never share your email."
       >
         <TextInput
           id="email"
@@ -25,7 +25,7 @@ const TextInputDemo: FC = () => {
       <FormField
         label="With error"
         htmlFor="with-error"
-        error={value ? null : 'Required'}
+        {...(value ? {} : {error: 'Required'})}
       >
         <TextInput
           id="with-error"

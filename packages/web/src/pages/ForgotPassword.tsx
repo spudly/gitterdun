@@ -1,5 +1,11 @@
 import {FC, useState} from 'react';
 import {useUser} from '../hooks/useUser.js';
+import {FormCard} from '../widgets/FormCard.js';
+import {FormField} from '../widgets/FormField.js';
+import {TextInput} from '../widgets/TextInput.js';
+import {Button} from '../widgets/Button.js';
+import {Alert} from '../widgets/Alert.js';
+import {Stack} from '../widgets/Stack.js';
 
 const ForgotPassword: FC = () => {
   const {forgotPassword} = useUser();
@@ -20,34 +26,27 @@ const ForgotPassword: FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white rounded-lg shadow p-6">
-      <h2 className="text-2xl font-semibold mb-4">Forgot Password</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label
-            className="block text-sm font-medium text-gray-700"
-            htmlFor="email"
-          >
-            <span>Email</span>
-            <input
-              id="email"
-              type="email"
-              className="mt-1 w-full border rounded px-3 py-2"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-            />
-          </label>
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-indigo-600 text-white py-2 rounded"
-        >
-          Send reset link
-        </button>
-      </form>
-      {message && <p className="mt-4 text-sm text-gray-600">{message}</p>}
-    </div>
+    <FormCard title="Forgot Password">
+      <Stack gap="md">
+        <form onSubmit={handleSubmit}>
+          <Stack gap="md">
+            <FormField label="Email" htmlFor="email" required>
+              <TextInput
+                id="email"
+                type="email"
+                value={email}
+                onChange={v => setEmail(v)}
+                required
+              />
+            </FormField>
+            <Button type="submit" fullWidth>
+              Send reset link
+            </Button>
+          </Stack>
+        </form>
+        {message && <Alert type="info">{message}</Alert>}
+      </Stack>
+    </FormCard>
   );
 };
 

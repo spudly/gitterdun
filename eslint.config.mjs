@@ -9,6 +9,7 @@ import style from 'eslint-config-airbnb-base/rules/style';
 import variables from 'eslint-config-airbnb-base/rules/variables';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import typescriptEslintParser from '@typescript-eslint/parser';
+import * as reactHooks from 'eslint-plugin-react-hooks';
 
 // TODO: get rid of these
 const {rules: baseBestPracticesRules} = bestPractices;
@@ -24,7 +25,7 @@ const __dirname = dirname(__filename);
 const compat = new FlatCompat({baseDirectory: __dirname});
 
 const eslintConfig = [
-  ...compat.extends('airbnb', 'airbnb/hooks'),
+  ...compat.extends('airbnb'),
   {
     plugins: {'@typescript-eslint': typescriptEslint},
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
@@ -356,8 +357,14 @@ const eslintConfig = [
       'react/jsx-curly-newline': 'off',
       'no-confusing-arrow': 'off', // not confusing to me
       'import/newline-after-import': 'off',
+      'no-trailing-spaces': 'off',
+      'react/jsx-first-prop-new-line': 'off',
+      'react/jsx-indent': 'off',
+      'react/jsx-indent-props': 'off',
     },
   },
+  // React Hooks RC + Compiler rule
+  reactHooks.configs.recommended,
   {
     files: ['**/*.ts', '**/*.tsx'],
     rules: {
@@ -387,6 +394,8 @@ const eslintConfig = [
       'import/no-named-as-default-member': 'off',
       // Disable `import/no-unresolved`, see README.md for details
       'import/no-unresolved': 'off',
+      // Enable React Compiler rule via react-hooks RC
+      'react-hooks/react-compiler': 'error',
     },
   },
   {
