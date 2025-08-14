@@ -22,10 +22,7 @@ const Goals: FC = () => {
 
   const {data: goalsResponse, isLoading} = useQuery({
     queryKey: ['goals'],
-    queryFn: () =>
-      user
-        ? goalsApi.getAll({user_id: user.id})
-        : Promise.resolve({success: true, data: []}),
+    queryFn: () => goalsApi.getAll({user_id: user!.id}),
     enabled: !!user,
   });
 

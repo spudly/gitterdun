@@ -101,7 +101,7 @@ const Dashboard: FC = () => {
             key={chore.id}
             title={chore.title}
             description={
-              <Text size="sm" muted>
+              <Text size="sm" muted as="span">
                 {chore.description || 'No description'}
               </Text>
             }

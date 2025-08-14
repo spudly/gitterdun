@@ -14,6 +14,7 @@ module.exports = {
     '!**/node_modules/**',
     '!**/dist/**',
     '!**/*.demo.*',
+    '!**/*.config.*',
   ],
   moduleNameMapper: {'^(\\.{1,2}/.*)\\.js$': '$1'},
   testMatch: [

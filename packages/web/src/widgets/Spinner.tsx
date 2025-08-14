@@ -37,5 +37,3 @@ export const Spinner: FC<SpinnerProps> = ({
   }
   return <div aria-label="loading" className={`mx-auto ${base}`} />;
 };
-
-export default Spinner;

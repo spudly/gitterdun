@@ -361,6 +361,7 @@ const eslintConfig = [
       'react/jsx-first-prop-new-line': 'off',
       'react/jsx-indent': 'off',
       'react/jsx-indent-props': 'off',
+      'max-len': 'off',
     },
   },
   // React Hooks RC + Compiler rule
