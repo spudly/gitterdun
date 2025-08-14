@@ -3,14 +3,23 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx,json,css}",
+        "*.config.{ts,tsx,js,jsx,json,css}"
+      ],
       "outputs": ["dist/**", "build/**", "lib/**"]
     },
-    "type-check": {"dependsOn": ["^build"]},
-    "lint": {"dependsOn": ["^build"]},
-    "test": {"dependsOn": ["^build"], "outputs": ["coverage/**"]},
+    "lint": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**/*.{ts,tsx,js,jsx,json,css}"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**/*.{ts,tsx,js,jsx,json,css}", "jest.config.js"],
+      "outputs": ["coverage/**"]
+    },
     "dev": {"dependsOn": ["^build"], "cache": false, "persistent": true},
-    "ci:check": {
-      "dependsOn": ["build", "lint", "prettier:check", "type-check", "test"]
-    }
+    "//#prettier:check": {"cache": false},
+    "ci:check": {"dependsOn": ["build", "lint", "//#prettier:check", "test"]}
   }
 }

@@ -52,9 +52,7 @@ export const FamilySchema = z.object({
   created_at: z.string(),
 });
 
-export const CreateFamilySchema = z.object({
-  name: z.string().min(1).max(100),
-});
+export const CreateFamilySchema = z.object({name: z.string().min(1).max(100)});
 
 export const FamilyMemberSchema = z.object({
   family_id: z.number(),

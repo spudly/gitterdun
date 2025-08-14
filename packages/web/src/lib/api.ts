@@ -1,6 +1,7 @@
 // API utility functions using native fetch
 // Prefer hitting the API server directly rather than relying on the Vite proxy
-const API_ORIGIN = (import.meta as any).env?.VITE_API_ORIGIN ?? 'http://localhost:3000';
+const API_ORIGIN =
+  (import.meta as any).env?.VITE_API_ORIGIN ?? 'http://localhost:3000';
 const API_BASE_URL = `${API_ORIGIN}/api`;
 
 interface ApiResponse<T = any> {

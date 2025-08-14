@@ -15,7 +15,7 @@
     "start": "npm run start --workspace=packages/api",
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
-    "type-check": "npm run type-check --workspaces --if-present",
+    "test:changed": "npm run test --workspaces --if-present -- --onlyChanged",
     "prettier": "prettier --write .",
     "prettier:check": "prettier --check .",
     "lint-staged": "lint-staged"
