@@ -322,6 +322,7 @@ const eslintConfig = [
             '**/protractor.conf.*.{js,jsx,ts,tsx}', // protractor config
             '**/karma.conf.{js,jsx,ts,tsx}', // karma config
             '**/.eslintrc.{js,jsx,ts,tsx}', // eslint config
+            '**/*.config.{js,jsx,ts,tsx}', // config files
           ],
           optionalDependencies: false,
         },

@@ -8,6 +8,7 @@ const CardDemo: FC = () => {
       <Card header={<div>Header</div>}>With header</Card>
       <Card footer={<div>Footer</div>}>With footer</Card>
       <Card elevated={false}>Bordered (flat)</Card>
+      <Card padded={false}>No Padding</Card>
     </div>
   );
 };

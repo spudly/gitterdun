@@ -22,6 +22,12 @@ const ButtonDemo: FC = () => {
           Toggle Loading
         </Button>
       </div>
+      <div className="space-x-2">
+        <Button leftIcon={<span aria-label="left">◀</span>}>Left Icon</Button>
+        <Button rightIcon={<span aria-label="right">▶</span>}>
+          Right Icon
+        </Button>
+      </div>
       <div>
         <Button fullWidth>Full width</Button>
       </div>

@@ -3,18 +3,19 @@ import {createRoot} from 'react-dom/client';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import Layout, {NavigationItem} from './widgets/Layout.js';
-import Spinner from './widgets/Spinner.js';
-const Dashboard = lazy(() => import('./pages/Dashboard.js'));
-const Chores = lazy(() => import('./pages/Chores.js'));
-const Goals = lazy(() => import('./pages/Goals.js'));
-const Leaderboard = lazy(() => import('./pages/Leaderboard.js'));
-const Admin = lazy(() => import('./pages/Admin.js'));
-const Login = lazy(() => import('./pages/Login.js'));
-const ForgotPassword = lazy(() => import('./pages/ForgotPassword.js'));
-const ResetPassword = lazy(() => import('./pages/ResetPassword.js'));
-const Family = lazy(() => import('./pages/Family.js'));
-const AcceptInvitation = lazy(() => import('./pages/AcceptInvitation.js'));
-const Demos = lazy(() => import('./pages/Demos.js'));
+import {Spinner} from './widgets/Spinner.js';
+
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Chores = lazy(() => import('./pages/Chores'));
+const Goals = lazy(() => import('./pages/Goals'));
+const Leaderboard = lazy(() => import('./pages/Leaderboard'));
+const Admin = lazy(() => import('./pages/Admin'));
+const Login = lazy(() => import('./pages/Login'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const Family = lazy(() => import('./pages/Family'));
+const AcceptInvitation = lazy(() => import('./pages/AcceptInvitation'));
+const Demos = lazy(() => import('./pages/Demos'));
 
 // Create a client
 const queryClient = new QueryClient({

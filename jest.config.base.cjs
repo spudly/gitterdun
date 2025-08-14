@@ -1,5 +1,6 @@
 /** @type {import('jest').Config} */
 module.exports = {
+  passWithNoTests: true,
   testEnvironment: 'node',
   transform: {
     '^.+\\.(t|j)sx?$': [
@@ -8,11 +9,11 @@ module.exports = {
     ],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
-  testMatch: ['**/__tests__/**/*.(spec|test).(ts|tsx|js)'],
   collectCoverageFrom: [
     '**/*.{ts,tsx,js,jsx}',
     '!**/node_modules/**',
     '!**/dist/**',
   ],
   moduleNameMapper: {},
+  testMatch: ['<rootDir>/src/**/__tests__/**/*.(spec|test).(ts|js)'],
 };

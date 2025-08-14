@@ -1,19 +1,16 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
-    "build": {"dependsOn": ["^build"], "outputs": ["dist/**", "build/**", "lib/**"]},
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", "build/**", "lib/**"]
+    },
     "type-check": {"dependsOn": ["^build"]},
     "lint": {"dependsOn": ["^build"]},
-    "test": {
-      "dependsOn": ["^build"],
-      "outputs": [
-        "coverage/**",
-        ".nyc_output/**",
-        "playwright-report/**",
-        "test-results/**"
-      ]
-    },
+    "test": {"dependsOn": ["^build"], "outputs": ["coverage/**"]},
     "dev": {"dependsOn": ["^build"], "cache": false, "persistent": true},
-    "ci:check": {"dependsOn": ["build", "lint", "type-check", "test"]}
+    "ci:check": {
+      "dependsOn": ["build", "lint", "prettier:check", "type-check", "test"]
+    }
   }
 }

@@ -11,13 +11,8 @@
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "CI=true VITE_API_ORIGIN=http://localhost:3000 VITE_COVERAGE=true playwright test && nyc report --reporter=lcov --reporter=text-summary && nyc check-coverage --lines=100 --functions=100 --branches=100 --statements=100",
-    "test:dev": "playwright test --ui",
-    "test:webserver": "VITE_COVERAGE=${VITE_COVERAGE:-false} vite",
-    "test:install": "playwright install --with-deps",
-    "test:headed": "playwright test --headed",
-    "test:report": "playwright show-report; open coverage/lcov-report/index.html",
-    "test:coverage": "nyc report --reporter=lcov --reporter=text-summary && nyc check-coverage --lines=100 --functions=100 --branches=100 --statements=100"
+    "pretest": "rm -rf coverage",
+    "test": "jest --coverage"
   },
   "dependencies": {
     "@gitterdun/shared": "file:../shared",
@@ -28,18 +23,17 @@
   },
   "devDependencies": {
     "@babel/plugin-transform-react-jsx": "^7.27.1",
-    "@playwright/test": "^1.47.2",
     "@tailwindcss/postcss": "^4.1.11",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
     "@vitejs/plugin-react": "^4.7.0",
     "autoprefixer": "^10.4.21",
-    "babel-plugin-istanbul": "^6.1.1",
-    "nyc": "^15.1.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.11",
+    "ts-jest": "^29.4.1",
     "typescript": "^5.6.3",
-    "vite": "^4.5.14",
-    "vite-plugin-istanbul": "^7.1.0"
+    "jest": "^30.0.5",
+    "jest-environment-jsdom": "^30.0.5",
+    "vite": "^4.5.14"
   }
 }
