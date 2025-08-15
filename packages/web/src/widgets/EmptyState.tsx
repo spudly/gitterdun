@@ -1,12 +1,13 @@
-import {FC, ReactNode} from 'react';
+import type {FC, ReactNode} from 'react';
+import clsx from 'clsx';
 
-export interface EmptyStateProps {
-  icon?: ReactNode;
-  title: ReactNode;
-  description?: ReactNode;
-  action?: ReactNode;
-  className?: string;
-}
+export type EmptyStateProps = {
+  readonly icon?: ReactNode;
+  readonly title: ReactNode;
+  readonly description?: ReactNode;
+  readonly action?: ReactNode;
+  readonly className?: string;
+};
 
 export const EmptyState: FC<EmptyStateProps> = ({
   icon,
@@ -16,10 +17,15 @@ export const EmptyState: FC<EmptyStateProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`text-center py-12 ${className}`}>
-      {icon && <div className="text-gray-400 mb-4">{icon}</div>}
+    <div className={clsx('text-center py-12', className)}>
+      {icon != null ? <div className="text-gray-400 mb-4">{icon}</div> : null}
+
       <h3 className="text-lg font-medium text-gray-900 mb-2">{title}</h3>
-      {description && <p className="text-gray-500 mb-4">{description}</p>}
+
+      {description != null ? (
+        <p className="text-gray-500 mb-4">{description}</p>
+      ) : null}
+
       {action}
     </div>
   );

@@ -1,4 +1,4 @@
-import {FC, ReactNode} from 'react';
+import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 import {Text} from './Text.js';
 
@@ -13,7 +13,7 @@ const COLOR_BG: Record<StatColor, string> = {
   gray: 'bg-gray-100 text-gray-600',
 };
 
-export const getStatColorClass = (color?: StatColor): string => {
+export const getStatColorClass = (color: StatColor = 'gray'): string => {
   switch (color) {
     case 'blue':
       return COLOR_BG.blue;
@@ -26,18 +26,17 @@ export const getStatColorClass = (color?: StatColor): string => {
     case 'purple':
       return COLOR_BG.purple;
     case 'gray':
-      return COLOR_BG.gray;
     default:
       return COLOR_BG.gray;
   }
 };
 
-export interface StatCardProps {
-  icon?: ReactNode;
-  label: ReactNode;
-  value: ReactNode;
-  color?: StatColor;
-}
+export type StatCardProps = {
+  readonly icon?: ReactNode;
+  readonly label: ReactNode;
+  readonly value: ReactNode;
+  readonly color?: StatColor;
+};
 
 export const StatCard: FC<StatCardProps> = ({
   icon,
@@ -51,10 +50,12 @@ export const StatCard: FC<StatCardProps> = ({
         <div className={clsx('p-2 rounded-lg', getStatColorClass(color))}>
           {icon}
         </div>
+
         <div className="ml-4">
-          <Text as="p" size="sm" weight="medium" muted>
+          <Text as="p" muted size="sm" weight="medium">
             {label}
           </Text>
+
           <Text as="p" size="lg" weight="semibold">
             {value}
           </Text>

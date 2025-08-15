@@ -1,12 +1,12 @@
-import {FC, ReactNode} from 'react';
+import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export interface PageHeaderProps {
-  title: ReactNode;
-  subtitle?: ReactNode;
-  actions?: ReactNode;
-  className?: string;
-}
+export type PageHeaderProps = {
+  readonly title: ReactNode;
+  readonly subtitle?: ReactNode;
+  readonly actions?: ReactNode;
+  readonly className?: string;
+};
 
 export const PageHeader: FC<PageHeaderProps> = ({
   title,
@@ -19,9 +19,15 @@ export const PageHeader: FC<PageHeaderProps> = ({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
-          {subtitle && <p className="text-gray-600 mt-1">{subtitle}</p>}
+
+          {subtitle != null ? (
+            <p className="text-gray-600 mt-1">{subtitle}</p>
+          ) : null}
         </div>
-        {actions && <div className="flex items-center gap-2">{actions}</div>}
+
+        {actions != null ? (
+          <div className="flex items-center gap-2">{actions}</div>
+        ) : null}
       </div>
     </div>
   );

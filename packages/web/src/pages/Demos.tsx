@@ -1,4 +1,4 @@
-import {FC} from 'react';
+import type {FC} from 'react';
 import {useParams} from 'react-router-dom';
 import {TextLink} from '../widgets/TextLink.js';
 import {Text} from '../widgets/Text.js';
@@ -42,12 +42,13 @@ const registry: Record<string, FC> = {
 const Demos: FC = () => {
   const params = useParams();
   const {name} = params;
-  if (name && registry[name]) {
+  if (name != null && name !== '' && registry[name]) {
     const Demo = registry[name];
     return (
       <PageContainer variant="wide">
         <Stack gap="md">
           <TextLink to="/__demos">← All demos</TextLink>
+
           <Demo />
         </Stack>
       </PageContainer>
@@ -55,10 +56,16 @@ const Demos: FC = () => {
   }
   return (
     <PageContainer variant="wide">
-      <Text as="h1" size="2xl" weight="semibold">
+      <Text as="h1"
+size="2xl"
+weight="semibold"
+      >
         Widget Demos
       </Text>
-      <BulletList indent="md" density="tight">
+
+      <BulletList density="tight"
+indent="md"
+      >
         {Object.keys(registry).map(key => (
           <li key={key}>
             <TextLink to={`/__demos/${key}`}>{key}</TextLink>

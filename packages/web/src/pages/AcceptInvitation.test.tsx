@@ -19,8 +19,8 @@ describe('AcceptInvitation page', () => {
 
   it('accepts invitation and navigates on success', async () => {
     jest.useFakeTimers();
-    const {invitationsApi}: any = apiModule;
-    invitationsApi.accept.mockResolvedValueOnce({success: true});
+    const mocked = jest.mocked(apiModule);
+    mocked.invitationsApi.accept.mockResolvedValueOnce({success: true});
     render(
       <MemoryRouter initialEntries={['/accept-invitation?token=abc']}>
         <AcceptInvitation />
@@ -47,8 +47,8 @@ describe('AcceptInvitation page', () => {
   });
 
   it('shows error when API fails', async () => {
-    const {invitationsApi}: any = apiModule;
-    invitationsApi.accept.mockRejectedValueOnce(new Error('fail'));
+    const mocked = jest.mocked(apiModule);
+    mocked.invitationsApi.accept.mockRejectedValueOnce(new Error('fail'));
     render(
       <MemoryRouter initialEntries={['/accept-invitation?token=abc']}>
         <AcceptInvitation />
@@ -71,8 +71,11 @@ describe('AcceptInvitation page', () => {
   });
 
   it('shows failure message when API returns success=false', async () => {
-    const {invitationsApi}: any = apiModule;
-    invitationsApi.accept.mockResolvedValueOnce({success: false, error: 'x'});
+    const mocked = jest.mocked(apiModule);
+    mocked.invitationsApi.accept.mockResolvedValueOnce({
+      success: false,
+      error: 'x',
+    });
     render(
       <MemoryRouter initialEntries={['/accept-invitation?token=abc']}>
         <AcceptInvitation />

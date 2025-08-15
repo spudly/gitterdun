@@ -52,7 +52,7 @@ describe('Leaderboard page', () => {
   });
 
   it('shows streak-based subtitle when sortBy is streak_count', async () => {
-    const {leaderboardApi}: any = apiModule;
+    const {leaderboardApi} = jest.mocked(apiModule);
     leaderboardApi.get.mockResolvedValueOnce({
       success: true,
       data: {

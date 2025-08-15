@@ -1,8 +1,9 @@
-import {FC} from 'react';
-import {Podium, PodiumItem} from './Podium.js';
+import type {FC} from 'react';
+import type {PodiumItem} from './Podium.js';
+import {Podium} from './Podium.js';
 
 const PodiumDemo: FC = () => {
-  const sampleLeaderboard: PodiumItem[] = [
+  const sampleLeaderboard: Array<PodiumItem> = [
     {
       id: 1,
       rank: 1,
@@ -32,7 +33,7 @@ const PodiumDemo: FC = () => {
     },
   ];
 
-  const customLeaderboard: PodiumItem[] = [
+  const customLeaderboard: Array<PodiumItem> = [
     {
       id: 'user-1',
       rank: 1,
@@ -68,31 +69,36 @@ const PodiumDemo: FC = () => {
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Leaderboard Podium</h3>
+
         <Podium items={sampleLeaderboard} />
       </div>
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Custom Podium</h3>
+
         <Podium items={customLeaderboard} />
       </div>
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Without Medals</h3>
+
         <Podium items={sampleLeaderboard} showMedals={false} />
       </div>
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Custom Styling</h3>
-        <Podium
-          items={sampleLeaderboard}
-          className="bg-gray-100 p-6 rounded-lg"
-        />
+
+        <div className="bg-gray-100 p-6 rounded-lg">
+          <Podium items={sampleLeaderboard} />
+        </div>
       </div>
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Usage Example</h3>
+
         <div className="bg-gray-50 p-6 rounded-lg">
           <h3 className="text-xl font-semibold mb-4">Monthly Leaderboard</h3>
+
           <Podium items={sampleLeaderboard} />
 
           <div className="text-center mt-6">

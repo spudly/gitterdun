@@ -1,6 +1,6 @@
-import {FC} from 'react';
+import type {FC} from 'react';
 import {useQuery} from '@tanstack/react-query';
-import {ChoreWithUsername} from '@gitterdun/shared';
+import type {ChoreWithUsername} from '@gitterdun/shared';
 import {choresApi} from '../lib/api.js';
 import {useUser} from '../hooks/useUser.js';
 import {PageContainer} from '../widgets/PageContainer.js';
@@ -18,11 +18,11 @@ const Dashboard: FC = () => {
 
   const {data: choresResponse, isLoading: choresLoading} = useQuery({
     queryKey: ['chores', 'dashboard'],
-    queryFn: () => choresApi.getAll({limit: 10}),
+    queryFn: async () => choresApi.getAll({limit: 10}),
     enabled: !!user,
   });
 
-  const chores = choresResponse?.data || [];
+  const chores = choresResponse?.data ?? [];
 
   const getCompletedChoresCount = () =>
     chores.filter((c: ChoreWithUsername) => c.status === 'completed').length;
@@ -37,7 +37,7 @@ const Dashboard: FC = () => {
       .reduce((sum: number, c: ChoreWithUsername) => sum + c.point_reward, 0);
   const getDueSoonChoresCount = () =>
     chores.filter((c: ChoreWithUsername) => {
-      if (!c.due_date) {
+      if (c.due_date == null) {
         return false;
       }
       const dueDate = new Date(c.due_date);
@@ -61,31 +61,31 @@ const Dashboard: FC = () => {
 
       <GridContainer cols={4} gap="lg">
         <StatCard
+          color="blue"
           icon={<CheckCircleIcon />}
           label="Completed Chores"
           value={getCompletedChoresCount()}
-          color="blue"
         />
 
         <StatCard
+          color="yellow"
           icon={<ClockIcon />}
           label="Pending Chores"
           value={getPendingChoresCount()}
-          color="yellow"
         />
 
         <StatCard
+          color="green"
           icon={<DocIcon />}
           label="Total Points"
           value={getTotalPoints()}
-          color="green"
         />
 
         <StatCard
+          color="red"
           icon={<ClockIcon />}
           label="Due Soon"
           value={getDueSoonChoresCount()}
-          color="red"
         />
       </GridContainer>
 
@@ -98,14 +98,14 @@ const Dashboard: FC = () => {
       >
         {chores.map((chore: ChoreWithUsername) => (
           <ListRow
-            key={chore.id}
-            title={chore.title}
             description={
-              <Text size="sm" muted as="span">
-                {chore.description || 'No description'}
+              <Text as="span" muted size="sm">
+                {chore.description ?? 'No description'}
               </Text>
             }
+            key={chore.id}
             right={<Text>{chore.point_reward} pts</Text>}
+            title={chore.title}
           />
         ))}
       </Card>

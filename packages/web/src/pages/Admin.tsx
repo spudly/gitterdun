@@ -1,6 +1,7 @@
-import {FC, useState} from 'react';
+import type {FC} from 'react';
+import { useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
-import {ChoreWithUsername} from '@gitterdun/shared';
+import type {ChoreWithUsername} from '@gitterdun/shared';
 import {useNavigate} from 'react-router-dom';
 import {choresApi, familiesApi, invitationsApi} from '../lib/api.js';
 import {useUser} from '../hooks/useUser.js';
@@ -24,6 +25,7 @@ import {Text} from '../widgets/Text.js';
 import {Toolbar} from '../widgets/Toolbar.js';
 import {Stack} from '../widgets/Stack.js';
 import {InlineMeta} from '../widgets/InlineMeta.js';
+import {useToast} from '../widgets/ToastProvider.js';
 import {
   DocIcon,
   ClockIcon,
@@ -36,11 +38,11 @@ const Admin: FC = () => {
 
   const {data: choresResponse, isLoading} = useQuery({
     queryKey: ['chores', 'admin'],
-    queryFn: () => choresApi.getAll(),
+    queryFn: async () => choresApi.getAll(),
     enabled: !!user && user.role === 'admin',
   });
 
-  const chores = choresResponse?.data || [];
+  const chores = choresResponse?.data ?? [];
 
   const [familyName, setFamilyName] = useState('');
   const [message, setMessage] = useState<string | null>(null);
@@ -53,12 +55,14 @@ const Admin: FC = () => {
   const [inviteRoleAdmin, setInviteRoleAdmin] = useState<'parent' | 'child'>(
     'parent',
   );
+  const {safeAsync} = useToast();
 
   if (!user || user.role !== 'admin') {
     return (
       <PageContainer variant="centered">
         <Card padded>
           <PageHeader title="Access Denied" />
+
           <Text muted>You need admin privileges to view this page.</Text>
         </Card>
       </PageContainer>
@@ -80,21 +84,24 @@ const Admin: FC = () => {
       <Stack gap="lg">
         {/* Family Management */}
         <FormSection title="Family Management">
-          {message && (
+          {message != null && message !== '' ? (
             <Alert type={messageType === 'success' ? 'success' : 'error'}>
               {message}
             </Alert>
-          )}
+          ) : null}
+
           <Toolbar>
             <TextInput
+              onChange={v => {
+                setFamilyName(v);
+              }}
               placeholder="Family name"
               value={familyName}
-              onChange={v => setFamilyName(v)}
             />
+
             <Button
-              type="button"
-              onClick={async () => {
-                if (!familyName.trim()) {
+              onClick={safeAsync(async () => {
+                if (familyName.trim() === '') {
                   return;
                 }
                 try {
@@ -107,43 +114,61 @@ const Admin: FC = () => {
                     setMessage('Family created. Redirecting...');
                     setMessageType('success');
                     setFamilyName('');
-                    setTimeout(() => navigate('/family'), 1200);
+                    setTimeout(() => {
+                      navigate('/family');
+                    }, 1200);
                   } else {
-                    setMessage(res.error || 'Failed to create family');
+                    setMessage(res.error ?? 'Failed to create family');
                     setMessageType('error');
                   }
                 } catch (_e) {
                   setMessage('Failed to create family');
                   setMessageType('error');
                 }
-              }}
+              }, 'Could not create family. Please try again.')}
+              type="button"
             >
               Create Family
             </Button>
           </Toolbar>
+
           <Toolbar>
             <TextInput
+              onChange={v => {
+                setInviteFamIdAdmin(v);
+              }}
               placeholder="Family ID"
               value={inviteFamIdAdmin}
-              onChange={v => setInviteFamIdAdmin(v)}
             />
+
             <TextInput
+              onChange={v => {
+                setInviteEmailAdmin(v);
+              }}
               placeholder="Invite email"
               value={inviteEmailAdmin}
-              onChange={v => setInviteEmailAdmin(v)}
             />
+
             <SelectInput
+              onChange={v => {
+                const role = v === 'parent' || v === 'child' ? v : 'parent';
+                setInviteRoleAdmin(role);
+              }}
               value={inviteRoleAdmin}
-              onChange={v => setInviteRoleAdmin(v as 'parent' | 'child')}
             >
               <option value="parent">Parent</option>
+
               <option value="child">Child</option>
             </SelectInput>
+
             <Button
-              type="button"
-              onClick={async () => {
+              onClick={safeAsync(async () => {
                 const famId = Number(inviteFamIdAdmin);
-                if (!famId || !inviteEmailAdmin) {
+                if (
+                  !Number.isFinite(famId)
+                  || famId <= 0
+                  || inviteEmailAdmin === ''
+                ) {
                   setMessage('Enter family ID and email');
                   setMessageType('error');
                   return;
@@ -164,7 +189,8 @@ const Admin: FC = () => {
                   setMessage('Failed to invite');
                   setMessageType('error');
                 }
-              }}
+              }, 'Could not create invitation. Please try again.')}
+              type="button"
             >
               Invite
             </Button>
@@ -175,36 +201,39 @@ const Admin: FC = () => {
         <GridContainer cols={4} gap="lg">
           <StatCard
             color="blue"
+            icon={<DocIcon />}
             label="Total Chores"
             value={chores.length}
-            icon={<DocIcon />}
           />
+
           <StatCard
             color="yellow"
+            icon={<ClockIcon />}
             label="Pending Approval"
             value={
               chores.filter((c: ChoreWithUsername) => c.status === 'completed')
                 .length
             }
-            icon={<ClockIcon />}
           />
+
           <StatCard
             color="green"
+            icon={<CheckCircleIcon />}
             label="Approved"
             value={
               chores.filter((c: ChoreWithUsername) => c.status === 'approved')
                 .length
             }
-            icon={<CheckCircleIcon />}
           />
+
           <StatCard
             color="purple"
+            icon={<SparklesIcon />}
             label="Bonus Chores"
             value={
               chores.filter((c: ChoreWithUsername) => c.chore_type === 'bonus')
                 .length
             }
-            icon={<SparklesIcon />}
           />
         </GridContainer>
 
@@ -219,6 +248,7 @@ const Admin: FC = () => {
           <List>
             {chores.map((chore: ChoreWithUsername) => (
               <ListRow
+                description={chore.description}
                 key={chore.id}
                 left={
                   <StatusDot
@@ -231,6 +261,44 @@ const Admin: FC = () => {
                     }
                     size={12}
                   />
+                }
+                meta={
+                  <InlineMeta>
+                    <span>Points: {chore.point_reward}</span>
+
+                    {chore.bonus_points > 0 && (
+                      <span>Bonus: +{chore.bonus_points}</span>
+                    )}
+
+                    {chore.penalty_points > 0 && (
+                      <span>Penalty: -{chore.penalty_points}</span>
+                    )}
+
+                    {chore.due_date != null ? (
+                      <span>
+                        Due: {new Date(chore.due_date).toLocaleDateString()}
+                      </span>
+                    ) : null}
+                  </InlineMeta>
+                }
+                right={
+                  <Toolbar>
+                    {chore.status === 'completed' && (
+                      <>
+                        <Button size="sm" variant="primary">
+                          Approve
+                        </Button>
+
+                        <Button size="sm" variant="danger">
+                          Reject
+                        </Button>
+                      </>
+                    )}
+
+                    <Button size="sm" variant="secondary">
+                      Edit
+                    </Button>
+                  </Toolbar>
                 }
                 title={chore.title}
                 titleRight={
@@ -246,44 +314,11 @@ const Admin: FC = () => {
                     >
                       {chore.status}
                     </StatusBadge>
+
                     {chore.chore_type === 'bonus' && (
                       <Badge variant="purple">Bonus</Badge>
                     )}
                   </>
-                }
-                description={chore.description}
-                right={
-                  <Toolbar>
-                    {chore.status === 'completed' && (
-                      <>
-                        <Button size="sm" variant="primary">
-                          Approve
-                        </Button>
-                        <Button size="sm" variant="danger">
-                          Reject
-                        </Button>
-                      </>
-                    )}
-                    <Button size="sm" variant="secondary">
-                      Edit
-                    </Button>
-                  </Toolbar>
-                }
-                meta={
-                  <InlineMeta>
-                    <span>Points: {chore.point_reward}</span>
-                    {chore.bonus_points > 0 && (
-                      <span>Bonus: +{chore.bonus_points}</span>
-                    )}
-                    {chore.penalty_points > 0 && (
-                      <span>Penalty: -{chore.penalty_points}</span>
-                    )}
-                    {chore.due_date && (
-                      <span>
-                        Due: {new Date(chore.due_date).toLocaleDateString()}
-                      </span>
-                    )}
-                  </InlineMeta>
                 }
               />
             ))}

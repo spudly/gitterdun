@@ -1,4 +1,4 @@
-import {FC} from 'react';
+import type {FC} from 'react';
 import {ListRow} from './ListRow.js';
 import {StatusDot} from './StatusDot.js';
 import {Badge} from './Badge.js';
@@ -11,27 +11,30 @@ const ListRowDemo: FC = () => {
       data-testid="ListRowDemo"
     >
       <ListRow
-        left={<StatusDot color="green" />}
-        title="Dishwasher"
         description="Load and start"
+        left={<StatusDot color="green" />}
         right={<Badge variant="success">completed</Badge>}
+        title="Dishwasher"
       />
+
       <ListRow
-        left={<StatusDot color="yellow" />}
-        title="Laundry"
         description="Fold clothes"
+        left={<StatusDot color="yellow" />}
         right={<Button size="sm">Complete</Button>}
+        title="Laundry"
       />
+
       <ListRow
-        left={<StatusDot color="blue" />}
-        title="Homework"
         description="Math exercises"
+        left={<StatusDot color="blue" />}
         right={
           <>
             <Badge variant="purple">Bonus</Badge>
+
             <Badge variant="info">approved</Badge>
           </>
         }
+        title="Homework"
       />
     </div>
   );

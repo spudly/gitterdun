@@ -5,7 +5,10 @@ describe('Modal', () => {
   it('opens and closes via overlay, escape and close button', () => {
     const onClose = jest.fn();
     render(
-      <Modal isOpen onClose={onClose} title="M">
+      <Modal isOpen
+onClose={onClose}
+title="M"
+      >
         <div>Body</div>
       </Modal>,
     );
@@ -22,17 +25,19 @@ describe('Modal', () => {
   it('respects props and closed state', () => {
     const onClose = jest.fn();
     const {rerender} = render(
-      <Modal isOpen={false} onClose={onClose}>
+      <Modal isOpen={false}
+onClose={onClose}
+      >
         <div>Body</div>
       </Modal>,
     );
     expect(document.querySelector('.fixed')).toBeNull();
     rerender(
       <Modal
+        closeOnOverlayClick={false}
         isOpen
         onClose={onClose}
         showCloseButton={false}
-        closeOnOverlayClick={false}
       >
         <div>Body</div>
       </Modal>,
@@ -44,10 +49,10 @@ describe('Modal', () => {
     // now enable closeOnOverlayClick and click overlay directly
     rerender(
       <Modal
+        closeOnOverlayClick
         isOpen
         onClose={onClose}
         showCloseButton={false}
-        closeOnOverlayClick
       >
         <div>Body</div>
       </Modal>,
@@ -57,10 +62,10 @@ describe('Modal', () => {
     // ensure when disabled, clicking overlay does not call onClose
     rerender(
       <Modal
+        closeOnOverlayClick={false}
         isOpen
         onClose={onClose}
         showCloseButton={false}
-        closeOnOverlayClick={false}
       >
         <div>Body</div>
       </Modal>,
@@ -85,10 +90,10 @@ describe('Modal', () => {
     const onClose = jest.fn();
     render(
       <Modal
+        closeOnOverlayClick
         isOpen
         onClose={onClose}
         showCloseButton={false}
-        closeOnOverlayClick
       >
         <div>Body</div>
       </Modal>,
@@ -103,10 +108,10 @@ describe('Modal', () => {
     const onClose = jest.fn();
     render(
       <Modal
+        closeOnOverlayClick
         isOpen
         onClose={onClose}
         showCloseButton={false}
-        closeOnOverlayClick
       >
         <div>Body</div>
       </Modal>,

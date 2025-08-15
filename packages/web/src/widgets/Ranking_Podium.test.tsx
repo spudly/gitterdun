@@ -1,10 +1,12 @@
 import {render, screen} from '@testing-library/react';
-import {RankingList, RankingItem} from './RankingList';
-import {Podium, PodiumItem} from './Podium';
+import type { RankingItem} from './RankingList';
+import {RankingList} from './RankingList';
+import type { PodiumItem} from './Podium';
+import {Podium} from './Podium';
 
 describe('RankingList & Podium', () => {
   it('renders ranking list with/without rank', () => {
-    const items: RankingItem[] = [
+    const items: Array<RankingItem> = [
       {
         id: 1,
         rank: 1,
@@ -15,7 +17,7 @@ describe('RankingList & Podium', () => {
       },
     ];
     const {rerender} = render(
-      <RankingList items={items} title="T" subtitle="S" />,
+      <RankingList items={items} subtitle="S" title="T" />,
     );
     expect(screen.getByText('T')).toBeInTheDocument();
     expect(screen.getByText('S')).toBeInTheDocument();
@@ -25,7 +27,7 @@ describe('RankingList & Podium', () => {
   });
 
   it('renders podium medals and raw ranks', () => {
-    const items: PodiumItem[] = [
+    const items: Array<PodiumItem> = [
       {id: 1, rank: 1, content: <span>A</span>, score: 5, subtitle: 's'},
       {id: 2, rank: 2, content: <span>B</span>},
       {id: 3, rank: 3, content: <span>C</span>},

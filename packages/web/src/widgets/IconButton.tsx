@@ -1,14 +1,18 @@
-import {FC, ReactNode, ButtonHTMLAttributes} from 'react';
+import type {FC, ReactNode, ButtonHTMLAttributes} from 'react';
 import clsx from 'clsx';
 
-export interface IconButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement> {
-  icon: ReactNode;
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
-  className?: string;
-  label?: string;
-}
+export type IconButtonProps = Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'className'
+> & {
+  readonly icon: ReactNode;
+  readonly variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+  readonly size?: 'sm' | 'md' | 'lg';
+  readonly label?: string;
+  readonly rounded?: boolean; // extra-rounded
+  readonly fullWidth?: boolean;
+  readonly gradient?: boolean;
+};
 
 const VARIANT_STYLES = {
   primary: 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500',
@@ -25,25 +29,31 @@ export const IconButton: FC<IconButtonProps> = ({
   icon,
   variant = 'primary',
   size = 'md',
-  className = '',
   label,
-  disabled,
+  rounded = false,
+  fullWidth = false,
+  disabled = false,
+  gradient = false,
   ...props
 }) => {
   const baseStyles = clsx(
-    'inline-flex items-center justify-center rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors',
+    'inline-flex items-center justify-center font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors',
     VARIANT_STYLES[variant],
     SIZE_STYLES[size],
-    className,
+    rounded ? 'rounded-full' : 'rounded-md',
+    fullWidth ? 'w-full' : null,
+    gradient
+      ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
+      : null,
   );
   const disabledStyles = disabled ? 'opacity-50 cursor-not-allowed' : '';
 
   return (
     <button
-      type="button"
+      aria-label={label}
       className={clsx(baseStyles, disabledStyles)}
       disabled={disabled}
-      aria-label={label}
+      type="button"
       {...props}
     >
       <div className={ICON_SIZE_STYLES[size]}>{icon}</div>

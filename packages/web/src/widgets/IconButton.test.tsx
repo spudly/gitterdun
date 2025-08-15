@@ -3,7 +3,10 @@ import {IconButton} from './IconButton';
 
 describe('IconButton', () => {
   it('renders and can be disabled', () => {
-    render(<IconButton icon={<span>i</span>} label="icon" disabled />);
+    render(<IconButton disabled
+icon={<span>i</span>}
+label="icon"
+           />);
     expect(screen.getByRole('button')).toBeDisabled();
   });
 
@@ -12,8 +15,8 @@ describe('IconButton', () => {
       <IconButton
         icon={<span>i</span>}
         label="icon"
-        variant="secondary"
         size="sm"
+        variant="secondary"
       />,
     );
     expect(getByRole('button')).toBeEnabled();
@@ -21,8 +24,8 @@ describe('IconButton', () => {
       <IconButton
         icon={<span>i</span>}
         label="icon"
-        variant="danger"
         size="lg"
+        variant="danger"
       />,
     );
     expect(getByRole('button')).toBeEnabled();
@@ -30,8 +33,8 @@ describe('IconButton', () => {
       <IconButton
         icon={<span>i</span>}
         label="icon"
-        variant="ghost"
         size="md"
+        variant="ghost"
       />,
     );
     expect(getByRole('button')).toBeEnabled();

@@ -3,8 +3,22 @@
 - [x] setup the react compiler eslint plugin
 - [ ] cleanup eslint configuration, merging other configs into a single unified
       config
-- [ ] write jest tests => 100% coverage
-- [ ] IconButton demo has duplicate code (SVGs). Clean that up and make sure
+- [x] write jest tests => 100% coverage
+- [x] IconButton demo has duplicate code (SVGs). Clean that up and make sure
       other stuff isn't duplicated.
-- [ ] Use padding/gap. Do not use margins
+- [x] Use padding/gap. Do not use margins
 - [ ] Use `test` instead of `it` for jest tests
+- [ ] add depcheck
+- [ ] comment reasons for disabling eslint rules
+  - [ ] stylistic rules not necessary because of prettier
+  - [ ] add unused eslint rules
+- [x] use types, not interfaces
+- [ ] prettier-plugin-tailwindcss
+- [ ] eslint-plugin-tailwindcss
+- [ ] re-enable react/jsx-max-depth, import/max-dependencies
+- [ ] add eslint-plugin-jest
+- [ ] format SQL using prettier-plugin-embed + prettier-plugin-sql
+- [ ] upgrade to express 5
+- [ ] update all dependencies
+- [ ] instruct cursor to always make sure that any new code it writes passes checks: eslint, jest, typescript, prettier
+- [ ] audit all the eslint-disable rules that AI added; make sure they're not for stupid reasons

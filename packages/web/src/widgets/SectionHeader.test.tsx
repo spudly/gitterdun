@@ -4,7 +4,9 @@ import {SectionHeader} from './SectionHeader';
 describe('SectionHeader', () => {
   it('renders title, subtitle, children', () => {
     render(
-      <SectionHeader title="T" subtitle="S">
+      <SectionHeader subtitle="S"
+title="T"
+      >
         <button type="button">C</button>
       </SectionHeader>,
     );

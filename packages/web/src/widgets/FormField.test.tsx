@@ -5,11 +5,11 @@ describe('FormField', () => {
   it('renders label, required, help and error', () => {
     render(
       <FormField
-        label="Email"
-        htmlFor="email"
-        required
-        helpText="help"
         error="err"
+        helpText="help"
+        htmlFor="email"
+        label="Email"
+        required
       >
         <input id="email" />
       </FormField>,
@@ -22,7 +22,9 @@ describe('FormField', () => {
 
   it('renders without optional props', () => {
     render(
-      <FormField label="Name" htmlFor="name">
+      <FormField htmlFor="name"
+label="Name"
+      >
         <input id="name" />
       </FormField>,
     );

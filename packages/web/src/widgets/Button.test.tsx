@@ -7,8 +7,8 @@ describe('Button', () => {
     const {rerender} = render(
       <Button
         leftIcon={<span>◀</span>}
-        rightIcon={<span>▶</span>}
         onClick={onClick}
+        rightIcon={<span>▶</span>}
       >
         Go
       </Button>,

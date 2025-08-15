@@ -1,37 +1,59 @@
-import {ReactNode} from 'react';
+import type {ReactNode} from 'react';
 import clsx from 'clsx';
+import {isReactNode} from '../utils/isReactNode';
 
-export interface Column<T> {
+export type Column<T> = {
   key: string;
   header: string;
   render?: (item: T, index: number) => ReactNode;
-  className?: string;
-}
+  align?: 'left' | 'center' | 'right';
+};
 
-export interface DataTableProps<T> {
-  data: T[];
-  columns: Column<T>[];
-  className?: string;
-  emptyMessage?: string;
-  loading?: boolean;
-  onRowClick?: (item: T, index: number) => void;
-  rowClassName?: (item: T, index: number) => string;
-}
+export type DataTableProps<T> = {
+  readonly data: Array<T>;
+  readonly columns: Array<Column<T>>;
+  readonly emptyMessage?: string;
+  readonly loading?: boolean;
+  readonly onRowClick?: (item: T, index: number) => void;
+  readonly rowVariant?: 'default' | 'hoverable';
+};
 
-export const DataTable = <T extends Record<string, any>>({
+const get = <OBJ extends object, PROP extends string | number | symbol>(
+  obj: OBJ,
+  prop: PROP,
+): PROP extends keyof OBJ ? OBJ[PROP] : undefined => {
+  if (prop in obj) {
+    // @ts-expect-error: prop may not be a key of obj, so we allow undefined
+    return obj[prop]; // eslint-disable-line @typescript-eslint/no-unsafe-return -- not unsafe
+  }
+
+  // @ts-expect-error: ts just isn't smart enough to understand my syntax, or I'm not smart enough to write it correctly, lol
+  return undefined;
+};
+
+const isObjectWithId = (item: unknown): item is {id: string | number} => {
+  return (
+    typeof item === 'object'
+    && item !== null
+    && 'id' in item
+    && ['string', 'number'].includes(typeof item.id)
+  );
+};
+
+export const DataTable = <T extends object>({
   data,
   columns,
-  className = '',
   emptyMessage = 'No data available',
   loading = false,
   onRowClick,
-  rowClassName,
+  rowVariant = 'hoverable',
 }: DataTableProps<T>) => {
   if (loading) {
     return (
       <div className="bg-white shadow overflow-hidden sm:rounded-md">
         <div className="px-4 py-8 text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto" />
+
           <p className="mt-2 text-gray-600">Loading...</p>
         </div>
       </div>
@@ -49,55 +71,60 @@ export const DataTable = <T extends Record<string, any>>({
   }
 
   return (
-    <div
-      className={clsx(
-        'bg-white shadow overflow-hidden sm:rounded-md',
-        className,
-      )}
-    >
+    <div className={clsx('bg-white shadow overflow-hidden sm:rounded-md')}>
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
             {columns.map(column => (
               <th
-                key={column.key}
                 className={clsx(
-                  'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-                  column.className,
+                  'px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider',
+                  {
+                    left: 'text-left',
+                    center: 'text-center',
+                    right: 'text-right',
+                  }[column.align ?? 'left'],
                 )}
+                key={column.key}
               >
                 {column.header}
               </th>
             ))}
           </tr>
         </thead>
+
         <tbody className="bg-white divide-y divide-gray-200">
           {data.map((item, index) => (
             <tr
-              key={
-                typeof item === 'object' && item !== null && 'id' in item
-                  ? (item as any).id
-                  : `row-${index}`
-              }
               className={clsx(
-                onRowClick && 'cursor-pointer hover:bg-gray-50',
-                rowClassName && rowClassName(item, index),
+                onRowClick && 'cursor-pointer',
+                rowVariant === 'hoverable' && 'hover:bg-gray-50',
               )}
+              key={isObjectWithId(item) ? item.id : `row-${index}`}
               onClick={() => onRowClick?.(item, index)}
             >
-              {columns.map(column => (
-                <td
-                  key={`${column.key}-${typeof item === 'object' && item !== null && 'id' in item ? (item as any).id : index}`}
-                  className={clsx(
-                    'px-6 py-4 whitespace-nowrap text-sm text-gray-900',
-                    column.className,
-                  )}
-                >
-                  {column.render
-                    ? column.render(item, index)
-                    : item[column.key]}
-                </td>
-              ))}
+              {columns.map(column => {
+                const columnValue = get(item, column.key);
+                return (
+                  <td
+                    className={clsx(
+                      'px-6 py-4 whitespace-nowrap text-sm text-gray-900',
+                      {
+                        left: 'text-left',
+                        center: 'text-center',
+                        right: 'text-right',
+                      }[column.align ?? 'left'],
+                    )}
+                    key={`${column.key}-${isObjectWithId(item) ? item.id : index}`}
+                  >
+                    {column.render
+                      ? column.render(item, index)
+                      : isReactNode(columnValue)
+                        ? columnValue
+                        : null}
+                  </td>
+                );
+              })}
             </tr>
           ))}
         </tbody>

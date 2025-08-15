@@ -1,4 +1,4 @@
-import {FC, ReactNode} from 'react';
+import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
 export type StatusType =
@@ -10,12 +10,16 @@ export type StatusType =
   | 'completed'
   | 'approved';
 
-export interface StatusBadgeProps {
-  status: StatusType;
-  children?: ReactNode;
-  className?: string;
-  size?: 'sm' | 'md' | 'lg';
-}
+export type StatusBadgeProps = {
+  readonly status: StatusType;
+  readonly children?: ReactNode;
+  readonly size?: 'sm' | 'md' | 'lg';
+  // semantic styling flags
+  readonly outlined?: boolean;
+  readonly uppercase?: boolean;
+  readonly wide?: boolean; // tracking-wide
+  readonly bold?: boolean;
+};
 
 const STATUS_STYLES: Record<StatusType, string> = {
   success: 'bg-green-100 text-green-800',
@@ -25,6 +29,16 @@ const STATUS_STYLES: Record<StatusType, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
   completed: 'bg-green-100 text-green-800',
   approved: 'bg-blue-100 text-blue-800',
+};
+
+const OUTLINE_STYLES: Record<StatusType, string> = {
+  success: 'border-2 border-green-300',
+  error: 'border-2 border-red-300',
+  warning: 'border-2 border-yellow-300',
+  info: 'border-2 border-blue-300',
+  pending: 'border-2 border-yellow-300',
+  completed: 'border-2 border-green-300',
+  approved: 'border-2 border-blue-300',
 };
 
 export const getStatusClass = (status: StatusType): string => {
@@ -57,17 +71,23 @@ const SIZE_STYLES = {
 export const StatusBadge: FC<StatusBadgeProps> = ({
   status,
   children,
-  className = '',
   size = 'md',
+  outlined = false,
+  uppercase = false,
+  wide = false,
+  bold = false,
 }) => {
   const baseStyles = clsx(
-    'inline-flex items-center rounded-full font-medium',
+    'inline-flex items-center rounded-full',
+    bold ? 'font-bold' : 'font-medium',
     getStatusClass(status),
     SIZE_STYLES[size],
-    className,
+    outlined ? OUTLINE_STYLES[status] : null,
+    uppercase ? 'uppercase' : null,
+    wide ? 'tracking-wide' : null,
   );
 
-  return <span className={baseStyles}>{children || status}</span>;
+  return <span className={baseStyles}>{children ?? status}</span>;
 };
 
 export default StatusBadge;

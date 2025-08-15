@@ -1,12 +1,13 @@
-import Database from 'better-sqlite3';
-import type * as BetterSqlite3 from 'better-sqlite3';
-import path from 'path';
-import fs from 'fs';
+import Db from 'better-sqlite3';
+import type {Database} from 'better-sqlite3';
+import path from 'node:path';
+import fs from 'node:fs';
 
 // Allow overriding database path for tests via env var
-const resolvedDbPath = process.env['DB_PATH']
-  ? path.resolve(process.env['DB_PATH'])
-  : path.join(process.cwd(), 'data', 'gitterdun.db');
+const resolvedDbPath =
+  process.env['DB_PATH'] != null
+    ? path.resolve(process.env['DB_PATH'])
+    : path.join(process.cwd(), 'data', 'gitterdun.db');
 
 // Ensure directory exists
 const dataDir = path.dirname(resolvedDbPath);
@@ -15,7 +16,7 @@ if (!fs.existsSync(dataDir)) {
 }
 
 // Create database connection
-const db: BetterSqlite3.Database = new Database(resolvedDbPath);
+const db: Database = new Db(resolvedDbPath);
 
 // Enable foreign keys
 db.pragma('foreign_keys = ON');

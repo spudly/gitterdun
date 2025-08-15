@@ -1,19 +1,18 @@
-import {FC, ReactNode} from 'react';
+import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export interface PodiumItem {
+export type PodiumItem = {
   id: string | number;
-  rank: number;
+  rank: 1 | 2 | 3;
   content: ReactNode;
   score?: string | number;
   subtitle?: string;
-}
+};
 
-export interface PodiumProps {
-  items: PodiumItem[];
-  className?: string;
-  showMedals?: boolean;
-}
+export type PodiumProps = {
+  readonly items: Array<PodiumItem>;
+  readonly showMedals?: boolean;
+};
 
 const RANK_STYLES = {
   1: 'order-2 bg-yellow-500',
@@ -23,18 +22,11 @@ const RANK_STYLES = {
 
 const MEDALS = {1: '🥇', 2: '🥈', 3: '🥉'};
 
-export const Podium: FC<PodiumProps> = ({
-  items,
-  className = '',
-  showMedals = true,
-}) => {
+export const Podium: FC<PodiumProps> = ({items, showMedals = true}) => {
   return (
-    <div
-      className={clsx('grid grid-cols-1 md:grid-cols-3 gap-6 mb-8', className)}
-    >
+    <div className={clsx('grid grid-cols-1 md:grid-cols-3 gap-6 mb-8')}>
       {items.slice(0, 3).map(item => (
         <div
-          key={item.id}
           className={clsx(
             'text-center',
             item.rank === 1
@@ -43,21 +35,27 @@ export const Podium: FC<PodiumProps> = ({
                 ? 'order-1'
                 : 'order-3',
           )}
+          key={item.id}
         >
           <div
             className={clsx(
               'relative mx-auto w-24 h-24 rounded-full flex items-center justify-center text-2xl font-bold text-white',
-              RANK_STYLES[item.rank as keyof typeof RANK_STYLES],
+              RANK_STYLES[item.rank],
             )}
           >
-            {showMedals ? MEDALS[item.rank as keyof typeof MEDALS] : item.rank}
+            {showMedals ? MEDALS[item.rank] : item.rank}
           </div>
+
           <div className="mt-4">
             {item.content}
-            {item.score && <p className="text-gray-600">{item.score} points</p>}
-            {item.subtitle && (
+
+            {item.score != null ? (
+              <p className="text-gray-600">{item.score} points</p>
+            ) : null}
+
+            {item.subtitle != null ? (
               <p className="text-sm text-gray-500">{item.subtitle}</p>
-            )}
+            ) : null}
           </div>
         </div>
       ))}

@@ -1,4 +1,4 @@
-import {NavigationItem} from './widgets/Layout';
+import type {NavigationItem} from './widgets/Layout';
 
 export const NAVIGATION_ITEMS: NavigationItem[] = [
   {name: 'Dashboard', path: '/', icon: '🏠'},

@@ -5,9 +5,9 @@ describe('PageHeader', () => {
   it('renders title, subtitle and actions', () => {
     render(
       <PageHeader
-        title="Title"
-        subtitle="Sub"
         actions={<button type="button">A</button>}
+        subtitle="Sub"
+        title="Title"
       />,
     );
     expect(screen.getByText('Title')).toBeInTheDocument();

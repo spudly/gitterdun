@@ -1,8 +1,15 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
-import {FC, useState} from 'react';
+import type {FC} from 'react';
+import {useState} from 'react';
 import {Modal} from './Modal.js';
 import {Button} from './Button.js';
 import {TextInput} from './TextInput.js';
+import {PageContainer} from './PageContainer.js';
+import {SectionHeader} from './SectionHeader.js';
+import {Card} from './Card.js';
+import {Stack} from './Stack.js';
+import {GridContainer} from './GridContainer.js';
+import {FormField} from './FormField.js';
+import {Checkbox} from './Checkbox.js';
 
 const ModalDemo: FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,224 +28,301 @@ const ModalDemo: FC = () => {
   };
 
   return (
-    <div className="space-y-6 p-4">
-      <h2 className="text-2xl font-bold">Modal Component</h2>
+    <PageContainer variant="default">
+      <SectionHeader title="Modal Component" />
 
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Basic Modal</h3>
-        <Button onClick={() => openModal()}>Open Basic Modal</Button>
+      <Stack>
+        <SectionHeader title="Basic Modal" variant="compact" />
+
+        <Button
+          onClick={() => {
+            openModal();
+          }}
+        >
+          Open Basic Modal
+        </Button>
 
         <Modal
+          closeOnOverlayClick={closeOnOverlayClick}
           isOpen={isOpen}
           onClose={closeModal}
-          title={modalTitle}
-          size={modalSize}
           showCloseButton={showCloseButton}
-          closeOnOverlayClick={closeOnOverlayClick}
+          size={modalSize}
+          title={modalTitle}
         >
           <div className="space-y-4">
             <p className="text-gray-600">
               This is a basic modal with customizable content. You can put any
               React components inside.
             </p>
+
             <div className="flex justify-end space-x-2">
-              <Button variant="secondary" onClick={closeModal}>
+              <Button onClick={closeModal} variant="secondary">
                 Cancel
               </Button>
+
               <Button onClick={closeModal}>Confirm</Button>
             </div>
           </div>
         </Modal>
-      </div>
+      </Stack>
 
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Different Sizes</h3>
-        <div className="flex flex-wrap gap-2">
-          <Button onClick={() => openModal('sm')} variant="secondary">
+      <Stack>
+        <SectionHeader title="Different Sizes" variant="compact" />
+
+        <GridContainer cols={4}>
+          <Button
+            onClick={() => {
+              openModal('sm');
+            }}
+            variant="secondary"
+          >
             Small Modal
           </Button>
-          <Button onClick={() => openModal('md')} variant="secondary">
+
+          <Button
+            onClick={() => {
+              openModal('md');
+            }}
+            variant="secondary"
+          >
             Medium Modal
           </Button>
-          <Button onClick={() => openModal('lg')} variant="secondary">
+
+          <Button
+            onClick={() => {
+              openModal('lg');
+            }}
+            variant="secondary"
+          >
             Large Modal
           </Button>
-          <Button onClick={() => openModal('xl')} variant="secondary">
+
+          <Button
+            onClick={() => {
+              openModal('xl');
+            }}
+            variant="secondary"
+          >
             Extra Large Modal
           </Button>
-        </div>
-      </div>
+        </GridContainer>
+      </Stack>
 
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Form Modal</h3>
-        <Button onClick={() => openModal('lg')} variant="primary">
+      <Stack>
+        <SectionHeader title="Form Modal" variant="compact" />
+
+        <Button
+          onClick={() => {
+            openModal('lg');
+          }}
+          variant="primary"
+        >
           Open Form Modal
         </Button>
 
         <Modal
-          isOpen={isOpen && modalSize === 'lg'}
+          isOpen={isOpen ? modalSize === 'lg' : false}
           onClose={closeModal}
-          title="User Registration Form"
           size="lg"
+          title="User Registration Form"
         >
-          <form className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <label htmlFor="first-name" className="sr-only">
-                First Name
-              </label>
-              <TextInput
-                id="first-name"
-                placeholder="Enter first name"
-                required
-              />
-              <label htmlFor="last-name" className="sr-only">
-                Last Name
-              </label>
-              <TextInput
-                id="last-name"
-                placeholder="Enter last name"
-                required
-              />
-            </div>
-            <label htmlFor="email" className="sr-only">
-              Email
-            </label>
-            <TextInput
-              id="email"
-              type="email"
-              placeholder="Enter email address"
-              required
-            />
-            <label htmlFor="password" className="sr-only">
-              Password
-            </label>
-            <TextInput
-              id="password"
-              type="password"
-              placeholder="Enter password"
-              required
-            />
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button variant="secondary" onClick={closeModal}>
-                Cancel
-              </Button>
-              <Button onClick={closeModal}>Register</Button>
-            </div>
+          <form>
+            <Stack>
+              <GridContainer cols={2}>
+                <FormField htmlFor="first-name" label="First Name" required>
+                  <TextInput
+                    id="first-name"
+                    placeholder="Enter first name"
+                    required
+                  />
+                </FormField>
+                <FormField htmlFor="last-name" label="Last Name" required>
+                  <TextInput
+                    id="last-name"
+                    placeholder="Enter last name"
+                    required
+                  />
+                </FormField>
+              </GridContainer>
+              <FormField htmlFor="email" label="Email" required>
+                <TextInput
+                  id="email"
+                  placeholder="Enter email address"
+                  required
+                  type="email"
+                />
+              </FormField>
+              <FormField htmlFor="password" label="Password" required>
+                <TextInput
+                  id="password"
+                  placeholder="Enter password"
+                  required
+                  type="password"
+                />
+              </FormField>
+              <div>
+                <Stack gap="sm">
+                  <Checkbox
+                    checked={showCloseButton}
+                    id="show-close-button"
+                    label="Show Close Button"
+                    onChange={v => {
+                      setShowCloseButton(v);
+                    }}
+                  />
+                  <Checkbox
+                    checked={closeOnOverlayClick}
+                    id="close-on-overlay"
+                    label="Close on Overlay Click"
+                    onChange={v => {
+                      setCloseOnOverlayClick(v);
+                    }}
+                  />
+                </Stack>
+              </div>
+              <FormField htmlFor="modal-title" label="Modal Title">
+                <TextInput
+                  id="modal-title"
+                  onChange={value => {
+                    setModalTitle(value);
+                  }}
+                  placeholder="Enter modal title"
+                  value={modalTitle}
+                />
+              </FormField>
+              <div>
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button onClick={closeModal} variant="secondary">
+                    Cancel
+                  </Button>
+                  <Button onClick={closeModal}>Register</Button>
+                </div>
+              </div>
+            </Stack>
           </form>
         </Modal>
-      </div>
+      </Stack>
 
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Modal Configuration</h3>
-        <div className="bg-gray-50 p-4 rounded-lg space-y-4">
-          <div className="flex items-center space-x-4">
-            <label htmlFor="show-close-button" className="flex items-center">
-              <input
-                type="checkbox"
+      <Stack>
+        <SectionHeader title="Modal Configuration" variant="compact" />
+        <Card>
+          <Stack>
+            <Stack>
+              <Checkbox
                 checked={showCloseButton}
-                onChange={e => setShowCloseButton(e.target.checked)}
-                className="mr-2"
-                id="show-close-button"
+                id="cfg-show-close-button"
+                label="Show Close Button"
+                onChange={v => {
+                  setShowCloseButton(v);
+                }}
               />
-              Show Close Button
-            </label>
-            <label htmlFor="close-on-overlay" className="flex items-center">
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={closeOnOverlayClick}
-                onChange={e => setCloseOnOverlayClick(e.target.checked)}
-                className="mr-2"
-                id="close-on-overlay"
+                id="cfg-close-on-overlay"
+                label="Close on Overlay Click"
+                onChange={v => {
+                  setCloseOnOverlayClick(v);
+                }}
               />
-              Close on Overlay Click
-            </label>
-          </div>
+            </Stack>
+            <FormField htmlFor="cfg-modal-title" label="Modal Title">
+              <TextInput
+                id="cfg-modal-title"
+                onChange={value => {
+                  setModalTitle(value);
+                }}
+                placeholder="Enter modal title"
+                value={modalTitle}
+              />
+            </FormField>
+          </Stack>
+        </Card>
+      </Stack>
 
-          <div>
-            <label
-              htmlFor="modal-title"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Modal Title
-            </label>
-            <input
-              type="text"
-              id="modal-title"
-              value={modalTitle}
-              onChange={e => setModalTitle(e.target.value)}
-              className="w-full border rounded px-3 py-2"
-              placeholder="Enter modal title"
-            />
-          </div>
-        </div>
-      </div>
+      <Stack>
+        <SectionHeader title="Alert Modal" variant="compact" />
 
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Alert Modal</h3>
-        <Button onClick={() => openModal('sm')} variant="danger">
+        <Button
+          onClick={() => {
+            openModal('sm');
+          }}
+          variant="danger"
+        >
           Show Alert
         </Button>
 
         <Modal
-          isOpen={isOpen && modalSize === 'sm'}
+          isOpen={isOpen ? modalSize === 'sm' : false}
           onClose={closeModal}
-          title="Confirmation Required"
           size="sm"
+          title="Confirmation Required"
         >
           <div className="text-center space-y-4">
             <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
               <svg
                 className="h-6 w-6 text-red-600"
                 fill="none"
-                viewBox="0 0 24 24"
                 stroke="currentColor"
+                viewBox="0 0 24 24"
               >
                 <path
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
                 />
               </svg>
             </div>
+
             <p className="text-sm text-gray-500">
               Are you sure you want to delete this item? This action cannot be
               undone.
             </p>
+
             <div className="flex justify-center space-x-2">
-              <Button variant="secondary" onClick={closeModal}>
+              <Button onClick={closeModal} variant="secondary">
                 Cancel
               </Button>
-              <Button variant="danger" onClick={closeModal}>
+
+              <Button onClick={closeModal} variant="danger">
                 Delete
               </Button>
             </div>
           </div>
         </Modal>
-      </div>
+      </Stack>
 
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Custom Styling</h3>
-        <Button onClick={() => openModal('md')} variant="primary">
+      <Stack>
+        <SectionHeader title="Custom Styling" variant="compact" />
+
+        <Button
+          onClick={() => {
+            openModal('md');
+          }}
+          variant="primary"
+        >
           Custom Styled Modal
         </Button>
 
         <Modal
-          isOpen={isOpen && modalSize === 'md'}
+          isOpen={isOpen ? modalSize === 'md' : false}
           onClose={closeModal}
-          title="Custom Styled Modal"
+          outlineColor="blue"
+          outlined
           size="md"
-          className="border-4 border-blue-500"
+          title="Custom Styled Modal"
         >
           <div className="text-center space-y-4">
             <p className="text-blue-600 font-medium">
               This modal has custom styling applied!
             </p>
+
             <Button onClick={closeModal}>Close</Button>
           </div>
         </Modal>
-      </div>
-    </div>
+      </Stack>
+    </PageContainer>
   );
 };
 

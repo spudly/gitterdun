@@ -2,7 +2,7 @@ import {render, screen, fireEvent, act} from '@testing-library/react';
 import {MemoryRouter, useLocation} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import ResetPassword from './ResetPassword';
-import * as useUserModule from '../hooks/useUser';
+import {useUser} from '../hooks/useUser';
 
 jest.mock('../hooks/useUser', () => ({
   useUser: jest.fn(() => ({resetPassword: jest.fn(async () => ({}))})),
@@ -72,6 +72,7 @@ describe('ResetPassword page', () => {
       <QueryClientProvider client={new QueryClient()}>
         <MemoryRouter initialEntries={['/reset-password?token=t']}>
           <LocationProbe />
+
           <ResetPassword />
         </MemoryRouter>
       </QueryClientProvider>,
@@ -96,11 +97,23 @@ describe('ResetPassword page', () => {
   });
 
   it('handles reset API rejection (catch branch)', async () => {
-    (useUserModule.useUser as unknown as jest.Mock).mockReturnValueOnce({
+    jest.mocked(useUser).mockReturnValueOnce({
+      user: null,
+      isLoading: false,
+      error: null,
+      login: jest.fn(),
+      register: jest.fn(),
+      logout: jest.fn(),
+      forgotPassword: jest.fn(),
       resetPassword: jest.fn(async () => {
         throw new Error('boom');
       }),
-    } as any);
+      isLoggingIn: false,
+      isRegistering: false,
+      isLoggingOut: false,
+      loginError: null,
+      registerError: null,
+    } as ReturnType<typeof useUser>);
     render(wrap(<ResetPassword />));
     fireEvent.change(screen.getByLabelText(/New Password/i), {
       target: {value: 'abcdef'},

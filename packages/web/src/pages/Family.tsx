@@ -1,6 +1,8 @@
-import {FC, useEffect, useState} from 'react';
+import type {FC} from 'react';
+import { useEffect, useState} from 'react';
 import {useQuery, useMutation} from '@tanstack/react-query';
 import {familiesApi, invitationsApi} from '../lib/api.js';
+import {FamilyMemberSchema} from '@gitterdun/shared';
 import {PageContainer} from '../widgets/PageContainer.js';
 import {FormSection} from '../widgets/FormSection.js';
 import {MembersList} from '../widgets/MembersList.js';
@@ -26,30 +28,38 @@ const Family: FC = () => {
 
   const myFamiliesQuery = useQuery({
     queryKey: ['families', 'mine'],
-    queryFn: () => familiesApi.myFamilies(),
+    queryFn: async () => familiesApi.myFamilies(),
     enabled: !!user,
   });
 
   useEffect(() => {
     const first = myFamiliesQuery.data?.data?.[0];
-    if (first && !selectedFamilyId) {
-      setSelectedFamilyId(first.id);
+    if (first != null && selectedFamilyId == null) {
+      const candidate = (first as {id?: unknown}).id;
+      if (typeof candidate === 'number') {
+        setSelectedFamilyId(candidate);
+      }
     }
   }, [myFamiliesQuery.data, selectedFamilyId]);
 
   const membersQuery = useQuery({
     queryKey: ['families', selectedFamilyId, 'members'],
-    queryFn: () => familiesApi.listMembers(selectedFamilyId as number),
-    enabled: !!selectedFamilyId,
+    queryFn: async () => {
+      if (selectedFamilyId == null) {
+        return {success: true, data: []};
+      }
+      return familiesApi.listMembers(selectedFamilyId);
+    },
+    enabled: selectedFamilyId != null,
   });
 
   const createFamilyMutation = useMutation({
     mutationFn: familiesApi.create,
-    onSuccess: () => myFamiliesQuery.refetch(),
+    onSuccess: async () => myFamiliesQuery.refetch(),
   });
 
   const createChildMutation = useMutation({
-    mutationFn: (p: {
+    mutationFn: async (p: {
       familyId: number;
       username: string;
       email: string;
@@ -60,11 +70,11 @@ const Family: FC = () => {
         email: p.email,
         password: p.password,
       }),
-    onSuccess: () => membersQuery.refetch(),
+    onSuccess: async () => membersQuery.refetch(),
   });
 
   const inviteMutation = useMutation({
-    mutationFn: (p: {
+    mutationFn: async (p: {
       familyId: number;
       email: string;
       role: 'parent' | 'child';
@@ -82,43 +92,59 @@ const Family: FC = () => {
       <FormSection title="Your Families">
         <Toolbar>
           <SelectInput
+            onChange={val => {
+              const parsed = Number(val);
+              setSelectedFamilyId(Number.isNaN(parsed) ? null : parsed);
+            }}
             value={selectedFamilyId ?? ''}
-            onChange={val => setSelectedFamilyId(Number(val))}
           >
-            <option value="" disabled>
+            <option disabled value="">
               Select a family
             </option>
+
             {familyOptions.map(f => (
               <option key={f.id} value={f.id}>
                 {f.name}
               </option>
             ))}
           </SelectInput>
+
           <TextInput
+            onChange={val => {
+              setNewFamilyName(val);
+            }}
             placeholder="New family name"
             value={newFamilyName}
-            onChange={val => setNewFamilyName(val)}
           />
+
           <Button
-            type="button"
             onClick={() => {
-              if (!newFamilyName.trim()) {
+              if (newFamilyName.trim() === '') {
                 return;
               }
               createFamilyMutation.mutate({name: newFamilyName.trim()});
               setNewFamilyName('');
             }}
+            type="button"
           >
             Create
           </Button>
         </Toolbar>
       </FormSection>
 
-      {selectedFamilyId && (
+      {selectedFamilyId != null ? (
         <GridContainer cols={2} gap="lg">
           <FormSection title="Members">
-            <MembersList members={(membersQuery.data?.data ?? []) as any} />
+            {/* Parse API data using zod schema to avoid any */}
+            {(() => {
+              const parsed = FamilyMemberSchema.array().safeParse(
+                membersQuery.data?.data ?? [],
+              );
+              const members = parsed.success ? parsed.data : [];
+              return <MembersList members={members} />;
+            })()}
           </FormSection>
+
           <FormSection>
             <Stack gap="md">
               <div>
@@ -126,28 +152,41 @@ const Family: FC = () => {
                   <Text as="h3" weight="semibold">
                     Create Child Account
                   </Text>
+
                   <Stack gap="sm">
                     <TextInput
+                      onChange={val => {
+                        setChildUsername(val);
+                      }}
                       placeholder="Username"
                       value={childUsername}
-                      onChange={val => setChildUsername(val)}
                     />
+
                     <TextInput
+                      onChange={val => {
+                        setChildEmail(val);
+                      }}
                       placeholder="Email"
                       type="email"
                       value={childEmail}
-                      onChange={val => setChildEmail(val)}
                     />
+
                     <TextInput
+                      onChange={val => {
+                        setChildPassword(val);
+                      }}
                       placeholder="Password"
                       type="password"
                       value={childPassword}
-                      onChange={val => setChildPassword(val)}
                     />
+
                     <Button
-                      type="button"
                       onClick={() => {
-                        if (!childUsername || !childEmail || !childPassword) {
+                        if (
+                          childUsername === ''
+                          || childEmail === ''
+                          || childPassword === ''
+                        ) {
                           return;
                         }
                         createChildMutation.mutate({
@@ -160,35 +199,46 @@ const Family: FC = () => {
                         setChildEmail('');
                         setChildPassword('');
                       }}
+                      type="button"
                     >
                       Create
                     </Button>
                   </Stack>
                 </Stack>
               </div>
+
               <div>
                 <Stack gap="sm">
                   <Text as="h3" weight="semibold">
                     Invite Member
                   </Text>
+
                   <Toolbar>
                     <TextInput
+                      onChange={val => {
+                        setInviteEmail(val);
+                      }}
                       placeholder="Email"
                       type="email"
                       value={inviteEmail}
-                      onChange={val => setInviteEmail(val)}
                     />
+
                     <SelectInput
+                      onChange={val => {
+                        const role =
+                          val === 'parent' || val === 'child' ? val : 'parent';
+                        setInviteRole(role);
+                      }}
                       value={inviteRole}
-                      onChange={val => setInviteRole(val as 'parent' | 'child')}
                     >
                       <option value="parent">Parent</option>
+
                       <option value="child">Child</option>
                     </SelectInput>
+
                     <Button
-                      type="button"
                       onClick={() => {
-                        if (!inviteEmail) {
+                        if (inviteEmail === '') {
                           return;
                         }
                         inviteMutation.mutate({
@@ -198,6 +248,7 @@ const Family: FC = () => {
                         });
                         setInviteEmail('');
                       }}
+                      type="button"
                     >
                       Send
                     </Button>
@@ -207,7 +258,7 @@ const Family: FC = () => {
             </Stack>
           </FormSection>
         </GridContainer>
-      )}
+      ) : null}
     </PageContainer>
   );
 };

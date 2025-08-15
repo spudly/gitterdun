@@ -2,16 +2,22 @@ import {render, screen, fireEvent} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
 
 import Layout from './Layout';
+import type {User} from '@gitterdun/shared';
 
-let mockUser: any = {
+const mockUser: User = {
+  id: 1,
   username: 'User',
+  email: 'user@example.com',
   role: 'admin',
   points: 10,
   streak_count: 2,
+  created_at: '2023-01-01T00:00:00.000Z',
+  updated_at: '2023-01-01T00:00:00.000Z',
 };
+let user: User | null = mockUser;
 const mockLogout = jest.fn();
 jest.mock('../hooks/useUser', () => ({
-  useUser: () => ({user: mockUser, logout: mockLogout}),
+  useUser: () => ({user: user, logout: mockLogout}),
 }));
 
 describe('Layout', () => {
@@ -28,7 +34,7 @@ describe('Layout', () => {
   });
 
   it('shows login when no user and hides admin link', () => {
-    mockUser = null;
+    user = null;
     render(
       <MemoryRouter initialEntries={['/']}>
         <Layout navigation={[]}>
@@ -40,7 +46,7 @@ describe('Layout', () => {
   });
 
   it('calls logout when clicking Logout button', () => {
-    mockUser = {username: 'User', role: 'user', points: 0, streak_count: 0};
+    user = mockUser;
     mockLogout.mockClear();
     render(
       <MemoryRouter initialEntries={['/']}>

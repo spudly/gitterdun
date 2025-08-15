@@ -1,21 +1,23 @@
-import {FC, useState} from 'react';
-import {DataTable, Column} from './DataTable.js';
+import type {FC} from 'react';
+import {useState} from 'react';
+import type {Column} from './DataTable.js';
+import {DataTable} from './DataTable.js';
 import {StatusBadge} from './StatusBadge.js';
 import {Button} from './Button.js';
 
-interface User {
+type User = {
   id: number;
   name: string;
   email: string;
   role: string;
   status: 'active' | 'inactive' | 'pending';
   lastLogin: string;
-}
+};
 
 const DataTableDemo: FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  const sampleData: User[] = [
+  const sampleData: Array<User> = [
     {
       id: 1,
       name: 'John Doe',
@@ -50,7 +52,7 @@ const DataTableDemo: FC = () => {
     },
   ];
 
-  const columns: Column<User>[] = [
+  const columns: Array<Column<User>> = [
     {
       key: 'name',
       header: 'Name',
@@ -63,8 +65,10 @@ const DataTableDemo: FC = () => {
               </span>
             </div>
           </div>
+
           <div className="ml-4">
             <div className="text-sm font-medium text-gray-900">{user.name}</div>
+
             <div className="text-sm text-gray-500">ID: {user.id}</div>
           </div>
         </div>
@@ -114,6 +118,7 @@ const DataTableDemo: FC = () => {
           <Button size="sm" variant="secondary">
             Edit
           </Button>
+
           <Button size="sm" variant="danger">
             Delete
           </Button>
@@ -132,67 +137,65 @@ const DataTableDemo: FC = () => {
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Basic Table</h3>
+
         <DataTable
-          data={sampleData}
           columns={columns}
+          data={sampleData}
           onRowClick={handleRowClick}
         />
 
-        {selectedUser && (
+        {selectedUser ? (
           <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
             <p className="text-sm text-blue-800">
               Selected user: <strong>{selectedUser.name}</strong> (
               {selectedUser.email})
             </p>
           </div>
-        )}
+        ) : null}
       </div>
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Empty State</h3>
+
         <DataTable
-          data={[]}
           columns={columns}
+          data={[]}
           emptyMessage="No users found. Try adjusting your search criteria."
         />
       </div>
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Loading State</h3>
-        <DataTable data={[]} columns={columns} loading />
+
+        <DataTable columns={columns} data={[]} loading />
       </div>
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Custom Row Styling</h3>
-        <DataTable
-          data={sampleData}
-          columns={columns}
-          rowClassName={(_user, index) =>
-            index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
-          }
-        />
+
+        <DataTable columns={columns} data={sampleData} rowVariant="hoverable" />
       </div>
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Simplified Columns</h3>
+
         <DataTable
-          data={sampleData}
           columns={[
             {key: 'name', header: 'Name'},
             {key: 'email', header: 'Email'},
             {key: 'role', header: 'Role'},
             {key: 'status', header: 'Status'},
           ]}
+          data={sampleData}
         />
       </div>
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Custom Styling</h3>
-        <DataTable
-          data={sampleData}
-          columns={columns}
-          className="border-2 border-blue-200"
-        />
+
+        <div className="border-2 border-blue-200 rounded-md">
+          <DataTable columns={columns} data={sampleData} />
+        </div>
       </div>
     </div>
   );

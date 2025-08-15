@@ -1,4 +1,4 @@
-import {FC} from 'react';
+import type {FC} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {leaderboardApi} from '../lib/api.js';
 import {PageContainer} from '../widgets/PageContainer.js';
@@ -9,13 +9,22 @@ import {PageLoading} from '../widgets/PageLoading.js';
 import {Text} from '../widgets/Text.js';
 
 const Leaderboard: FC = () => {
-  const {data: leaderboardResponse, isLoading} = useQuery({
+  const {
+    data: leaderboardResponse,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['leaderboard'],
-    queryFn: () => leaderboardApi.get({limit: 10, sortBy: 'points'}),
+    queryFn: async () => leaderboardApi.get({limit: 10, sortBy: 'points'}),
   });
+  if (error) {
+    const err = error instanceof Error ? error : new Error(String(error));
+    // eslint-disable-next-line no-console -- dev logging only
+    console.error(err);
+  }
 
-  const leaderboard = leaderboardResponse?.data?.leaderboard || [];
-  const sortBy = leaderboardResponse?.data?.sortBy || 'points';
+  const leaderboard = leaderboardResponse?.data?.leaderboard ?? [];
+  const sortBy = leaderboardResponse?.data?.sortBy ?? 'points';
 
   if (isLoading) {
     return (
@@ -33,8 +42,10 @@ const Leaderboard: FC = () => {
         <Text as="h3" size="lg" weight="semibold">
           {entry.username}
         </Text>
+
         <Text muted>{entry.points} points</Text>
-        <Text size="sm" muted>
+
+        <Text muted size="sm">
           {entry.chores_completed} chores
         </Text>
       </>
@@ -53,6 +64,7 @@ const Leaderboard: FC = () => {
     subtitle: (
       <>
         <span>{entry.chores_completed} chores completed</span>
+
         <span>{entry.badges_earned} badges earned</span>
       </>
     ),
@@ -67,8 +79,8 @@ const Leaderboard: FC = () => {
 
       <RankingList
         items={rankingItems}
-        title="Full Rankings"
         subtitle={`Sorted by ${sortBy === 'points' ? 'total points' : 'streak count'}`}
+        title="Full Rankings"
       />
     </PageContainer>
   );

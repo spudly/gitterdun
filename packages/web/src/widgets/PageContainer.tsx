@@ -1,11 +1,11 @@
-import {FC, ReactNode} from 'react';
+import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export interface PageContainerProps {
-  children: ReactNode;
-  className?: string;
-  variant?: 'default' | 'centered' | 'narrow' | 'wide';
-}
+export type PageContainerProps = {
+  readonly children: ReactNode;
+  readonly variant?: 'default' | 'centered' | 'narrow' | 'wide';
+  readonly gradient?: 'none' | 'indigo' | 'blue' | 'purple' | 'pink';
+};
 
 const VARIANT_STYLES = {
   default: 'min-h-screen bg-gray-50 p-6',
@@ -23,11 +23,21 @@ const CONTAINER_STYLES = {
 
 export const PageContainer: FC<PageContainerProps> = ({
   children,
-  className = '',
   variant = 'default',
+  gradient = 'none',
 }) => {
+  const GRADIENT_STYLES: Record<
+    NonNullable<PageContainerProps['gradient']>,
+    string
+  > = {
+    none: '',
+    indigo: 'bg-gradient-to-br from-blue-50 to-indigo-100',
+    blue: 'bg-gradient-to-br from-sky-50 to-blue-100',
+    purple: 'bg-gradient-to-br from-violet-50 to-purple-100',
+    pink: 'bg-gradient-to-br from-pink-50 to-rose-100',
+  };
   return (
-    <div className={clsx(VARIANT_STYLES[variant], className)}>
+    <div className={clsx(VARIANT_STYLES[variant], GRADIENT_STYLES[gradient])}>
       <div className={CONTAINER_STYLES[variant]}>{children}</div>
     </div>
   );

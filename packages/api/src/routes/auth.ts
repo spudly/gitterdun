@@ -4,11 +4,16 @@ import {
   LoginSchema,
   CreateUserSchema,
   UserSchema,
+  UserWithPasswordRowSchema,
   ForgotPasswordRequestSchema,
   ResetPasswordSchema,
+  SessionRowSchema,
+  IdRowSchema,
+  PasswordResetRowSchema,
+  asError,
 } from '@gitterdun/shared';
 import {z} from 'zod';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import db from '../lib/db';
 import {logger} from '../utils/logger';
 
@@ -16,7 +21,7 @@ const router = express.Router();
 
 const getCookie = (req: express.Request, name: string): string | undefined => {
   const cookieHeader = req.headers.cookie;
-  if (!cookieHeader) {
+  if (cookieHeader == null) {
     return undefined;
   }
   const cookieString = Array.isArray(cookieHeader)
@@ -26,7 +31,7 @@ const getCookie = (req: express.Request, name: string): string | undefined => {
     .split(';')
     .reduce<Record<string, string>>((acc, part) => {
       const [rawKey, ...rest] = part.trim().split('=');
-      if (!rawKey) {
+      if (rawKey == null || !rawKey) {
         return acc;
       }
       const key = decodeURIComponent(rawKey);
@@ -52,28 +57,50 @@ const createSession = (userId: number) => {
 
 const getUserFromSession = (req: express.Request) => {
   const sessionId = getCookie(req, 'sid');
-  if (!sessionId) return null;
-  const session = db
+  if (sessionId == null) {
+    return null;
+  }
+  const sessionRow = db
     .prepare(
       'SELECT s.user_id as user_id, s.expires_at as expires_at FROM sessions s WHERE s.id = ?',
     )
-    .get(sessionId) as {user_id: number; expires_at: string} | undefined;
+    .get(sessionId);
+  const session =
+    sessionRow != null ? SessionRowSchema.parse(sessionRow) : undefined;
 
-  if (!session) return null;
+  if (!session) {
+    return null;
+  }
   if (new Date(session.expires_at).getTime() < Date.now()) {
     db.prepare('DELETE FROM sessions WHERE id = ?').run(sessionId);
     return null;
   }
 
   const user = db
-    .prepare('SELECT * FROM users WHERE id = ?')
-    .get(session.user_id) as any;
-  if (!user) return null;
-  delete user.password_hash;
+    .prepare(
+      `
+        SELECT
+          id,
+          username,
+          email,
+          role,
+          points,
+          streak_count,
+          created_at,
+          updated_at
+        FROM users
+        WHERE id = ?
+      `,
+    )
+    .get(session.user_id);
+  if (user == null) {
+    return null;
+  }
   return UserSchema.parse(user);
 };
 
 // POST /api/auth/login - User login
+// eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
 router.post('/login', async (req, res) => {
   try {
     // Validate request body
@@ -81,9 +108,14 @@ router.post('/login', async (req, res) => {
     const {email, password} = validatedBody;
 
     // Query user from database
-    const user = db
-      .prepare('SELECT * FROM users WHERE email = ?')
-      .get(email) as any;
+    const userRow = db
+      .prepare(
+        `SELECT id, username, email, password_hash, role, points, streak_count, created_at, updated_at
+         FROM users WHERE email = ?`,
+      )
+      .get(email);
+    const user =
+      userRow != null ? UserWithPasswordRowSchema.parse(userRow) : undefined;
 
     if (!user) {
       return res
@@ -101,7 +133,7 @@ router.post('/login', async (req, res) => {
     }
 
     // Create session
-    const {sessionId, expiresAt} = createSession(user.id as number);
+    const {sessionId, expiresAt} = createSession(user.id);
 
     // Set cookie (httpOnly for security; sameSite lax for simplicity here)
     res.cookie('sid', sessionId, {
@@ -112,9 +144,16 @@ router.post('/login', async (req, res) => {
       path: '/',
     });
 
-    const userWithoutPassword = {...user};
-    delete (userWithoutPassword as any).password_hash;
-    const validatedUser = UserSchema.parse(userWithoutPassword);
+    const validatedUser = UserSchema.parse({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      points: user.points,
+      streak_count: user.streak_count,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
+    });
 
     logger.info(`User logged in: ${email}`);
 
@@ -125,17 +164,13 @@ router.post('/login', async (req, res) => {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      logger.warn({errors: error.errors}, 'Login validation error');
+      logger.warn({error}, 'Login validation error');
       return res
         .status(400)
-        .json({
-          success: false,
-          error: 'Invalid request data',
-          details: error.errors,
-        });
+        .json({success: false, error: 'Invalid request data', details: error});
     }
 
-    logger.error({error: error as Error}, 'Login error');
+    logger.error({error: asError(error)}, 'Login error');
     return res
       .status(500)
       .json({success: false, error: 'Internal server error'});
@@ -143,6 +178,7 @@ router.post('/login', async (req, res) => {
 });
 
 // POST /api/auth/register - Parent self-registration and family creation optional later
+// eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
 router.post('/register', async (req, res) => {
   try {
     // Validate request body
@@ -152,9 +188,9 @@ router.post('/register', async (req, res) => {
     // Check if user already exists
     const existingUser = db
       .prepare('SELECT id FROM users WHERE email = ? OR username = ?')
-      .get(email, username) as any;
+      .get(email, username);
 
-    if (existingUser) {
+    if (existingUser != null) {
       return res
         .status(409)
         .json({
@@ -176,7 +212,7 @@ router.post('/register', async (req, res) => {
       RETURNING id, username, email, role, points, streak_count, created_at, updated_at
     `,
       )
-      .get(username, email, passwordHash, role) as any;
+      .get(username, email, passwordHash, role);
 
     const validatedUser = UserSchema.parse(result);
 
@@ -191,17 +227,17 @@ router.post('/register', async (req, res) => {
       });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      logger.warn({errors: error.errors}, 'Registration validation error');
+      logger.warn({error}, 'Registration validation error');
       return res
         .status(400)
         .json({
           success: false,
           error: 'Invalid request data',
-          details: error.errors,
+          details: error.stack,
         });
     }
 
-    logger.error({error: error as Error}, 'Registration error');
+    logger.error({error: asError(error)}, 'Registration error');
     return res
       .status(500)
       .json({success: false, error: 'Internal server error'});
@@ -212,13 +248,13 @@ router.post('/register', async (req, res) => {
 router.post('/logout', (req, res) => {
   try {
     const sessionId = getCookie(req, 'sid');
-    if (sessionId) {
+    if (sessionId != null) {
       db.prepare('DELETE FROM sessions WHERE id = ?').run(sessionId);
     }
     res.clearCookie('sid', {path: '/'});
     return res.json({success: true, message: 'Logged out'});
   } catch (error) {
-    logger.error({error: error as Error}, 'Logout error');
+    logger.error({error: asError(error)}, 'Logout error');
     return res
       .status(500)
       .json({success: false, error: 'Internal server error'});
@@ -234,7 +270,7 @@ router.get('/me', (req, res) => {
     }
     return res.json({success: true, data: user});
   } catch (error) {
-    logger.error({error: error as Error}, 'Me error');
+    logger.error({error: asError(error)}, 'Me error');
     return res
       .status(500)
       .json({success: false, error: 'Internal server error'});
@@ -245,9 +281,8 @@ router.get('/me', (req, res) => {
 router.post('/forgot', (req, res) => {
   try {
     const {email} = ForgotPasswordRequestSchema.parse(req.body);
-    const user = db
-      .prepare('SELECT id FROM users WHERE email = ?')
-      .get(email) as {id: number} | undefined;
+    const row = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
+    const user = row != null ? IdRowSchema.parse(row) : undefined;
 
     // Always respond with success to prevent enumeration
     if (!user) {
@@ -276,7 +311,7 @@ router.post('/forgot', (req, res) => {
         .status(400)
         .json({success: false, error: 'Invalid request data'});
     }
-    logger.error({error: error as Error}, 'Forgot password error');
+    logger.error({error: asError(error)}, 'Forgot password error');
     return res
       .status(500)
       .json({success: false, error: 'Internal server error'});
@@ -284,16 +319,16 @@ router.post('/forgot', (req, res) => {
 });
 
 // POST /api/auth/reset - reset password
+// eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
 router.post('/reset', async (req, res) => {
   try {
     const {token, password} = ResetPasswordSchema.parse(req.body);
-    const found = db
+    const row = db
       .prepare(
         'SELECT token, user_id, expires_at, used FROM password_resets WHERE token = ?',
       )
-      .get(token) as
-      | {token: string; user_id: number; expires_at: string; used: number}
-      | undefined;
+      .get(token);
+    const found = row != null ? PasswordResetRowSchema.parse(row) : undefined;
 
     if (!found || found.used) {
       return res.status(400).json({success: false, error: 'Invalid token'});
@@ -318,7 +353,7 @@ router.post('/reset', async (req, res) => {
         .status(400)
         .json({success: false, error: 'Invalid request data'});
     }
-    logger.error({error: error as Error}, 'Reset password error');
+    logger.error({error: asError(error)}, 'Reset password error');
     return res
       .status(500)
       .json({success: false, error: 'Internal server error'});

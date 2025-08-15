@@ -5,7 +5,9 @@ import {FormSection} from './FormSection';
 describe('GridContainer + FormSection', () => {
   it('renders content', () => {
     render(
-      <GridContainer cols={2} gap="md">
+      <GridContainer cols={2}
+gap="md"
+      >
         <FormSection title="S">
           <div>c</div>
         </FormSection>
@@ -21,7 +23,7 @@ describe('GridContainer + FormSection', () => {
         <div>child</div>
       </GridContainer>,
     );
-    const el = screen.getByText('child').parentElement as HTMLElement;
+    const el = screen.getByText('child').parentElement!;
     expect(el).toHaveClass('grid');
     expect(el).toHaveClass('grid-cols-1', 'md:grid-cols-2');
     expect(el).toHaveClass('gap-4');

@@ -4,18 +4,18 @@ import {StatCard, getStatColorClass} from './StatCard';
 describe('StatCard', () => {
   it('renders icon, label and value', () => {
     render(
-      <StatCard icon={<span>i</span>} label="L" value={123} color="blue" />,
+      <StatCard color="blue" icon={<span>i</span>} label="L" value={123} />,
     );
     expect(screen.getByText('L')).toBeInTheDocument();
     expect(screen.getByText('123')).toBeInTheDocument();
   });
 
   it('covers color variants', () => {
-    const {rerender} = render(<StatCard label="a" value="1" color="yellow" />);
-    rerender(<StatCard label="b" value="2" color="green" />);
-    rerender(<StatCard label="c" value="3" color="red" />);
-    rerender(<StatCard label="d" value="4" color="purple" />);
-    rerender(<StatCard label="e" value="5" color="gray" />);
+    const {rerender} = render(<StatCard color="yellow" label="a" value="1" />);
+    rerender(<StatCard color="green" label="b" value="2" />);
+    rerender(<StatCard color="red" label="c" value="3" />);
+    rerender(<StatCard color="purple" label="d" value="4" />);
+    rerender(<StatCard color="gray" label="e" value="5" />);
   });
 
   it('uses default color when not provided', () => {
@@ -31,6 +31,6 @@ describe('StatCard', () => {
     expect(getStatColorClass('red')).toBeTruthy();
     expect(getStatColorClass('purple')).toBeTruthy();
     expect(getStatColorClass('gray')).toBeTruthy();
-    expect(getStatColorClass(undefined as any)).toBeTruthy();
+    expect(getStatColorClass()).toBeTruthy();
   });
 });

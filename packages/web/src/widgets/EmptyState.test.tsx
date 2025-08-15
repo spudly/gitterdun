@@ -5,10 +5,10 @@ describe('EmptyState', () => {
   it('renders title, description and action', () => {
     render(
       <EmptyState
-        title="T"
-        description="D"
         action={<button type="button">A</button>}
+        description="D"
         icon={<span aria-hidden>i</span>}
+        title="T"
       />,
     );
     expect(screen.getByText('T')).toBeInTheDocument();

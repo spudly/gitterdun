@@ -1,4 +1,5 @@
-import {FC, useState} from 'react';
+import type {FC} from 'react';
+import { useState} from 'react';
 import {Alert} from './Alert.js';
 
 const AlertDemo: FC = () => {
@@ -29,11 +30,11 @@ const AlertDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">With Titles</h3>
 
-        <Alert type="success" title="Success!">
+        <Alert title="Success!" type="success">
           Your changes have been saved successfully.
         </Alert>
 
-        <Alert type="error" title="Error Occurred">
+        <Alert title="Error Occurred" type="error">
           There was a problem processing your request.
         </Alert>
       </div>
@@ -41,20 +42,24 @@ const AlertDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Dismissible Alert</h3>
 
-        {dismissibleAlert && (
+        {dismissibleAlert ? (
           <Alert
-            type="info"
+            onDismiss={() => {
+              setDismissibleAlert(false);
+            }}
             title="Dismissible Alert"
-            onDismiss={() => setDismissibleAlert(false)}
+            type="info"
           >
             This alert can be dismissed by clicking the X button.
           </Alert>
-        )}
+        ) : null}
 
         <button
-          type="button"
           className="bg-blue-600 text-white px-4 py-2 rounded"
-          onClick={() => setDismissibleAlert(true)}
+          onClick={() => {
+            setDismissibleAlert(true);
+          }}
+          type="button"
         >
           Show Alert Again
         </button>
@@ -63,10 +68,7 @@ const AlertDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Custom Styling</h3>
 
-        <Alert
-          type="warning"
-          className="border-2 border-yellow-400 bg-yellow-100"
-        >
+        <Alert outlined type="warning">
           This alert has custom styling applied.
         </Alert>
       </div>

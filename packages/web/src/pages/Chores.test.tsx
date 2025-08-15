@@ -36,8 +36,8 @@ describe('Chores page', () => {
   });
 
   it('renders status dot/badge branches including pending', async () => {
-    const {choresApi}: any = apiModule;
-    choresApi.getAll.mockResolvedValueOnce({
+    const mocked = jest.mocked(apiModule);
+    mocked.choresApi.getAll.mockResolvedValueOnce({
       success: true,
       data: [
         {
@@ -70,8 +70,8 @@ describe('Chores page', () => {
   });
 
   it('renders penalty and due date meta when present', async () => {
-    const {choresApi}: any = apiModule;
-    choresApi.getAll.mockResolvedValueOnce({
+    const mocked = jest.mocked(apiModule);
+    mocked.choresApi.getAll.mockResolvedValueOnce({
       success: true,
       data: [
         {

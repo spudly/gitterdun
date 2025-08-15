@@ -1,7 +1,7 @@
 import {render, screen, fireEvent, act} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Family from './Family';
-import * as useUserModule from '../hooks/useUser';
+import {useUser} from '../hooks/useUser';
 import * as apiModule from '../lib/api';
 
 jest.mock('../hooks/useUser', () => ({
@@ -27,9 +27,22 @@ const wrap = (ui: React.ReactElement) => (
 
 describe('Family page', () => {
   it('requires login when user is null', () => {
-    (useUserModule.useUser as unknown as jest.Mock).mockReturnValueOnce({
+    const mockedUseUser = jest.mocked(useUser);
+    mockedUseUser.mockReturnValueOnce({
       user: null,
-    } as any);
+      isLoading: false,
+      error: null,
+      login: jest.fn(),
+      register: jest.fn(),
+      logout: jest.fn(),
+      forgotPassword: jest.fn(),
+      resetPassword: jest.fn(),
+      isLoggingIn: false,
+      isRegistering: false,
+      isLoggingOut: false,
+      loginError: null,
+      registerError: null,
+    } as ReturnType<typeof useUser>);
     render(wrap(<Family />));
     expect(
       screen.getByText('Please log in to manage your family.'),
@@ -43,7 +56,7 @@ describe('Family page', () => {
   });
 
   it('allows creating a new family and child & inviting a member', async () => {
-    const {familiesApi, invitationsApi}: any = apiModule;
+    const {familiesApi, invitationsApi} = jest.mocked(apiModule);
     familiesApi.create.mockResolvedValueOnce({success: true});
     familiesApi.createChild.mockResolvedValueOnce({success: true});
     invitationsApi.create.mockResolvedValueOnce({success: true});

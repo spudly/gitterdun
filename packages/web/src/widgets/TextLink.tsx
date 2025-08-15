@@ -1,10 +1,12 @@
-import {FC, ReactNode} from 'react';
-import {Link, LinkProps} from 'react-router-dom';
+import clsx from 'clsx';
+import type {FC, ReactNode} from 'react';
+import type {LinkProps} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
-export interface TextLinkProps extends LinkProps {
-  children: ReactNode;
-  className?: string;
-}
+export type TextLinkProps = LinkProps & {
+  readonly children: ReactNode;
+  readonly className?: string;
+};
 
 export const TextLink: FC<TextLinkProps> = ({
   children,
@@ -12,7 +14,7 @@ export const TextLink: FC<TextLinkProps> = ({
   ...rest
 }) => {
   return (
-    <Link {...rest} className={`text-indigo-600 ${className}`}>
+    <Link {...rest} className={clsx('text-indigo-600', className)}>
       {children}
     </Link>
   );

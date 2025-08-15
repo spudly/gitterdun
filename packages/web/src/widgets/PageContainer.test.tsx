@@ -28,7 +28,7 @@ describe('PageContainer', () => {
     );
     expect(screen.getByText('n')).toBeInTheDocument();
     rerender(
-      <PageContainer className="x">
+      <PageContainer>
         <div>x</div>
       </PageContainer>,
     );

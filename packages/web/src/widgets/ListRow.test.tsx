@@ -5,12 +5,12 @@ describe('ListRow', () => {
   it('renders all regions when provided', () => {
     render(
       <ListRow
-        left={<span>L</span>}
-        title="Title"
-        titleRight={<span>TR</span>}
         description="Desc"
+        left={<span>L</span>}
         meta={<span>M</span>}
         right={<button type="button">R</button>}
+        title="Title"
+        titleRight={<span>TR</span>}
       />,
     );
     expect(screen.getByText('L')).toBeInTheDocument();

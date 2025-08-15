@@ -1,5 +1,6 @@
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query';
-import {User} from '@gitterdun/shared';
+import {UserSchema} from '@gitterdun/shared';
+import type {User} from '@gitterdun/shared';
 import {authApi} from '../lib/api.js';
 
 export const useUser = () => {
@@ -15,7 +16,7 @@ export const useUser = () => {
       try {
         const res = await authApi.me();
         if (res.success && res.data) {
-          return res.data as unknown as User;
+          return UserSchema.parse(res.data);
         }
         return null;
       } catch (_error) {
@@ -52,11 +53,11 @@ export const useUser = () => {
     },
   });
 
-  const login = (email: string, password: string) => {
+  const login = async (email: string, password: string) => {
     return loginMutation.mutateAsync({email, password});
   };
 
-  const register = (
+  const register = async (
     username: string,
     email: string,
     password: string,
@@ -70,7 +71,7 @@ export const useUser = () => {
     });
   };
 
-  const logout = () => {
+  const logout = async () => {
     return logoutMutation.mutateAsync();
   };
 
@@ -81,8 +82,8 @@ export const useUser = () => {
     login,
     register,
     logout,
-    forgotPassword: (email: string) => authApi.forgotPassword({email}),
-    resetPassword: (token: string, password: string) =>
+    forgotPassword: async (email: string) => authApi.forgotPassword({email}),
+    resetPassword: async (token: string, password: string) =>
       authApi.resetPassword({token, password}),
     isLoggingIn: loginMutation.isPending,
     isRegistering: registerMutation.isPending,

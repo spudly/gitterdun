@@ -4,7 +4,9 @@ import {InputGroup} from './InputGroup';
 describe('InputGroup', () => {
   it('renders help and error', () => {
     render(
-      <InputGroup helpText="H" error="E">
+      <InputGroup error="E"
+helpText="H"
+      >
         <input />
       </InputGroup>,
     );

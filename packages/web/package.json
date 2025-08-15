@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "rm -rf dist",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint src/**/*.ts src/**/*.tsx",
@@ -20,7 +21,8 @@
     "clsx": "^2.1.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-router-dom": "^6.22.3"
+    "react-router-dom": "^6.22.3",
+    "zod": "^4.0.17"
   },
   "devDependencies": {
     "@babel/plugin-transform-react-jsx": "^7.27.1",

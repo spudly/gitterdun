@@ -1,6 +1,6 @@
-import {FC} from 'react';
+import type {FC} from 'react';
 import {useQuery} from '@tanstack/react-query';
-import {ChoreWithUsername} from '@gitterdun/shared';
+import type {ChoreWithUsername} from '@gitterdun/shared';
 import {choresApi} from '../lib/api.js';
 import {useUser} from '../hooks/useUser.js';
 import {PageContainer} from '../widgets/PageContainer.js';
@@ -18,11 +18,11 @@ const Chores: FC = () => {
 
   const {data: choresResponse, isLoading} = useQuery({
     queryKey: ['chores'],
-    queryFn: () => choresApi.getAll(),
+    queryFn: async () => choresApi.getAll(),
     enabled: !!user,
   });
 
-  const chores = choresResponse?.data || [];
+  const chores = choresResponse?.data ?? [];
 
   if (isLoading) {
     return (
@@ -59,32 +59,26 @@ const Chores: FC = () => {
       <List>
         {chores.map((chore: ChoreWithUsername) => (
           <ListRow
+            description={chore.description}
             key={chore.id}
             left={renderStatusDot(chore.status)}
-            title={chore.title}
-            titleRight={
-              <>
-                {renderStatusBadge(chore.status)}
-                {chore.chore_type === 'bonus' && (
-                  <Badge variant="purple">Bonus</Badge>
-                )}
-              </>
-            }
-            description={chore.description}
             meta={
               <InlineMeta>
                 <span>Points: {chore.point_reward}</span>
+
                 {chore.bonus_points > 0 && (
                   <span>Bonus: +{chore.bonus_points}</span>
                 )}
+
                 {chore.penalty_points > 0 && (
                   <span>Penalty: -{chore.penalty_points}</span>
                 )}
-                {chore.due_date && (
+
+                {chore.due_date != null ? (
                   <span>
                     Due: {new Date(chore.due_date).toLocaleDateString()}
                   </span>
-                )}
+                ) : null}
               </InlineMeta>
             }
             right={
@@ -93,6 +87,16 @@ const Chores: FC = () => {
                   Complete
                 </Button>
               ) : undefined
+            }
+            title={chore.title}
+            titleRight={
+              <>
+                {renderStatusBadge(chore.status)}
+
+                {chore.chore_type === 'bonus' && (
+                  <Badge variant="purple">Bonus</Badge>
+                )}
+              </>
             }
           />
         ))}

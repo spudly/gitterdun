@@ -5,7 +5,10 @@ describe('Alert', () => {
   it('shows types, title and dismiss', () => {
     const onDismiss = jest.fn();
     const {rerender} = render(
-      <Alert type="info" title="T" onDismiss={onDismiss}>
+      <Alert onDismiss={onDismiss}
+title="T"
+type="info"
+      >
         Body
       </Alert>,
     );

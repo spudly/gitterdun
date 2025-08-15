@@ -1,8 +1,9 @@
-import {FC} from 'react';
-import {RankingList, RankingItem} from './RankingList.js';
+import type {FC} from 'react';
+import type {RankingItem} from './RankingList.js';
+import {RankingList} from './RankingList.js';
 
 const RankingListDemo: FC = () => {
-  const sampleRankings: RankingItem[] = [
+  const sampleRankings: Array<RankingItem> = [
     {
       id: 1,
       rank: 1,
@@ -53,7 +54,7 @@ const RankingListDemo: FC = () => {
     },
   ];
 
-  const teamRankings: RankingItem[] = [
+  const teamRankings: Array<RankingItem> = [
     {
       id: 'team-1',
       rank: 1,
@@ -90,48 +91,55 @@ const RankingListDemo: FC = () => {
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Basic Ranking List</h3>
+
         <RankingList
           items={sampleRankings}
-          title="Full Rankings"
           subtitle="Sorted by total points"
+          title="Full Rankings"
         />
       </div>
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Team Rankings</h3>
+
         <RankingList
           items={teamRankings}
-          title="Team Performance"
           subtitle="Weekly challenge results"
+          title="Team Performance"
         />
       </div>
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Without Ranks</h3>
+
         <RankingList
           items={sampleRankings}
-          title="Participants"
           showRank={false}
+          title="Participants"
         />
       </div>
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Custom Styling</h3>
+
         <RankingList
           items={sampleRankings.slice(0, 3)}
+          outlineColor="blue"
+          outlined
           title="Top Performers"
-          className="border-2 border-blue-200"
         />
       </div>
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Usage Example</h3>
+
         <div className="bg-gray-50 p-6 rounded-lg">
           <h3 className="text-xl font-semibold mb-4">Monthly Leaderboard</h3>
+
           <RankingList
             items={sampleRankings}
-            title="Full Rankings"
             subtitle="Sorted by total points"
+            title="Full Rankings"
           />
 
           <div className="text-center mt-6">

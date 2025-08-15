@@ -1,13 +1,14 @@
-import {FC} from 'react';
+import type {FC} from 'react';
+import clsx from 'clsx';
 
 type StatusColor = 'green' | 'blue' | 'yellow' | 'red' | 'gray';
 
-export interface StatusDotProps {
-  color?: StatusColor;
-  size?: number;
-  label?: string;
-  className?: string;
-}
+export type StatusDotProps = {
+  readonly color?: StatusColor;
+  readonly size?: number;
+  readonly label?: string;
+  readonly className?: string;
+};
 
 const COLOR_MAP: Record<StatusColor, string> = {
   green: 'bg-green-500',
@@ -17,7 +18,7 @@ const COLOR_MAP: Record<StatusColor, string> = {
   gray: 'bg-gray-300',
 };
 
-export const getDotColorClass = (color?: StatusColor): string => {
+export const getDotColorClass = (color: StatusColor = 'gray'): string => {
   switch (color) {
     case 'green':
       return COLOR_MAP.green;
@@ -28,7 +29,6 @@ export const getDotColorClass = (color?: StatusColor): string => {
     case 'red':
       return COLOR_MAP.red;
     case 'gray':
-      return COLOR_MAP.gray;
     default:
       return COLOR_MAP.gray;
   }
@@ -42,9 +42,13 @@ export const StatusDot: FC<StatusDotProps> = ({
 }) => {
   return (
     <span
-      role={label ? 'img' : undefined}
-      aria-label={label}
-      className={`inline-block rounded-full ${getDotColorClass(color)} ${className}`}
+      aria-hidden={label == null}
+      aria-label={label ?? undefined}
+      className={clsx(
+        'inline-block rounded-full',
+        getDotColorClass(color),
+        className,
+      )}
       style={{width: size, height: size}}
     />
   );

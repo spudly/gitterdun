@@ -11,7 +11,7 @@
     },
     "lint": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**/*.{ts,tsx,js,jsx,json,css}"]
+      "inputs": ["src/**/*.{ts,tsx,js,jsx,json,css}", "eslint.config.mjs"]
     },
     "test": {
       "dependsOn": ["^build"],

@@ -5,13 +5,14 @@ describe('SelectInput', () => {
   it('changes and shows error', () => {
     const onChange = jest.fn();
     render(
-      <SelectInput onChange={v => onChange(v)} error="bad" defaultValue="">
+      <SelectInput defaultValue="" error="bad" onChange={onChange}>
         <option value="">-</option>
+
         <option value="a">A</option>
       </SelectInput>,
     );
     fireEvent.change(screen.getByDisplayValue('-'), {target: {value: 'a'}});
-    expect(onChange).toHaveBeenCalledWith('a');
+    expect(onChange).toHaveBeenCalledWith('a', expect.any(Object));
     expect(screen.getByText('bad')).toBeInTheDocument();
     const select = screen.getByRole('combobox');
     expect(select).toHaveClass('border-red-500');
@@ -21,6 +22,7 @@ describe('SelectInput', () => {
     render(
       <SelectInput defaultValue="">
         <option value="">-</option>
+
         <option value="a">A</option>
       </SelectInput>,
     );

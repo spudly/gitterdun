@@ -1,10 +1,16 @@
-import {ChangeEvent, FC, SelectHTMLAttributes} from 'react';
+import type {ChangeEvent, FC, SelectHTMLAttributes} from 'react';
+import clsx from 'clsx';
 
-export interface SelectInputProps
-  extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'onChange'> {
-  error?: string | null;
-  onChange?: (value: string, event: ChangeEvent<HTMLSelectElement>) => void;
-}
+export type SelectInputProps = Omit<
+  SelectHTMLAttributes<HTMLSelectElement>,
+  'onChange'
+> & {
+  readonly error?: string | null;
+  readonly onChange?: (
+    value: string,
+    event: ChangeEvent<HTMLSelectElement>,
+  ) => void;
+};
 
 export const SelectInput: FC<SelectInputProps> = ({
   error,
@@ -15,19 +21,21 @@ export const SelectInput: FC<SelectInputProps> = ({
 }) => {
   const base =
     'w-full border rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500';
-  const errorCls = error
-    ? 'border-red-500 focus:ring-red-500'
-    : 'border-gray-300';
+  const errorCls =
+    error != null ? 'border-red-500 focus:ring-red-500' : 'border-gray-300';
   return (
     <div className={className}>
       <select
-        className={`${base} ${errorCls}`}
+        className={clsx(base, errorCls)}
         onChange={e => onChange?.(e.target.value, e)}
         {...rest}
       >
         {children}
       </select>
-      {error && <div className="mt-1 text-xs text-red-600">{error}</div>}
+
+      {error != null ? (
+        <div className="mt-1 text-xs text-red-600">{error}</div>
+      ) : null}
     </div>
   );
 };

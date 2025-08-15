@@ -1,4 +1,4 @@
-import {FC, ReactNode} from 'react';
+import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
 type AllowedAs = 'p' | 'span' | 'h1' | 'h2' | 'h3';
@@ -21,28 +21,28 @@ const WEIGHT: Record<TextWeight, string> = {
   bold: 'font-bold',
 };
 
-export interface TextProps {
-  children: ReactNode;
-  as?: AllowedAs;
-  size?: TextSize;
-  weight?: TextWeight;
-  muted?: boolean;
-  uppercase?: boolean;
-  capitalize?: boolean;
-}
+export type TextProps = {
+  readonly children: ReactNode;
+  readonly as?: AllowedAs;
+  readonly size?: TextSize;
+  readonly weight?: TextWeight;
+  readonly muted?: boolean;
+  readonly uppercase?: boolean;
+  readonly capitalize?: boolean;
+};
 
 export const Text: FC<TextProps> = ({
   children,
-  as = 'p',
+  as: Element = 'p',
   size = 'md',
   weight = 'normal',
   muted = false,
   uppercase = false,
   capitalize = false,
 }) => {
-  const Comp: any = as;
   return (
-    <Comp
+    <Element
+      // eslint-disable-next-line react/forbid-component-props -- this is a native element, so className is OK
       className={clsx(
         SIZE[size],
         WEIGHT[weight],
@@ -52,7 +52,7 @@ export const Text: FC<TextProps> = ({
       )}
     >
       {children}
-    </Comp>
+    </Element>
   );
 };
 

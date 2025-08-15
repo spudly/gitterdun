@@ -1,13 +1,15 @@
-import {FC, useEffect, useState} from 'react';
+import type {FC} from 'react';
+import {useEffect, useState} from 'react';
+import clsx from 'clsx';
 
 type SpinnerSize = 'sm' | 'md' | 'lg';
 
-export interface SpinnerProps {
-  size?: SpinnerSize;
-  inline?: boolean;
-  className?: string;
-  delayMs?: number;
-}
+export type SpinnerProps = {
+  readonly size?: SpinnerSize;
+  readonly inline?: boolean;
+  readonly className?: string;
+  readonly delayMs?: number;
+};
 
 const SIZE_MAP: Record<SpinnerSize, string> = {
   sm: 'w-4 h-4 border-2',
@@ -23,17 +25,25 @@ export const Spinner: FC<SpinnerProps> = ({
 }) => {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
-    const id = setTimeout(() => setVisible(true), delayMs);
-    return () => clearTimeout(id);
+    const id = setTimeout(() => {
+      setVisible(true);
+    }, delayMs);
+    return () => {
+      clearTimeout(id);
+    };
   }, [delayMs]);
 
   if (!visible) {
     return null;
   }
 
-  const base = `animate-spin rounded-full border-b-transparent border-indigo-600 ${SIZE_MAP[size]} ${className}`;
+  const base = clsx(
+    'animate-spin rounded-full border-b-transparent border-indigo-600',
+    SIZE_MAP[size],
+    className,
+  );
   if (inline) {
-    return <span aria-label="loading" className={`inline-block ${base}`} />;
+    return <span aria-label="loading" className={clsx('inline-block', base)} />;
   }
-  return <div aria-label="loading" className={`mx-auto ${base}`} />;
+  return <div aria-label="loading" className={clsx('mx-auto', base)} />;
 };

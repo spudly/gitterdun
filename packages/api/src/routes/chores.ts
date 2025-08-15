@@ -5,6 +5,11 @@ import {
   ChoreQuerySchema,
   ChoreSchema,
   ChoreWithUsernameSchema,
+  ChoreAssignmentSchema,
+  asError,
+  CountRowSchema,
+  IdParamSchema,
+  CompleteChoreBodySchema,
 } from '@gitterdun/shared';
 import {z} from 'zod';
 import db from '../lib/db';
@@ -13,6 +18,7 @@ import {logger} from '../utils/logger';
 const router = express.Router();
 
 // GET /api/chores - Get all chores
+// eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
 router.get('/', async (req, res) => {
   try {
     // Validate query parameters
@@ -26,12 +32,15 @@ router.get('/', async (req, res) => {
     } = validatedQuery;
 
     let query = `
-      SELECT c.*, u.username as created_by_username 
+      SELECT 
+        c.id, c.title, c.description, c.point_reward, c.bonus_points, c.penalty_points,
+        c.due_date, c.recurrence_rule, c.chore_type, c.status, c.created_by, c.created_at, c.updated_at,
+        u.username as created_by_username 
       FROM chores c 
       LEFT JOIN users u ON c.created_by = u.id
       WHERE 1=1
     `;
-    const params: any[] = [];
+    const params: Array<string | number> = [];
 
     if (status) {
       query += ' AND c.status = ?';
@@ -43,7 +52,7 @@ router.get('/', async (req, res) => {
       params.push(choreType);
     }
 
-    if (userId) {
+    if (userId != null) {
       query +=
         ' AND c.id IN (SELECT chore_id FROM chore_assignments WHERE user_id = ?)';
       params.push(userId);
@@ -51,18 +60,18 @@ router.get('/', async (req, res) => {
 
     // Get total count for pagination
     const countQuery = query.replace(
-      'c.*, u.username as created_by_username',
-      'COUNT(*) as total',
+      /SELECT[\s\S]*?FROM/,
+      'SELECT COUNT(*) as total FROM',
     );
-    const totalResult = db.prepare(countQuery).get(...params) as any;
-    const {total} = totalResult;
+    const totalRow = db.prepare(countQuery).get(...params);
+    const {count: total} = CountRowSchema.parse(totalRow);
 
     // Add pagination and ordering
     query += ' ORDER BY c.created_at DESC LIMIT ? OFFSET ?';
     const offset = (page - 1) * limit;
     params.push(limit, offset);
 
-    const chores = db.prepare(query).all(...params) as any[];
+    const chores = db.prepare(query).all(...params);
     const validatedChores = chores.map(chore =>
       ChoreWithUsernameSchema.parse(chore),
     );
@@ -74,17 +83,17 @@ router.get('/', async (req, res) => {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      logger.warn({errors: error.errors}, 'Chores query validation error');
+      logger.warn({error}, 'Chores query validation error');
       return res
         .status(400)
         .json({
           success: false,
           error: 'Invalid query parameters',
-          details: error.errors,
+          details: error.stack,
         });
     }
 
-    logger.error({error: error as Error}, 'Get chores error');
+    logger.error({error: asError(error)}, 'Get chores error');
     return res
       .status(500)
       .json({success: false, error: 'Internal server error'});
@@ -92,6 +101,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/chores - Create a new chore
+// eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
 router.post('/', async (req, res) => {
   try {
     // Validate request body
@@ -111,7 +121,7 @@ router.post('/', async (req, res) => {
     // Start transaction
     const transaction = db.transaction(() => {
       // Create the chore
-      const newChore = db
+      const createdRow = db
         .prepare(
           `
         INSERT INTO chores (title, description, point_reward, bonus_points, penalty_points, due_date, recurrence_rule, chore_type, created_by) 
@@ -129,7 +139,9 @@ router.post('/', async (req, res) => {
           recurrenceRule,
           choreType,
           1,
-        ) as any; // TODO: Get actual user ID from auth
+        ); // TODO: Get actual user ID from auth
+
+      const newChore = ChoreSchema.parse(createdRow);
 
       // Assign to users if specified
       if (assignedUsers.length > 0) {
@@ -144,7 +156,6 @@ router.post('/', async (req, res) => {
     });
 
     const newChore = transaction();
-    const validatedChore = ChoreSchema.parse(newChore);
 
     logger.info({choreId: newChore.id, title}, 'New chore created');
 
@@ -152,22 +163,22 @@ router.post('/', async (req, res) => {
       .status(201)
       .json({
         success: true,
-        data: validatedChore,
+        data: newChore,
         message: 'Chore created successfully',
       });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      logger.warn({errors: error.errors}, 'Create chore validation error');
+      logger.warn({error}, 'Create chore validation error');
       return res
         .status(400)
         .json({
           success: false,
           error: 'Invalid request data',
-          details: error.errors,
+          details: error.stack,
         });
     }
 
-    logger.error({error: error as Error}, 'Create chore error');
+    logger.error({error: asError(error)}, 'Create chore error');
     return res
       .status(500)
       .json({success: false, error: 'Internal server error'});
@@ -175,10 +186,10 @@ router.post('/', async (req, res) => {
 });
 
 // GET /api/chores/:id - Get a specific chore
+// eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
 router.get('/:id', async (req, res) => {
   try {
-    const {id} = req.params;
-    const choreId = parseInt(id, 10);
+    const {id: choreId} = IdParamSchema.parse(req.params);
 
     if (Number.isNaN(choreId)) {
       return res.status(400).json({success: false, error: 'Invalid chore ID'});
@@ -187,15 +198,18 @@ router.get('/:id', async (req, res) => {
     const chore = db
       .prepare(
         `
-      SELECT c.*, u.username as created_by_username 
+      SELECT 
+        c.id, c.title, c.description, c.point_reward, c.bonus_points, c.penalty_points,
+        c.due_date, c.recurrence_rule, c.chore_type, c.status, c.created_by, c.created_at, c.updated_at,
+        u.username as created_by_username 
       FROM chores c 
       LEFT JOIN users u ON c.created_by = u.id 
       WHERE c.id = ?
     `,
       )
-      .get(choreId) as any;
+      .get(choreId);
 
-    if (!chore) {
+    if (chore == null) {
       return res.status(404).json({success: false, error: 'Chore not found'});
     }
 
@@ -203,7 +217,7 @@ router.get('/:id', async (req, res) => {
 
     return res.json({success: true, data: validatedChore});
   } catch (error) {
-    logger.error({error: error as Error}, 'Get chore error');
+    logger.error({error: asError(error)}, 'Get chore error');
     return res
       .status(500)
       .json({success: false, error: 'Internal server error'});
@@ -211,10 +225,11 @@ router.get('/:id', async (req, res) => {
 });
 
 // PUT /api/chores/:id - Update a chore
+// eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
 router.put('/:id', async (req, res) => {
   try {
-    const {id} = req.params;
-    const choreId = parseInt(id, 10);
+    const {id} = IdParamSchema.parse(req.params);
+    const choreId = id;
     const validatedBody = UpdateChoreSchema.parse(req.body);
 
     if (Number.isNaN(choreId)) {
@@ -224,15 +239,15 @@ router.put('/:id', async (req, res) => {
     // Check if chore exists
     const existingChore = db
       .prepare('SELECT id FROM chores WHERE id = ?')
-      .get(choreId) as any;
+      .get(choreId);
 
-    if (!existingChore) {
+    if (existingChore == null) {
       return res.status(404).json({success: false, error: 'Chore not found'});
     }
 
     // Build update query dynamically
-    const updateFields: string[] = [];
-    const values: any[] = [];
+    const updateFields: Array<string> = [];
+    const values: Array<string | number> = [];
 
     if (validatedBody.title !== undefined) {
       updateFields.push('title = ?');
@@ -296,7 +311,7 @@ router.put('/:id', async (req, res) => {
       RETURNING *
     `;
 
-    const updatedChore = db.prepare(updateQuery).get(...values) as any;
+    const updatedChore = db.prepare(updateQuery).get(...values);
     const validatedChore = ChoreSchema.parse(updatedChore);
 
     logger.info({choreId}, 'Chore updated');
@@ -308,17 +323,17 @@ router.put('/:id', async (req, res) => {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      logger.warn({errors: error.errors}, 'Update chore validation error');
+      logger.warn({error}, 'Update chore validation error');
       return res
         .status(400)
         .json({
           success: false,
           error: 'Invalid request data',
-          details: error.errors,
+          details: error.stack,
         });
     }
 
-    logger.error({error: error as Error}, 'Update chore error');
+    logger.error({error: asError(error)}, 'Update chore error');
     return res
       .status(500)
       .json({success: false, error: 'Internal server error'});
@@ -326,10 +341,11 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE /api/chores/:id - Delete a chore
+// eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
 router.delete('/:id', async (req, res) => {
   try {
-    const {id} = req.params;
-    const choreId = parseInt(id, 10);
+    const {id} = IdParamSchema.parse(req.params);
+    const choreId = id;
 
     if (Number.isNaN(choreId)) {
       return res.status(400).json({success: false, error: 'Invalid chore ID'});
@@ -338,9 +354,9 @@ router.delete('/:id', async (req, res) => {
     // Check if chore exists
     const existingChore = db
       .prepare('SELECT id FROM chores WHERE id = ?')
-      .get(choreId) as any;
+      .get(choreId);
 
-    if (!existingChore) {
+    if (existingChore == null) {
       return res.status(404).json({success: false, error: 'Chore not found'});
     }
 
@@ -351,7 +367,7 @@ router.delete('/:id', async (req, res) => {
 
     return res.json({success: true, message: 'Chore deleted successfully'});
   } catch (error) {
-    logger.error({error: error as Error}, 'Delete chore error');
+    logger.error({error: asError(error)}, 'Delete chore error');
     return res
       .status(500)
       .json({success: false, error: 'Internal server error'});
@@ -359,47 +375,54 @@ router.delete('/:id', async (req, res) => {
 });
 
 // POST /api/chores/:id/complete - Mark a chore as completed
+// eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
 router.post('/:id/complete', async (req, res) => {
   try {
-    const {id} = req.params;
-    const choreId = parseInt(id, 10);
-    const {userId, notes} = req.body;
+    const {id} = IdParamSchema.parse(req.params);
+    const choreId = id;
+    const {userId, notes} = CompleteChoreBodySchema.parse(req.body);
 
     if (Number.isNaN(choreId)) {
       return res.status(400).json({success: false, error: 'Invalid chore ID'});
     }
 
-    if (!userId) {
-      return res
-        .status(400)
-        .json({success: false, error: 'User ID is required'});
-    }
+    // userId is validated via schema
 
     // Start transaction
     const transaction = db.transaction(() => {
       // Check if chore assignment exists
-      const assignment = db
+      const assignmentRow = db
         .prepare(
-          'SELECT * FROM chore_assignments WHERE chore_id = ? AND user_id = ?',
+          `SELECT id, chore_id, user_id, assigned_at, completed_at, approved_at, approved_by,
+                  points_earned, bonus_points_earned, penalty_points_earned, notes
+           FROM chore_assignments WHERE chore_id = ? AND user_id = ?`,
         )
-        .get(choreId, userId) as any;
+        .get(choreId, userId);
 
-      if (!assignment) {
+      if (assignmentRow == null) {
         throw new Error('Chore assignment not found');
       }
 
-      if (assignment.completed_at) {
+      const assignment = ChoreAssignmentSchema.parse(assignmentRow);
+
+      if (assignment.completed_at != null) {
         throw new Error('Chore is already completed');
       }
 
       // Get chore details for points calculation
-      const chore = db
-        .prepare('SELECT * FROM chores WHERE id = ?')
-        .get(choreId) as any;
+      const choreRow = db
+        .prepare(
+          `SELECT id, title, description, point_reward, bonus_points, penalty_points,
+                         due_date, recurrence_rule, chore_type, status, created_by, created_at, updated_at
+                  FROM chores WHERE id = ?`,
+        )
+        .get(choreId);
 
-      if (!chore) {
+      if (choreRow == null) {
         throw new Error('Chore not found');
       }
+
+      const chore = ChoreSchema.parse(choreRow);
 
       // Calculate points (basic reward for now, bonus/penalty can be added later)
       const pointsEarned = chore.point_reward;
@@ -469,7 +492,7 @@ router.post('/:id/complete', async (req, res) => {
       return res.status(400).json({success: false, error: error.message});
     }
 
-    logger.error({error: error as Error}, 'Complete chore error');
+    logger.error({error: asError(error)}, 'Complete chore error');
     return res
       .status(500)
       .json({success: false, error: 'Internal server error'});

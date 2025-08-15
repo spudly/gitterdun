@@ -1,12 +1,11 @@
-import {FC, ReactNode} from 'react';
+import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export interface FormSectionProps {
-  title?: string;
-  children: ReactNode;
-  className?: string;
-  variant?: 'default' | 'compact' | 'spacious';
-}
+export type FormSectionProps = {
+  readonly title?: string;
+  readonly children: ReactNode;
+  readonly variant?: 'default' | 'compact' | 'spacious';
+};
 
 const VARIANT_STYLES = {
   default: 'p-4 bg-white rounded shadow',
@@ -17,16 +16,16 @@ const VARIANT_STYLES = {
 export const FormSection: FC<FormSectionProps> = ({
   title,
   children,
-  className = '',
   variant = 'default',
 }) => {
-  const baseStyles = clsx(VARIANT_STYLES[variant], className);
+  const baseStyles = clsx(VARIANT_STYLES[variant]);
 
   return (
     <div className={baseStyles}>
-      {title && (
+      {title != null ? (
         <h3 className="text-lg font-semibold mb-3 text-gray-900">{title}</h3>
-      )}
+      ) : null}
+
       {children}
     </div>
   );

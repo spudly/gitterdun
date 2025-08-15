@@ -8,7 +8,9 @@ describe('Demos page', () => {
       render(
         <MemoryRouter initialEntries={['/__demos']}>
           <Routes>
-            <Route path="/__demos" element={<Demos />} />
+            <Route element={<Demos />}
+path="/__demos"
+            />
           </Routes>
         </MemoryRouter>,
       );
@@ -21,7 +23,9 @@ describe('Demos page', () => {
       render(
         <MemoryRouter initialEntries={['/__demos/Button']}>
           <Routes>
-            <Route path="/__demos/:name" element={<Demos />} />
+            <Route element={<Demos />}
+path="/__demos/:name"
+            />
           </Routes>
         </MemoryRouter>,
       );

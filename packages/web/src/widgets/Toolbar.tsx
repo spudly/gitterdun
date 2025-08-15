@@ -1,8 +1,6 @@
-import {FC, ReactNode} from 'react';
+import type {FC, ReactNode} from 'react';
 
-export interface ToolbarProps {
-  children: ReactNode;
-}
+export type ToolbarProps = {readonly children: ReactNode};
 
 export const Toolbar: FC<ToolbarProps> = ({children}) => {
   return <div className="flex gap-2 items-center">{children}</div>;

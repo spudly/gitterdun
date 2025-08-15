@@ -1,6 +1,6 @@
 import {useQuery} from '@tanstack/react-query';
-import {Goal} from '@gitterdun/shared';
-import {FC} from 'react';
+import type {Goal} from '@gitterdun/shared';
+import type {FC} from 'react';
 import {goalsApi} from '../lib/api.js';
 import {useUser} from '../hooks/useUser.js';
 import {PageContainer} from '../widgets/PageContainer.js';
@@ -22,11 +22,11 @@ const Goals: FC = () => {
 
   const {data: goalsResponse, isLoading} = useQuery({
     queryKey: ['goals'],
-    queryFn: () => goalsApi.getAll({user_id: user!.id}),
-    enabled: !!user,
+    queryFn: async () => goalsApi.getAll({user_id: Number(user?.id)}),
+    enabled: user != null,
   });
 
-  const goals = goalsResponse?.data || [];
+  const goals = goalsResponse?.data ?? [];
 
   if (isLoading) {
     return (
@@ -56,14 +56,20 @@ const Goals: FC = () => {
                 {goal.status}
               </Badge>
             </SectionHeader>
+
             <Stack gap="sm">
-              {goal.description && <Text muted>{goal.description}</Text>}
+              {goal.description != null && goal.description !== '' ? (
+                <Text muted>{goal.description}</Text>
+              ) : null}
+
               <KeyValue label="Current Points:" value={goal.current_points} />
+
               <KeyValue label="Target Points:" value={goal.target_points} />
+
               <ProgressBar
-                value={goal.current_points}
                 max={goal.target_points}
                 showPercentage
+                value={goal.current_points}
               />
             </Stack>
           </Card>
@@ -72,9 +78,9 @@ const Goals: FC = () => {
 
       {goals.length === 0 && (
         <EmptyState
-          title="No goals yet"
           description="Create your first goal to start tracking your progress!"
           icon={<CheckCircleIcon size="lg" />}
+          title="No goals yet"
         />
       )}
     </PageContainer>

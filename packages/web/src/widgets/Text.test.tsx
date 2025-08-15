@@ -5,12 +5,19 @@ describe('Text', () => {
   it('renders with variants', () => {
     render(
       <>
-        <Text as="h1" size="2xl" weight="bold">
+        <Text as="h1"
+size="2xl"
+weight="bold"
+        >
           Heading
         </Text>
-        <Text muted uppercase>
+
+        <Text muted
+uppercase
+        >
           Muted Upper
         </Text>
+
         <Text capitalize>cap words</Text>
       </>,
     );

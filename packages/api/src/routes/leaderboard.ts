@@ -1,33 +1,23 @@
 import express from 'express';
 import {z} from 'zod';
+import {
+  LeaderboardRowSchema,
+  LeaderboardQuerySchema,
+  LeaderboardEntrySchema,
+  asError,
+} from '@gitterdun/shared';
 import db from '../lib/db';
 import {logger} from '../utils/logger';
 
 const router = express.Router();
 
-// Leaderboard query schema
-const LeaderboardQuerySchema = z.object({
-  limit: z.coerce.number().int().min(1).max(100).default(10),
-  sortBy: z.enum(['points', 'streak']).default('points'),
-});
-
-// Leaderboard entry schema
-const LeaderboardEntrySchema = z.object({
-  rank: z.number(),
-  id: z.number(),
-  username: z.string(),
-  points: z.number(),
-  streak_count: z.number(),
-  badges_earned: z.number(),
-  chores_completed: z.number(),
-});
+// Schemas moved to shared
 
 // GET /api/leaderboard - Get leaderboard rankings
+// eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
 router.get('/', async (req, res) => {
   try {
-    // Validate query parameters
-    const validatedQuery = LeaderboardQuerySchema.parse(req.query);
-    const {limit, sortBy} = validatedQuery;
+    const {limit, sortBy} = LeaderboardQuerySchema.parse(req.query);
 
     const query = `
       SELECT 
@@ -46,9 +36,12 @@ router.get('/', async (req, res) => {
       LIMIT ?
     `;
 
-    const leaderboard = db.prepare(query).all(limit) as any[];
-    const validatedLeaderboard = leaderboard.map((row: any, index: number) =>
-      LeaderboardEntrySchema.parse({rank: index + 1, ...row}),
+    const leaderboard = db.prepare(query).all(limit);
+    const validatedLeaderboard = leaderboard.map(
+      (row: unknown, index: number) => {
+        const parsed = LeaderboardRowSchema.parse(row);
+        return LeaderboardEntrySchema.parse({rank: index + 1, ...parsed});
+      },
     );
 
     logger.info(
@@ -66,17 +59,17 @@ router.get('/', async (req, res) => {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      logger.warn({errors: error.errors}, 'Leaderboard query validation error');
+      logger.warn({error}, 'Leaderboard query validation error');
       return res
         .status(400)
         .json({
           success: false,
           error: 'Invalid query parameters',
-          details: error.errors,
+          details: error.stack,
         });
     }
 
-    logger.error({error: error as Error}, 'Get leaderboard error');
+    logger.error({error: asError(error)}, 'Get leaderboard error');
     return res
       .status(500)
       .json({success: false, error: 'Internal server error'});

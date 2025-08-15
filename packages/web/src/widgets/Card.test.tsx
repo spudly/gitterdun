@@ -4,7 +4,9 @@ import {Card} from './Card';
 describe('Card', () => {
   it('renders header/footer', () => {
     render(
-      <Card header={<div>H</div>} footer={<div>F</div>}>
+      <Card footer={<div>F</div>}
+header={<div>H</div>}
+      >
         C
       </Card>,
     );
@@ -17,19 +19,21 @@ describe('Card', () => {
     render(<Card>Default</Card>);
     const inner = screen.getByText('Default');
     expect(inner).toHaveClass('p-6');
-    const outer = inner.parentElement as HTMLElement;
+    const outer = inner.parentElement!;
     expect(outer).toHaveClass('shadow');
   });
 
   it('respects padded=false and elevated=false', () => {
     render(
-      <Card padded={false} elevated={false}>
+      <Card elevated={false}
+padded={false}
+      >
         Cond
       </Card>,
     );
     const inner = screen.getByText('Cond');
     expect(inner).not.toHaveClass('p-6');
-    const outer = inner.parentElement as HTMLElement;
+    const outer = inner.parentElement!;
     expect(outer).toHaveClass('border');
   });
 });

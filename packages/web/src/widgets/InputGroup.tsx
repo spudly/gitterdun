@@ -1,17 +1,15 @@
-import {FC, ReactNode} from 'react';
+import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export interface InputGroupProps {
-  children: ReactNode;
-  className?: string;
-  error?: string;
-  helpText?: string;
-  layout?: 'vertical' | 'horizontal';
-}
+export type InputGroupProps = {
+  readonly children: ReactNode;
+  readonly error?: string;
+  readonly helpText?: string;
+  readonly layout?: 'vertical' | 'horizontal';
+};
 
 export const InputGroup: FC<InputGroupProps> = ({
   children,
-  className = '',
   error,
   helpText,
   layout = 'vertical',
@@ -21,14 +19,18 @@ export const InputGroup: FC<InputGroupProps> = ({
   );
 
   return (
-    <div className={clsx(baseStyles, className)}>
+    <div className={baseStyles}>
       <div className={layout === 'horizontal' ? 'flex-1' : ''}>{children}</div>
-      {helpText && <p className="text-sm text-gray-500">{helpText}</p>}
-      {error && (
+
+      {helpText != null ? (
+        <p className="text-sm text-gray-500">{helpText}</p>
+      ) : null}
+
+      {error != null ? (
         <p className="text-sm text-red-600" role="alert">
           {error}
         </p>
-      )}
+      ) : null}
     </div>
   );
 };

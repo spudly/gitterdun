@@ -33,9 +33,9 @@ describe('Admin page', () => {
   });
 
   it('handles family creation and invitation flows', async () => {
-    const {familiesApi, invitationsApi}: any = apiModule;
-    familiesApi.create.mockResolvedValueOnce({success: true});
-    invitationsApi.create.mockResolvedValueOnce({success: true});
+    const mocked = jest.mocked(apiModule);
+    mocked.familiesApi.create.mockResolvedValueOnce({success: true});
+    mocked.invitationsApi.create.mockResolvedValueOnce({success: true});
 
     render(wrap(<Admin />));
     await screen.findByText('Admin Panel');
@@ -62,8 +62,8 @@ describe('Admin page', () => {
   });
 
   it('renders chore list and action buttons for completed status', async () => {
-    const {choresApi}: any = apiModule;
-    choresApi.getAll.mockResolvedValueOnce({
+    const mocked = jest.mocked(apiModule);
+    mocked.choresApi.getAll.mockResolvedValueOnce({
       success: true,
       data: [
         {
@@ -75,6 +75,12 @@ describe('Admin page', () => {
           penalty_points: 0,
           chore_type: 'regular',
           status: 'completed',
+          created_by: 1,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          due_date: undefined,
+          recurrence_rule: undefined,
+          created_by_username: 'admin',
         },
       ],
     });
@@ -86,8 +92,8 @@ describe('Admin page', () => {
   });
 
   it('renders pending chore and shows penalty/due meta', async () => {
-    const {choresApi}: any = apiModule;
-    choresApi.getAll.mockResolvedValueOnce({
+    const mocked = jest.mocked(apiModule);
+    mocked.choresApi.getAll.mockResolvedValueOnce({
       success: true,
       data: [
         {
@@ -113,17 +119,37 @@ describe('Admin page', () => {
   });
 
   it('requires admin privileges', async () => {
-    jest
-      .mocked(useUserModule.useUser)
-      .mockReturnValueOnce({user: {id: 2, role: 'user'}} as ReturnType<
-        typeof useUserModule.useUser
-      >);
+    const mockedUseUser = jest.mocked(useUserModule.useUser);
+    mockedUseUser.mockReturnValueOnce({
+      user: {
+        id: 2,
+        username: 'testuser',
+        email: 'test@example.com',
+        role: 'user',
+        points: 0,
+        streak_count: 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      isLoading: false,
+      error: null,
+      login: jest.fn(),
+      register: jest.fn(),
+      logout: jest.fn(),
+      forgotPassword: jest.fn(),
+      resetPassword: jest.fn(),
+      isLoggingIn: false,
+      isRegistering: false,
+      isLoggingOut: false,
+      loginError: null,
+      registerError: null,
+    });
     render(wrap(<Admin />));
     expect(await screen.findByText('Access Denied')).toBeInTheDocument();
   });
 
   it('validates and handles errors on family create and invite', async () => {
-    const {familiesApi, invitationsApi}: any = apiModule;
+    const {familiesApi, invitationsApi} = jest.mocked(apiModule);
 
     // Create Family: empty name should no-op (validation line)
     render(wrap(<Admin />));
@@ -171,8 +197,8 @@ describe('Admin page', () => {
   });
 
   it('renders approved chore and bonus badge', async () => {
-    const {choresApi}: any = apiModule;
-    choresApi.getAll.mockResolvedValueOnce({
+    const mocked = jest.mocked(apiModule);
+    mocked.choresApi.getAll.mockResolvedValueOnce({
       success: true,
       data: [
         {
@@ -194,8 +220,8 @@ describe('Admin page', () => {
   });
 
   it('handles family create API rejection (catch path)', async () => {
-    const {familiesApi}: any = apiModule;
-    familiesApi.create.mockRejectedValueOnce(new Error('boom'));
+    const mocked = jest.mocked(apiModule);
+    mocked.familiesApi.create.mockRejectedValueOnce(new Error('boom'));
     render(wrap(<Admin />));
     await screen.findByText('Admin Panel');
     fireEvent.change(screen.getByPlaceholderText('Family name'), {
@@ -210,7 +236,7 @@ describe('Admin page', () => {
   });
 
   it('shows backup error message when create returns success=false without error', async () => {
-    const {familiesApi}: any = apiModule;
+    const {familiesApi} = jest.mocked(apiModule);
     familiesApi.create.mockResolvedValueOnce({success: false});
     render(wrap(<Admin />));
     await screen.findByText('Admin Panel');
@@ -227,7 +253,7 @@ describe('Admin page', () => {
 
   it('navigates to /family after successful create via setTimeout', async () => {
     jest.useFakeTimers();
-    const {familiesApi}: any = apiModule;
+    const {familiesApi} = jest.mocked(apiModule);
     familiesApi.create.mockResolvedValueOnce({success: true});
 
     const LocationProbe = () => {
@@ -239,6 +265,7 @@ describe('Admin page', () => {
       <QueryClientProvider client={new QueryClient()}>
         <MemoryRouter initialEntries={['/']}>
           <LocationProbe />
+
           <Admin />
         </MemoryRouter>
       </QueryClientProvider>,

@@ -84,7 +84,7 @@ describe('Routes', () => {
     ['/__demos', 'Mock Demos'],
     ['/__demos/Button', 'Mock Demos'],
   ])('renders %s -> %s', async (path, expectedText) => {
-    await renderAtPath(path as string);
-    expect(await screen.findByText(expectedText as string)).toBeInTheDocument();
+    await renderAtPath(path);
+    expect(await screen.findByText(expectedText)).toBeInTheDocument();
   });
 });

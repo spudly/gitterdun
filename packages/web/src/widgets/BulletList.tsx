@@ -1,4 +1,4 @@
-import {FC, ReactNode} from 'react';
+import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
 type Indent = 'sm' | 'md' | 'lg';
@@ -11,35 +11,33 @@ const DENSITY: Record<Density, string> = {
   normal: 'space-y-2',
 };
 
-export const getIndentClass = (indent?: Indent): string => {
+export const getIndentClass = (indent: Indent = 'md'): string => {
   switch (indent) {
     case 'sm':
       return INDENT.sm;
-    case 'md':
-      return INDENT.md;
     case 'lg':
       return INDENT.lg;
+    case 'md':
     default:
       return INDENT.md;
   }
 };
 
-export const getDensityClass = (density?: Density): string => {
+export const getDensityClass = (density: Density = 'tight'): string => {
   switch (density) {
-    case 'tight':
-      return DENSITY.tight;
     case 'normal':
       return DENSITY.normal;
+    case 'tight':
     default:
       return DENSITY.tight;
   }
 };
 
-export interface BulletListProps {
-  children: ReactNode;
-  indent?: Indent;
-  density?: Density;
-}
+export type BulletListProps = {
+  readonly children: ReactNode;
+  readonly indent?: Indent;
+  readonly density?: Density;
+};
 
 export const BulletList: FC<BulletListProps> = ({
   children,

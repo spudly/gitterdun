@@ -4,7 +4,9 @@ import {BulletList, getDensityClass, getIndentClass} from './BulletList';
 describe('BulletList', () => {
   it('renders items with props', () => {
     render(
-      <BulletList indent="lg" density="normal">
+      <BulletList density="normal"
+indent="lg"
+      >
         <li>X</li>
       </BulletList>,
     );
@@ -13,19 +15,25 @@ describe('BulletList', () => {
 
   it('covers indent and density variants', () => {
     const {rerender, getByText} = render(
-      <BulletList indent="sm" density="tight">
+      <BulletList density="tight"
+indent="sm"
+      >
         <li>A</li>
       </BulletList>,
     );
     expect(getByText('A')).toBeInTheDocument();
     rerender(
-      <BulletList indent="md" density="normal">
+      <BulletList density="normal"
+indent="md"
+      >
         <li>B</li>
       </BulletList>,
     );
     expect(getByText('B')).toBeInTheDocument();
     rerender(
-      <BulletList indent="lg" density="tight">
+      <BulletList density="tight"
+indent="lg"
+      >
         <li>C</li>
       </BulletList>,
     );
@@ -33,9 +41,14 @@ describe('BulletList', () => {
   });
 
   it('falls back to defaults on invalid props (runtime)', () => {
-    // cast to any to simulate bad runtime values and hit fallback branches
+    // simulate bad runtime values and hit fallback branches
     const {container} = render(
-      <BulletList indent={'nope' as any} density={'nope' as any}>
+      <BulletList
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- simulate invalid prop for fallback
+        density={'nope' as unknown as 'tight' | 'normal'}
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- simulate invalid prop for fallback
+        indent={'nope' as unknown as 'sm' | 'md' | 'lg'}
+      >
         <li>Z</li>
       </BulletList>,
     );
@@ -46,10 +59,10 @@ describe('BulletList', () => {
     expect(getIndentClass('sm')).toBeTruthy();
     expect(getIndentClass('md')).toBeTruthy();
     expect(getIndentClass('lg')).toBeTruthy();
-    expect(getIndentClass(undefined as any)).toBeTruthy();
+    expect(getIndentClass(undefined)).toBeTruthy();
     expect(getDensityClass('tight')).toBeTruthy();
     expect(getDensityClass('normal')).toBeTruthy();
-    expect(getDensityClass(undefined as any)).toBeTruthy();
+    expect(getDensityClass(undefined)).toBeTruthy();
   });
 
   it('component defaults (no props) render', () => {

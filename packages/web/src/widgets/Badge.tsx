@@ -1,4 +1,4 @@
-import {FC, ReactNode} from 'react';
+import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
 type BadgeVariant =
@@ -9,11 +9,11 @@ type BadgeVariant =
   | 'purple'
   | 'neutral';
 
-export interface BadgeProps {
-  children: ReactNode;
-  variant?: BadgeVariant;
-  className?: string;
-}
+export type BadgeProps = {
+  readonly children: ReactNode;
+  readonly variant?: BadgeVariant;
+  readonly className?: string;
+};
 
 const VARIANTS: Record<BadgeVariant, string> = {
   success: 'bg-green-100 text-green-800',

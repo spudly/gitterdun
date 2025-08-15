@@ -26,15 +26,27 @@ describe('ForgotPassword page', () => {
   });
 
   it('shows error message when request rejects (catch path)', async () => {
-    const mocked = useUserModule.useUser as unknown as jest.Mock;
+    const mocked = jest.mocked(useUserModule.useUser);
     const defaultImpl = mocked.getMockImplementation();
     mocked.mockImplementation(
       () =>
         ({
+          user: null,
+          isLoading: false,
+          error: null,
+          login: jest.fn(),
+          register: jest.fn(),
+          logout: jest.fn(),
           forgotPassword: jest.fn(async () => {
             throw new Error('boom');
           }),
-        }) as unknown as ReturnType<typeof useUserModule.useUser>,
+          resetPassword: jest.fn(),
+          isLoggingIn: false,
+          isRegistering: false,
+          isLoggingOut: false,
+          loginError: null,
+          registerError: null,
+        }) as ReturnType<typeof useUserModule.useUser>,
     );
     render(wrap(<ForgotPassword />));
     fireEvent.change(screen.getByLabelText(/email/i), {
@@ -47,6 +59,6 @@ describe('ForgotPassword page', () => {
     });
     expect(await screen.findByText('Request failed')).toBeInTheDocument();
     // restore default implementation for subsequent tests
-    mocked.mockImplementation(defaultImpl as any);
+    mocked.mockImplementation(defaultImpl);
   });
 });

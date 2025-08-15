@@ -47,7 +47,7 @@ describe('Goals page', () => {
   });
 
   it('covers completed, abandoned, and in_progress variants and empty state', async () => {
-    const {goalsApi}: any = apiModule;
+    const {goalsApi} = jest.mocked(apiModule);
     goalsApi.getAll.mockResolvedValueOnce({
       success: true,
       data: [
@@ -86,24 +86,27 @@ describe('Goals page', () => {
   });
 
   it('uses fallback empty data when user is null (covers queryFn else branch)', async () => {
-    jest.isolateModules(() => {
+    await jest.isolateModulesAsync(async () => {
       jest.doMock('../hooks/useUser', () => ({useUser: () => ({user: null})}));
       jest.doMock('@tanstack/react-query', () => {
-        const actual = jest.requireActual('@tanstack/react-query');
+        const actual = jest.requireActual<
+          typeof import('@tanstack/react-query')
+        >('@tanstack/react-query');
+        type UseQueryOpts<T> = {queryFn?: () => T};
+        type QueryResult = {data: {data: Array<unknown>}; isLoading: false};
         return {
           ...actual,
-          useQuery: (opts: any) => {
-            if (opts && typeof opts.queryFn === 'function') {
-              // Execute the queryFn so the else branch in Goals.tsx line 28 runs
+          useQuery: (opts: UseQueryOpts<unknown>): QueryResult => {
+            if (typeof opts.queryFn === 'function') {
+              // Execute the queryFn so the else branch in Goals.tsx runs
               opts.queryFn();
             }
             return {data: {data: []}, isLoading: false};
           },
         };
       });
-      // eslint-disable-next-line global-require, @typescript-eslint/no-var-requires
-      const {default: GoalsNull} = require('./Goals');
-      render(wrap(<GoalsNull />));
+      const mod = await import('./Goals');
+      render(wrap(<mod.default />));
     });
     expect(await screen.findByText('No goals yet')).toBeInTheDocument();
   });
