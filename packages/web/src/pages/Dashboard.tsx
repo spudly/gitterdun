@@ -11,7 +11,7 @@ import {Card} from '../widgets/Card.js';
 import {ListRow} from '../widgets/ListRow.js';
 import {Text} from '../widgets/Text.js';
 import {PageLoading} from '../widgets/PageLoading.js';
-import {CheckCircleIcon, ClockIcon, DocIcon} from '../widgets/icons.js';
+import {CheckCircleIcon, ClockIcon, DocIcon} from '../widgets/icons';
 
 const Dashboard: FC = () => {
   const {user} = useUser();

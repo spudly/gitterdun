@@ -106,6 +106,9 @@ describe('Admin page', () => {
           chore_type: 'regular',
           status: 'pending',
           due_date: new Date().toISOString(),
+          created_by: 1,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         },
       ],
     });
@@ -210,6 +213,9 @@ describe('Admin page', () => {
           penalty_points: 0,
           chore_type: 'bonus',
           status: 'approved',
+          created_by: 1,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         },
       ],
     });

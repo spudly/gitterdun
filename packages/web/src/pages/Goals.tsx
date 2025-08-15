@@ -11,7 +11,7 @@ import {ProgressBar} from '../widgets/ProgressBar.js';
 import {Text} from '../widgets/Text.js';
 import {SectionHeader} from '../widgets/SectionHeader.js';
 import {Stack} from '../widgets/Stack.js';
-import {CheckCircleIcon} from '../widgets/icons.js';
+import {CheckCircleIcon} from '../widgets/icons';
 import {PageLoading} from '../widgets/PageLoading.js';
 import {Badge} from '../widgets/Badge.js';
 import {KeyValue} from '../widgets/KeyValue.js';

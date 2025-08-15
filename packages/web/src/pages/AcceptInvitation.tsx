@@ -1,5 +1,5 @@
 import type {FC} from 'react';
-import { useState} from 'react';
+import {useState} from 'react';
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import {invitationsApi} from '../lib/api.js';
 import {FormCard} from '../widgets/FormCard.js';
@@ -22,17 +22,21 @@ const AcceptInvitation: FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage(null);
-    safeAsync(async () => {
-      const res = await invitationsApi.accept({token, username, password});
-      if (res.success) {
-        setMessage('Invitation accepted. You can now log in.');
-        setTimeout(() => {
-          navigate('/login');
-        }, 1200);
-      } else {
-        setMessage('Failed to accept');
-      }
-    }, 'Could not accept invitation. Please try again.')();
+    safeAsync(
+      async () => {
+        const res = await invitationsApi.accept({token, username, password});
+        if (res.success) {
+          setMessage('Invitation accepted. You can now log in.');
+          setTimeout(() => {
+            navigate('/login');
+          }, 1200);
+        } else {
+          setMessage('Failed to accept');
+        }
+      },
+      'Failed to accept',
+      setMessage,
+    )();
   };
 
   if (!token) {

@@ -80,6 +80,7 @@ describe('api utils', () => {
     await api.get(
       '/x',
       z.object({a: z.number(), b: z.undefined(), c: z.null()}),
+      {a: 1, b: undefined, c: null},
     );
     expect(calls[calls.length - 1]).toMatch(/a=1/);
     expect(calls[calls.length - 1]).not.toMatch(/b=/);

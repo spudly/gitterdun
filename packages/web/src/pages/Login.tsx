@@ -1,5 +1,5 @@
 import type {FC} from 'react';
-import { useState} from 'react';
+import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useUser} from '../hooks/useUser.js';
 import {FormCard} from '../widgets/FormCard.js';
@@ -22,10 +22,14 @@ const Login: FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage(null);
-    safeAsync(async () => {
-      await login(email, password);
-      navigate('/');
-    }, 'Login failed. Please try again.')();
+    safeAsync(
+      async () => {
+        await login(email, password);
+        navigate('/');
+      },
+      'Login failed',
+      setMessage,
+    )();
   };
 
   return (

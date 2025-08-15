@@ -29,6 +29,7 @@ jest.mock('../lib/api', () => ({
           },
         ],
         sortBy: 'points',
+        totalUsers: 2,
       },
     })),
   },
@@ -68,6 +69,7 @@ describe('Leaderboard page', () => {
           },
         ],
         sortBy: 'streak_count',
+        totalUsers: 1,
       },
     });
     render(wrap(<Leaderboard />));

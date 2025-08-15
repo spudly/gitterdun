@@ -1,5 +1,5 @@
 import type {FC} from 'react';
-import { useState} from 'react';
+import {useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import type {ChoreWithUsername} from '@gitterdun/shared';
 import {useNavigate} from 'react-router-dom';
@@ -31,7 +31,7 @@ import {
   ClockIcon,
   CheckCircleIcon,
   SparklesIcon,
-} from '../widgets/icons.js';
+} from '../widgets/icons';
 
 const Admin: FC = () => {
   const {user} = useUser();

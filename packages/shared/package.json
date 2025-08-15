@@ -10,7 +10,7 @@
     "build": "tsc",
     "lint": "eslint \"src/**/*.ts\"",
     "test": "jest",
-    "test:watch": "jest --watch",
+    "test:dev": "jest --watch",
     "test:coverage": "jest --coverage"
   },
   "dependencies": {

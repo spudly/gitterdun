@@ -40,10 +40,25 @@ export const StatusDot: FC<StatusDotProps> = ({
   label,
   className = '',
 }) => {
+  if (label != null) {
+    return (
+      <img
+        alt={label}
+        className={clsx(
+          'inline-block rounded-full',
+          getDotColorClass(color),
+          className,
+        )}
+        height={size}
+        src="data:image/gif;base64,R0lGODlhAQABAAAAACw="
+        style={{width: size, height: size}}
+        width={size}
+      />
+    );
+  }
   return (
     <span
-      aria-hidden={label == null}
-      aria-label={label ?? undefined}
+      aria-hidden
       className={clsx(
         'inline-block rounded-full',
         getDotColorClass(color),

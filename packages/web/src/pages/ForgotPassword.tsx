@@ -1,5 +1,5 @@
 import type {FC} from 'react';
-import { useState} from 'react';
+import {useState} from 'react';
 import {useUser} from '../hooks/useUser.js';
 import {FormCard} from '../widgets/FormCard.js';
 import {FormField} from '../widgets/FormField.js';
@@ -18,12 +18,16 @@ const ForgotPassword: FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage(null);
-    safeAsync(async () => {
-      await forgotPassword(email);
-      setMessage(
-        'If the email exists, a reset link has been sent. Check server logs for token in dev.',
-      );
-    }, 'Could not send reset link. Please try again.')();
+    safeAsync(
+      async () => {
+        await forgotPassword(email);
+        setMessage(
+          'If the email exists, a reset link has been sent. Check server logs for token in dev.',
+        );
+      },
+      'Request failed',
+      setMessage,
+    )();
   };
 
   return (
