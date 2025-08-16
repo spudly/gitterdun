@@ -14,6 +14,7 @@ import {
 import {z} from 'zod';
 import db from '../lib/db';
 import {logger} from '../utils/logger';
+import {sql} from '../utils/sql';
 
 const router = express.Router();
 
@@ -31,14 +32,27 @@ router.get('/', async (req, res) => {
       limit,
     } = validatedQuery;
 
-    let query = `
-      SELECT 
-        c.id, c.title, c.description, c.point_reward, c.bonus_points, c.penalty_points,
-        c.due_date, c.recurrence_rule, c.chore_type, c.status, c.created_by, c.created_at, c.updated_at,
-        u.username as created_by_username 
-      FROM chores c 
-      LEFT JOIN users u ON c.created_by = u.id
-      WHERE 1=1
+    let query = sql`
+      SELECT
+        c.id,
+        c.title,
+        c.description,
+        c.point_reward,
+        c.bonus_points,
+        c.penalty_points,
+        c.due_date,
+        c.recurrence_rule,
+        c.chore_type,
+        c.status,
+        c.created_by,
+        c.created_at,
+        c.updated_at,
+        u.username AS created_by_username
+      FROM
+        chores c
+        LEFT JOIN users u ON c.created_by = u.id
+      WHERE
+        1 = 1
     `;
     const params: Array<string | number> = [];
 
@@ -122,13 +136,22 @@ router.post('/', async (req, res) => {
     const transaction = db.transaction(() => {
       // Create the chore
       const createdRow = db
-        .prepare(
-          `
-        INSERT INTO chores (title, description, point_reward, bonus_points, penalty_points, due_date, recurrence_rule, chore_type, created_by) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) 
-        RETURNING *
-      `,
-        )
+        .prepare(sql`
+          INSERT INTO
+            chores (
+              title,
+              description,
+              point_reward,
+              bonus_points,
+              penalty_points,
+              due_date,
+              recurrence_rule,
+              chore_type,
+              created_by
+            )
+          VALUES
+            (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *
+        `)
         .get(
           title,
           description,
@@ -146,9 +169,12 @@ router.post('/', async (req, res) => {
       // Assign to users if specified
       if (assignedUsers.length > 0) {
         assignedUsers.forEach(userId => {
-          db.prepare(
-            'INSERT INTO chore_assignments (chore_id, user_id) VALUES (?, ?)',
-          ).run(newChore.id, userId);
+          db.prepare(sql`
+            INSERT INTO
+              chore_assignments (chore_id, user_id)
+            VALUES
+              (?, ?)
+          `).run(newChore.id, userId);
         });
       }
 
@@ -196,17 +222,28 @@ router.get('/:id', async (req, res) => {
     }
 
     const chore = db
-      .prepare(
-        `
-      SELECT 
-        c.id, c.title, c.description, c.point_reward, c.bonus_points, c.penalty_points,
-        c.due_date, c.recurrence_rule, c.chore_type, c.status, c.created_by, c.created_at, c.updated_at,
-        u.username as created_by_username 
-      FROM chores c 
-      LEFT JOIN users u ON c.created_by = u.id 
-      WHERE c.id = ?
-    `,
-      )
+      .prepare(sql`
+        SELECT
+          c.id,
+          c.title,
+          c.description,
+          c.point_reward,
+          c.bonus_points,
+          c.penalty_points,
+          c.due_date,
+          c.recurrence_rule,
+          c.chore_type,
+          c.status,
+          c.created_by,
+          c.created_at,
+          c.updated_at,
+          u.username AS created_by_username
+        FROM
+          chores c
+          LEFT JOIN users u ON c.created_by = u.id
+        WHERE
+          c.id = ?
+      `)
       .get(choreId);
 
     if (chore == null) {
@@ -238,7 +275,14 @@ router.put('/:id', async (req, res) => {
 
     // Check if chore exists
     const existingChore = db
-      .prepare('SELECT id FROM chores WHERE id = ?')
+      .prepare(sql`
+        SELECT
+          id
+        FROM
+          chores
+        WHERE
+          id = ?
+      `)
       .get(choreId);
 
     if (existingChore == null) {
@@ -304,11 +348,12 @@ router.put('/:id', async (req, res) => {
     updateFields.push('updated_at = CURRENT_TIMESTAMP');
     values.push(choreId);
 
-    const updateQuery = `
-      UPDATE chores 
-      SET ${updateFields.join(', ')} 
-      WHERE id = ?
-      RETURNING *
+    const updateQuery = sql`
+      UPDATE chores
+      SET
+        ${updateFields.join(', ')}
+      WHERE
+        id = ? RETURNING *
     `;
 
     const updatedChore = db.prepare(updateQuery).get(...values);
@@ -353,7 +398,14 @@ router.delete('/:id', async (req, res) => {
 
     // Check if chore exists
     const existingChore = db
-      .prepare('SELECT id FROM chores WHERE id = ?')
+      .prepare(sql`
+        SELECT
+          id
+        FROM
+          chores
+        WHERE
+          id = ?
+      `)
       .get(choreId);
 
     if (existingChore == null) {
@@ -361,7 +413,11 @@ router.delete('/:id', async (req, res) => {
     }
 
     // Delete the chore (chore_assignments will be deleted due to CASCADE)
-    db.prepare('DELETE FROM chores WHERE id = ?').run(choreId);
+    db.prepare(sql`
+      DELETE FROM chores
+      WHERE
+        id = ?
+    `).run(choreId);
 
     logger.info({choreId}, 'Chore deleted');
 
@@ -392,11 +448,25 @@ router.post('/:id/complete', async (req, res) => {
     const transaction = db.transaction(() => {
       // Check if chore assignment exists
       const assignmentRow = db
-        .prepare(
-          `SELECT id, chore_id, user_id, assigned_at, completed_at, approved_at, approved_by,
-                  points_earned, bonus_points_earned, penalty_points_earned, notes
-           FROM chore_assignments WHERE chore_id = ? AND user_id = ?`,
-        )
+        .prepare(sql`
+          SELECT
+            id,
+            chore_id,
+            user_id,
+            assigned_at,
+            completed_at,
+            approved_at,
+            approved_by,
+            points_earned,
+            bonus_points_earned,
+            penalty_points_earned,
+            notes
+          FROM
+            chore_assignments
+          WHERE
+            chore_id = ?
+            AND user_id = ?
+        `)
         .get(choreId, userId);
 
       if (assignmentRow == null) {
@@ -411,11 +481,26 @@ router.post('/:id/complete', async (req, res) => {
 
       // Get chore details for points calculation
       const choreRow = db
-        .prepare(
-          `SELECT id, title, description, point_reward, bonus_points, penalty_points,
-                         due_date, recurrence_rule, chore_type, status, created_by, created_at, updated_at
-                  FROM chores WHERE id = ?`,
-        )
+        .prepare(sql`
+          SELECT
+            id,
+            title,
+            description,
+            point_reward,
+            bonus_points,
+            penalty_points,
+            due_date,
+            recurrence_rule,
+            chore_type,
+            status,
+            created_by,
+            created_at,
+            updated_at
+          FROM
+            chores
+          WHERE
+            id = ?
+        `)
         .get(choreId);
 
       if (choreRow == null) {
@@ -430,17 +515,18 @@ router.post('/:id/complete', async (req, res) => {
       const penaltyPointsEarned = 0; // TODO: Implement penalty logic
 
       // Update chore assignment
-      db.prepare(
-        `
-        UPDATE chore_assignments 
-        SET completed_at = CURRENT_TIMESTAMP, 
-            points_earned = ?, 
-            bonus_points_earned = ?, 
-            penalty_points_earned = ?,
-            notes = ?
-        WHERE chore_id = ? AND user_id = ?
-      `,
-      ).run(
+      db.prepare(sql`
+        UPDATE chore_assignments
+        SET
+          completed_at = CURRENT_TIMESTAMP,
+          points_earned = ?,
+          bonus_points_earned = ?,
+          penalty_points_earned = ?,
+          notes = ?
+        WHERE
+          chore_id = ?
+          AND user_id = ?
+      `).run(
         pointsEarned,
         bonusPointsEarned,
         penaltyPointsEarned,
@@ -450,18 +536,21 @@ router.post('/:id/complete', async (req, res) => {
       );
 
       // Update user points
-      db.prepare('UPDATE users SET points = points + ? WHERE id = ?').run(
-        pointsEarned + bonusPointsEarned - penaltyPointsEarned,
-        userId,
-      );
+      db.prepare(sql`
+        UPDATE users
+        SET
+          points = points + ?
+        WHERE
+          id = ?
+      `).run(pointsEarned + bonusPointsEarned - penaltyPointsEarned, userId);
 
       // Create notification for admin approval
-      db.prepare(
-        `
-        INSERT INTO notifications (user_id, title, message, type, related_id) 
-        VALUES (?, ?, ?, ?, ?)
-      `,
-      ).run(
+      db.prepare(sql`
+        INSERT INTO
+          notifications (user_id, title, message, type, related_id)
+        VALUES
+          (?, ?, ?, ?, ?)
+      `).run(
         userId,
         'Chore Completed',
         `Your chore "${chore.title}" has been completed and is pending approval.`,

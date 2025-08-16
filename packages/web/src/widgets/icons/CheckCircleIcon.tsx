@@ -17,5 +17,3 @@ export const CheckCircleIcon: IconComponent = ({size = 'md'}) => (
     />
   </svg>
 );
-
-

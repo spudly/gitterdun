@@ -17,5 +17,3 @@ export const SparklesIcon: IconComponent = ({size = 'md'}) => (
     />
   </svg>
 );
-
-

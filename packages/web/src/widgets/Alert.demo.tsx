@@ -1,5 +1,5 @@
 import type {FC} from 'react';
-import { useState} from 'react';
+import {useState} from 'react';
 import {Alert} from './Alert.js';
 
 const AlertDemo: FC = () => {

@@ -15,9 +15,7 @@ describe('InlineMeta/Toolbar/KeyValue', () => {
           <button type="button">B</button>
         </Toolbar>
 
-        <KeyValue label="K"
-value="V"
-        />
+        <KeyValue label="K" value="V" />
       </div>,
     );
     expect(screen.getByText('A')).toBeInTheDocument();

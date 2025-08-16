@@ -5,16 +5,11 @@ import {Text} from './Text.js';
 const BulletListDemo: FC = () => {
   return (
     <div>
-      <Text as="h2"
-size="lg"
-weight="semibold"
-      >
+      <Text as="h2" size="lg" weight="semibold">
         BulletList
       </Text>
 
-      <BulletList density="tight"
-indent="md"
-      >
+      <BulletList density="tight" indent="md">
         <li>First item</li>
 
         <li>Second item</li>

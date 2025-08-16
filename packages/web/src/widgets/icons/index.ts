@@ -5,5 +5,3 @@ export * from './CheckCircleIcon';
 export * from './SparklesIcon';
 export * from './TrophyIcon';
 export * from './InfoCircleIcon';
-
-

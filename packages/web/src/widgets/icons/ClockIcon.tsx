@@ -17,5 +17,3 @@ export const ClockIcon: IconComponent = ({size = 'md'}) => (
     />
   </svg>
 );
-
-

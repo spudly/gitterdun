@@ -3,10 +3,7 @@ import {IconButton} from './IconButton';
 
 describe('IconButton', () => {
   it('renders and can be disabled', () => {
-    render(<IconButton disabled
-icon={<span>i</span>}
-label="icon"
-           />);
+    render(<IconButton disabled icon={<span>i</span>} label="icon" />);
     expect(screen.getByRole('button')).toBeDisabled();
   });
 

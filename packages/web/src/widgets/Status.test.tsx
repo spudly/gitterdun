@@ -8,10 +8,7 @@ describe('Status components', () => {
       <div>
         <StatusBadge status="completed">Completed</StatusBadge>
 
-        <StatusDot color="green"
-label="ok"
-size={10}
-        />
+        <StatusDot color="green" label="ok" size={10} />
       </div>,
     );
     expect(screen.getByText('Completed')).toBeInTheDocument();
@@ -38,20 +35,9 @@ size={10}
   });
 
   it('covers StatusDot all colors and unlabeled', () => {
-    const {rerender} = render(<StatusDot color="blue"
-label="b"
-size={8}
-                              />);
-    rerender(<StatusDot color="yellow"
-label="y"
-size={8}
-             />);
-    rerender(<StatusDot color="red"
-label="r"
-size={8}
-             />);
-    rerender(<StatusDot color="gray"
-size={8}
-             />);
+    const {rerender} = render(<StatusDot color="blue" label="b" size={8} />);
+    rerender(<StatusDot color="yellow" label="y" size={8} />);
+    rerender(<StatusDot color="red" label="r" size={8} />);
+    rerender(<StatusDot color="gray" size={8} />);
   });
 });

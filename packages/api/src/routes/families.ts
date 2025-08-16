@@ -13,6 +13,7 @@ import {
 } from '@gitterdun/shared';
 import bcrypt from 'bcryptjs';
 import db from '../lib/db';
+import {sql} from '../utils/sql';
 
 const router = express.Router();
 
@@ -46,7 +47,15 @@ const requireUserId = (req: express.Request): number => {
     throw Object.assign(new Error('Not authenticated'), {status: 401});
   }
   const sessionRow = db
-    .prepare('SELECT user_id, expires_at FROM sessions WHERE id = ?')
+    .prepare(sql`
+      SELECT
+        user_id,
+        expires_at
+      FROM
+        sessions
+      WHERE
+        id = ?
+    `)
     .get(sid);
   const session =
     sessionRow != null ? SessionRowSchema.parse(sessionRow) : undefined;
@@ -54,7 +63,11 @@ const requireUserId = (req: express.Request): number => {
     throw Object.assign(new Error('Not authenticated'), {status: 401});
   }
   if (new Date(session.expires_at).getTime() < Date.now()) {
-    db.prepare('DELETE FROM sessions WHERE id = ?').run(sid);
+    db.prepare(sql`
+      DELETE FROM sessions
+      WHERE
+        id = ?
+    `).run(sid);
     throw Object.assign(new Error('Session expired'), {status: 401});
   }
   return session.user_id;
@@ -67,16 +80,25 @@ router.post('/', (req, res) => {
     const {name} = CreateFamilySchema.parse(req.body);
 
     const familyRow = db
-      .prepare(
-        `INSERT INTO families (name, owner_id) VALUES (?, ?) RETURNING id, name, owner_id, created_at`,
-      )
+      .prepare(sql`
+        INSERT INTO
+          families (name, owner_id)
+        VALUES
+          (?, ?) RETURNING id,
+          name,
+          owner_id,
+          created_at
+      `)
       .get(name, userId);
 
     const family = FamilySchema.parse(familyRow);
 
-    db.prepare(
-      'INSERT INTO family_members (family_id, user_id, role) VALUES (?, ?, ?)',
-    ).run(family.id, userId, 'parent');
+    db.prepare(sql`
+      INSERT INTO
+        family_members (family_id, user_id, role)
+      VALUES
+        (?, ?, ?)
+    `).run(family.id, userId, 'parent');
 
     return res.status(201).json({success: true, data: family});
   } catch (error) {
@@ -95,20 +117,34 @@ router.get('/:id/members', (req, res) => {
     const userId = requireUserId(req);
     const {id: familyId} = IdParamSchema.parse(req.params);
     const isMember = db
-      .prepare(
-        'SELECT 1 FROM family_members WHERE family_id = ? AND user_id = ?',
-      )
+      .prepare(sql`
+        SELECT
+          1
+        FROM
+          family_members
+        WHERE
+          family_id = ?
+          AND user_id = ?
+      `)
       .get(familyId, userId);
     if (isMember == null) {
       return res.status(403).json({success: false, error: 'Forbidden'});
     }
 
     const rows = db
-      .prepare(
-        `SELECT fm.family_id, fm.user_id, fm.role, u.username, u.email
-	         FROM family_members fm JOIN users u ON u.id = fm.user_id
-	         WHERE fm.family_id = ?`,
-      )
+      .prepare(sql`
+        SELECT
+          fm.family_id,
+          fm.user_id,
+          fm.role,
+          u.username,
+          u.email
+        FROM
+          family_members fm
+          JOIN users u ON u.id = fm.user_id
+        WHERE
+          fm.family_id = ?
+      `)
       .all(familyId);
     const data = rows.map(r => FamilyMemberSchema.parse(r));
     return res.json({success: true, data});
@@ -128,9 +164,15 @@ router.post('/:id/children', async (req, res) => {
     const {username, email, password} = CreateChildSchema.parse(req.body);
 
     const membershipRow = db
-      .prepare(
-        'SELECT role FROM family_members WHERE family_id = ? AND user_id = ?',
-      )
+      .prepare(sql`
+        SELECT
+          role
+        FROM
+          family_members
+        WHERE
+          family_id = ?
+          AND user_id = ?
+      `)
       .get(familyId, userId);
     const membership =
       membershipRow != null ? RoleRowSchema.parse(membershipRow) : undefined;
@@ -139,7 +181,15 @@ router.post('/:id/children', async (req, res) => {
     }
 
     const existing = db
-      .prepare('SELECT 1 FROM users WHERE email = ? OR username = ?')
+      .prepare(sql`
+        SELECT
+          1
+        FROM
+          users
+        WHERE
+          email = ?
+          OR username = ?
+      `)
       .get(email, username);
     if (existing != null) {
       return res.status(409).json({success: false, error: 'User exists'});
@@ -147,15 +197,21 @@ router.post('/:id/children', async (req, res) => {
 
     const passwordHash = await bcrypt.hash(password, 12);
     const userRow = db
-      .prepare(
-        `INSERT INTO users (username, email, password_hash, role) VALUES (?, ?, ?, 'user') RETURNING id`,
-      )
+      .prepare(sql`
+        INSERT INTO
+          users (username, email, password_hash, role)
+        VALUES
+          (?, ?, ?, 'user') RETURNING id
+      `)
       .get(username, email, passwordHash);
     const user = IdRowSchema.parse(userRow);
 
-    db.prepare(
-      'INSERT INTO family_members (family_id, user_id, role) VALUES (?, ?, ?)',
-    ).run(familyId, user.id, 'child');
+    db.prepare(sql`
+      INSERT INTO
+        family_members (family_id, user_id, role)
+      VALUES
+        (?, ?, ?)
+    `).run(familyId, user.id, 'child');
 
     return res.status(201).json({success: true, message: 'Child created'});
   } catch (error) {
@@ -175,13 +231,20 @@ router.get('/mine', (req, res) => {
   try {
     const userId = requireUserId(req);
     const rows = db
-      .prepare(
-        `SELECT f.id, f.name, f.owner_id, f.created_at
-	         FROM families f
-	         JOIN family_members fm ON fm.family_id = f.id
-	         WHERE fm.user_id = ?
-	         ORDER BY f.created_at DESC`,
-      )
+      .prepare(sql`
+        SELECT
+          f.id,
+          f.name,
+          f.owner_id,
+          f.created_at
+        FROM
+          families f
+          JOIN family_members fm ON fm.family_id = f.id
+        WHERE
+          fm.user_id = ?
+        ORDER BY
+          f.created_at DESC
+      `)
       .all(userId);
     const families = rows.map(r => FamilySchema.parse(r));
     return res.json({success: true, data: families});

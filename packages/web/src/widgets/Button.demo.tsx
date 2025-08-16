@@ -1,13 +1,11 @@
 import type {FC} from 'react';
-import { useState} from 'react';
+import {useState} from 'react';
 import {Button} from './Button.js';
 
 const ButtonDemo: FC = () => {
   const [loading, setLoading] = useState(false);
   return (
-    <div className="space-y-6"
-data-testid="ButtonDemo"
-    >
+    <div className="space-y-6" data-testid="ButtonDemo">
       <div className="space-x-2">
         <Button>Default</Button>
 
@@ -29,8 +27,11 @@ data-testid="ButtonDemo"
       <div className="space-x-2">
         <Button disabled>Disabled</Button>
 
-        <Button loading={loading}
-onClick={() => { setLoading(v => !v); }}
+        <Button
+          loading={loading}
+          onClick={() => {
+            setLoading(v => !v);
+          }}
         >
           Toggle Loading
         </Button>

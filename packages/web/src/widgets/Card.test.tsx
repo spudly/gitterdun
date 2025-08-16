@@ -4,9 +4,7 @@ import {Card} from './Card';
 describe('Card', () => {
   it('renders header/footer', () => {
     render(
-      <Card footer={<div>F</div>}
-header={<div>H</div>}
-      >
+      <Card footer={<div>F</div>} header={<div>H</div>}>
         C
       </Card>,
     );
@@ -25,9 +23,7 @@ header={<div>H</div>}
 
   it('respects padded=false and elevated=false', () => {
     render(
-      <Card elevated={false}
-padded={false}
-      >
+      <Card elevated={false} padded={false}>
         Cond
       </Card>,
     );

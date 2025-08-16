@@ -3,9 +3,7 @@ import {StatusDot} from './StatusDot.js';
 
 const StatusDotDemo: FC = () => {
   return (
-    <div className="flex items-center gap-3"
-data-testid="StatusDotDemo"
-    >
+    <div className="flex items-center gap-3" data-testid="StatusDotDemo">
       <StatusDot color="green" />
 
       <StatusDot color="blue" />

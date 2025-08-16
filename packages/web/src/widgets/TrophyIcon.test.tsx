@@ -7,5 +7,3 @@ describe('TrophyIcon', () => {
     expect(document.querySelectorAll('svg').length).toBe(1);
   });
 });
-
-

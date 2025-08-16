@@ -6,10 +6,7 @@ describe('List & ListRow', () => {
   it('renders list row content', () => {
     render(
       <List>
-        <ListRow description="Desc"
-right={<span>R</span>}
-title="Row"
-        />
+        <ListRow description="Desc" right={<span>R</span>} title="Row" />
       </List>,
     );
     expect(screen.getByText('Row')).toBeInTheDocument();

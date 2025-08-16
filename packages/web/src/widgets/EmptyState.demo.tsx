@@ -4,12 +4,8 @@ import {Button} from './Button.js';
 
 const EmptyStateDemo: FC = () => {
   return (
-    <div className="space-y-6"
-data-testid="EmptyStateDemo"
-    >
-      <EmptyState description="Nothing to show right now."
-title="No data"
-      />
+    <div className="space-y-6" data-testid="EmptyStateDemo">
+      <EmptyState description="Nothing to show right now." title="No data" />
 
       <EmptyState
         action={<Button>Invite</Button>}

@@ -1,7 +1,7 @@
 import {render, screen} from '@testing-library/react';
-import type { RankingItem} from './RankingList';
+import type {RankingItem} from './RankingList';
 import {RankingList} from './RankingList';
-import type { PodiumItem} from './Podium';
+import type {PodiumItem} from './Podium';
 import {Podium} from './Podium';
 
 describe('RankingList & Podium', () => {

@@ -7,5 +7,3 @@ describe('DocIcon', () => {
     expect(document.querySelectorAll('svg').length).toBe(1);
   });
 });
-
-

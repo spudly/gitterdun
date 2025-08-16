@@ -7,5 +7,3 @@ describe('InfoCircleIcon', () => {
     expect(document.querySelectorAll('svg').length).toBe(1);
   });
 });
-
-

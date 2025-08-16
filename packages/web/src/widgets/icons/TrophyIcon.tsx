@@ -17,5 +17,3 @@ export const TrophyIcon: IconComponent = ({size = 'md'}) => (
     />
   </svg>
 );
-
-

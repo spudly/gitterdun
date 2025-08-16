@@ -1,6 +1,5 @@
 /** @type {import('jest').Config} */
 module.exports = {
-  passWithNoTests: true,
   testEnvironment: 'node',
   transform: {
     '^.+\\.(t|j)sx?$': [
@@ -16,6 +15,9 @@ module.exports = {
     '!**/*.demo.*',
     '!**/*.config.*',
   ],
+  coverageThreshold: {
+    global: {branches: 100, functions: 100, lines: 100, statements: 100},
+  },
   moduleNameMapper: {'^(\\.{1,2}/.*)\\.js$': '$1'},
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.(spec|test).(ts|tsx|js|jsx)',

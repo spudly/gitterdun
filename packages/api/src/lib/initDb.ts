@@ -3,6 +3,7 @@ import path from 'node:path';
 import db from './db';
 import {asError, CountRowSchema} from '@gitterdun/shared';
 import {logger} from '../utils/logger';
+import {sql} from '../utils/sql';
 
 export const initializeDatabase = async (): Promise<void> => {
   try {
@@ -18,7 +19,14 @@ export const initializeDatabase = async (): Promise<void> => {
     // Insert a default admin user if none exists
     const adminExists = CountRowSchema.parse(
       db
-        .prepare('SELECT COUNT(*) as count FROM users WHERE role = ?')
+        .prepare(sql`
+          SELECT
+            COUNT(*) AS count
+          FROM
+            users
+          WHERE
+            role = ?
+        `)
         .get('admin'),
     );
 
@@ -26,12 +34,19 @@ export const initializeDatabase = async (): Promise<void> => {
       const bcrypt = await import('bcryptjs');
       const hashedPassword = bcrypt.default.hashSync('admin123', 10);
 
-      db.prepare(
-        `
-        INSERT INTO users (username, email, password_hash, role, points, streak_count)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `,
-      ).run('admin', 'admin@gitterdun.com', hashedPassword, 'admin', 0, 0);
+      db.prepare(sql`
+        INSERT INTO
+          users (
+            username,
+            email,
+            password_hash,
+            role,
+            points,
+            streak_count
+          )
+        VALUES
+          (?, ?, ?, ?, ?, ?)
+      `).run('admin', 'admin@gitterdun.com', hashedPassword, 'admin', 0, 0);
 
       logger.info('Default admin user created: admin@gitterdun.com / admin123');
     }

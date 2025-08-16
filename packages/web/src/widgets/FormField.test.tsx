@@ -22,9 +22,7 @@ describe('FormField', () => {
 
   it('renders without optional props', () => {
     render(
-      <FormField htmlFor="name"
-label="Name"
-      >
+      <FormField htmlFor="name" label="Name">
         <input id="name" />
       </FormField>,
     );

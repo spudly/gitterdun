@@ -1,5 +1,5 @@
 import type {FC} from 'react';
-import { useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useQuery, useMutation} from '@tanstack/react-query';
 import {familiesApi, invitationsApi} from '../lib/api.js';
 import {FamilyMemberSchema} from '@gitterdun/shared';

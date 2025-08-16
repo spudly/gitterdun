@@ -8,6 +8,7 @@ import {
 } from '@gitterdun/shared';
 import db from '../lib/db';
 import {logger} from '../utils/logger';
+import {sql} from '../utils/sql';
 
 const router = express.Router();
 
@@ -19,21 +20,31 @@ router.get('/', async (req, res) => {
   try {
     const {limit, sortBy} = LeaderboardQuerySchema.parse(req.query);
 
-    const query = `
-      SELECT 
+    const query = sql`
+      SELECT
         u.id,
         u.username,
         u.points,
         u.streak_count,
-        COUNT(ub.badge_id) as badges_earned,
-        COUNT(DISTINCT ca.chore_id) as chores_completed
-      FROM users u
-      LEFT JOIN user_badges ub ON u.id = ub.user_id
-      LEFT JOIN chore_assignments ca ON u.id = ca.user_id AND ca.approved_at IS NOT NULL
-      WHERE u.role = 'user'
-      GROUP BY u.id, u.username, u.points, u.streak_count
-      ORDER BY ${sortBy} DESC, u.points DESC
-      LIMIT ?
+        COUNT(ub.badge_id) AS badges_earned,
+        COUNT(DISTINCT ca.chore_id) AS chores_completed
+      FROM
+        users u
+        LEFT JOIN user_badges ub ON u.id = ub.user_id
+        LEFT JOIN chore_assignments ca ON u.id = ca.user_id
+        AND ca.approved_at IS NOT NULL
+      WHERE
+        u.role = 'user'
+      GROUP BY
+        u.id,
+        u.username,
+        u.points,
+        u.streak_count
+      ORDER BY
+        ${sortBy} DESC,
+        u.points DESC
+      LIMIT
+        ?
     `;
 
     const leaderboard = db.prepare(query).all(limit);

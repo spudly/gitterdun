@@ -11,11 +11,15 @@ export type CheckboxProps = {
   ) => void;
 };
 
-export const Checkbox: FC<CheckboxProps> = ({id, label, checked, disabled, onChange}) => {
+export const Checkbox: FC<CheckboxProps> = ({
+  id,
+  label,
+  checked,
+  disabled,
+  onChange,
+}) => {
   return (
-    <label className="flex items-center gap-2"
-htmlFor={id}
-    >
+    <label className="flex items-center gap-2" htmlFor={id}>
       <input
         checked={checked}
         disabled={disabled}
@@ -29,4 +33,3 @@ htmlFor={id}
 };
 
 export default Checkbox;
-

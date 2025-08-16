@@ -27,7 +27,10 @@ export const UpdateUserSchema = z.object({
   streak_count: z.number().int().min(0).optional(),
 });
 
-export const LoginSchema = z.object({email: z.email(), password: z.string().min(1)});
+export const LoginSchema = z.object({
+  email: z.email(),
+  password: z.string().min(1),
+});
 
 // Auth helper schemas
 export const ForgotPasswordRequestSchema = z.object({email: z.email()});

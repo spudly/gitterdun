@@ -11,6 +11,7 @@ import {
 import {z} from 'zod';
 import db from '../lib/db';
 import {logger} from '../utils/logger';
+import {sql} from '../utils/sql';
 
 const router = express.Router();
 
@@ -28,7 +29,22 @@ router.get('/', async (req, res) => {
         .json({success: false, error: 'User ID is required'});
     }
 
-    let query = `SELECT id, user_id, title, description, target_points, current_points, status, created_at, updated_at FROM goals WHERE user_id = ?`;
+    let query = sql`
+      SELECT
+        id,
+        user_id,
+        title,
+        description,
+        target_points,
+        current_points,
+        status,
+        created_at,
+        updated_at
+      FROM
+        goals
+      WHERE
+        user_id = ?
+    `;
     const params: Array<string | number> = [userId];
 
     if (status) {
@@ -91,13 +107,18 @@ router.post('/', async (req, res) => {
     }
 
     const result = db
-      .prepare(
-        `
-      INSERT INTO goals (title, description, target_points, current_points, user_id) 
-      VALUES (?, ?, ?, ?, ?) 
-      RETURNING *
-    `,
-      )
+      .prepare(sql`
+        INSERT INTO
+          goals (
+            title,
+            description,
+            target_points,
+            current_points,
+            user_id
+          )
+        VALUES
+          (?, ?, ?, ?, ?) RETURNING *
+      `)
       .get(title, description, targetPoints, 0, 1);
 
     const validatedGoal = GoalSchema.parse(result);
@@ -145,9 +166,22 @@ router.get('/:id', async (req, res) => {
     }
 
     const goal = db
-      .prepare(
-        'SELECT id, user_id, title, description, target_points, current_points, status, created_at, updated_at FROM goals WHERE id = ?',
-      )
+      .prepare(sql`
+        SELECT
+          id,
+          user_id,
+          title,
+          description,
+          target_points,
+          current_points,
+          status,
+          created_at,
+          updated_at
+        FROM
+          goals
+        WHERE
+          id = ?
+      `)
       .get(goalId);
 
     if (goal == null) {
@@ -179,7 +213,14 @@ router.put('/:id', async (req, res) => {
 
     // Check if goal exists
     const existingGoal = db
-      .prepare('SELECT id FROM goals WHERE id = ?')
+      .prepare(sql`
+        SELECT
+          id
+        FROM
+          goals
+        WHERE
+          id = ?
+      `)
       .get(goalId);
 
     if (existingGoal == null) {
@@ -225,11 +266,12 @@ router.put('/:id', async (req, res) => {
     updateFields.push('updated_at = CURRENT_TIMESTAMP');
     values.push(goalId);
 
-    const updateQuery = `
-      UPDATE goals 
-      SET ${updateFields.join(', ')} 
-      WHERE id = ?
-      RETURNING *
+    const updateQuery = sql`
+      UPDATE goals
+      SET
+        ${updateFields.join(', ')}
+      WHERE
+        id = ? RETURNING *
     `;
 
     const updatedGoal = db.prepare(updateQuery).get(...values);
@@ -274,7 +316,14 @@ router.delete('/:id', async (req, res) => {
 
     // Check if goal exists
     const existingGoal = db
-      .prepare('SELECT id FROM goals WHERE id = ?')
+      .prepare(sql`
+        SELECT
+          id
+        FROM
+          goals
+        WHERE
+          id = ?
+      `)
       .get(goalId);
 
     if (existingGoal == null) {
@@ -282,7 +331,11 @@ router.delete('/:id', async (req, res) => {
     }
 
     // Delete the goal
-    db.prepare('DELETE FROM goals WHERE id = ?').run(goalId);
+    db.prepare(sql`
+      DELETE FROM goals
+      WHERE
+        id = ?
+    `).run(goalId);
 
     logger.info({goalId}, 'Goal deleted');
 

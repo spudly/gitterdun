@@ -16,6 +16,7 @@ import {z} from 'zod';
 import crypto from 'node:crypto';
 import db from '../lib/db';
 import {logger} from '../utils/logger';
+import {sql} from '../utils/sql';
 
 const router = express.Router();
 
@@ -48,9 +49,12 @@ const createSession = (userId: number) => {
   const now = new Date();
   const expiresAt = new Date(now.getTime() + 1000 * 60 * 60 * 24 * 7); // 7 days
 
-  db.prepare(
-    'INSERT INTO sessions (id, user_id, created_at, expires_at) VALUES (?, ?, CURRENT_TIMESTAMP, ?)',
-  ).run(sessionId, userId, expiresAt.toISOString());
+  db.prepare(sql`
+    INSERT INTO
+      sessions (id, user_id, created_at, expires_at)
+    VALUES
+      (?, ?, CURRENT_TIMESTAMP, ?)
+  `).run(sessionId, userId, expiresAt.toISOString());
 
   return {sessionId, expiresAt};
 };
@@ -61,9 +65,15 @@ const getUserFromSession = (req: express.Request) => {
     return null;
   }
   const sessionRow = db
-    .prepare(
-      'SELECT s.user_id as user_id, s.expires_at as expires_at FROM sessions s WHERE s.id = ?',
-    )
+    .prepare(sql`
+      SELECT
+        s.user_id AS user_id,
+        s.expires_at AS expires_at
+      FROM
+        sessions s
+      WHERE
+        s.id = ?
+    `)
     .get(sessionId);
   const session =
     sessionRow != null ? SessionRowSchema.parse(sessionRow) : undefined;
@@ -72,26 +82,30 @@ const getUserFromSession = (req: express.Request) => {
     return null;
   }
   if (new Date(session.expires_at).getTime() < Date.now()) {
-    db.prepare('DELETE FROM sessions WHERE id = ?').run(sessionId);
+    db.prepare(sql`
+      DELETE FROM sessions
+      WHERE
+        id = ?
+    `).run(sessionId);
     return null;
   }
 
   const user = db
-    .prepare(
-      `
-        SELECT
-          id,
-          username,
-          email,
-          role,
-          points,
-          streak_count,
-          created_at,
-          updated_at
-        FROM users
-        WHERE id = ?
-      `,
-    )
+    .prepare(sql`
+      SELECT
+        id,
+        username,
+        email,
+        role,
+        points,
+        streak_count,
+        created_at,
+        updated_at
+      FROM
+        users
+      WHERE
+        id = ?
+    `)
     .get(session.user_id);
   if (user == null) {
     return null;
@@ -109,10 +123,22 @@ router.post('/login', async (req, res) => {
 
     // Query user from database
     const userRow = db
-      .prepare(
-        `SELECT id, username, email, password_hash, role, points, streak_count, created_at, updated_at
-         FROM users WHERE email = ?`,
-      )
+      .prepare(sql`
+        SELECT
+          id,
+          username,
+          email,
+          password_hash,
+          role,
+          points,
+          streak_count,
+          created_at,
+          updated_at
+        FROM
+          users
+        WHERE
+          email = ?
+      `)
       .get(email);
     const user =
       userRow != null ? UserWithPasswordRowSchema.parse(userRow) : undefined;
@@ -187,7 +213,15 @@ router.post('/register', async (req, res) => {
 
     // Check if user already exists
     const existingUser = db
-      .prepare('SELECT id FROM users WHERE email = ? OR username = ?')
+      .prepare(sql`
+        SELECT
+          id
+        FROM
+          users
+        WHERE
+          email = ?
+          OR username = ?
+      `)
       .get(email, username);
 
     if (existingUser != null) {
@@ -205,13 +239,19 @@ router.post('/register', async (req, res) => {
 
     // Create user
     const result = db
-      .prepare(
-        `
-      INSERT INTO users (username, email, password_hash, role) 
-      VALUES (?, ?, ?, ?) 
-      RETURNING id, username, email, role, points, streak_count, created_at, updated_at
-    `,
-      )
+      .prepare(sql`
+        INSERT INTO
+          users (username, email, password_hash, role)
+        VALUES
+          (?, ?, ?, ?) RETURNING id,
+          username,
+          email,
+          role,
+          points,
+          streak_count,
+          created_at,
+          updated_at
+      `)
       .get(username, email, passwordHash, role);
 
     const validatedUser = UserSchema.parse(result);
@@ -249,7 +289,11 @@ router.post('/logout', (req, res) => {
   try {
     const sessionId = getCookie(req, 'sid');
     if (sessionId != null) {
-      db.prepare('DELETE FROM sessions WHERE id = ?').run(sessionId);
+      db.prepare(sql`
+        DELETE FROM sessions
+        WHERE
+          id = ?
+      `).run(sessionId);
     }
     res.clearCookie('sid', {path: '/'});
     return res.json({success: true, message: 'Logged out'});
@@ -281,7 +325,16 @@ router.get('/me', (req, res) => {
 router.post('/forgot', (req, res) => {
   try {
     const {email} = ForgotPasswordRequestSchema.parse(req.body);
-    const row = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
+    const row = db
+      .prepare(sql`
+        SELECT
+          id
+        FROM
+          users
+        WHERE
+          email = ?
+      `)
+      .get(email);
     const user = row != null ? IdRowSchema.parse(row) : undefined;
 
     // Always respond with success to prevent enumeration
@@ -294,9 +347,12 @@ router.post('/forgot', (req, res) => {
 
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + 1000 * 60 * 15); // 15 minutes
-    db.prepare(
-      'INSERT INTO password_resets (token, user_id, created_at, expires_at, used) VALUES (?, ?, CURRENT_TIMESTAMP, ?, 0)',
-    ).run(token, user.id, expiresAt.toISOString());
+    db.prepare(sql`
+      INSERT INTO
+        password_resets (token, user_id, created_at, expires_at, used)
+      VALUES
+        (?, ?, CURRENT_TIMESTAMP, ?, 0)
+    `).run(token, user.id, expiresAt.toISOString());
 
     // In a real app, send email. For now, log the token.
     logger.info({email, token}, 'Password reset requested');
@@ -324,9 +380,17 @@ router.post('/reset', async (req, res) => {
   try {
     const {token, password} = ResetPasswordSchema.parse(req.body);
     const row = db
-      .prepare(
-        'SELECT token, user_id, expires_at, used FROM password_resets WHERE token = ?',
-      )
+      .prepare(sql`
+        SELECT
+          token,
+          user_id,
+          expires_at,
+          used
+        FROM
+          password_resets
+        WHERE
+          token = ?
+      `)
       .get(token);
     const found = row != null ? PasswordResetRowSchema.parse(row) : undefined;
 
@@ -338,13 +402,20 @@ router.post('/reset', async (req, res) => {
     }
 
     const hashed = await bcrypt.hash(password, 12);
-    db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(
-      hashed,
-      found.user_id,
-    );
-    db.prepare('UPDATE password_resets SET used = 1 WHERE token = ?').run(
-      token,
-    );
+    db.prepare(sql`
+      UPDATE users
+      SET
+        password_hash = ?
+      WHERE
+        id = ?
+    `).run(hashed, found.user_id);
+    db.prepare(sql`
+      UPDATE password_resets
+      SET
+        used = 1
+      WHERE
+        token = ?
+    `).run(token);
 
     return res.json({success: true, message: 'Password has been reset'});
   } catch (error) {

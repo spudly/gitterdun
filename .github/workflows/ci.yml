@@ -24,4 +24,4 @@ jobs:
       - name: Run checks and tests (Turbo)
         env:
           CI: true
-        run: npx turbo run ci:check
+        run: npm run ci:check

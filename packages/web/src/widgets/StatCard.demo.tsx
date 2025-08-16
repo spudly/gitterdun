@@ -28,11 +28,7 @@ const StatCardDemo: FC = () => {
         value={345}
       />
 
-      <StatCard color="red"
-icon={<span>⚠️</span>}
-label="Due Soon"
-value={2}
-      />
+      <StatCard color="red" icon={<span>⚠️</span>} label="Due Soon" value={2} />
     </div>
   );
 };

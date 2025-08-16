@@ -5,10 +5,7 @@ describe('Modal', () => {
   it('opens and closes via overlay, escape and close button', () => {
     const onClose = jest.fn();
     render(
-      <Modal isOpen
-onClose={onClose}
-title="M"
-      >
+      <Modal isOpen onClose={onClose} title="M">
         <div>Body</div>
       </Modal>,
     );
@@ -25,9 +22,7 @@ title="M"
   it('respects props and closed state', () => {
     const onClose = jest.fn();
     const {rerender} = render(
-      <Modal isOpen={false}
-onClose={onClose}
-      >
+      <Modal isOpen={false} onClose={onClose}>
         <div>Body</div>
       </Modal>,
     );

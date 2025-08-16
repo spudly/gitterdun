@@ -1,6 +1,9 @@
 import type {FC, ReactNode} from 'react';
 
-export type KeyValueProps = {readonly label: ReactNode; readonly value: ReactNode};
+export type KeyValueProps = {
+  readonly label: ReactNode;
+  readonly value: ReactNode;
+};
 
 export const KeyValue: FC<KeyValueProps> = ({label, value}) => {
   return (

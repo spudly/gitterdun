@@ -3,9 +3,7 @@ import {Card} from './Card.js';
 
 const CardDemo: FC = () => {
   return (
-    <div className="space-y-4"
-data-testid="CardDemo"
-    >
+    <div className="space-y-4" data-testid="CardDemo">
       <Card>Simple card</Card>
 
       <Card header={<div>Header</div>}>With header</Card>

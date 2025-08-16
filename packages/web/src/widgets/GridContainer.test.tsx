@@ -5,9 +5,7 @@ import {FormSection} from './FormSection';
 describe('GridContainer + FormSection', () => {
   it('renders content', () => {
     render(
-      <GridContainer cols={2}
-gap="md"
-      >
+      <GridContainer cols={2} gap="md">
         <FormSection title="S">
           <div>c</div>
         </FormSection>

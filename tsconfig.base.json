@@ -13,7 +13,6 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "types": ["node"],
     "alwaysStrict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
@@ -26,6 +25,6 @@
     "useUnknownInCatchVariables": true,
     "exactOptionalPropertyTypes": true
   },
-  "include": ["packages/**/*", "packages/**/*.tsx", "packages/**/*.ts"],
+  "include": ["**/*.tsx", "**/*.ts"],
   "exclude": ["node_modules", "**/dist", "**/build"]
 }

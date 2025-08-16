@@ -7,7 +7,8 @@
 - [x] IconButton demo has duplicate code (SVGs). Clean that up and make sure
       other stuff isn't duplicated.
 - [x] Use padding/gap. Do not use margins
-- [ ] Use `test` instead of `it` for jest tests
+- [ ] Use `test` instead of `it` for jest tests. maybe there's a eslint rule for
+      this
 - [ ] add depcheck
 - [ ] comment reasons for disabling eslint rules
   - [ ] stylistic rules not necessary because of prettier
@@ -20,5 +21,7 @@
 - [ ] format SQL using prettier-plugin-embed + prettier-plugin-sql
 - [ ] upgrade to express 5
 - [ ] update all dependencies
-- [ ] instruct cursor to always make sure that any new code it writes passes checks: eslint, jest, typescript, prettier
-- [ ] audit all the eslint-disable rules that AI added; make sure they're not for stupid reasons
+- [x] instruct cursor to always make sure that any new code it writes passes
+      checks: eslint, jest, typescript, prettier
+- [ ] audit all the eslint-disable rules that AI added; make sure they're not
+      for stupid reasons

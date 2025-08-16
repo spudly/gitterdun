@@ -7,11 +7,11 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "--prebuild": "rm -rf dist",
-    "build": "tsc",
+    "type-check": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "lint": "eslint \"src/**/*.ts\"",
     "test": "jest",
-    "test:dev": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:dev": "jest --watch"
   },
   "dependencies": {
     "zod": "^4.0.17"

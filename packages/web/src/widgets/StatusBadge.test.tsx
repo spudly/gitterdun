@@ -4,9 +4,7 @@ import {StatusBadge, getStatusClass} from './StatusBadge';
 describe('StatusBadge', () => {
   it('renders with provided status and size', () => {
     render(
-      <StatusBadge size="sm"
-status="info"
-      >
+      <StatusBadge size="sm" status="info">
         Info
       </StatusBadge>,
     );

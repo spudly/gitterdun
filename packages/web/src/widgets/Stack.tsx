@@ -11,7 +11,10 @@ const GAP_MAP: Record<StackGap, string> = {
   xl: 'space-y-8',
 };
 
-export type StackProps = {readonly children: ReactNode; readonly gap?: StackGap};
+export type StackProps = {
+  readonly children: ReactNode;
+  readonly gap?: StackGap;
+};
 
 export const Stack: FC<StackProps> = ({children, gap = 'md'}) => {
   return <div className={clsx(GAP_MAP[gap])}>{children}</div>;

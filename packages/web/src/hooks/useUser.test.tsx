@@ -1,4 +1,4 @@
-import type { FC, PropsWithChildren } from 'react';
+import type {FC, PropsWithChildren} from 'react';
 import {renderHook, act} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {useUser} from './useUser';
@@ -34,7 +34,7 @@ jest.mock('../lib/api', () => {
 
 const wrapper: FC<PropsWithChildren> = ({children}) => {
   const client = new QueryClient();
-  return <QueryClientProvider client={client}>{children}</QueryClientProvider>
+  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 };
 
 describe('useUser', () => {

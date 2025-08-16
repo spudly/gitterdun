@@ -1,14 +1,12 @@
 import type {FC} from 'react';
-import { useState} from 'react';
+import {useState} from 'react';
 import {TextInput} from './TextInput.js';
 import {FormField} from './FormField.js';
 
 const TextInputDemo: FC = () => {
   const [value, setValue] = useState('');
   return (
-    <div className="space-y-4"
-data-testid="TextInputDemo"
-    >
+    <div className="space-y-4" data-testid="TextInputDemo">
       <FormField
         helpText="We'll never share your email."
         htmlFor="email"
@@ -16,21 +14,17 @@ data-testid="TextInputDemo"
       >
         <TextInput
           id="email"
-          onChange={v => { setValue(v); }}
+          onChange={v => {
+            setValue(v);
+          }}
           placeholder="you@example.com"
           type="email"
           value={value}
         />
       </FormField>
 
-      <FormField htmlFor="password"
-label="Password"
-required
-      >
-        <TextInput id="password"
-placeholder="••••••"
-type="password"
-        />
+      <FormField htmlFor="password" label="Password" required>
+        <TextInput id="password" placeholder="••••••" type="password" />
       </FormField>
 
       <FormField
@@ -40,15 +34,15 @@ type="password"
       >
         <TextInput
           id="with-error"
-          onChange={v => { setValue(v); }}
+          onChange={v => {
+            setValue(v);
+          }}
           placeholder="Type something"
           value={value}
         />
       </FormField>
 
-      <TextInput disabled
-placeholder="Disabled"
-      />
+      <TextInput disabled placeholder="Disabled" />
     </div>
   );
 };

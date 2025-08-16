@@ -19,6 +19,7 @@
       "outputs": ["coverage/**"]
     },
     "dev": {"dependsOn": ["^build"], "cache": false, "persistent": true},
+    "type-check": {"dependsOn": ["^build"], "cache": false},
     "//#prettier:check": {"cache": false},
     "ci:check": {"dependsOn": ["build", "lint", "//#prettier:check", "test"]}
   }

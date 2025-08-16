@@ -56,16 +56,11 @@ const Demos: FC = () => {
   }
   return (
     <PageContainer variant="wide">
-      <Text as="h1"
-size="2xl"
-weight="semibold"
-      >
+      <Text as="h1" size="2xl" weight="semibold">
         Widget Demos
       </Text>
 
-      <BulletList density="tight"
-indent="md"
-      >
+      <BulletList density="tight" indent="md">
         {Object.keys(registry).map(key => (
           <li key={key}>
             <TextLink to={`/__demos/${key}`}>{key}</TextLink>

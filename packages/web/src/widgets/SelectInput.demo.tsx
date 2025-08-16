@@ -1,21 +1,19 @@
 import type {FC} from 'react';
-import { useState} from 'react';
+import {useState} from 'react';
 import {SelectInput} from './SelectInput.js';
 import {FormField} from './FormField.js';
 
 const SelectInputDemo: FC = () => {
   const [v, setV] = useState('');
   return (
-    <div className="space-y-4"
-data-testid="SelectInputDemo"
-    >
-      <FormField htmlFor="role"
-label="Role"
-      >
+    <div className="space-y-4" data-testid="SelectInputDemo">
+      <FormField htmlFor="role" label="Role">
         <SelectInput
           data-testid="roleSelect"
           id="role"
-          onChange={val => { setV(val); }}
+          onChange={val => {
+            setV(val);
+          }}
           value={v}
         >
           <option value="">Select</option>
@@ -26,13 +24,8 @@ label="Role"
         </SelectInput>
       </FormField>
 
-      <FormField htmlFor="disabled"
-label="Disabled"
-      >
-        <SelectInput defaultValue="child"
-disabled
-id="disabled"
-        >
+      <FormField htmlFor="disabled" label="Disabled">
+        <SelectInput defaultValue="child" disabled id="disabled">
           <option value="parent">Parent</option>
 
           <option value="child">Child</option>
@@ -46,7 +39,9 @@ id="disabled"
       >
         <SelectInput
           id="with-error-select"
-          onChange={val => { setV(val); }}
+          onChange={val => {
+            setV(val);
+          }}
           value={v}
         >
           <option value="">Select</option>

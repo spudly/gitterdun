@@ -17,5 +17,3 @@ export const InfoCircleIcon: IconComponent = ({size = 'md'}) => (
     />
   </svg>
 );
-
-

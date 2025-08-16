@@ -14,6 +14,7 @@ import {
 } from '@gitterdun/shared';
 import bcrypt from 'bcryptjs';
 import db from '../lib/db';
+import {sql} from '../utils/sql';
 
 const router = express.Router();
 
@@ -46,7 +47,15 @@ const requireUserId = (req: express.Request): number => {
     throw Object.assign(new Error('Not authenticated'), {status: 401});
   }
   const sessionRow = db
-    .prepare('SELECT user_id, expires_at FROM sessions WHERE id = ?')
+    .prepare(sql`
+      SELECT
+        user_id,
+        expires_at
+      FROM
+        sessions
+      WHERE
+        id = ?
+    `)
     .get(sid);
   const session =
     sessionRow != null ? SessionRowSchema.parse(sessionRow) : undefined;
@@ -54,7 +63,11 @@ const requireUserId = (req: express.Request): number => {
     throw Object.assign(new Error('Not authenticated'), {status: 401});
   }
   if (new Date(session.expires_at).getTime() < Date.now()) {
-    db.prepare('DELETE FROM sessions WHERE id = ?').run(sid);
+    db.prepare(sql`
+      DELETE FROM sessions
+      WHERE
+        id = ?
+    `).run(sid);
     throw Object.assign(new Error('Session expired'), {status: 401});
   }
   return session.user_id;
@@ -68,9 +81,15 @@ router.post('/:familyId', (req, res) => {
     const {email, role} = CreateInvitationSchema.parse(req.body);
 
     const membershipRow = db
-      .prepare(
-        'SELECT role FROM family_members WHERE family_id = ? AND user_id = ?',
-      )
+      .prepare(sql`
+        SELECT
+          role
+        FROM
+          family_members
+        WHERE
+          family_id = ?
+          AND user_id = ?
+      `)
       .get(familyId, inviterId);
     const membership =
       membershipRow != null ? RoleRowSchema.parse(membershipRow) : undefined;
@@ -80,10 +99,19 @@ router.post('/:familyId', (req, res) => {
 
     const token = crypto.randomBytes(24).toString('hex');
     const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24h
-    db.prepare(
-      `INSERT INTO family_invitations (token, family_id, email, role, invited_by, expires_at)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-    ).run(token, familyId, email, role, inviterId, expiresAt.toISOString());
+    db.prepare(sql`
+      INSERT INTO
+        family_invitations (
+          token,
+          family_id,
+          email,
+          role,
+          invited_by,
+          expires_at
+        )
+      VALUES
+        (?, ?, ?, ?, ?, ?)
+    `).run(token, familyId, email, role, inviterId, expiresAt.toISOString());
 
     // Email sending would go here; return token for dev
     return res.json({success: true, message: 'Invitation created', token});
@@ -105,10 +133,20 @@ router.post('/accept', async (req, res) => {
   try {
     const {token, username, password} = AcceptInvitationSchema.parse(req.body);
     const invRow = db
-      .prepare(
-        `SELECT token, family_id, email, role, invited_by, expires_at, accepted
-         FROM family_invitations WHERE token = ?`,
-      )
+      .prepare(sql`
+        SELECT
+          token,
+          family_id,
+          email,
+          role,
+          invited_by,
+          expires_at,
+          accepted
+        FROM
+          family_invitations
+        WHERE
+          token = ?
+      `)
       .get(token);
     const inv =
       invRow != null ? FamilyInvitationRowSchema.parse(invRow) : undefined;
@@ -125,7 +163,15 @@ router.post('/accept', async (req, res) => {
 
     // If user exists by email, verify password; else create new user
     const existingRow = db
-      .prepare('SELECT id, password_hash FROM users WHERE email = ?')
+      .prepare(sql`
+        SELECT
+          id,
+          password_hash
+        FROM
+          users
+        WHERE
+          email = ?
+      `)
       .get(inv.email);
     const existing =
       existingRow != null
@@ -145,9 +191,12 @@ router.post('/accept', async (req, res) => {
     } else {
       const hash = await bcrypt.hash(password, 12);
       const createdRow = db
-        .prepare(
-          `INSERT INTO users (username, email, password_hash, role) VALUES (?, ?, ?, 'user') RETURNING id`,
-        )
+        .prepare(sql`
+          INSERT INTO
+            users (username, email, password_hash, role)
+          VALUES
+            (?, ?, ?, 'user') RETURNING id
+        `)
         .get(username, inv.email, hash);
       const created = IdRowSchema.parse(createdRow);
       userId = created.id;
@@ -155,19 +204,32 @@ router.post('/accept', async (req, res) => {
 
     // Add membership if not already
     const member = db
-      .prepare(
-        'SELECT 1 FROM family_members WHERE family_id = ? AND user_id = ?',
-      )
+      .prepare(sql`
+        SELECT
+          1
+        FROM
+          family_members
+        WHERE
+          family_id = ?
+          AND user_id = ?
+      `)
       .get(inv.family_id, userId);
     if (member == null) {
-      db.prepare(
-        'INSERT INTO family_members (family_id, user_id, role) VALUES (?, ?, ?)',
-      ).run(inv.family_id, userId, inv.role);
+      db.prepare(sql`
+        INSERT INTO
+          family_members (family_id, user_id, role)
+        VALUES
+          (?, ?, ?)
+      `).run(inv.family_id, userId, inv.role);
     }
 
-    db.prepare(
-      'UPDATE family_invitations SET accepted = 1 WHERE token = ?',
-    ).run(token);
+    db.prepare(sql`
+      UPDATE family_invitations
+      SET
+        accepted = 1
+      WHERE
+        token = ?
+    `).run(token);
 
     return res.json({success: true, message: 'Invitation accepted'});
   } catch (error) {

@@ -7,5 +7,3 @@ describe('CheckCircleIcon', () => {
     expect(document.querySelectorAll('svg').length).toBe(1);
   });
 });
-
-

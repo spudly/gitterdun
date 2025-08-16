@@ -4,9 +4,7 @@ import {BulletList, getDensityClass, getIndentClass} from './BulletList';
 describe('BulletList', () => {
   it('renders items with props', () => {
     render(
-      <BulletList density="normal"
-indent="lg"
-      >
+      <BulletList density="normal" indent="lg">
         <li>X</li>
       </BulletList>,
     );
@@ -15,25 +13,19 @@ indent="lg"
 
   it('covers indent and density variants', () => {
     const {rerender, getByText} = render(
-      <BulletList density="tight"
-indent="sm"
-      >
+      <BulletList density="tight" indent="sm">
         <li>A</li>
       </BulletList>,
     );
     expect(getByText('A')).toBeInTheDocument();
     rerender(
-      <BulletList density="normal"
-indent="md"
-      >
+      <BulletList density="normal" indent="md">
         <li>B</li>
       </BulletList>,
     );
     expect(getByText('B')).toBeInTheDocument();
     rerender(
-      <BulletList density="tight"
-indent="lg"
-      >
+      <BulletList density="tight" indent="lg">
         <li>C</li>
       </BulletList>,
     );

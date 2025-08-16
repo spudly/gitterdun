@@ -17,5 +17,3 @@ export const DocIcon: IconComponent = ({size = 'md'}) => (
     />
   </svg>
 );
-
-
