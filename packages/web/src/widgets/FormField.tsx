@@ -1,38 +1,45 @@
-import {FC, ReactNode} from 'react';
+import type {FC, ReactNode} from 'react';
+import clsx from 'clsx';
 
-export interface FormFieldProps {
-  label?: ReactNode;
-  help?: ReactNode;
-  error?: string | null;
-  required?: boolean;
-  children: ReactNode;
-  className?: string;
-  htmlFor?: string;
-}
+export type FormFieldProps = {
+  readonly label: string;
+  readonly htmlFor: string;
+  readonly children: ReactNode;
+  readonly required?: boolean;
+  readonly error?: string;
+  readonly helpText?: string;
+};
 
 export const FormField: FC<FormFieldProps> = ({
   label,
-  help,
-  error,
-  required,
-  children,
-  className = '',
   htmlFor,
+  children,
+  required = false,
+  error,
+  helpText,
 }) => {
   return (
-    <div className={`space-y-1 ${className}`}>
-      {label && (
-        <label
-          className="block text-sm font-medium text-gray-700"
-          htmlFor={htmlFor}
-        >
-          {label}
-          {required && <span className="text-red-600 ml-0.5">*</span>}
-        </label>
-      )}
+    <div className={clsx('space-y-1')}>
+      <label
+        className="block text-sm font-medium text-gray-700"
+        htmlFor={htmlFor}
+      >
+        {label}
+
+        {required ? <span className="ml-1 text-red-500">*</span> : null}
+      </label>
+
       {children}
-      {help && !error && <div className="text-xs text-gray-500">{help}</div>}
-      {error && <div className="text-xs text-red-600">{error}</div>}
+
+      {helpText ?  (
+        <p className="text-sm text-gray-500">{helpText}</p>
+      ) : null}
+
+      {error ?  (
+        <p className="text-sm text-red-600" role="alert">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 };

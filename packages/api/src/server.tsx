@@ -1,25 +1,26 @@
 import express from 'express';
 import compression from 'compression';
+import cors from 'cors';
 import helmet from 'helmet';
-import path from 'path';
+import path from 'node:path';
 import dotenv from 'dotenv';
 import {initializeDatabase} from './lib/initDb';
 import {logger} from './utils/logger';
 
-// Import routes
 import authRoutes from './routes/auth';
 import choreRoutes from './routes/chores';
 import goalRoutes from './routes/goals';
 import leaderboardRoutes from './routes/leaderboard';
 import familyRoutes from './routes/families';
 import invitationRoutes from './routes/invitations';
+import {asError} from '@gitterdun/shared';
 
 // Load environment variables
 dotenv.config();
 
 const appRootDir = path.resolve();
 const isProduction = process.env['NODE_ENV'] === 'production';
-const PORT = process.env['PORT'] || 3000;
+const PORT = process.env['PORT'] ?? 3000;
 
 async function createServer() {
   try {
@@ -48,6 +49,9 @@ async function createServer() {
     );
 
     app.use(compression());
+    if (!isProduction) {
+      app.use(cors({origin: [/^http:\/\/localhost:\d+$/], credentials: true}));
+    }
     app.use(express.json({limit: '10mb'}));
     app.use(express.urlencoded({extended: true, limit: '10mb'}));
 
@@ -76,27 +80,27 @@ async function createServer() {
     // Error handling middleware
     app.use(
       (
-        err: any,
+        err: unknown,
         _req: express.Request,
         res: express.Response,
         _next: express.NextFunction,
       ) => {
         logger.error({error: err}, 'Error');
 
-        if ((err as any).type === 'entity.parse.failed') {
+        if (asError(err).type === 'entity.parse.failed') {
           return res
             .status(400)
             .json({success: false, error: 'Invalid JSON payload'});
         }
 
         return res
-          .status((err as any).status || 500)
+          .status(asError(err).status ?? 500)
           .json({
             success: false,
             error:
               process.env['NODE_ENV'] === 'production'
                 ? 'Internal server error'
-                : (err as any).message,
+                : asError(err).message,
           });
       },
     );
@@ -121,7 +125,7 @@ async function createServer() {
   }
 }
 
-createServer().catch(err => {
-  logger.error({error: err}, 'Failed to start server');
+createServer().catch((err: unknown) => {
+  logger.error({error: asError(err)}, 'Failed to start server');
   process.exit(1);
 });

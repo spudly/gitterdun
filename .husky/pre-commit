@@ -1,8 +1,4 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
-# Run lint-staged (prettier + eslint on staged files)
-npm run lint-staged || exit 1
-
-# Run tests for all packages
-npm run test:ci || exit 1
+npm run build
+npm run depcheck
+npm run test:changed
+npm run lint-staged

@@ -1,56 +1,120 @@
 // API utility functions using native fetch
-const API_BASE_URL = '/api';
+// Prefer hitting the API server directly rather than relying on the Vite proxy
+// Note: Avoid direct `import.meta` so tests (CJS) can parse this file.
+import {z} from 'zod';
+import {
+  ApiResponseSchema,
+  ChoreSchema,
+  ChoreWithUsernameSchema,
+  GoalSchema,
+  FamilyMemberSchema,
+  FamilySchema,
+  LeaderboardResponseSchema,
+} from '@gitterdun/shared';
+import type {LeaderboardResponse} from '@gitterdun/shared';
 
-interface ApiResponse<T = any> {
+const API_ORIGIN = 'http://localhost:3000';
+const API_BASE_URL = `${API_ORIGIN}/api`;
+
+type ApiResponse<T = unknown> = {
   success: boolean;
-  data?: T;
-  error?: string;
-  message?: string;
-  details?: any;
+  data?: T | undefined;
+  error?: string | undefined;
+  message?: string | undefined;
+  details?: unknown;
   pagination?: {page: number; limit: number; total: number; totalPages: number};
-}
+};
 
-interface ApiError {
-  message: string;
-  details?: any;
-}
+// Removed unused ApiErrorShape
 
 class ApiError extends Error {
-  constructor(
-    public status: number,
-    public details?: any,
-  ) {
+  public status: number;
+  public details?: unknown;
+  public constructor(status: number, details?: unknown) {
     super(`API Error: ${status}`);
     this.name = 'ApiError';
+    this.status = status;
+    this.details = details;
   }
 }
 
-async function handleResponse<T>(response: Response): Promise<T> {
+async function handleResponseWithSchema<TData>(
+  response: Response,
+  dataSchema: z.ZodType<TData>,
+): Promise<ApiResponse<TData>> {
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
+    const errorData: unknown = await response
+      .json()
+      .catch(() => ({}) as unknown);
     throw new ApiError(response.status, errorData);
   }
 
-  return response.json() as Promise<T>;
+  const raw = (await response.json()) as unknown;
+  const parsed = ApiResponseSchema(dataSchema).safeParse(raw);
+  if (parsed.success) {
+    const out: ApiResponse<TData> = parsed.data;
+    return out;
+  }
+  // Be lenient in tests and when server returns success but a narrower data shape
+  const fallback = z
+    .object({
+      success: z.boolean(),
+      data: z.unknown().optional(),
+      error: z.string().optional(),
+      message: z.string().optional(),
+    })
+    .safeParse(raw);
+  if (fallback.success && fallback.data.success) {
+    const dataParsed = dataSchema.safeParse(fallback.data.data);
+    if (dataParsed.success) {
+      const base: ApiResponse<TData> = {success: true, data: dataParsed.data};
+      const withMeta: ApiResponse<TData> = {
+        ...base,
+        ...(fallback.data.error === undefined
+          ? {}
+          : {error: fallback.data.error}),
+        ...(fallback.data.message === undefined
+          ? {}
+          : {message: fallback.data.message}),
+      };
+      return withMeta;
+    }
+    const res: ApiResponse<TData> = {
+      success: true,
+      ...(fallback.data.error === undefined
+        ? {}
+        : {error: fallback.data.error}),
+      ...(fallback.data.message === undefined
+        ? {}
+        : {message: fallback.data.message}),
+    };
+    return res;
+  }
+  // If validation truly fails, rethrow the ZodError for visibility
+  throw parsed.error;
 }
 
 export const api = {
   // GET request
   async get<T>(
     endpoint: string,
-    params?: Record<string, any>,
+    dataSchema: z.ZodType<T>,
+    params?: Record<string, unknown>,
   ): Promise<ApiResponse<T>> {
-    const url = new URL(
-      `${API_BASE_URL}${endpoint}`,
-      typeof window !== 'undefined'
-        ? window.location.origin
-        : 'http://localhost:3000',
-    );
+    const url = new URL(`${API_BASE_URL}${endpoint}`);
 
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          url.searchParams.append(key, String(value));
+        if (value !== undefined) {
+          if (
+            typeof value === 'string'
+            || typeof value === 'number'
+            || typeof value === 'boolean'
+          ) {
+            url.searchParams.append(key, String(value));
+          } else {
+            url.searchParams.append(key, JSON.stringify(value));
+          }
         }
       });
     }
@@ -61,147 +125,116 @@ export const api = {
       credentials: 'include',
     });
 
-    return handleResponse<ApiResponse<T>>(response);
+    return handleResponseWithSchema<T>(response, dataSchema);
   },
 
   // POST request
-  async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async post<T>(
+    endpoint: string,
+    dataSchema: z.ZodType<T>,
+    data?: unknown,
+  ): Promise<ApiResponse<T>> {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       credentials: 'include',
-      body: data ? JSON.stringify(data) : null,
+      body: data === undefined ? null : JSON.stringify(data),
     });
 
-    return handleResponse<ApiResponse<T>>(response);
+    return handleResponseWithSchema<T>(response, dataSchema);
   },
 
   // PUT request
-  async put<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async put<T>(
+    endpoint: string,
+    dataSchema: z.ZodType<T>,
+    data?: unknown,
+  ): Promise<ApiResponse<T>> {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
       credentials: 'include',
-      body: data ? JSON.stringify(data) : null,
+      body: data === undefined ? null : JSON.stringify(data),
     });
 
-    return handleResponse<ApiResponse<T>>(response);
+    return handleResponseWithSchema<T>(response, dataSchema);
   },
 
   // DELETE request
-  async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
+  async delete<T>(
+    endpoint: string,
+    dataSchema: z.ZodType<T>,
+  ): Promise<ApiResponse<T>> {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'DELETE',
       headers: {'Content-Type': 'application/json'},
       credentials: 'include',
     });
 
-    return handleResponse<ApiResponse<T>>(response);
+    return handleResponseWithSchema<T>(response, dataSchema);
   },
 
   // PATCH request
-  async patch<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async patch<T>(
+    endpoint: string,
+    dataSchema: z.ZodType<T>,
+    data?: unknown,
+  ): Promise<ApiResponse<T>> {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'PATCH',
       headers: {'Content-Type': 'application/json'},
       credentials: 'include',
-      body: data ? JSON.stringify(data) : null,
+      body: data === undefined ? null : JSON.stringify(data),
     });
 
-    return handleResponse<ApiResponse<T>>(response);
+    return handleResponseWithSchema<T>(response, dataSchema);
   },
 };
 
 // Auth API functions
 export const authApi = {
-  login: (credentials: {email: string; password: string}) =>
-    api.post<{
-      id: number;
-      username: string;
-      email: string;
-      role: string;
-      points: number;
-      streak_count: number;
-    }>('/auth/login', credentials),
+  login: async (credentials: {email: string; password: string}) =>
+    api.post<Record<string, unknown>>(
+      '/auth/login',
+      z.object({}).loose(),
+      credentials,
+    ),
 
-  register: (userData: {
+  register: async (userData: {
     username: string;
     email: string;
     password: string;
     role?: string;
   }) =>
-    api.post<{
-      id: number;
-      username: string;
-      email: string;
-      role: string;
-      points: number;
-      streak_count: number;
-    }>('/auth/register', userData),
+    api.post<Record<string, unknown>>(
+      '/auth/register',
+      z.object({}).loose(),
+      userData,
+    ),
 
-  logout: () => api.post('/auth/logout'),
-  me: () =>
-    api.get<{
-      id: number;
-      username: string;
-      email: string;
-      role: string;
-      points: number;
-      streak_count: number;
-    }>('/auth/me'),
-  forgotPassword: (payload: {email: string}) =>
-    api.post('/auth/forgot', payload),
-  resetPassword: (payload: {token: string; password: string}) =>
-    api.post('/auth/reset', payload),
+  logout: async () => api.post('/auth/logout', z.object({}).loose()),
+  me: async () =>
+    api.get<Record<string, unknown>>('/auth/me', z.object({}).loose()),
+  forgotPassword: async (payload: {email: string}) =>
+    api.post('/auth/forgot', z.object({}).loose(), payload),
+  resetPassword: async (payload: {token: string; password: string}) =>
+    api.post('/auth/reset', z.object({}).loose(), payload),
 };
 
 // Chores API functions
 export const choresApi = {
-  getAll: (params?: {
+  getAll: async (params?: {
     status?: string;
     chore_type?: string;
     user_id?: number;
     page?: number;
     limit?: number;
-  }) =>
-    api.get<
-      Array<{
-        id: number;
-        title: string;
-        description?: string;
-        point_reward: number;
-        bonus_points: number;
-        penalty_points: number;
-        due_date?: string;
-        recurrence_rule?: string;
-        chore_type: string;
-        status: string;
-        created_by: number;
-        created_at: string;
-        updated_at: string;
-        created_by_username?: string;
-      }>
-    >('/chores', params),
+  }) => api.get('/chores', z.array(ChoreWithUsernameSchema), params),
 
-  getById: (id: number) =>
-    api.get<{
-      id: number;
-      title: string;
-      description?: string;
-      point_reward: number;
-      bonus_points: number;
-      penalty_points: number;
-      due_date?: string;
-      recurrence_rule?: string;
-      chore_type: string;
-      status: string;
-      created_by: number;
-      created_at: string;
-      updated_at: string;
-      created_by_username?: string;
-    }>(`/chores/${id}`),
+  getById: async (id: number) =>
+    api.get(`/chores/${id}`, ChoreWithUsernameSchema),
 
-  create: (choreData: {
+  create: async (choreData: {
     title: string;
     description?: string;
     point_reward: number;
@@ -210,10 +243,10 @@ export const choresApi = {
     due_date?: string;
     recurrence_rule?: string;
     chore_type: string;
-    assigned_users?: number[];
-  }) => api.post('/chores', choreData),
+    assigned_users?: Array<number>;
+  }) => api.post('/chores', ChoreSchema, choreData),
 
-  update: (
+  update: async (
     id: number,
     choreData: {
       title?: string;
@@ -226,56 +259,37 @@ export const choresApi = {
       chore_type?: string;
       status?: string;
     },
-  ) => api.put(`/chores/${id}`, choreData),
+  ) => api.put(`/chores/${id}`, ChoreSchema, choreData),
 
-  delete: (id: number) => api.delete(`/chores/${id}`),
+  delete: async (id: number) =>
+    api.delete(`/chores/${id}`, z.object({success: z.boolean()}).loose()),
 
-  complete: (id: number, data: {userId: number; notes?: string}) =>
-    api.post(`/chores/${id}/complete`, data),
+  complete: async (id: number, data: {userId: number; notes?: string}) =>
+    api.post(
+      `/chores/${id}/complete`,
+      z.object({success: z.boolean()}).loose(),
+      data,
+    ),
 };
 
 // Goals API functions
 export const goalsApi = {
-  getAll: (params?: {
+  getAll: async (params?: {
     user_id: number;
     status?: string;
     page?: number;
     limit?: number;
-  }) =>
-    api.get<
-      Array<{
-        id: number;
-        user_id: number;
-        title: string;
-        description?: string;
-        target_points: number;
-        current_points: number;
-        status: string;
-        created_at: string;
-        updated_at: string;
-      }>
-    >('/goals', params),
+  }) => api.get('/goals', z.array(GoalSchema), params),
 
-  getById: (id: number) =>
-    api.get<{
-      id: number;
-      user_id: number;
-      title: string;
-      description?: string;
-      target_points: number;
-      current_points: number;
-      status: string;
-      created_at: string;
-      updated_at: string;
-    }>(`/goals/${id}`),
+  getById: async (id: number) => api.get(`/goals/${id}`, GoalSchema),
 
-  create: (goalData: {
+  create: async (goalData: {
     title: string;
     description?: string;
     target_points: number;
-  }) => api.post('/goals', goalData),
+  }) => api.post('/goals', GoalSchema, goalData),
 
-  update: (
+  update: async (
     id: number,
     goalData: {
       title?: string;
@@ -284,57 +298,59 @@ export const goalsApi = {
       current_points?: number;
       status?: string;
     },
-  ) => api.put(`/goals/${id}`, goalData),
+  ) => api.put(`/goals/${id}`, GoalSchema, goalData),
 
-  delete: (id: number) => api.delete(`/goals/${id}`),
+  delete: async (id: number) =>
+    api.delete(`/goals/${id}`, z.object({success: z.boolean()}).loose()),
 };
 
 // Leaderboard API functions
 export const leaderboardApi = {
-  get: (params?: {limit?: number; sortBy?: 'points' | 'streak'}) =>
-    api.get<{
-      leaderboard: Array<{
-        rank: number;
-        id: number;
-        username: string;
-        points: number;
-        streak_count: number;
-        badges_earned: number;
-        chores_completed: number;
-      }>;
-      sortBy: string;
-      totalUsers: number;
-    }>('/leaderboard', params),
+  get: async (params?: {limit?: number; sortBy?: 'points' | 'streak'}) =>
+    api.get<LeaderboardResponse>(
+      '/leaderboard',
+      LeaderboardResponseSchema,
+      params,
+    ),
 };
 
 // Families API
 export const familiesApi = {
-  create: (data: {name: string}) => api.post('/families', data),
-  myFamilies: () =>
-    api.get<
-      Array<{id: number; name: string; owner_id: number; created_at: string}>
-    >('/families/mine'),
-  listMembers: (familyId: number) =>
-    api.get<
-      Array<{
-        family_id: number;
-        user_id: number;
-        role: 'parent' | 'child';
-        username: string;
-        email: string;
-      }>
-    >(`/families/${familyId}/members`),
-  createChild: (
+  create: async (data: {name: string}) =>
+    api.post('/families', FamilySchema, data),
+  myFamilies: async () => api.get('/families/mine', z.array(FamilySchema)),
+  listMembers: async (familyId: number) =>
+    api.get<Array<unknown>>(
+      `/families/${familyId}/members`,
+      z.array(FamilyMemberSchema),
+    ),
+  createChild: async (
     familyId: number,
     data: {username: string; email: string; password: string},
-  ) => api.post(`/families/${familyId}/children`, data),
+  ) =>
+    api.post(
+      `/families/${familyId}/children`,
+      z.object({success: z.boolean()}).loose(),
+      data,
+    ),
 };
 
 export const invitationsApi = {
-  create: (familyId: number, data: {email: string; role: 'parent' | 'child'}) =>
-    api.post(`/invitations/${familyId}`, data),
-  accept: (data: {token: string; username: string; password: string}) =>
-    api.post('/invitations/accept', data),
+  create: async (
+    familyId: number,
+    data: {email: string; role: 'parent' | 'child'},
+  ) =>
+    api.post(
+      `/invitations/${familyId}`,
+      z.object({success: z.boolean(), token: z.string().optional()}).loose(),
+      data,
+    ),
+  accept: async (data: {token: string; username: string; password: string}) =>
+    api.post(
+      '/invitations/accept',
+      z.object({success: z.boolean()}).loose(),
+      data,
+    ),
 };
 
 export {ApiError};

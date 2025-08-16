@@ -1,4 +1,5 @@
-import {FC} from 'react';
+import type {FC} from 'react';
+import clsx from 'clsx';
 
 type AvatarSize = 'sm' | 'md' | 'lg';
 
@@ -8,12 +9,12 @@ const SIZE_MAP: Record<AvatarSize, string> = {
   lg: 'w-12 h-12 text-base',
 };
 
-export interface AvatarCircleProps {
-  label: string;
-  emoji?: string;
-  size?: AvatarSize;
-  ring?: boolean;
-}
+export type AvatarCircleProps = {
+  readonly label: string;
+  readonly emoji?: string;
+  readonly size?: AvatarSize;
+  readonly ring?: boolean;
+};
 
 export const AvatarCircle: FC<AvatarCircleProps> = ({
   label,
@@ -23,11 +24,15 @@ export const AvatarCircle: FC<AvatarCircleProps> = ({
 }) => {
   return (
     <div
-      className={`rounded-full bg-gray-100 flex items-center justify-center font-medium text-gray-700 ${SIZE_MAP[size]} ${ring ? 'ring-2 ring-indigo-500' : ''}`}
-      title={label}
       aria-label={label}
+      className={clsx(
+        'flex items-center justify-center rounded-full bg-gray-100 font-medium text-gray-700',
+        SIZE_MAP[size],
+        ring ? 'ring-2 ring-indigo-500' : null,
+      )}
+      title={label}
     >
-      {emoji || label.slice(0, 2).toUpperCase()}
+      {emoji ?? label.slice(0, 2).toUpperCase()}
     </div>
   );
 };

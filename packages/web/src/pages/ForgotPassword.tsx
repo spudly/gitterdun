@@ -1,53 +1,63 @@
-import {FC, useState} from 'react';
+import type {FC} from 'react';
+import {useState} from 'react';
 import {useUser} from '../hooks/useUser.js';
+import {FormCard} from '../widgets/FormCard.js';
+import {FormField} from '../widgets/FormField.js';
+import {TextInput} from '../widgets/TextInput.js';
+import {Button} from '../widgets/Button.js';
+import {Alert} from '../widgets/Alert.js';
+import {Stack} from '../widgets/Stack.js';
+import {useToast} from '../widgets/ToastProvider.js';
 
 const ForgotPassword: FC = () => {
   const {forgotPassword} = useUser();
+  const {safeAsync} = useToast();
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setMessage(null);
-    try {
-      await forgotPassword(email);
-      setMessage(
-        'If the email exists, a reset link has been sent. Check server logs for token in dev.',
-      );
-    } catch (_err) {
-      setMessage('Request failed');
-    }
+    safeAsync(
+      async () => {
+        await forgotPassword(email);
+        setMessage(
+          'If the email exists, a reset link has been sent. Check server logs for token in dev.',
+        );
+      },
+      'Request failed',
+      setMessage,
+    )();
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white rounded-lg shadow p-6">
-      <h2 className="text-2xl font-semibold mb-4">Forgot Password</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label
-            className="block text-sm font-medium text-gray-700"
-            htmlFor="email"
-          >
-            <span>Email</span>
-            <input
-              id="email"
-              type="email"
-              className="mt-1 w-full border rounded px-3 py-2"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-            />
-          </label>
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-indigo-600 text-white py-2 rounded"
-        >
-          Send reset link
-        </button>
-      </form>
-      {message && <p className="mt-4 text-sm text-gray-600">{message}</p>}
-    </div>
+    <FormCard title="Forgot Password">
+      <Stack gap="md">
+        <form onSubmit={handleSubmit}>
+          <Stack gap="md">
+            <FormField htmlFor="email" label="Email" required>
+              <TextInput
+                id="email"
+                onChange={value => {
+                  setEmail(value);
+                }}
+                required
+                type="email"
+                value={email}
+              />
+            </FormField>
+
+            <Button fullWidth type="submit">
+              Send reset link
+            </Button>
+          </Stack>
+        </form>
+
+        {message !== undefined && message !== '' ? (
+          <Alert type="info">{message}</Alert>
+        ) : null}
+      </Stack>
+    </FormCard>
   );
 };
 

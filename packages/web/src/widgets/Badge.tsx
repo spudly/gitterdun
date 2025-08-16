@@ -1,4 +1,5 @@
-import {FC, ReactNode} from 'react';
+import type {FC, ReactNode} from 'react';
+import clsx from 'clsx';
 
 type BadgeVariant =
   | 'success'
@@ -8,11 +9,11 @@ type BadgeVariant =
   | 'purple'
   | 'neutral';
 
-export interface BadgeProps {
-  children: ReactNode;
-  variant?: BadgeVariant;
-  className?: string;
-}
+export type BadgeProps = {
+  readonly children: ReactNode;
+  readonly variant?: BadgeVariant;
+  readonly className?: string;
+};
 
 const VARIANTS: Record<BadgeVariant, string> = {
   success: 'bg-green-100 text-green-800',
@@ -30,7 +31,11 @@ export const Badge: FC<BadgeProps> = ({
 }) => {
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${VARIANTS[variant]} ${className}`}
+      className={clsx(
+        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
+        VARIANTS[variant],
+        className,
+      )}
     >
       {children}
     </span>

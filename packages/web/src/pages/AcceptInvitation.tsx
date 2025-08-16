@@ -1,29 +1,42 @@
-import {FC, useState} from 'react';
+import type {FC} from 'react';
+import {useState} from 'react';
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import {invitationsApi} from '../lib/api.js';
+import {FormCard} from '../widgets/FormCard.js';
+import {FormField} from '../widgets/FormField.js';
+import {TextInput} from '../widgets/TextInput.js';
+import {Button} from '../widgets/Button.js';
+import {Alert} from '../widgets/Alert.js';
+import {Stack} from '../widgets/Stack.js';
+import {useToast} from '../widgets/ToastProvider.js';
 
 const AcceptInvitation: FC = () => {
   const [params] = useSearchParams();
-  const token = params.get('token') || '';
+  const token = params.get('token') ?? '';
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const navigate = useNavigate();
+  const {safeAsync} = useToast();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setMessage(null);
-    try {
-      const res = await invitationsApi.accept({token, username, password});
-      if (res.success) {
-        setMessage('Invitation accepted. You can now log in.');
-        setTimeout(() => navigate('/login'), 1200);
-      } else {
-        setMessage('Failed to accept');
-      }
-    } catch (_err) {
-      setMessage('Failed to accept');
-    }
+    safeAsync(
+      async () => {
+        const res = await invitationsApi.accept({token, username, password});
+        if (res.success) {
+          setMessage('Invitation accepted. You can now log in.');
+          setTimeout(() => {
+            navigate('/login');
+          }, 1200);
+        } else {
+          setMessage('Failed to accept');
+        }
+      },
+      'Failed to accept',
+      setMessage,
+    )();
   };
 
   if (!token) {
@@ -31,50 +44,43 @@ const AcceptInvitation: FC = () => {
   }
 
   return (
-    <div className="max-w-md mx-auto bg-white rounded-lg shadow p-6">
-      <h2 className="text-2xl font-semibold mb-4">Accept Invitation</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label
-            className="block text-sm font-medium text-gray-700"
-            htmlFor="username"
-          >
-            <span>Username</span>
-            <input
+    <FormCard title="Accept Invitation">
+      <form onSubmit={handleSubmit}>
+        <Stack gap="md">
+          <FormField htmlFor="username" label="Username" required>
+            <TextInput
               id="username"
-              className="mt-1 w-full border rounded px-3 py-2"
+              onChange={value => {
+                setUsername(value);
+              }}
+              required
               value={username}
-              onChange={e => setUsername(e.target.value)}
-              required
             />
-          </label>
-        </div>
-        <div>
-          <label
-            className="block text-sm font-medium text-gray-700"
-            htmlFor="password"
-          >
-            <span>Password</span>
-            <input
+          </FormField>
+
+          <FormField htmlFor="password" label="Password" required>
+            <TextInput
               id="password"
-              type="password"
-              className="mt-1 w-full border rounded px-3 py-2"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
               minLength={6}
+              onChange={value => {
+                setPassword(value);
+              }}
+              required
+              type="password"
+              value={password}
             />
-          </label>
-        </div>
-        {message && <div className="text-sm text-gray-600">{message}</div>}
-        <button
-          type="submit"
-          className="w-full bg-indigo-600 text-white py-2 rounded"
-        >
-          Accept Invitation
-        </button>
+          </FormField>
+
+          {message !== undefined && message !== '' ? (
+            <Alert type="info">{message}</Alert>
+          ) : null}
+
+          <Button fullWidth type="submit">
+            Accept Invitation
+          </Button>
+        </Stack>
       </form>
-    </div>
+    </FormCard>
   );
 };
 

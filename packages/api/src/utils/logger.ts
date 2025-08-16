@@ -1,6 +1,7 @@
-import pino, {LoggerOptions} from 'pino';
+import type {LoggerOptions} from 'pino';
+import pino from 'pino';
 
-const baseOptions: LoggerOptions = {level: process.env['LOG_LEVEL'] || 'info'};
+const baseOptions: LoggerOptions = {level: process.env['LOG_LEVEL'] ?? 'info'};
 
 const devTransport =
   process.env['NODE_ENV'] === 'development'

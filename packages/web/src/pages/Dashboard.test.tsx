@@ -1,21 +1,75 @@
-import {test, expect} from '@playwright/test';
+import {describe, expect, jest, test} from '@jest/globals';
+import {render, screen} from '@testing-library/react';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import Dashboard from './Dashboard';
 
-test('dashboard shows stats and recent chores after login', async ({page}) => {
-  await page.goto('/login');
-  await page.locator('input[type="email"]').fill('admin@gitterdun.com');
-  await page.locator('input[type="password"]').fill('admin123');
-  await page.getByRole('button', {name: 'Login'}).click();
-  await page.goto('/');
-  await expect(
-    page.getByRole('heading', {level: 1, name: 'Dashboard'}),
-  ).toBeVisible();
-  await expect(page.getByText('Completed Chores')).toBeVisible();
-  await expect(page.getByText('Pending Chores')).toBeVisible();
-  await expect(page.getByText('Total Points')).toBeVisible();
-  await expect(page.getByText('Due Soon')).toBeVisible();
-  await expect(page.getByText('Recent Chores')).toBeVisible();
-  // Ensure a recent item block exists
-  // Assert the recent list container exists in the DOM
-  const recentList = page.locator('div.divide-y');
-  expect(await recentList.count()).toBeGreaterThan(0);
+jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
+  useUser: () => ({user: {id: 1}}),
+}));
+
+jest.mock<typeof import('../lib/api')>('../lib/api', () => ({
+  choresApi: {
+    getAll: jest.fn(async () => ({
+      success: true,
+      data: [
+        {
+          id: 1,
+          title: 'T1',
+          description: '',
+          point_reward: 5,
+          bonus_points: 0,
+          penalty_points: 0,
+          chore_type: 'regular',
+          status: 'completed',
+        },
+        {
+          id: 2,
+          title: 'T2',
+          description: '',
+          point_reward: 10,
+          bonus_points: 0,
+          penalty_points: 0,
+          chore_type: 'regular',
+          status: 'approved',
+        },
+        {
+          id: 3,
+          title: 'T3',
+          description: '',
+          point_reward: 1,
+          bonus_points: 0,
+          penalty_points: 0,
+          chore_type: 'regular',
+          status: 'pending',
+          due_date: new Date(Date.now() + 86400000).toISOString(),
+        },
+      ],
+    })),
+  },
+}));
+
+const wrap = (ui: React.ReactElement) => (
+  <QueryClientProvider client={new QueryClient()}>{ui}</QueryClientProvider>
+);
+
+describe('dashboard page', () => {
+  test('renders header', async () => {
+    render(wrap(<Dashboard />));
+    await expect(screen.findByText('Dashboard')).resolves.toBeInTheDocument();
+  });
+
+  test('computes stats and lists recent chores', async () => {
+    render(wrap(<Dashboard />));
+    await expect(screen.findByText('Dashboard')).resolves.toBeInTheDocument();
+    // Completed/Pending counts (multiple '1' exist; assert by nearby labels)
+    expect(screen.getByText('Completed Chores').nextSibling).toHaveTextContent(
+      '1',
+    );
+    expect(screen.getByText('Pending Chores').nextSibling).toHaveTextContent(
+      '1',
+    );
+    // Recent chores list titles
+    expect(screen.getByText('T1')).toBeInTheDocument();
+    expect(screen.getByText('T2')).toBeInTheDocument();
+  });
 });

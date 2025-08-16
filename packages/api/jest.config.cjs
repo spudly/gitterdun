@@ -5,5 +5,5 @@ module.exports = {
   ...base,
   rootDir: '.',
   testEnvironment: 'node',
-  testMatch: ['<rootDir>/src/**/__tests__/**/*.(spec|test).(ts|js)'],
+  displayName: 'api',
 };

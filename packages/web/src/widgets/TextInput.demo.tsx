@@ -1,4 +1,5 @@
-import {FC, useState} from 'react';
+import type {FC} from 'react';
+import {useState} from 'react';
 import {TextInput} from './TextInput.js';
 import {FormField} from './FormField.js';
 
@@ -7,34 +8,41 @@ const TextInputDemo: FC = () => {
   return (
     <div className="space-y-4" data-testid="TextInputDemo">
       <FormField
-        label="Email"
+        helpText="We'll never share your email."
         htmlFor="email"
-        help="We'll never share your email."
+        label="Email"
       >
         <TextInput
           id="email"
-          type="email"
+          onChange={value => {
+            setValue(value);
+          }}
           placeholder="you@example.com"
+          type="email"
           value={value}
-          onChange={v => setValue(v)}
         />
       </FormField>
-      <FormField label="Password" htmlFor="password" required>
-        <TextInput id="password" type="password" placeholder="••••••" />
+
+      <FormField htmlFor="password" label="Password" required>
+        <TextInput id="password" placeholder="••••••" type="password" />
       </FormField>
+
       <FormField
-        label="With error"
         htmlFor="with-error"
-        error={value ? null : 'Required'}
+        label="With error"
+        {...(value ? {} : {error: 'Required'})}
       >
         <TextInput
           id="with-error"
+          onChange={value => {
+            setValue(value);
+          }}
           placeholder="Type something"
           value={value}
-          onChange={v => setValue(v)}
         />
       </FormField>
-      <TextInput placeholder="Disabled" disabled />
+
+      <TextInput disabled placeholder="Disabled" />
     </div>
   );
 };

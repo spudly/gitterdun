@@ -4,7 +4,7 @@ import {z} from 'zod';
 export const UserSchema = z.object({
   id: z.number(),
   username: z.string().min(1).max(50),
-  email: z.string().email().max(255),
+  email: z.email().max(255),
   role: z.enum(['admin', 'user']),
   points: z.number().int().min(0),
   streak_count: z.number().int().min(0),
@@ -15,27 +15,25 @@ export const UserSchema = z.object({
 
 export const CreateUserSchema = z.object({
   username: z.string().min(1).max(50),
-  email: z.string().email().max(255),
+  email: z.email().max(255),
   password: z.string().min(6),
   role: z.enum(['admin', 'user']).optional().default('user'),
 });
 
 export const UpdateUserSchema = z.object({
   username: z.string().min(1).max(50).optional(),
-  email: z.string().email().max(255).optional(),
+  email: z.email().max(255).optional(),
   points: z.number().int().min(0).optional(),
   streak_count: z.number().int().min(0).optional(),
 });
 
 export const LoginSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(1),
 });
 
 // Auth helper schemas
-export const ForgotPasswordRequestSchema = z.object({
-  email: z.string().email(),
-});
+export const ForgotPasswordRequestSchema = z.object({email: z.email()});
 
 export const ResetPasswordSchema = z.object({
   token: z.string().min(1),
@@ -47,29 +45,29 @@ export const FamilySchema = z.object({
   id: z.number(),
   name: z.string().min(1).max(100),
   owner_id: z.number(),
-  created_at: z.string().datetime(),
+  // Accept SQLite DATETIME strings (e.g., 'YYYY-MM-DD HH:MM:SS')
+  // Use plain string to be lenient for server responses
+  created_at: z.string(),
 });
 
-export const CreateFamilySchema = z.object({
-  name: z.string().min(1).max(100),
-});
+export const CreateFamilySchema = z.object({name: z.string().min(1).max(100)});
 
 export const FamilyMemberSchema = z.object({
   family_id: z.number(),
   user_id: z.number(),
   role: z.enum(['parent', 'child']),
   username: z.string(),
-  email: z.string().email(),
+  email: z.email(),
 });
 
 export const CreateChildSchema = z.object({
   username: z.string().min(1).max(50),
-  email: z.string().email().max(255),
+  email: z.email().max(255),
   password: z.string().min(6),
 });
 
 export const CreateInvitationSchema = z.object({
-  email: z.string().email().max(255),
+  email: z.email().max(255),
   role: z.enum(['parent', 'child']),
 });
 
@@ -87,7 +85,7 @@ export const ChoreSchema = z.object({
   point_reward: z.number().int().min(0),
   bonus_points: z.number().int().min(0).default(0),
   penalty_points: z.number().int().min(0).default(0),
-  due_date: z.string().datetime().optional(),
+  due_date: z.iso.datetime().optional(),
   recurrence_rule: z.string().optional(),
   chore_type: z
     .string()
@@ -100,8 +98,8 @@ export const ChoreSchema = z.object({
       message: 'status must be either "pending", "completed", or "approved"',
     }),
   created_by: z.number(),
-  created_at: z.string().datetime(),
-  updated_at: z.string().datetime(),
+  created_at: z.iso.datetime(),
+  updated_at: z.iso.datetime(),
 });
 
 // Chore with username for API responses
@@ -115,7 +113,7 @@ export const CreateChoreSchema = z.object({
   point_reward: z.number().int().min(0),
   bonus_points: z.number().int().min(0).optional().default(0),
   penalty_points: z.number().int().min(0).optional().default(0),
-  due_date: z.string().datetime().optional(),
+  due_date: z.iso.datetime().optional(),
   recurrence_rule: z.string().optional(),
   chore_type: z
     .string()
@@ -132,7 +130,7 @@ export const UpdateChoreSchema = z.object({
   point_reward: z.number().int().min(0).optional(),
   bonus_points: z.number().int().min(0).optional(),
   penalty_points: z.number().int().min(0).optional(),
-  due_date: z.string().datetime().optional(),
+  due_date: z.iso.datetime().optional(),
   recurrence_rule: z.string().optional(),
   chore_type: z
     .string()
@@ -153,9 +151,9 @@ export const ChoreAssignmentSchema = z.object({
   id: z.number(),
   chore_id: z.number(),
   user_id: z.number(),
-  assigned_at: z.string().datetime(),
-  completed_at: z.string().datetime().optional(),
-  approved_at: z.string().datetime().optional(),
+  assigned_at: z.iso.datetime(),
+  completed_at: z.iso.datetime().optional(),
+  approved_at: z.iso.datetime().optional(),
   approved_by: z.number().optional(),
   points_earned: z.number().int().min(0).default(0),
   bonus_points_earned: z.number().int().min(0).default(0),
@@ -164,8 +162,8 @@ export const ChoreAssignmentSchema = z.object({
 });
 
 export const UpdateChoreAssignmentSchema = z.object({
-  completed_at: z.string().datetime().optional(),
-  approved_at: z.string().datetime().optional(),
+  completed_at: z.iso.datetime().optional(),
+  approved_at: z.iso.datetime().optional(),
   approved_by: z.number().optional(),
   points_earned: z.number().int().min(0).optional(),
   bonus_points_earned: z.number().int().min(0).optional(),
@@ -186,8 +184,8 @@ export const GoalSchema = z.object({
     .refine(val => ['active', 'completed', 'abandoned'].includes(val), {
       message: 'status must be either "active", "completed", or "abandoned"',
     }),
-  created_at: z.string().datetime(),
-  updated_at: z.string().datetime(),
+  created_at: z.iso.datetime(),
+  updated_at: z.iso.datetime(),
 });
 
 export const CreateGoalSchema = z.object({
@@ -212,7 +210,7 @@ export const BadgeSchema = z.object({
   icon: z.string().optional(),
   points_required: z.number().int().min(0).default(0),
   streak_required: z.number().int().min(0).default(0),
-  created_at: z.string().datetime(),
+  created_at: z.iso.datetime(),
 });
 
 // Reward schemas
@@ -223,7 +221,7 @@ export const RewardSchema = z.object({
   points_required: z.number().int().min(0),
   is_active: z.boolean().default(true),
   created_by: z.number(),
-  created_at: z.string().datetime(),
+  created_at: z.iso.datetime(),
 });
 
 export const CreateRewardSchema = z.object({
@@ -249,7 +247,7 @@ export const NotificationSchema = z.object({
   ]),
   is_read: z.boolean().default(false),
   related_id: z.number().optional(),
-  created_at: z.string().datetime(),
+  created_at: z.iso.datetime(),
 });
 
 // Query parameter schemas
@@ -270,7 +268,7 @@ export const GoalQuerySchema = PaginationSchema.extend({
 });
 
 // Response schemas
-export const ApiResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
+export const ApiResponseSchema = <T extends z.ZodType>(dataSchema: T) =>
   z.object({
     success: z.boolean(),
     data: dataSchema.optional(),
@@ -278,9 +276,7 @@ export const ApiResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
     message: z.string().optional(),
   });
 
-export const PaginatedResponseSchema = <T extends z.ZodTypeAny>(
-  dataSchema: T,
-) =>
+export const PaginatedResponseSchema = <T extends z.ZodType>(dataSchema: T) =>
   z.object({
     success: z.boolean(),
     data: z.array(dataSchema),
@@ -291,6 +287,98 @@ export const PaginatedResponseSchema = <T extends z.ZodTypeAny>(
       totalPages: z.number(),
     }),
   });
+
+// Utility/minor schemas
+export const CountRowSchema = z.object({count: z.number()});
+export const CompleteChoreBodySchema = z.object({
+  userId: z.coerce.number().int().min(1),
+  notes: z.string().optional(),
+});
+
+// Common param/query schemas
+export const IdParamSchema = z.object({id: z.coerce.number().int().min(1)});
+export const FamilyIdParamSchema = z.object({
+  familyId: z.coerce.number().int().min(1),
+});
+
+// Database row schemas (runtime-validated parsing for raw DB results)
+export const SessionRowSchema = z.object({
+  user_id: z.number(),
+  expires_at: z.string(),
+});
+
+export const IdRowSchema = z.object({id: z.number()});
+
+export const RoleRowSchema = z.object({role: z.enum(['parent', 'child'])});
+
+export const PasswordResetRowSchema = z.object({
+  token: z.string(),
+  user_id: z.number(),
+  expires_at: z.string(),
+  used: z.number(),
+});
+
+export const FamilyInvitationRowSchema = z.object({
+  token: z.string(),
+  family_id: z.number(),
+  email: z.email(),
+  role: z.enum(['parent', 'child']),
+  invited_by: z.number(),
+  expires_at: z.string(),
+  accepted: z.number(),
+});
+
+export const UserPasswordHashRowSchema = z.object({
+  id: z.number(),
+  password_hash: z.string(),
+});
+
+export const UserWithPasswordRowSchema = z.object({
+  id: z.number(),
+  username: z.string().min(1).max(50),
+  email: z.email().max(255),
+  password_hash: z.string(),
+  role: z.enum(['admin', 'user']),
+  points: z.number().int().min(0),
+  streak_count: z.number().int().min(0),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+
+// Leaderboard row from aggregated query
+export const LeaderboardRowSchema = z.object({
+  id: z.number(),
+  username: z.string(),
+  points: z.number(),
+  streak_count: z.number(),
+  badges_earned: z.number(),
+  chores_completed: z.number(),
+});
+
+// Leaderboard query and entry schemas
+export const LeaderboardQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(100).default(10),
+  sortBy: z.enum(['points', 'streak']).default('points'),
+});
+
+export const LeaderboardEntrySchema = z.object({
+  rank: z.number(),
+  id: z.number(),
+  username: z.string(),
+  points: z.number(),
+  streak_count: z.number(),
+  badges_earned: z.number(),
+  chores_completed: z.number(),
+});
+
+// Leaderboard API response schema
+export const LeaderboardResponseSchema = z
+  .object({
+    leaderboard: z.array(LeaderboardEntrySchema),
+    sortBy: z.string(),
+    totalUsers: z.number(),
+  })
+  .loose();
 
 // Type exports
 export type User = z.infer<typeof UserSchema>;
@@ -326,3 +414,4 @@ export type Notification = z.infer<typeof NotificationSchema>;
 export type Pagination = z.infer<typeof PaginationSchema>;
 export type ChoreQuery = z.infer<typeof ChoreQuerySchema>;
 export type GoalQuery = z.infer<typeof GoalQuerySchema>;
+export type LeaderboardResponse = z.infer<typeof LeaderboardResponseSchema>;

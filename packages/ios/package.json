@@ -7,7 +7,6 @@
     "build": "echo 'No build scripts for ios'",
     "preview": "echo 'No preview scripts for ios'",
     "lint": "echo 'No lint scripts for ios'",
-    "test": "echo 'No test scripts for ios'",
-    "test:ci": "echo 'No test:ci scripts for ios'"
+    "test": "echo 'No test scripts for ios'"
   }
 }

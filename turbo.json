@@ -1,0 +1,46 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx,json,css}",
+        "*.config.{ts,tsx,js,jsx,json,css}"
+      ],
+      "outputs": ["dist/**", "build/**", "lib/**"]
+    },
+    "lint": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**/*.{ts,tsx,js,jsx,json,css}", "eslint.config.mjs"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**/*.{ts,tsx,js,jsx,json,css}", "jest.config.js"],
+      "outputs": ["coverage/**"]
+    },
+    "dev": {"dependsOn": ["^build"], "cache": false, "persistent": true},
+    "type-check": {"dependsOn": ["^build"], "cache": false},
+    "//#prettier:check": {"cache": false},
+    "//#depcheck": {
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx,json,css}",
+        ".depcheckrc.json",
+        "package.json"
+      ]
+    },
+    "//#lint-staged": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**/*.{ts,tsx,js,jsx,json,css}", "eslint.config.mjs"]
+    },
+    "//#test:changed": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**/*.{ts,tsx,js,jsx,json,css}", "jest.config.js"]
+    },
+    "precommit:check": {
+      "dependsOn": ["//#depcheck", "build", "//#test:changed", "//#lint-staged"]
+    },
+    "ci:check": {
+      "dependsOn": ["//#depcheck", "build", "test", "lint", "//#prettier:check"]
+    }
+  }
+}

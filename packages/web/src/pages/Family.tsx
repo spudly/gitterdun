@@ -1,6 +1,19 @@
-import {FC, useEffect, useState} from 'react';
+import type {FC} from 'react';
+import {useEffect, useState} from 'react';
 import {useQuery, useMutation} from '@tanstack/react-query';
 import {familiesApi, invitationsApi} from '../lib/api.js';
+import {FamilyMemberSchema} from '@gitterdun/shared';
+import {PageContainer} from '../widgets/PageContainer.js';
+import {FormSection} from '../widgets/FormSection.js';
+import {MembersList} from '../widgets/MembersList.js';
+import {Toolbar} from '../widgets/Toolbar.js';
+// import {FormField} from '../widgets/FormField.js';
+import {TextInput} from '../widgets/TextInput.js';
+import {SelectInput} from '../widgets/SelectInput.js';
+import {Button} from '../widgets/Button.js';
+import {GridContainer} from '../widgets/GridContainer.js';
+import {Stack} from '../widgets/Stack.js';
+import {Text} from '../widgets/Text.js';
 import {useUser} from '../hooks/useUser.js';
 
 const Family: FC = () => {
@@ -15,49 +28,61 @@ const Family: FC = () => {
 
   const myFamiliesQuery = useQuery({
     queryKey: ['families', 'mine'],
-    queryFn: () => familiesApi.myFamilies(),
-    enabled: !!user,
+    queryFn: async () => familiesApi.myFamilies(),
+    enabled: Boolean(user),
   });
 
   useEffect(() => {
     const first = myFamiliesQuery.data?.data?.[0];
-    if (first && !selectedFamilyId) {
-      setSelectedFamilyId(first.id);
+    if (first !== undefined && selectedFamilyId === undefined) {
+      const candidate = (first as {id?: unknown}).id;
+      if (typeof candidate === 'number') {
+        setSelectedFamilyId(candidate);
+      }
     }
   }, [myFamiliesQuery.data, selectedFamilyId]);
 
   const membersQuery = useQuery({
     queryKey: ['families', selectedFamilyId, 'members'],
-    queryFn: () => familiesApi.listMembers(selectedFamilyId as number),
-    enabled: !!selectedFamilyId,
+    queryFn: async () => {
+      if (selectedFamilyId === undefined) {
+        return {success: true, data: []};
+      }
+      return familiesApi.listMembers(selectedFamilyId);
+    },
+    enabled: selectedFamilyId !== null,
   });
 
   const createFamilyMutation = useMutation({
     mutationFn: familiesApi.create,
-    onSuccess: () => myFamiliesQuery.refetch(),
+    onSuccess: async () => myFamiliesQuery.refetch(),
   });
 
   const createChildMutation = useMutation({
-    mutationFn: (p: {
+    mutationFn: async (params: {
       familyId: number;
       username: string;
       email: string;
       password: string;
     }) =>
-      familiesApi.createChild(p.familyId, {
-        username: p.username,
-        email: p.email,
-        password: p.password,
+      familiesApi.createChild(params.familyId, {
+        username: params.username,
+        email: params.email,
+        password: params.password,
       }),
-    onSuccess: () => membersQuery.refetch(),
+    onSuccess: async () => membersQuery.refetch(),
   });
 
   const inviteMutation = useMutation({
-    mutationFn: (p: {
+    mutationFn: async (params: {
       familyId: number;
       email: string;
       role: 'parent' | 'child';
-    }) => invitationsApi.create(p.familyId, {email: p.email, role: p.role}),
+    }) =>
+      invitationsApi.create(params.familyId, {
+        email: params.email,
+        role: params.role,
+      }),
   });
 
   if (!user) {
@@ -67,150 +92,178 @@ const Family: FC = () => {
   const familyOptions = myFamiliesQuery.data?.data ?? [];
 
   return (
-    <div className="space-y-8">
-      <div className="p-4 bg-white rounded shadow">
-        <h2 className="text-lg font-semibold mb-3">Your Families</h2>
-        <div className="flex gap-2 items-center">
-          <select
-            className="border px-2 py-1 rounded"
+    <PageContainer>
+      <FormSection title="Your Families">
+        <Toolbar>
+          <SelectInput
+            onChange={val => {
+              const parsed = Number(val);
+              setSelectedFamilyId(Number.isNaN(parsed) ? null : parsed);
+            }}
             value={selectedFamilyId ?? ''}
-            onChange={e => setSelectedFamilyId(Number(e.target.value))}
           >
-            <option value="" disabled>
+            <option disabled value="">
               Select a family
             </option>
-            {familyOptions.map(f => (
-              <option key={f.id} value={f.id}>
-                {f.name}
+
+            {familyOptions.map(family => (
+              <option key={family.id} value={family.id}>
+                {family.name}
               </option>
             ))}
-          </select>
-          <input
+          </SelectInput>
+
+          <TextInput
+            onChange={val => {
+              setNewFamilyName(val);
+            }}
             placeholder="New family name"
-            className="border px-2 py-1 rounded flex-1"
             value={newFamilyName}
-            onChange={e => setNewFamilyName(e.target.value)}
           />
-          <button
-            type="button"
-            className="bg-indigo-600 text-white px-3 py-1 rounded"
+
+          <Button
             onClick={() => {
-              if (!newFamilyName.trim()) {
+              if (newFamilyName.trim() === '') {
                 return;
               }
               createFamilyMutation.mutate({name: newFamilyName.trim()});
               setNewFamilyName('');
             }}
+            type="button"
           >
             Create
-          </button>
-        </div>
-      </div>
+          </Button>
+        </Toolbar>
+      </FormSection>
 
-      {selectedFamilyId && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-4 bg-white rounded shadow">
-            <h3 className="font-semibold mb-2">Members</h3>
-            <ul className="space-y-1">
-              {(membersQuery.data?.data ?? []).map(m => (
-                <li key={`${m.user_id}`} className="flex justify-between">
-                  <span>
-                    {m.username} ({m.email})
-                  </span>
-                  <span className="text-sm text-gray-500">{m.role}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="p-4 bg-white rounded shadow space-y-4">
-            <div>
-              <h3 className="font-semibold mb-2">Create Child Account</h3>
-              <div className="space-y-2">
-                <input
-                  className="border px-2 py-1 rounded w-full"
-                  placeholder="Username"
-                  value={childUsername}
-                  onChange={e => setChildUsername(e.target.value)}
-                />
-                <input
-                  className="border px-2 py-1 rounded w-full"
-                  placeholder="Email"
-                  type="email"
-                  value={childEmail}
-                  onChange={e => setChildEmail(e.target.value)}
-                />
-                <input
-                  className="border px-2 py-1 rounded w-full"
-                  placeholder="Password"
-                  type="password"
-                  value={childPassword}
-                  onChange={e => setChildPassword(e.target.value)}
-                />
-                <button
-                  type="button"
-                  className="bg-indigo-600 text-white px-3 py-1 rounded"
-                  onClick={() => {
-                    if (!childUsername || !childEmail || !childPassword) {
-                      return;
-                    }
-                    createChildMutation.mutate({
-                      familyId: selectedFamilyId,
-                      username: childUsername,
-                      email: childEmail,
-                      password: childPassword,
-                    });
-                    setChildUsername('');
-                    setChildEmail('');
-                    setChildPassword('');
-                  }}
-                >
-                  Create
-                </button>
+      {selectedFamilyId ?  (
+        <GridContainer cols={2} gap="lg">
+          <FormSection title="Members">
+            {/* Parse API data using zod schema to avoid any */}
+            {(() => {
+              const parsed = FamilyMemberSchema.array().safeParse(
+                membersQuery.data?.data ?? [],
+              );
+              const members = parsed.success ? parsed.data : [];
+              return <MembersList members={members} />;
+            })()}
+          </FormSection>
+
+          <FormSection>
+            <Stack gap="md">
+              <div>
+                <Stack gap="sm">
+                  <Text as="h3" weight="semibold">
+                    Create Child Account
+                  </Text>
+
+                  <Stack gap="sm">
+                    <TextInput
+                      onChange={val => {
+                        setChildUsername(val);
+                      }}
+                      placeholder="Username"
+                      value={childUsername}
+                    />
+
+                    <TextInput
+                      onChange={val => {
+                        setChildEmail(val);
+                      }}
+                      placeholder="Email"
+                      type="email"
+                      value={childEmail}
+                    />
+
+                    <TextInput
+                      onChange={val => {
+                        setChildPassword(val);
+                      }}
+                      placeholder="Password"
+                      type="password"
+                      value={childPassword}
+                    />
+
+                    <Button
+                      onClick={() => {
+                        if (
+                          childUsername === ''
+                          || childEmail === ''
+                          || childPassword === ''
+                        ) {
+                          return;
+                        }
+                        createChildMutation.mutate({
+                          familyId: selectedFamilyId,
+                          username: childUsername,
+                          email: childEmail,
+                          password: childPassword,
+                        });
+                        setChildUsername('');
+                        setChildEmail('');
+                        setChildPassword('');
+                      }}
+                      type="button"
+                    >
+                      Create
+                    </Button>
+                  </Stack>
+                </Stack>
               </div>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-2">Invite Member</h3>
-              <div className="flex gap-2 items-center">
-                <input
-                  className="border px-2 py-1 rounded flex-1"
-                  placeholder="Email"
-                  type="email"
-                  value={inviteEmail}
-                  onChange={e => setInviteEmail(e.target.value)}
-                />
-                <select
-                  className="border px-2 py-1 rounded"
-                  value={inviteRole}
-                  onChange={e =>
-                    setInviteRole(e.target.value as 'parent' | 'child')
-                  }
-                >
-                  <option value="parent">Parent</option>
-                  <option value="child">Child</option>
-                </select>
-                <button
-                  type="button"
-                  className="bg-indigo-600 text-white px-3 py-1 rounded"
-                  onClick={() => {
-                    if (!inviteEmail) {
-                      return;
-                    }
-                    inviteMutation.mutate({
-                      familyId: selectedFamilyId,
-                      email: inviteEmail,
-                      role: inviteRole,
-                    });
-                    setInviteEmail('');
-                  }}
-                >
-                  Send
-                </button>
+
+              <div>
+                <Stack gap="sm">
+                  <Text as="h3" weight="semibold">
+                    Invite Member
+                  </Text>
+
+                  <Toolbar>
+                    <TextInput
+                      onChange={val => {
+                        setInviteEmail(val);
+                      }}
+                      placeholder="Email"
+                      type="email"
+                      value={inviteEmail}
+                    />
+
+                    <SelectInput
+                      onChange={val => {
+                        const role =
+                          val === 'parent' || val === 'child' ? val : 'parent';
+                        setInviteRole(role);
+                      }}
+                      value={inviteRole}
+                    >
+                      <option value="parent">Parent</option>
+
+                      <option value="child">Child</option>
+                    </SelectInput>
+
+                    <Button
+                      onClick={() => {
+                        if (inviteEmail === '') {
+                          return;
+                        }
+                        inviteMutation.mutate({
+                          familyId: selectedFamilyId,
+                          email: inviteEmail,
+                          role: inviteRole,
+                        });
+                        setInviteEmail('');
+                      }}
+                      type="button"
+                    >
+                      Send
+                    </Button>
+                  </Toolbar>
+                </Stack>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+            </Stack>
+          </FormSection>
+        </GridContainer>
+      ) : null}
+    </PageContainer>
   );
 };
 

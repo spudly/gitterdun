@@ -5,16 +5,22 @@ import {
   FamilySchema,
   CreateChildSchema,
   FamilyMemberSchema,
+  SessionRowSchema,
+  RoleRowSchema,
+  IdRowSchema,
+  IdParamSchema,
+  asError,
 } from '@gitterdun/shared';
 import bcrypt from 'bcryptjs';
 import db from '../lib/db';
+import {sql} from '../utils/sql';
 
 const router = express.Router();
 
 // Helper: require auth via session cookie
 const getCookie = (req: express.Request, name: string): string | undefined => {
   const cookieHeader = req.headers.cookie;
-  if (!cookieHeader) {
+  if (cookieHeader === undefined) {
     return undefined;
   }
   const cookieString = Array.isArray(cookieHeader)
@@ -37,14 +43,31 @@ const getCookie = (req: express.Request, name: string): string | undefined => {
 
 const requireUserId = (req: express.Request): number => {
   const sid = getCookie(req, 'sid');
-  if (!sid) throw Object.assign(new Error('Not authenticated'), {status: 401});
-  const session = db
-    .prepare('SELECT user_id, expires_at FROM sessions WHERE id = ?')
-    .get(sid) as {user_id: number; expires_at: string} | undefined;
-  if (!session)
+  if (sid === undefined) {
     throw Object.assign(new Error('Not authenticated'), {status: 401});
+  }
+  const sessionRow = db
+    .prepare(sql`
+      SELECT
+        user_id,
+        expires_at
+      FROM
+        sessions
+      WHERE
+        id = ?
+    `)
+    .get(sid);
+  const session =
+    sessionRow !== undefined ? SessionRowSchema.parse(sessionRow) : undefined;
+  if (!session) {
+    throw Object.assign(new Error('Not authenticated'), {status: 401});
+  }
   if (new Date(session.expires_at).getTime() < Date.now()) {
-    db.prepare('DELETE FROM sessions WHERE id = ?').run(sid);
+    db.prepare(sql`
+      DELETE FROM sessions
+      WHERE
+        id = ?
+    `).run(sid);
     throw Object.assign(new Error('Session expired'), {status: 401});
   }
   return session.user_id;
@@ -56,25 +79,35 @@ router.post('/', (req, res) => {
     const userId = requireUserId(req);
     const {name} = CreateFamilySchema.parse(req.body);
 
-    const result = db
-      .prepare(
-        `INSERT INTO families (name, owner_id) VALUES (?, ?) RETURNING id, name, owner_id, created_at`,
-      )
-      .get(name, userId) as any;
+    const familyRow = db
+      .prepare(sql`
+        INSERT INTO
+          families (name, owner_id)
+        VALUES
+          (?, ?) RETURNING id,
+          name,
+          owner_id,
+          created_at
+      `)
+      .get(name, userId);
 
-    db.prepare(
-      'INSERT INTO family_members (family_id, user_id, role) VALUES (?, ?, ?)',
-    ).run(result.id, userId, 'parent');
+    const family = FamilySchema.parse(familyRow);
 
-    const family = FamilySchema.parse(result);
+    db.prepare(sql`
+      INSERT INTO
+        family_members (family_id, user_id, role)
+      VALUES
+        (?, ?, ?)
+    `).run(family.id, userId, 'parent');
+
     return res.status(201).json({success: true, data: family});
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({success: false, error: 'Invalid request'});
     }
     return res
-      .status((error as any).status || 500)
-      .json({success: false, error: (error as any).message || 'Server error'});
+      .status(asError(error).status ?? 500)
+      .json({success: false, error: asError(error).message || 'Server error'});
   }
 });
 
@@ -82,63 +115,103 @@ router.post('/', (req, res) => {
 router.get('/:id/members', (req, res) => {
   try {
     const userId = requireUserId(req);
-    const familyId = Number(req.params.id);
+    const {id: familyId} = IdParamSchema.parse(req.params);
     const isMember = db
-      .prepare(
-        'SELECT 1 FROM family_members WHERE family_id = ? AND user_id = ?',
-      )
+      .prepare(sql`
+        SELECT
+          1
+        FROM
+          family_members
+        WHERE
+          family_id = ?
+          AND user_id = ?
+      `)
       .get(familyId, userId);
-    if (!isMember)
+    if (isMember === undefined) {
       return res.status(403).json({success: false, error: 'Forbidden'});
+    }
 
     const rows = db
-      .prepare(
-        `SELECT fm.family_id, fm.user_id, fm.role, u.username, u.email
-         FROM family_members fm JOIN users u ON u.id = fm.user_id
-         WHERE fm.family_id = ?`,
-      )
-      .all(familyId) as any[];
-    const data = rows.map(r => FamilyMemberSchema.parse(r));
+      .prepare(sql`
+        SELECT
+          fm.family_id,
+          fm.user_id,
+          fm.role,
+          u.username,
+          u.email
+        FROM
+          family_members fm
+          JOIN users u ON u.id = fm.user_id
+        WHERE
+          fm.family_id = ?
+      `)
+      .all(familyId);
+    const data = rows.map(row => FamilyMemberSchema.parse(row));
     return res.json({success: true, data});
   } catch (error) {
     return res
-      .status((error as any).status || 500)
-      .json({success: false, error: (error as any).message || 'Server error'});
+      .status(asError(error).status ?? 500)
+      .json({success: false, error: asError(error).message || 'Server error'});
   }
 });
 
 // POST /api/families/:id/children - owner or parent creates a child account directly
+// eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
 router.post('/:id/children', async (req, res) => {
   try {
     const userId = requireUserId(req);
-    const familyId = Number(req.params.id);
+    const {id: familyId} = IdParamSchema.parse(req.params);
     const {username, email, password} = CreateChildSchema.parse(req.body);
 
-    const membership = db
-      .prepare(
-        'SELECT role FROM family_members WHERE family_id = ? AND user_id = ?',
-      )
-      .get(familyId, userId) as {role: 'parent' | 'child'} | undefined;
+    const membershipRow = db
+      .prepare(sql`
+        SELECT
+          role
+        FROM
+          family_members
+        WHERE
+          family_id = ?
+          AND user_id = ?
+      `)
+      .get(familyId, userId);
+    const membership =
+      membershipRow !== undefined ? RoleRowSchema.parse(membershipRow) : undefined;
     if (!membership || membership.role !== 'parent') {
       return res.status(403).json({success: false, error: 'Forbidden'});
     }
 
     const existing = db
-      .prepare('SELECT 1 FROM users WHERE email = ? OR username = ?')
+      .prepare(sql`
+        SELECT
+          1
+        FROM
+          users
+        WHERE
+          email = ?
+          OR username = ?
+      `)
       .get(email, username);
-    if (existing)
+    if (existing !== undefined) {
       return res.status(409).json({success: false, error: 'User exists'});
+    }
 
     const passwordHash = await bcrypt.hash(password, 12);
-    const user = db
-      .prepare(
-        `INSERT INTO users (username, email, password_hash, role) VALUES (?, ?, ?, 'user') RETURNING id`,
-      )
-      .get(username, email, passwordHash) as {id: number};
+    const userRow = db
+      .prepare(sql`
+        INSERT INTO
+          users (username, email, password_hash, role)
+        VALUES
+          (?, ?, ?, 'user') RETURNING id
+      `)
+      .get(username, email, passwordHash);
+    const user = IdRowSchema.parse(userRow);
 
-    db.prepare(
-      'INSERT INTO family_members (family_id, user_id, role) VALUES (?, ?, ?)',
-    ).run(familyId, user.id, 'child');
+    db.prepare(sql`
+      INSERT INTO
+        family_members (family_id, user_id, role)
+      VALUES
+        (?, ?, ?)
+    `).run(familyId, user.id, 'child');
 
     return res.status(201).json({success: true, message: 'Child created'});
   } catch (error) {
@@ -146,8 +219,8 @@ router.post('/:id/children', async (req, res) => {
       return res.status(400).json({success: false, error: 'Invalid request'});
     }
     return res
-      .status((error as any).status || 500)
-      .json({success: false, error: (error as any).message || 'Server error'});
+      .status(asError(error).status ?? 500)
+      .json({success: false, error: asError(error).message || 'Server error'});
   }
 });
 
@@ -158,18 +231,26 @@ router.get('/mine', (req, res) => {
   try {
     const userId = requireUserId(req);
     const rows = db
-      .prepare(
-        `SELECT f.id, f.name, f.owner_id, f.created_at
-         FROM families f
-         JOIN family_members fm ON fm.family_id = f.id
-         WHERE fm.user_id = ?
-         ORDER BY f.created_at DESC`,
-      )
-      .all(userId) as any[];
-    return res.json({success: true, data: rows});
+      .prepare(sql`
+        SELECT
+          f.id,
+          f.name,
+          f.owner_id,
+          f.created_at
+        FROM
+          families f
+          JOIN family_members fm ON fm.family_id = f.id
+        WHERE
+          fm.user_id = ?
+        ORDER BY
+          f.created_at DESC
+      `)
+      .all(userId);
+    const families = rows.map(row => FamilySchema.parse(row));
+    return res.json({success: true, data: families});
   } catch (error) {
     return res
-      .status((error as any).status || 500)
-      .json({success: false, error: (error as any).message || 'Server error'});
+      .status(asError(error).status ?? 500)
+      .json({success: false, error: asError(error).message || 'Server error'});
   }
 });

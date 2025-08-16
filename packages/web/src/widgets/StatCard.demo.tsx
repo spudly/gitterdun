@@ -1,31 +1,34 @@
-import {FC} from 'react';
+import type {FC} from 'react';
 import {StatCard} from './StatCard.js';
 
 const StatCardDemo: FC = () => {
   return (
     <div
-      className="grid grid-cols-1 md:grid-cols-4 gap-6"
+      className="grid grid-cols-1 gap-6 md:grid-cols-4"
       data-testid="StatCardDemo"
     >
       <StatCard
-        label="Completed"
-        value={12}
         color="green"
         icon={<span>✓</span>}
+        label="Completed"
+        value={12}
       />
+
       <StatCard
-        label="Pending"
-        value={7}
         color="yellow"
         icon={<span>⏳</span>}
+        label="Pending"
+        value={7}
       />
+
       <StatCard
-        label="Points"
-        value={345}
         color="blue"
         icon={<span>💎</span>}
+        label="Points"
+        value={345}
       />
-      <StatCard label="Due Soon" value={2} color="red" icon={<span>⚠️</span>} />
+
+      <StatCard color="red" icon={<span>⚠️</span>} label="Due Soon" value={2} />
     </div>
   );
 };

@@ -1,16 +1,17 @@
-import {ButtonHTMLAttributes, FC, ReactNode} from 'react';
+import type {ButtonHTMLAttributes, FC, ReactNode} from 'react';
+import clsx from 'clsx';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  fullWidth?: boolean;
-  loading?: boolean;
-  leftIcon?: ReactNode;
-  rightIcon?: ReactNode;
-}
+export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  readonly variant?: ButtonVariant;
+  readonly size?: ButtonSize;
+  readonly fullWidth?: boolean;
+  readonly loading?: boolean;
+  readonly leftIcon?: ReactNode;
+  readonly rightIcon?: ReactNode;
+};
 
 const VARIANT_CLASSNAMES: Record<ButtonVariant, string> = {
   primary: 'text-white bg-indigo-600 hover:bg-indigo-700 border-transparent',
@@ -32,7 +33,6 @@ export const Button: FC<ButtonProps> = ({
   loading = false,
   leftIcon,
   rightIcon,
-  className = '',
   disabled,
   children,
   ...rest
@@ -44,20 +44,27 @@ export const Button: FC<ButtonProps> = ({
 
   return (
     <button
+      className={clsx(
+        base,
+        VARIANT_CLASSNAMES[variant],
+        SIZE_CLASSNAMES[size],
+        width,
+      )}
+      disabled={(disabled ?? false) || loading}
       type="button"
-      className={`${base} ${VARIANT_CLASSNAMES[variant]} ${SIZE_CLASSNAMES[size]} ${width} ${className}`}
-      disabled={disabled || loading}
       {...rest}
     >
-      {loading && (
+      {loading ? (
         <span
-          className="absolute inline-block animate-spin rounded-full border-2 border-b-transparent border-white w-4 h-4"
           aria-hidden="true"
+          className="absolute inline-block size-4 animate-spin rounded-full border-2 border-white border-b-transparent"
         />
-      )}
-      <span className={`flex items-center gap-2 ${contentOpacity}`}>
+      ) : null}
+      <span className={clsx('flex items-center gap-2', contentOpacity)}>
         {leftIcon}
+
         {children}
+
         {rightIcon}
       </span>
     </button>

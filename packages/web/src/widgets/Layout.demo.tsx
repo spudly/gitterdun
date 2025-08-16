@@ -1,7 +1,8 @@
-import {FC} from 'react';
-import Layout, {NavigationItem} from './Layout.js';
+import type {FC} from 'react';
+import type {NavigationItem} from './Layout.js';
+import Layout from './Layout.js';
 
-const nav: NavigationItem[] = [
+const nav: Array<NavigationItem> = [
   {name: 'Dashboard', path: '/', icon: '🏠'},
   {name: 'Chores', path: '/chores', icon: '📋'},
   {name: 'Goals', path: '/goals', icon: '🎯'},
@@ -14,6 +15,7 @@ const LayoutDemo: FC = () => {
       <Layout navigation={nav}>
         <div className="space-y-2">
           <h2 className="text-xl font-semibold">Demo Content</h2>
+
           <p className="text-gray-600">
             This is rendered inside the Layout content area.
           </p>

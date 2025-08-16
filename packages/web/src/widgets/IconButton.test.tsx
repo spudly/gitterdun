@@ -1,0 +1,40 @@
+import {describe, expect, test} from '@jest/globals';
+import {render, screen} from '@testing-library/react';
+import {IconButton} from './IconButton';
+
+describe('iconButton', () => {
+  test('renders and can be disabled', () => {
+    render(<IconButton disabled icon={<span>i</span>} label="icon" />);
+    expect(screen.getByRole('button')).toBeDisabled();
+  });
+
+  test('supports variants and sizes when enabled', () => {
+    const {rerender, getByRole} = render(
+      <IconButton
+        icon={<span>i</span>}
+        label="icon"
+        size="sm"
+        variant="secondary"
+      />,
+    );
+    expect(getByRole('button')).toBeEnabled();
+    rerender(
+      <IconButton
+        icon={<span>i</span>}
+        label="icon"
+        size="lg"
+        variant="danger"
+      />,
+    );
+    expect(getByRole('button')).toBeEnabled();
+    rerender(
+      <IconButton
+        icon={<span>i</span>}
+        label="icon"
+        size="md"
+        variant="ghost"
+      />,
+    );
+    expect(getByRole('button')).toBeEnabled();
+  });
+});

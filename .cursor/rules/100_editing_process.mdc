@@ -1,0 +1,22 @@
+---
+description: When adding, editing, or deleting typescript or javascript code, follow these steps
+globs: ["packages/**/src/**/*"]
+alwaysApply: true
+---
+
+1. Start by creating unit tests to verify the desired behavior.
+2. Run the new unit tests and verify that they are failing (because you haven't implemented the new code yet).
+3. Implement the new code.
+4. Run the new unit tests again to verify that the tests are now passing. If they are not, make changes to the new code or new tests as needed until the code is fully implemented according to the request and tests are passing with 100% code coverage across all lines, branches, functions, and statements.
+5. Check the new code with the following tools to ensure that they all pass. If any of them are failing, you should continue iterating on the code and it's associated tests until these tools report no errors or warnings.
+   * Typescript
+   * ESLint
+   * Jest
+6. Use prettier to format the new code.
+7. Finally, confirm that you followed each of these steps and that all of the checks are passing. Use emojis (checkmark, etc.) to make that easy to spot.
+
+Additional constraints:
+* Only after completing all of the above steps should you consider the code finished.
+* Do not change the configuration for typescript, eslint, jest, or prettier unless explicitly told to do so or after requesting and receiving confirmation.
+* Do not add comments to the file to ignore or disable typescript, eslint, jest, or prettier errors or warnings unless explicitly told to do so or after requesting and receiving confirmation.
+* Following the steps outlined above in order is your highest priority even if the change seems trivial or you're trying to go fast. If you are unable to do so, stop and say so.

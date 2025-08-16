@@ -1,4 +1,6 @@
-import {FC, ReactNode} from 'react';
+import type {FC, ReactNode} from 'react';
+import clsx from 'clsx';
+import {Text} from './Text.js';
 
 type StatColor = 'blue' | 'yellow' | 'green' | 'red' | 'purple' | 'gray';
 
@@ -11,12 +13,30 @@ const COLOR_BG: Record<StatColor, string> = {
   gray: 'bg-gray-100 text-gray-600',
 };
 
-export interface StatCardProps {
-  icon?: ReactNode;
-  label: ReactNode;
-  value: ReactNode;
-  color?: StatColor;
-}
+export const getStatColorClass = (color: StatColor = 'gray'): string => {
+  switch (color) {
+    case 'blue':
+      return COLOR_BG.blue;
+    case 'yellow':
+      return COLOR_BG.yellow;
+    case 'green':
+      return COLOR_BG.green;
+    case 'red':
+      return COLOR_BG.red;
+    case 'purple':
+      return COLOR_BG.purple;
+    case 'gray':
+    default:
+      return COLOR_BG.gray;
+  }
+};
+
+export type StatCardProps = {
+  readonly icon?: ReactNode;
+  readonly label: ReactNode;
+  readonly value: ReactNode;
+  readonly color?: StatColor;
+};
 
 export const StatCard: FC<StatCardProps> = ({
   icon,
@@ -25,12 +45,20 @@ export const StatCard: FC<StatCardProps> = ({
   color = 'gray',
 }) => {
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="rounded-lg bg-white p-6 shadow">
       <div className="flex items-center">
-        <div className={`p-2 rounded-lg ${COLOR_BG[color]}`}>{icon}</div>
+        <div className={clsx('rounded-lg p-2', getStatColorClass(color))}>
+          {icon}
+        </div>
+
         <div className="ml-4">
-          <p className="text-sm font-medium text-gray-600">{label}</p>
-          <p className="text-2xl font-semibold text-gray-900">{value}</p>
+          <Text as="p" muted size="sm" weight="medium">
+            {label}
+          </Text>
+
+          <Text as="p" size="lg" weight="semibold">
+            {value}
+          </Text>
         </div>
       </div>
     </div>

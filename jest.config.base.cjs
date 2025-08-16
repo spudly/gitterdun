@@ -8,11 +8,19 @@ module.exports = {
     ],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
-  testMatch: ['**/__tests__/**/*.(spec|test).(ts|tsx|js)'],
   collectCoverageFrom: [
     '**/*.{ts,tsx,js,jsx}',
     '!**/node_modules/**',
     '!**/dist/**',
+    '!**/*.demo.*',
+    '!**/*.config.*',
   ],
-  moduleNameMapper: {},
+  coverageThreshold: {
+    global: {branches: 100, functions: 100, lines: 100, statements: 100},
+  },
+  moduleNameMapper: {'^(\\.{1,2}/.*)\\.js$': '$1'},
+  testMatch: [
+    '<rootDir>/src/**/__tests__/**/*.(spec|test).(ts|tsx|js|jsx)',
+    '<rootDir>/src/**/*.(spec|test).(ts|tsx|js|jsx)',
+  ],
 };

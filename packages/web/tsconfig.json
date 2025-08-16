@@ -1,15 +1,12 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": false,
-    "outDir": "./dist",
-    "rootDir": "./src",
+    "noEmit": true,
     "declaration": true,
     "declarationDir": "./dist",
     "emitDeclarationOnly": false,
-    "sourceMap": true,
-    "composite": true
+    "sourceMap": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["**/*.tsx", "**/*.ts", "jest.setup.ts", "src/setupTests.d.ts"],
+  "exclude": ["node_modules", "**/dist", "**/build"]
 }

@@ -1,13 +1,14 @@
-import {FC, ReactNode} from 'react';
+import type {FC, ReactNode} from 'react';
+import clsx from 'clsx';
 
-export interface CardProps {
-  children: ReactNode;
-  className?: string;
-  padded?: boolean;
-  elevated?: boolean;
-  header?: ReactNode;
-  footer?: ReactNode;
-}
+export type CardProps = {
+  readonly children: ReactNode;
+  readonly className?: string;
+  readonly padded?: boolean;
+  readonly elevated?: boolean;
+  readonly header?: ReactNode;
+  readonly footer?: ReactNode;
+};
 
 export const Card: FC<CardProps> = ({
   children,
@@ -21,14 +22,16 @@ export const Card: FC<CardProps> = ({
   const pad = padded ? 'p-6' : '';
   const elevation = elevated ? 'shadow' : 'border';
   return (
-    <div className={`${base} ${elevation} ${className}`}>
-      {header && (
-        <div className="px-6 py-4 border-b border-gray-200">{header}</div>
-      )}
+    <div className={clsx(base, elevation, className)}>
+      {header ?  (
+        <div className="border-b border-gray-200 px-6 py-4">{header}</div>
+      ) : null}
+
       <div className={pad}>{children}</div>
-      {footer && (
-        <div className="px-6 py-4 border-t border-gray-200">{footer}</div>
-      )}
+
+      {footer ?  (
+        <div className="border-t border-gray-200 px-6 py-4">{footer}</div>
+      ) : null}
     </div>
   );
 };

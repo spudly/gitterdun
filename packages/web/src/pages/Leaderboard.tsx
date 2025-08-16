@@ -1,104 +1,89 @@
-import {FC} from 'react';
+import type {FC} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {leaderboardApi} from '../lib/api.js';
+import {PageContainer} from '../widgets/PageContainer.js';
+import {PageHeader} from '../widgets/PageHeader.js';
+import {Podium} from '../widgets/Podium.js';
+import {RankingList} from '../widgets/RankingList.js';
+import {PageLoading} from '../widgets/PageLoading.js';
+import {Text} from '../widgets/Text.js';
 
 const Leaderboard: FC = () => {
-  const {data: leaderboardResponse, isLoading} = useQuery({
+  const {
+    data: leaderboardResponse,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['leaderboard'],
-    queryFn: () => leaderboardApi.get({limit: 10, sortBy: 'points'}),
+    queryFn: async () => leaderboardApi.get({limit: 10, sortBy: 'points'}),
   });
+  if (error) {
+    const err = error instanceof Error ? error : new Error(String(error));
+    // eslint-disable-next-line no-console -- dev logging only
+    console.error(err);
+  }
 
-  const leaderboard = leaderboardResponse?.data?.leaderboard || [];
-  const sortBy = leaderboardResponse?.data?.sortBy || 'points';
+  const leaderboard = leaderboardResponse?.data?.leaderboard ?? [];
+  const sortBy = leaderboardResponse?.data?.sortBy ?? 'points';
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto" />
-          <p className="mt-4 text-gray-600">Loading leaderboard...</p>
-        </div>
-      </div>
+      <PageContainer variant="centered">
+        <PageLoading message="Loading leaderboard..." />
+      </PageContainer>
     );
   }
 
+  const podiumItems = leaderboard.slice(0, 3).map((entry, index) => ({
+    id: entry.id,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- it's hard to reconcile this type with both typescript and the eslint error
+    rank: (index + 1) as 1 | 2 | 3,
+    content: (
+      <>
+        <Text as="h3" size="lg" weight="semibold">
+          {entry.username}
+        </Text>
+
+        <Text muted>{entry.points} points</Text>
+
+        <Text muted size="sm">
+          {entry.chores_completed} chores
+        </Text>
+      </>
+    ),
+  }));
+
+  const rankingItems = leaderboard.map(entry => ({
+    id: entry.id,
+    rank: entry.rank,
+    content: (
+      <Text as="h3" size="sm" weight="medium">
+        {entry.username}
+      </Text>
+    ),
+    score: `${entry.points} pts`,
+    subtitle: (
+      <>
+        <span>{entry.chores_completed} chores completed</span>
+
+        <span>{entry.badges_earned} badges earned</span>
+      </>
+    ),
+    metadata: <span>{entry.streak_count} day streak</span>,
+  }));
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Leaderboard</h1>
+    <PageContainer>
+      <PageHeader title="Leaderboard" />
 
-        {/* Top 3 Podium */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {leaderboard.slice(0, 3).map((entry, index) => (
-            <div
-              key={entry.id}
-              className={`text-center ${
-                index === 0 ? 'order-2' : index === 1 ? 'order-1' : 'order-3'
-              }`}
-            >
-              <div
-                className={`relative mx-auto w-24 h-24 rounded-full flex items-center justify-center text-2xl font-bold text-white ${
-                  index === 0
-                    ? 'bg-yellow-500'
-                    : index === 1
-                      ? 'bg-gray-400'
-                      : 'bg-orange-500'
-                }`}
-              >
-                {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mt-4">
-                {entry.username}
-              </h3>
-              <p className="text-gray-600">{entry.points} points</p>
-              <p className="text-sm text-gray-500">
-                {entry.chores_completed} chores
-              </p>
-            </div>
-          ))}
-        </div>
+      <Podium items={podiumItems} />
 
-        {/* Full Leaderboard */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">Full Rankings</h2>
-            <p className="text-sm text-gray-500">
-              Sorted by {sortBy === 'points' ? 'total points' : 'streak count'}
-            </p>
-          </div>
-          <div className="divide-y divide-gray-200">
-            {leaderboard.map(entry => (
-              <div key={entry.id} className="px-6 py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium text-gray-700 mr-4">
-                      {entry.rank}
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-900">
-                        {entry.username}
-                      </h3>
-                      <div className="flex items-center space-x-4 text-sm text-gray-500">
-                        <span>{entry.chores_completed} chores completed</span>
-                        <span>{entry.badges_earned} badges earned</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-lg font-semibold text-gray-900">
-                      {entry.points} pts
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {entry.streak_count} day streak
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+      <RankingList
+        items={rankingItems}
+        subtitle={`Sorted by ${sortBy === 'points' ? 'total points' : 'streak count'}`}
+        title="Full Rankings"
+      />
+    </PageContainer>
   );
 };
 
