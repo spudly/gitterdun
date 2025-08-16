@@ -74,7 +74,7 @@ const Chores: FC = () => {
                   <span>Penalty: -{chore.penalty_points}</span>
                 )}
 
-                {chore.due_date ?  (
+                {chore.due_date ? (
                   <span>
                     Due: {new Date(chore.due_date).toLocaleDateString()}
                   </span>

@@ -31,11 +31,9 @@ export const FormField: FC<FormFieldProps> = ({
 
       {children}
 
-      {helpText ?  (
-        <p className="text-sm text-gray-500">{helpText}</p>
-      ) : null}
+      {helpText ? <p className="text-sm text-gray-500">{helpText}</p> : null}
 
-      {error ?  (
+      {error ? (
         <p className="text-sm text-red-600" role="alert">
           {error}
         </p>

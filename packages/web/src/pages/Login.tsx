@@ -64,9 +64,7 @@ const Login: FC = () => {
             <Alert type="error">{message}</Alert>
           ) : null}
 
-          {loginError ?  (
-            <Alert type="error">{loginError.message}</Alert>
-          ) : null}
+          {loginError ? <Alert type="error">{loginError.message}</Alert> : null}
 
           <Button disabled={isLoggingIn} fullWidth type="submit">
             {isLoggingIn ? 'Logging in...' : 'Login'}

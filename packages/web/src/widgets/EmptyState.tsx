@@ -18,13 +18,11 @@ export const EmptyState: FC<EmptyStateProps> = ({
 }) => {
   return (
     <div className={clsx('py-12 text-center', className)}>
-      {icon ?  <div className="mb-4 text-gray-400">{icon}</div> : null}
+      {icon ? <div className="mb-4 text-gray-400">{icon}</div> : null}
 
       <h3 className="mb-2 text-lg font-medium text-gray-900">{title}</h3>
 
-      {description ?  (
-        <p className="mb-4 text-gray-500">{description}</p>
-      ) : null}
+      {description ? <p className="mb-4 text-gray-500">{description}</p> : null}
 
       {action}
     </div>

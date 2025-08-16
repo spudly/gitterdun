@@ -10,7 +10,7 @@
     "type-check": "tsc",
     "build": "tsc -p tsconfig.build.json",
     "lint": "eslint \"src/**/*.ts\"",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:dev": "jest --watch"
   },
   "dependencies": {

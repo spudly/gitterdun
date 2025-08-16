@@ -105,7 +105,7 @@ export const api = {
 
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined) {
+        if (value !== undefined && value !== null) {
           if (
             typeof value === 'string'
             || typeof value === 'number'
