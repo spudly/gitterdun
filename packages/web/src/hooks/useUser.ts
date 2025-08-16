@@ -3,27 +3,38 @@ import {UserSchema} from '@gitterdun/shared';
 import type {User} from '@gitterdun/shared';
 import {authApi} from '../lib/api.js';
 
+const NO_DATA_SUCCESS = {__noData: true} as const;
+
+function isNoDataSuccess(value: unknown): value is typeof NO_DATA_SUCCESS {
+  return Boolean((value as {__noData?: boolean} | null)?.__noData);
+}
+
+type UserQueryData = User | null | typeof NO_DATA_SUCCESS;
+
 export const useUser = () => {
   const queryClient = useQueryClient();
 
   const {
-    data: user,
+    data: rawUser,
     isLoading,
     error,
-  } = useQuery({
+  } = useQuery<UserQueryData>({
     queryKey: ['user'],
-    queryFn: async (): Promise<User | null> => {
+    queryFn: async (): Promise<UserQueryData> => {
       try {
         const res = await authApi.me();
         if (res.success && res.data) {
           return UserSchema.parse(res.data);
+        }
+        if (res.success && res.data === undefined) {
+          return NO_DATA_SUCCESS;
         }
         return null;
       } catch (_error) {
         return null;
       }
     },
-    staleTime: 1000 * 60 * 60, // 1 hour
+    staleTime: 1000 * 60 * 60,
     retry: false,
   });
 
@@ -74,6 +85,10 @@ export const useUser = () => {
   const logout = async () => {
     return logoutMutation.mutateAsync();
   };
+
+  const user: User | null | undefined = isNoDataSuccess(rawUser)
+    ? undefined
+    : (rawUser as User | null | undefined);
 
   return {
     user,

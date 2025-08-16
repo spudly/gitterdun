@@ -1,8 +1,7 @@
-/// <reference types="@testing-library/jest-dom" />
 import '@testing-library/jest-dom';
 
 // Provide a minimal WHATWG Response polyfill for tests that construct `new Response(...)`
-if (typeof global.Response === 'undefined') {
+if (typeof (globalThis as any).Response === 'undefined') {
   class SimpleResponse {
     readonly ok: boolean;
     readonly status: number;
@@ -24,7 +23,7 @@ if (typeof global.Response === 'undefined') {
       return JSON.parse(this._bodyText);
     }
   }
-  Object.defineProperty(global, 'Response', {
+  Object.defineProperty(globalThis as any, 'Response', {
     value: SimpleResponse,
     writable: true,
     configurable: true,

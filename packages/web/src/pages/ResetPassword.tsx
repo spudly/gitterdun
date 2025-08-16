@@ -66,7 +66,7 @@ const ResetPassword: FC = () => {
               id="confirm-password"
               minLength={6}
               onChange={value => {
-                setConfirm(v);
+                setConfirm(value);
               }}
               required
               type="password"

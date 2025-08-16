@@ -45,12 +45,10 @@ export const SectionHeader: FC<SectionHeaderProps> = ({
       <div>
         <h3 className={baseStyles}>{title}</h3>
 
-        {subtitle ?  (
-          <p className="text-sm text-gray-600">{subtitle}</p>
-        ) : null}
+        {subtitle ? <p className="text-sm text-gray-600">{subtitle}</p> : null}
       </div>
 
-      {children ?  (
+      {children ? (
         <div className="flex items-center gap-2">{children}</div>
       ) : null}
     </div>

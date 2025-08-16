@@ -39,7 +39,7 @@ const Admin: FC = () => {
   const {data: choresResponse, isLoading} = useQuery({
     queryKey: ['chores', 'admin'],
     queryFn: async () => choresApi.getAll(),
-    enabled: Boolean(user) && user.role === 'admin',
+    enabled: user?.role === 'admin',
   });
 
   const chores = choresResponse?.data ?? [];
@@ -278,7 +278,7 @@ const Admin: FC = () => {
                       <span>Penalty: -{chore.penalty_points}</span>
                     )}
 
-                    {chore.due_date ?  (
+                    {chore.due_date ? (
                       <span>
                         Due: {new Date(chore.due_date).toLocaleDateString()}
                       </span>

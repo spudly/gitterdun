@@ -46,25 +46,6 @@ const getBaseChoresQuery = () => {
   `;
 };
 
-const CHORE_FILTER_CONDITIONS = [
-  {
-    condition: (status: string | undefined) => status,
-    clause: ' AND c.status = ?',
-    getValue: (status: string | undefined) => status,
-  },
-  {
-    condition: (choreType: string | undefined) => choreType,
-    clause: ' AND c.chore_type = ?',
-    getValue: (choreType: string | undefined) => choreType,
-  },
-  {
-    condition: (userId: number | undefined) => userId !== undefined,
-    clause:
-      ' AND c.id IN (SELECT chore_id FROM chore_assignments WHERE user_id = ?)',
-    getValue: (userId: number | undefined) => userId,
-  },
-];
-
 const applyChoreFilters = (
   baseQuery: string,
   status?: string,
@@ -74,16 +55,20 @@ const applyChoreFilters = (
   let query = baseQuery;
   const params: Array<string | number> = [];
 
-  const filterValues = [status, choreType, userId];
+  if (typeof status === 'string' && status.length > 0) {
+    query += ' AND c.status = ?';
+    params.push(status);
+  }
 
-  for (let index = 0; index < CHORE_FILTER_CONDITIONS.length; index++) {
-    const filter = CHORE_FILTER_CONDITIONS[index];
-    const value = filterValues[index];
+  if (typeof choreType === 'string' && choreType.length > 0) {
+    query += ' AND c.chore_type = ?';
+    params.push(choreType);
+  }
 
-    if (filter.condition(value)) {
-      query += filter.clause;
-      params.push(filter.getValue(value)!);
-    }
+  if (typeof userId === 'number') {
+    query +=
+      ' AND c.id IN (SELECT chore_id FROM chore_assignments WHERE user_id = ?)';
+    params.push(userId);
   }
 
   return {query, params};
@@ -269,12 +254,12 @@ router.post('/', async (req, res) => {
     // Validate and extract request data
     const {
       title,
-      description,
+      description = '',
       point_reward: pointReward,
       bonus_points: bonusPoints = 0,
       penalty_points: penaltyPoints = 0,
-      due_date: dueDate,
-      recurrence_rule: recurrenceRule,
+      due_date: dueDate = null,
+      recurrence_rule: recurrenceRule = null,
       chore_type: choreType,
       assigned_users: assignedUsers = [],
     } = CreateChoreSchema.parse(req.body);

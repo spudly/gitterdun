@@ -20,12 +20,10 @@ export const PageHeader: FC<PageHeaderProps> = ({
         <div>
           <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
 
-          {subtitle ?  (
-            <p className="mt-1 text-gray-600">{subtitle}</p>
-          ) : null}
+          {subtitle ? <p className="mt-1 text-gray-600">{subtitle}</p> : null}
         </div>
 
-        {actions ?  (
+        {actions ? (
           <div className="flex items-center gap-2">{actions}</div>
         ) : null}
       </div>
