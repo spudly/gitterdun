@@ -9,7 +9,7 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   collectCoverageFrom: [
-    '**/*.{ts,tsx,js,jsx}',
+    '<rootDir>/src/**/*.{ts,tsx,js,jsx}',
     '!**/node_modules/**',
     '!**/dist/**',
     '!**/*.demo.*',
