@@ -20,7 +20,7 @@ const router = express.Router();
 // Helper: require auth via session cookie
 const getCookie = (req: express.Request, name: string): string | undefined => {
   const cookieHeader = req.headers.cookie;
-  if (cookieHeader == null) {
+  if (cookieHeader === undefined) {
     return undefined;
   }
   const cookieString = Array.isArray(cookieHeader)
@@ -30,7 +30,7 @@ const getCookie = (req: express.Request, name: string): string | undefined => {
     .split(';')
     .reduce<Record<string, string>>((acc, part) => {
       const [rawKey, ...rest] = part.trim().split('=');
-      if (rawKey == null) {
+      if (!rawKey) {
         return acc;
       }
       const key = decodeURIComponent(rawKey);
@@ -43,7 +43,7 @@ const getCookie = (req: express.Request, name: string): string | undefined => {
 
 const requireUserId = (req: express.Request): number => {
   const sid = getCookie(req, 'sid');
-  if (sid == null) {
+  if (sid === undefined) {
     throw Object.assign(new Error('Not authenticated'), {status: 401});
   }
   const sessionRow = db
@@ -58,7 +58,7 @@ const requireUserId = (req: express.Request): number => {
     `)
     .get(sid);
   const session =
-    sessionRow != null ? SessionRowSchema.parse(sessionRow) : undefined;
+    sessionRow !== undefined ? SessionRowSchema.parse(sessionRow) : undefined;
   if (!session) {
     throw Object.assign(new Error('Not authenticated'), {status: 401});
   }
@@ -127,7 +127,7 @@ router.get('/:id/members', (req, res) => {
           AND user_id = ?
       `)
       .get(familyId, userId);
-    if (isMember == null) {
+    if (isMember === undefined) {
       return res.status(403).json({success: false, error: 'Forbidden'});
     }
 
@@ -146,7 +146,7 @@ router.get('/:id/members', (req, res) => {
           fm.family_id = ?
       `)
       .all(familyId);
-    const data = rows.map(r => FamilyMemberSchema.parse(r));
+    const data = rows.map(row => FamilyMemberSchema.parse(row));
     return res.json({success: true, data});
   } catch (error) {
     return res
@@ -175,7 +175,7 @@ router.post('/:id/children', async (req, res) => {
       `)
       .get(familyId, userId);
     const membership =
-      membershipRow != null ? RoleRowSchema.parse(membershipRow) : undefined;
+      membershipRow !== undefined ? RoleRowSchema.parse(membershipRow) : undefined;
     if (!membership || membership.role !== 'parent') {
       return res.status(403).json({success: false, error: 'Forbidden'});
     }
@@ -191,7 +191,7 @@ router.post('/:id/children', async (req, res) => {
           OR username = ?
       `)
       .get(email, username);
-    if (existing != null) {
+    if (existing !== undefined) {
       return res.status(409).json({success: false, error: 'User exists'});
     }
 
@@ -246,7 +246,7 @@ router.get('/mine', (req, res) => {
           f.created_at DESC
       `)
       .all(userId);
-    const families = rows.map(r => FamilySchema.parse(r));
+    const families = rows.map(row => FamilySchema.parse(row));
     return res.json({success: true, data: families});
   } catch (error) {
     return res

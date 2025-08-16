@@ -1,8 +1,9 @@
+import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen, fireEvent} from '@testing-library/react';
 import {Modal, isOverlayKey, shouldCloseOnOverlayClick} from './Modal';
 
-describe('Modal', () => {
-  it('opens and closes via overlay, escape and close button', () => {
+describe('modal', () => {
+  test('opens and closes via overlay, escape and close button', () => {
     const onClose = jest.fn();
     render(
       <Modal isOpen onClose={onClose} title="M">
@@ -19,7 +20,7 @@ describe('Modal', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
-  it('respects props and closed state', () => {
+  test('respects props and closed state', () => {
     const onClose = jest.fn();
     const {rerender} = render(
       <Modal isOpen={false} onClose={onClose}>
@@ -69,19 +70,19 @@ describe('Modal', () => {
     fireEvent.click(overlay3);
   });
 
-  it('overlay key helper covers both branches', () => {
+  test('overlay key helper covers both branches', () => {
     expect(isOverlayKey('Enter')).toBe(true);
     expect(isOverlayKey(' ')).toBe(true);
     expect(isOverlayKey('Escape')).toBe(false);
   });
 
-  it('overlay click helper covers all branches', () => {
+  test('overlay click helper covers all branches', () => {
     expect(shouldCloseOnOverlayClick(true, true)).toBe(true);
     expect(shouldCloseOnOverlayClick(true, false)).toBe(false);
     expect(shouldCloseOnOverlayClick(false, true)).toBe(false);
   });
 
-  it('closes on overlay keydown when enabled', () => {
+  test('closes on overlay keydown when enabled', () => {
     const onClose = jest.fn();
     render(
       <Modal
@@ -99,7 +100,7 @@ describe('Modal', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
-  it('does not close on non-overlay keydown', () => {
+  test('does not close on non-overlay keydown', () => {
     const onClose = jest.fn();
     render(
       <Modal

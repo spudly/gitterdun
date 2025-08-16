@@ -1,3 +1,4 @@
+import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen, fireEvent, act} from '@testing-library/react';
 import {MemoryRouter, useLocation} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
@@ -29,7 +30,7 @@ const createUseUserMock = (
   ...overrides,
 });
 
-jest.mock('../hooks/useUser', () => ({
+jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
   useUser: jest.fn(() => createUseUserMock()),
 }));
 
@@ -39,7 +40,7 @@ const wrap = (ui: React.ReactElement) => (
   </QueryClientProvider>
 );
 
-it('shows login error when loginError is present', () => {
+test('shows login error when loginError is present', () => {
   jest
     .mocked(useUserModule.useUser)
     .mockReturnValueOnce(
@@ -55,8 +56,8 @@ it('shows login error when loginError is present', () => {
 
 // wrap moved above to satisfy no-use-before-define
 
-describe('Login page', () => {
-  it('renders and submits', async () => {
+describe('login page', () => {
+  test('renders and submits', async () => {
     const loginMock = jest.fn(async (_e: string, _p: string) => ({
       success: true,
       data: {
@@ -75,10 +76,10 @@ describe('Login page', () => {
       );
     render(wrap(<Login />));
     expect(screen.getAllByText('Login')[0]).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText(/email/i), {
+    fireEvent.change(screen.getByLabelText(/email/iu), {
       target: {value: 'user@example.com'},
     });
-    fireEvent.change(screen.getByLabelText(/password/i), {
+    fireEvent.change(screen.getByLabelText(/password/iu), {
       target: {value: 'b'},
     });
     await act(async () => {
@@ -89,7 +90,7 @@ describe('Login page', () => {
 
   // Success branch is exercised by the render-and-submit test above
 
-  it('handles login rejection path', async () => {
+  test('handles login rejection path', async () => {
     const mocked = jest.mocked(useUserModule.useUser);
     const defaultImpl = mocked.getMockImplementation();
     mocked.mockImplementation(() =>
@@ -100,20 +101,22 @@ describe('Login page', () => {
       }),
     );
     render(wrap(<Login />));
-    fireEvent.change(screen.getByLabelText(/email/i), {
+    fireEvent.change(screen.getByLabelText(/email/iu), {
       target: {value: 'user@example.com'},
     });
-    fireEvent.change(screen.getByLabelText(/password/i), {
+    fireEvent.change(screen.getByLabelText(/password/iu), {
       target: {value: 'b'},
     });
     await act(async () => {
       fireEvent.click(screen.getByRole('button', {name: 'Login'}));
     });
-    expect(await screen.findByText('Login failed')).toBeInTheDocument();
+    await expect(
+      screen.findByText('Login failed'),
+    ).resolves.toBeInTheDocument();
     mocked.mockImplementation(defaultImpl);
   });
 
-  it('shows loading state when isLoggingIn is true', () => {
+  test('shows loading state when isLoggingIn is true', () => {
     jest
       .mocked(useUserModule.useUser)
       .mockReturnValueOnce(createUseUserMock({isLoggingIn: true}));
@@ -122,7 +125,7 @@ describe('Login page', () => {
     // no restore needed when using mockReturnValueOnce
   });
 
-  it('shows inline loginError alert when provided by hook', () => {
+  test('shows inline loginError alert when provided by hook', () => {
     jest
       .mocked(useUserModule.useUser)
       .mockReturnValueOnce(
@@ -133,7 +136,7 @@ describe('Login page', () => {
     // no restore needed when using mockReturnValueOnce
   });
 
-  it('navigates to root on successful submit', async () => {
+  test('navigates to root on successful submit', async () => {
     const LocationProbe = () => {
       const loc = useLocation();
       return <div data-testid="loc">{loc.pathname}</div>;
@@ -147,10 +150,10 @@ describe('Login page', () => {
         </MemoryRouter>
       </QueryClientProvider>,
     );
-    fireEvent.change(screen.getByLabelText(/email/i), {
+    fireEvent.change(screen.getByLabelText(/email/iu), {
       target: {value: 'user@example.com'},
     });
-    fireEvent.change(screen.getByLabelText(/password/i), {
+    fireEvent.change(screen.getByLabelText(/password/iu), {
       target: {value: 'pw'},
     });
     await act(async () => {

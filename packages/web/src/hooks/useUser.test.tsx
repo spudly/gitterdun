@@ -1,10 +1,11 @@
+import {describe, expect, jest, test} from '@jest/globals';
 import type {FC, PropsWithChildren} from 'react';
 import {renderHook, act} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {useUser} from './useUser';
 import * as apis from '../lib/api';
 
-jest.mock('../lib/api', () => {
+jest.mock<typeof import('../lib/api')>('../lib/api', () => {
   return {
     authApi: {
       me: jest.fn(async () => ({
@@ -38,7 +39,7 @@ const wrapper: FC<PropsWithChildren> = ({children}) => {
 };
 
 describe('useUser', () => {
-  it('loads user and supports auth helpers', async () => {
+  test('loads user and supports auth helpers', async () => {
     const {result, rerender} = renderHook(() => useUser(), {wrapper});
     // wait a tick for query to resolve
     await act(async () => {
@@ -47,7 +48,7 @@ describe('useUser', () => {
       });
     });
     expect(
-      result.current.user == null || typeof result.current.user === 'object',
+      result.current.user === null || typeof result.current.user === 'object',
     ).toBe(true);
     await act(async () => {
       await result.current.login('a', 'b');
@@ -57,7 +58,7 @@ describe('useUser', () => {
     rerender();
   });
 
-  it('returns null on me error and covers forgot/reset helpers', async () => {
+  test('returns null on me error and covers forgot/reset helpers', async () => {
     const {authApi} = apis;
     jest.mocked(authApi.me).mockRejectedValueOnce(new Error('boom'));
     const {result} = renderHook(() => useUser(), {wrapper});
@@ -73,7 +74,7 @@ describe('useUser', () => {
     });
   });
 
-  it('returns null when me succeeds without data (covers line 20)', async () => {
+  test('returns null when me succeeds without data (covers line 20)', async () => {
     const {authApi} = apis;
     jest.mocked(authApi.me).mockResolvedValueOnce({success: true});
     const {result} = renderHook(() => useUser(), {wrapper});
@@ -82,10 +83,10 @@ describe('useUser', () => {
         setTimeout(resolve, 0);
       });
     });
-    expect(result.current.user == null).toBe(true);
+    expect(result.current.user === undefined).toBe(true);
   });
 
-  it('does not set user on login success without data (covers else at line 32)', async () => {
+  test('does not set user on login success without data (covers else at line 32)', async () => {
     const {authApi} = apis;
     jest.mocked(authApi.login).mockResolvedValueOnce({success: true});
     const client = new QueryClient();
@@ -100,7 +101,7 @@ describe('useUser', () => {
     expect(clientSpy).not.toHaveBeenCalled();
   });
 
-  it('does not set user on register success without data (covers else at line 41)', async () => {
+  test('does not set user on register success without data (covers else at line 41)', async () => {
     const {authApi} = apis;
     jest.mocked(authApi.register).mockResolvedValueOnce({success: true});
     const client = new QueryClient();
@@ -115,7 +116,7 @@ describe('useUser', () => {
     expect(clientSpy).not.toHaveBeenCalled();
   });
 
-  it('includes role in register payload when provided (covers ternary at line 69)', async () => {
+  test('includes role in register payload when provided (covers ternary at line 69)', async () => {
     const {authApi} = apis;
     const spy = jest.spyOn(authApi, 'register');
     const {result} = renderHook(() => useUser(), {wrapper});

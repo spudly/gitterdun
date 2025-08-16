@@ -1,9 +1,10 @@
+import {describe, expect, test} from '@jest/globals';
 import {render, screen, act} from '@testing-library/react';
 import {MemoryRouter, Routes, Route} from 'react-router-dom';
 import Demos from './Demos';
 
-describe('Demos page', () => {
-  it('renders list of demos at index route', async () => {
+describe('demos page', () => {
+  test('renders list of demos at index route', async () => {
     await act(async () => {
       render(
         <MemoryRouter initialEntries={['/__demos']}>
@@ -16,7 +17,7 @@ describe('Demos page', () => {
     expect(screen.getByText('Widget Demos')).toBeInTheDocument();
   });
 
-  it('renders a specific demo when :name is provided', async () => {
+  test('renders a specific demo when :name is provided', async () => {
     await act(async () => {
       render(
         <MemoryRouter initialEntries={['/__demos/Button']}>

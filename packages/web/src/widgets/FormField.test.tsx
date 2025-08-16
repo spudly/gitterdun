@@ -1,8 +1,9 @@
+import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {FormField} from './FormField';
 
-describe('FormField', () => {
-  it('renders label, required, help and error', () => {
+describe('formField', () => {
+  test('renders label, required, help and error', () => {
     render(
       <FormField
         error="err"
@@ -20,7 +21,7 @@ describe('FormField', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('err');
   });
 
-  it('renders without optional props', () => {
+  test('renders without optional props', () => {
     render(
       <FormField htmlFor="name" label="Name">
         <input id="name" />

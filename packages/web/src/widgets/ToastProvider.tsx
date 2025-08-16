@@ -42,7 +42,7 @@ export const ToastProvider: FC<{readonly children: ReactNode}> = ({
   const idRef = useRef(1);
 
   const removeToast = useCallback((id: number) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
+    setToasts(prev => prev.filter(toast => toast.id !== id));
   }, []);
 
   const addToast = useCallback(
@@ -56,7 +56,7 @@ export const ToastProvider: FC<{readonly children: ReactNode}> = ({
         expiresAt: now + (opts.durationMs ?? 4500),
       } satisfies Omit<Toast, 'description'>;
       const toast: Toast =
-        opts.description != null && opts.description !== ''
+        opts.description !== undefined && opts.description !== ''
           ? {...base, description: opts.description}
           : base;
       setToasts(prev => [...prev, toast]);
@@ -97,19 +97,19 @@ export const ToastProvider: FC<{readonly children: ReactNode}> = ({
     <ToastContext.Provider value={value}>
       {children}
       {/* Toast viewport */}
-      <div className="fixed top-4 right-4 z-50 space-y-2 w-[min(92vw,360px)]">
-        {toasts.map(t => (
+      <div className="fixed right-4 top-4 z-50 w-[min(92vw,360px)] space-y-2">
+        {toasts.map(toast => (
           <Alert
-            key={t.id}
+            key={toast.id}
             onDismiss={() => {
-              removeToast(t.id);
+              removeToast(toast.id);
             }}
-            type={t.variant === 'warning' ? 'warning' : t.variant}
+            type={toast.variant === 'warning' ? 'warning' : toast.variant}
           >
             <div className="flex flex-col">
-              <span className="font-medium">{t.title}</span>
-              {t.description != null && t.description !== '' ? (
-                <span className="text-sm opacity-90">{t.description}</span>
+              <span className="font-medium">{toast.title}</span>
+              {toast.description !== undefined && toast.description !== '' ? (
+                <span className="text-sm opacity-90">{toast.description}</span>
               ) : null}
             </div>
           </Alert>

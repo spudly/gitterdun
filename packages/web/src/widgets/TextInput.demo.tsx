@@ -14,8 +14,8 @@ const TextInputDemo: FC = () => {
       >
         <TextInput
           id="email"
-          onChange={v => {
-            setValue(v);
+          onChange={value => {
+            setValue(value);
           }}
           placeholder="you@example.com"
           type="email"
@@ -34,8 +34,8 @@ const TextInputDemo: FC = () => {
       >
         <TextInput
           id="with-error"
-          onChange={v => {
-            setValue(v);
+          onChange={value => {
+            setValue(value);
           }}
           placeholder="Type something"
           value={value}

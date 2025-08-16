@@ -45,9 +45,9 @@ export const StatCard: FC<StatCardProps> = ({
   color = 'gray',
 }) => {
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="rounded-lg bg-white p-6 shadow">
       <div className="flex items-center">
-        <div className={clsx('p-2 rounded-lg', getStatColorClass(color))}>
+        <div className={clsx('rounded-lg p-2', getStatColorClass(color))}>
           {icon}
         </div>
 

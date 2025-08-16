@@ -24,7 +24,7 @@ export const Checkbox: FC<CheckboxProps> = ({
         checked={checked}
         disabled={disabled}
         id={id}
-        onChange={e => onChange?.(e.target.checked, e)}
+        onChange={event => onChange?.(event.target.checked, e)}
         type="checkbox"
       />
       {label}

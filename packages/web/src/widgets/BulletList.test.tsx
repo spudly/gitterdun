@@ -1,8 +1,9 @@
+import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {BulletList, getDensityClass, getIndentClass} from './BulletList';
 
-describe('BulletList', () => {
-  it('renders items with props', () => {
+describe('bulletList', () => {
+  test('renders items with props', () => {
     render(
       <BulletList density="normal" indent="lg">
         <li>X</li>
@@ -11,7 +12,7 @@ describe('BulletList', () => {
     expect(screen.getByText('X')).toBeInTheDocument();
   });
 
-  it('covers indent and density variants', () => {
+  test('covers indent and density variants', () => {
     const {rerender, getByText} = render(
       <BulletList density="tight" indent="sm">
         <li>A</li>
@@ -32,14 +33,14 @@ describe('BulletList', () => {
     expect(getByText('C')).toBeInTheDocument();
   });
 
-  it('falls back to defaults on invalid props (runtime)', () => {
+  test('falls back to defaults on invalid props (runtime)', () => {
     // simulate bad runtime values and hit fallback branches
     const {container} = render(
       <BulletList
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- simulate invalid prop for fallback
-        density={'nope' as unknown as 'tight' | 'normal'}
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- simulate invalid prop for fallback
-        indent={'nope' as unknown as 'sm' | 'md' | 'lg'}
+        // @ts-expect-error: intentaionally passing invalid props
+        density="nope"
+        // @ts-expect-error: intentaionally passing invalid props
+        indent="nope"
       >
         <li>Z</li>
       </BulletList>,
@@ -47,7 +48,7 @@ describe('BulletList', () => {
     expect(container.querySelector('ul')).toBeInTheDocument();
   });
 
-  it('helper functions cover all branches', () => {
+  test('helper functions cover all branches', () => {
     expect(getIndentClass('sm')).toBeTruthy();
     expect(getIndentClass('md')).toBeTruthy();
     expect(getIndentClass('lg')).toBeTruthy();
@@ -57,7 +58,7 @@ describe('BulletList', () => {
     expect(getDensityClass(undefined)).toBeTruthy();
   });
 
-  it('component defaults (no props) render', () => {
+  test('component defaults (no props) render', () => {
     const {getByText} = render(
       <BulletList>
         <li>default</li>

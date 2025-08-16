@@ -19,7 +19,7 @@ const Chores: FC = () => {
   const {data: choresResponse, isLoading} = useQuery({
     queryKey: ['chores'],
     queryFn: async () => choresApi.getAll(),
-    enabled: !!user,
+    enabled: Boolean(user),
   });
 
   const chores = choresResponse?.data ?? [];
@@ -74,7 +74,7 @@ const Chores: FC = () => {
                   <span>Penalty: -{chore.penalty_points}</span>
                 )}
 
-                {chore.due_date != null ? (
+                {chore.due_date ?  (
                   <span>
                     Due: {new Date(chore.due_date).toLocaleDateString()}
                   </span>

@@ -47,19 +47,19 @@ export const RankingList: FC<RankingListProps> = ({
   return (
     <div
       className={clsx(
-        'bg-white rounded-lg shadow',
+        'rounded-lg bg-white shadow',
         outlined ? OUTLINE_CLASSES[outlineColor] : null,
       )}
     >
-      {title != null || subtitle != null ? (
-        <div className="px-6 py-4 border-b border-gray-200">
-          {title != null ? (
+      {title !== undefined || subtitle ? (
+        <div className="border-b border-gray-200 px-6 py-4">
+          {title === undefined ? null : (
             <h2 className="text-lg font-medium text-gray-900">{title}</h2>
-          ) : null}
+          )}
 
-          {subtitle != null ? (
+          {subtitle === undefined ? null : (
             <p className="text-sm text-gray-500">{subtitle}</p>
-          ) : null}
+          )}
         </div>
       ) : null}
 
@@ -69,7 +69,7 @@ export const RankingList: FC<RankingListProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 {showRank ? (
-                  <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium text-gray-700 mr-4">
+                  <div className="mr-4 flex size-8 items-center justify-center rounded-full bg-gray-100 text-sm font-medium text-gray-700">
                     {item.rank}
                   </div>
                 ) : null}
@@ -77,24 +77,24 @@ export const RankingList: FC<RankingListProps> = ({
                 <div>
                   {item.content}
 
-                  {item.subtitle != null ? (
+                  {item.subtitle === undefined ? null : (
                     <div className="flex items-center space-x-4 text-sm text-gray-500">
                       {item.subtitle}
                     </div>
-                  ) : null}
+                  )}
                 </div>
               </div>
 
               <div className="text-right">
-                {item.score != null ? (
+                {item.score === undefined ? null : (
                   <p className="text-lg font-semibold text-gray-900">
                     {item.score}
                   </p>
-                ) : null}
+                )}
 
-                {item.metadata != null ? (
+                {item.metadata === undefined ? null : (
                   <div className="text-sm text-gray-500">{item.metadata}</div>
-                ) : null}
+                )}
               </div>
             </div>
           </div>

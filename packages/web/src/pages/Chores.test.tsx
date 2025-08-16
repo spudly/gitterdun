@@ -1,11 +1,14 @@
+import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Chores from './Chores';
 import * as apiModule from '../lib/api';
 
-jest.mock('../hooks/useUser', () => ({useUser: () => ({user: {id: 1}})}));
+jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
+  useUser: () => ({user: {id: 1}}),
+}));
 
-jest.mock('../lib/api', () => ({
+jest.mock<typeof import('../lib/api')>('../lib/api', () => ({
   choresApi: {
     getAll: jest.fn(async () => ({
       success: true,
@@ -32,13 +35,13 @@ const wrap = (ui: React.ReactElement) => (
   <QueryClientProvider client={new QueryClient()}>{ui}</QueryClientProvider>
 );
 
-describe('Chores page', () => {
-  it('renders header', async () => {
+describe('chores page', () => {
+  test('renders header', async () => {
     render(wrap(<Chores />));
-    expect(await screen.findByText('Chores')).toBeInTheDocument();
+    await expect(screen.findByText('Chores')).resolves.toBeInTheDocument();
   });
 
-  it('renders status dot/badge branches including pending', async () => {
+  test('renders status dot/badge branches including pending', async () => {
     const mocked = jest.mocked(apiModule);
     mocked.choresApi.getAll.mockResolvedValueOnce({
       success: true,
@@ -72,13 +75,13 @@ describe('Chores page', () => {
       ],
     });
     render(wrap(<Chores />));
-    expect(await screen.findByText('B')).toBeInTheDocument();
+    await expect(screen.findByText('B')).resolves.toBeInTheDocument();
     expect(screen.getByText('approved')).toBeInTheDocument();
-    expect(await screen.findByText('C')).toBeInTheDocument();
+    await expect(screen.findByText('C')).resolves.toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Complete'})).toBeInTheDocument();
   });
 
-  it('renders penalty and due date meta when present', async () => {
+  test('renders penalty and due date meta when present', async () => {
     const mocked = jest.mocked(apiModule);
     mocked.choresApi.getAll.mockResolvedValueOnce({
       success: true,
@@ -100,8 +103,8 @@ describe('Chores page', () => {
       ],
     });
     render(wrap(<Chores />));
-    expect(await screen.findByText('D')).toBeInTheDocument();
-    expect(screen.getByText(/Penalty:/)).toBeInTheDocument();
-    expect(screen.getByText(/Due:/)).toBeInTheDocument();
+    await expect(screen.findByText('D')).resolves.toBeInTheDocument();
+    expect(screen.getByText(/Penalty:/u)).toBeInTheDocument();
+    expect(screen.getByText(/Due:/u)).toBeInTheDocument();
   });
 });

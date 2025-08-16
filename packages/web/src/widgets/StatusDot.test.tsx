@@ -1,8 +1,9 @@
+import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {StatusDot, getDotColorClass} from './StatusDot';
 
-describe('StatusDot', () => {
-  it('renders with label (role=img) and without', () => {
+describe('statusDot', () => {
+  test('renders with label (role=img) and without', () => {
     const {rerender} = render(<StatusDot color="red" label="alert" size={8} />);
     expect(screen.getByRole('img', {name: 'alert'})).toBeInTheDocument();
     rerender(<StatusDot color="gray" size={6} />);
@@ -10,7 +11,7 @@ describe('StatusDot', () => {
     expect(screen.queryByRole('img')).toBeNull();
   });
 
-  it('covers all known colors', () => {
+  test('covers all known colors', () => {
     const {rerender} = render(<StatusDot color="green" />);
     rerender(<StatusDot color="blue" />);
     rerender(<StatusDot color="yellow" />);
@@ -18,7 +19,7 @@ describe('StatusDot', () => {
     rerender(<StatusDot color="gray" />);
   });
 
-  it('helper covers all color branches', () => {
+  test('helper covers all color branches', () => {
     expect(getDotColorClass('green')).toBeTruthy();
     expect(getDotColorClass('blue')).toBeTruthy();
     expect(getDotColorClass('yellow')).toBeTruthy();
@@ -27,7 +28,7 @@ describe('StatusDot', () => {
     expect(getDotColorClass()).toBeTruthy();
   });
 
-  it('component default color path', () => {
+  test('component default color path', () => {
     const {container} = render(<StatusDot />);
     expect(container.firstChild).toBeInTheDocument();
   });

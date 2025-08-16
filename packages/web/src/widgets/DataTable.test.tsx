@@ -1,9 +1,10 @@
+import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen, fireEvent} from '@testing-library/react';
 import type {Column} from './DataTable';
 import {DataTable} from './DataTable';
 
-describe('DataTable', () => {
-  it('renders, handles click and loading/empty', () => {
+describe('dataTable', () => {
+  test('renders, handles click and loading/empty', () => {
     type Row = {id: number; name: string};
     const data: Array<Row> = [{id: 1, name: 'N'}];
     const columns: Array<Column<Row>> = [
@@ -21,7 +22,7 @@ describe('DataTable', () => {
     expect(screen.getByText('No data available')).toBeInTheDocument();
   });
 
-  it('uses row-index key path when items have no id', () => {
+  test('uses row-index key path when items have no id', () => {
     type Row = {name: string};
     const data: Array<Row> = [{name: 'X'}]; // no id triggers `row-${index}` branch
     const columns: Array<Column<Row>> = [{key: 'name', header: 'Name'}];
@@ -29,7 +30,7 @@ describe('DataTable', () => {
     expect(screen.getByText('X')).toBeInTheDocument();
   });
 
-  it('uses custom column render when provided', () => {
+  test('uses custom column render when provided', () => {
     type Row = {name: string};
     const data: Array<Row> = [{name: 'X'}, {name: 'Y'}];
     const columns: Array<Column<Row>> = [

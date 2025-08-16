@@ -1,5 +1,9 @@
 module.exports = {
-  plugins: ['prettier-plugin-embed', 'prettier-plugin-sql'],
+  plugins: [
+    'prettier-plugin-embed',
+    'prettier-plugin-sql',
+    'prettier-plugin-tailwindcss',
+  ],
   arrowParens: 'avoid',
   endOfLine: 'lf',
   printWidth: 80,

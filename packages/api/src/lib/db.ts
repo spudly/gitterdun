@@ -5,7 +5,7 @@ import fs from 'node:fs';
 
 // Allow overriding database path for tests via env var
 const resolvedDbPath =
-  process.env['DB_PATH'] != null
+  process.env['DB_PATH'] !== undefined
     ? path.resolve(process.env['DB_PATH'])
     : path.join(process.cwd(), 'data', 'gitterdun.db');
 

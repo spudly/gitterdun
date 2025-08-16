@@ -70,19 +70,23 @@ async function handleResponseWithSchema<TData>(
       const base: ApiResponse<TData> = {success: true, data: dataParsed.data};
       const withMeta: ApiResponse<TData> = {
         ...base,
-        ...(fallback.data.error != null ? {error: fallback.data.error} : {}),
-        ...(fallback.data.message != null
-          ? {message: fallback.data.message}
-          : {}),
+        ...(fallback.data.error === undefined
+          ? {}
+          : {error: fallback.data.error}),
+        ...(fallback.data.message === undefined
+          ? {}
+          : {message: fallback.data.message}),
       };
       return withMeta;
     }
     const res: ApiResponse<TData> = {
       success: true,
-      ...(fallback.data.error != null ? {error: fallback.data.error} : {}),
-      ...(fallback.data.message != null
-        ? {message: fallback.data.message}
-        : {}),
+      ...(fallback.data.error === undefined
+        ? {}
+        : {error: fallback.data.error}),
+      ...(fallback.data.message === undefined
+        ? {}
+        : {message: fallback.data.message}),
     };
     return res;
   }
@@ -101,7 +105,7 @@ export const api = {
 
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
+        if (value !== undefined) {
           if (
             typeof value === 'string'
             || typeof value === 'number'
@@ -134,7 +138,7 @@ export const api = {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       credentials: 'include',
-      body: data != null ? JSON.stringify(data) : null,
+      body: data === undefined ? null : JSON.stringify(data),
     });
 
     return handleResponseWithSchema<T>(response, dataSchema);
@@ -150,7 +154,7 @@ export const api = {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
       credentials: 'include',
-      body: data != null ? JSON.stringify(data) : null,
+      body: data === undefined ? null : JSON.stringify(data),
     });
 
     return handleResponseWithSchema<T>(response, dataSchema);
@@ -180,7 +184,7 @@ export const api = {
       method: 'PATCH',
       headers: {'Content-Type': 'application/json'},
       credentials: 'include',
-      body: data != null ? JSON.stringify(data) : null,
+      body: data === undefined ? null : JSON.stringify(data),
     });
 
     return handleResponseWithSchema<T>(response, dataSchema);

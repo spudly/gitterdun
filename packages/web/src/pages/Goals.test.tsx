@@ -1,11 +1,14 @@
+import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Goals from './Goals';
 import * as apiModule from '../lib/api';
 
-jest.mock('../hooks/useUser', () => ({useUser: () => ({user: {id: 1}})}));
+jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
+  useUser: () => ({user: {id: 1}}),
+}));
 
-jest.mock('../lib/api', () => ({
+jest.mock<typeof import('../lib/api')>('../lib/api', () => ({
   goalsApi: {
     getAll: jest.fn(async () => ({
       success: true,
@@ -40,13 +43,13 @@ const wrap = (ui: React.ReactElement) => (
   <QueryClientProvider client={new QueryClient()}>{ui}</QueryClientProvider>
 );
 
-describe('Goals page', () => {
-  it('renders header', async () => {
+describe('goals page', () => {
+  test('renders header', async () => {
     render(wrap(<Goals />));
-    expect(await screen.findByText('Goals')).toBeInTheDocument();
+    await expect(screen.findByText('Goals')).resolves.toBeInTheDocument();
   });
 
-  it('covers completed, abandoned, and in_progress variants and empty state', async () => {
+  test('covers completed, abandoned, and in_progress variants and empty state', async () => {
     const {goalsApi} = jest.mocked(apiModule);
     goalsApi.getAll.mockResolvedValueOnce({
       success: true,
@@ -76,38 +79,48 @@ describe('Goals page', () => {
       ],
     });
     render(wrap(<Goals />));
-    expect(await screen.findByText('A')).toBeInTheDocument();
+    await expect(screen.findByText('A')).resolves.toBeInTheDocument();
     expect(screen.getByText('B')).toBeInTheDocument();
 
     // Empty state when no goals
     goalsApi.getAll.mockResolvedValueOnce({success: true, data: []});
     render(wrap(<Goals />));
-    expect(await screen.findByText('No goals yet')).toBeInTheDocument();
+    await expect(
+      screen.findByText('No goals yet'),
+    ).resolves.toBeInTheDocument();
   });
 
-  it('uses fallback empty data when user is null (covers queryFn else branch)', async () => {
+  test('uses fallback empty data when user is null (covers queryFn else branch)', async () => {
     await jest.isolateModulesAsync(async () => {
-      jest.doMock('../hooks/useUser', () => ({useUser: () => ({user: null})}));
-      jest.doMock('@tanstack/react-query', () => {
-        const actual = jest.requireActual<
-          typeof import('@tanstack/react-query')
-        >('@tanstack/react-query');
-        type UseQueryOpts<T> = {queryFn?: () => T};
-        type QueryResult = {data: {data: Array<unknown>}; isLoading: false};
-        return {
-          ...actual,
-          useQuery: (opts: UseQueryOpts<unknown>): QueryResult => {
-            if (typeof opts.queryFn === 'function') {
-              // Execute the queryFn so the else branch in Goals.tsx runs
-              opts.queryFn();
-            }
-            return {data: {data: []}, isLoading: false};
-          },
-        };
-      });
+      jest.doMock<typeof import('../hooks/useUser')>(
+        '../hooks/useUser',
+        () => ({useUser: () => ({user: null})}),
+      );
+      jest.doMock<typeof import('@tanstack/react-query')>(
+        '@tanstack/react-query',
+        () => {
+          const actual = jest.requireActual<
+            typeof import('@tanstack/react-query')
+          >('@tanstack/react-query');
+          type UseQueryOpts<T> = {queryFn?: () => T};
+          type QueryResult = {data: {data: Array<unknown>}; isLoading: false};
+          return {
+            ...actual,
+            useQuery: (opts: UseQueryOpts<unknown>): QueryResult => {
+              if (typeof opts.queryFn === 'function') {
+                // Execute the queryFn so the else branch in Goals.tsx runs
+                opts.queryFn();
+              }
+              return {data: {data: []}, isLoading: false};
+            },
+          };
+        },
+      );
       const mod = await import('./Goals');
       render(wrap(<mod.default />));
     });
-    expect(await screen.findByText('No goals yet')).toBeInTheDocument();
+    await expect(
+      screen.findByText('No goals yet'),
+    ).resolves.toBeInTheDocument();
   });
 });

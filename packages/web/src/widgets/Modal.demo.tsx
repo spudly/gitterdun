@@ -167,16 +167,16 @@ const ModalDemo: FC = () => {
                     checked={showCloseButton}
                     id="show-close-button"
                     label="Show Close Button"
-                    onChange={v => {
-                      setShowCloseButton(v);
+                    onChange={value => {
+                      setShowCloseButton(value);
                     }}
                   />
                   <Checkbox
                     checked={closeOnOverlayClick}
                     id="close-on-overlay"
                     label="Close on Overlay Click"
-                    onChange={v => {
-                      setCloseOnOverlayClick(v);
+                    onChange={value => {
+                      setCloseOnOverlayClick(value);
                     }}
                   />
                 </Stack>
@@ -213,16 +213,16 @@ const ModalDemo: FC = () => {
                 checked={showCloseButton}
                 id="cfg-show-close-button"
                 label="Show Close Button"
-                onChange={v => {
-                  setShowCloseButton(v);
+                onChange={value => {
+                  setShowCloseButton(value);
                 }}
               />
               <Checkbox
                 checked={closeOnOverlayClick}
                 id="cfg-close-on-overlay"
                 label="Close on Overlay Click"
-                onChange={v => {
-                  setCloseOnOverlayClick(v);
+                onChange={value => {
+                  setCloseOnOverlayClick(value);
                 }}
               />
             </Stack>
@@ -258,10 +258,10 @@ const ModalDemo: FC = () => {
           size="sm"
           title="Confirmation Required"
         >
-          <div className="text-center space-y-4">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+          <div className="space-y-4 text-center">
+            <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-red-100">
               <svg
-                className="h-6 w-6 text-red-600"
+                className="size-6 text-red-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -313,8 +313,8 @@ const ModalDemo: FC = () => {
           size="md"
           title="Custom Styled Modal"
         >
-          <div className="text-center space-y-4">
-            <p className="text-blue-600 font-medium">
+          <div className="space-y-4 text-center">
+            <p className="font-medium text-blue-600">
               This modal has custom styling applied!
             </p>
 

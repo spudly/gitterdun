@@ -93,7 +93,7 @@ const FormFieldDemo: FC = () => {
           label="Bio"
         >
           <textarea
-            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="w-full rounded border px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500"
             id="bio"
             placeholder="Enter your bio..."
             rows={4}
@@ -104,7 +104,7 @@ const FormFieldDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Multiple Fields</h3>
 
-        <div className="space-y-4 max-w-md">
+        <div className="max-w-md space-y-4">
           <FormField htmlFor="first-name" label="First Name" required>
             <TextInput id="first-name" placeholder="Enter your first name" />
           </FormField>

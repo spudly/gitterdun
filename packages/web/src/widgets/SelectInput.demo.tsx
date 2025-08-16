@@ -4,7 +4,7 @@ import {SelectInput} from './SelectInput.js';
 import {FormField} from './FormField.js';
 
 const SelectInputDemo: FC = () => {
-  const [v, setV] = useState('');
+  const [value, setValue] = useState('');
   return (
     <div className="space-y-4" data-testid="SelectInputDemo">
       <FormField htmlFor="role" label="Role">
@@ -12,9 +12,9 @@ const SelectInputDemo: FC = () => {
           data-testid="roleSelect"
           id="role"
           onChange={val => {
-            setV(val);
+            setValue(val);
           }}
-          value={v}
+          value={value}
         >
           <option value="">Select</option>
 
@@ -40,9 +40,9 @@ const SelectInputDemo: FC = () => {
         <SelectInput
           id="with-error-select"
           onChange={val => {
-            setV(val);
+            setValue(val);
           }}
-          value={v}
+          value={value}
         >
           <option value="">Select</option>
 

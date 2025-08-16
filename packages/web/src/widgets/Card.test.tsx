@@ -1,8 +1,9 @@
+import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {Card} from './Card';
 
-describe('Card', () => {
-  it('renders header/footer', () => {
+describe('card', () => {
+  test('renders header/footer', () => {
     render(
       <Card footer={<div>F</div>} header={<div>H</div>}>
         C
@@ -13,7 +14,7 @@ describe('Card', () => {
     expect(screen.getByText('F')).toBeInTheDocument();
   });
 
-  it('applies default padding and elevation', () => {
+  test('applies default padding and elevation', () => {
     render(<Card>Default</Card>);
     const inner = screen.getByText('Default');
     expect(inner).toHaveClass('p-6');
@@ -21,7 +22,7 @@ describe('Card', () => {
     expect(outer).toHaveClass('shadow');
   });
 
-  it('respects padded=false and elevated=false', () => {
+  test('respects padded=false and elevated=false', () => {
     render(
       <Card elevated={false} padded={false}>
         Cond

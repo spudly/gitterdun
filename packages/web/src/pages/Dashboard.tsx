@@ -19,28 +19,33 @@ const Dashboard: FC = () => {
   const {data: choresResponse, isLoading: choresLoading} = useQuery({
     queryKey: ['chores', 'dashboard'],
     queryFn: async () => choresApi.getAll({limit: 10}),
-    enabled: !!user,
+    enabled: Boolean(user),
   });
 
   const chores = choresResponse?.data ?? [];
 
   const getCompletedChoresCount = () =>
-    chores.filter((c: ChoreWithUsername) => c.status === 'completed').length;
+    chores.filter((chore: ChoreWithUsername) => chore.status === 'completed')
+      .length;
   const getPendingChoresCount = () =>
-    chores.filter((c: ChoreWithUsername) => c.status === 'pending').length;
+    chores.filter((chore: ChoreWithUsername) => chore.status === 'pending')
+      .length;
   const getTotalPoints = () =>
     chores
       .filter(
-        (c: ChoreWithUsername) =>
-          c.status === 'completed' || c.status === 'approved',
+        (chore: ChoreWithUsername) =>
+          chore.status === 'completed' || chore.status === 'approved',
       )
-      .reduce((sum: number, c: ChoreWithUsername) => sum + c.point_reward, 0);
+      .reduce(
+        (sum: number, chore: ChoreWithUsername) => sum + chore.point_reward,
+        0,
+      );
   const getDueSoonChoresCount = () =>
-    chores.filter((c: ChoreWithUsername) => {
-      if (c.due_date == null) {
+    chores.filter((chore: ChoreWithUsername) => {
+      if (chore.due_date === undefined) {
         return false;
       }
-      const dueDate = new Date(c.due_date);
+      const dueDate = new Date(chore.due_date);
       const now = new Date();
       const diffTime = dueDate.getTime() - now.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));

@@ -1,13 +1,14 @@
+import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {Badge} from './Badge';
 
-describe('Badge', () => {
-  it('renders children', () => {
+describe('badge', () => {
+  test('renders children', () => {
     render(<Badge variant="success">Yay</Badge>);
     expect(screen.getByText('Yay')).toBeInTheDocument();
   });
 
-  it('handles other variants', () => {
+  test('handles other variants', () => {
     const {rerender} = render(<Badge variant="info">A</Badge>);
     expect(screen.getByText('A')).toBeInTheDocument();
     rerender(<Badge variant="warning">B</Badge>);

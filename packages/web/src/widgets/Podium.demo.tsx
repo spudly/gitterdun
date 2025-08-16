@@ -88,7 +88,7 @@ const PodiumDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Custom Styling</h3>
 
-        <div className="bg-gray-100 p-6 rounded-lg">
+        <div className="rounded-lg bg-gray-100 p-6">
           <Podium items={sampleLeaderboard} />
         </div>
       </div>
@@ -96,12 +96,12 @@ const PodiumDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Usage Example</h3>
 
-        <div className="bg-gray-50 p-6 rounded-lg">
-          <h3 className="text-xl font-semibold mb-4">Monthly Leaderboard</h3>
+        <div className="rounded-lg bg-gray-50 p-6">
+          <h3 className="mb-4 text-xl font-semibold">Monthly Leaderboard</h3>
 
           <Podium items={sampleLeaderboard} />
 
-          <div className="text-center mt-6">
+          <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Congratulations to our top performers this month!
             </p>

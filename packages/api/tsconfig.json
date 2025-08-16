@@ -5,8 +5,7 @@
     "declaration": true,
     "declarationDir": "./dist",
     "emitDeclarationOnly": false,
-    "sourceMap": true,
-    "composite": true
+    "sourceMap": true
   },
   "include": ["**/*.tsx", "**/*.ts"],
   "exclude": ["node_modules", "**/dist", "**/build"]

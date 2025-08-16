@@ -1,9 +1,10 @@
+import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen, fireEvent, act} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import ForgotPassword from './ForgotPassword';
 import * as useUserModule from '../hooks/useUser';
 
-jest.mock('../hooks/useUser', () => ({
+jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
   useUser: jest.fn(() => ({forgotPassword: jest.fn(async () => ({}))})),
 }));
 
@@ -11,10 +12,10 @@ const wrap = (ui: React.ReactElement) => (
   <QueryClientProvider client={new QueryClient()}>{ui}</QueryClientProvider>
 );
 
-describe('ForgotPassword page', () => {
-  it('submits and shows message', async () => {
+describe('forgotPassword page', () => {
+  test('submits and shows message', async () => {
     render(wrap(<ForgotPassword />));
-    const input = screen.getByLabelText(/email/i);
+    const input = screen.getByLabelText(/email/iu);
     fireEvent.change(input, {target: {value: 'e'}});
     await act(async () => {
       fireEvent.submit(
@@ -25,7 +26,7 @@ describe('ForgotPassword page', () => {
     expect(msgs.length).toBeGreaterThan(0);
   });
 
-  it('shows error message when request rejects (catch path)', async () => {
+  test('shows error message when request rejects (catch path)', async () => {
     const mocked = jest.mocked(useUserModule.useUser);
     const defaultImpl = mocked.getMockImplementation();
     mocked.mockImplementation(
@@ -49,7 +50,7 @@ describe('ForgotPassword page', () => {
         }) as ReturnType<typeof useUserModule.useUser>,
     );
     render(wrap(<ForgotPassword />));
-    fireEvent.change(screen.getByLabelText(/email/i), {
+    fireEvent.change(screen.getByLabelText(/email/iu), {
       target: {value: 'x@example.com'},
     });
     await act(async () => {
@@ -57,7 +58,9 @@ describe('ForgotPassword page', () => {
         screen.getByRole('button', {name: 'Send reset link'}).closest('form')!,
       );
     });
-    expect(await screen.findByText('Request failed')).toBeInTheDocument();
+    await expect(
+      screen.findByText('Request failed'),
+    ).resolves.toBeInTheDocument();
     // restore default implementation for subsequent tests
     mocked.mockImplementation(defaultImpl);
   });

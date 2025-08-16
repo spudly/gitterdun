@@ -1,14 +1,15 @@
+import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen, fireEvent, act} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Family from './Family';
 import {useUser} from '../hooks/useUser';
 import * as apiModule from '../lib/api';
 
-jest.mock('../hooks/useUser', () => ({
+jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
   useUser: jest.fn(() => ({user: {id: 1}})),
 }));
 
-jest.mock('../lib/api', () => ({
+jest.mock<typeof import('../lib/api')>('../lib/api', () => ({
   familiesApi: {
     myFamilies: jest.fn(async () => ({
       success: true,
@@ -25,8 +26,8 @@ const wrap = (ui: React.ReactElement) => (
   <QueryClientProvider client={new QueryClient()}>{ui}</QueryClientProvider>
 );
 
-describe('Family page', () => {
-  it('requires login when user is null', () => {
+describe('family page', () => {
+  test('requires login when user is null', () => {
     const mockedUseUser = jest.mocked(useUser);
     mockedUseUser.mockReturnValueOnce({
       user: null,
@@ -48,14 +49,14 @@ describe('Family page', () => {
       screen.getByText('Please log in to manage your family.'),
     ).toBeInTheDocument();
   });
-  it('renders section title', async () => {
+  test('renders section title', async () => {
     await act(async () => {
       render(wrap(<Family />));
     });
     expect(screen.getByText('Your Families')).toBeInTheDocument();
   });
 
-  it('allows creating a new family and child & inviting a member', async () => {
+  test('allows creating a new family and child & inviting a member', async () => {
     const {familiesApi, invitationsApi} = jest.mocked(apiModule);
     familiesApi.create.mockResolvedValueOnce({success: true});
     familiesApi.createChild.mockResolvedValueOnce({success: true});
@@ -95,7 +96,7 @@ describe('Family page', () => {
     });
   });
 
-  it('skips actions when inputs are empty (validation branches)', async () => {
+  test('skips actions when inputs are empty (validation branches)', async () => {
     render(wrap(<Family />));
     await screen.findByText('Your Families');
     // Click create with empty family name (guard branch)
@@ -116,7 +117,7 @@ describe('Family page', () => {
     });
   });
 
-  it('covers invite role select change', async () => {
+  test('covers invite role select change', async () => {
     render(wrap(<Family />));
     await screen.findByText('Your Families');
     fireEvent.change(screen.getAllByRole('combobox')[0]!, {

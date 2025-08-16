@@ -1,9 +1,10 @@
+import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Leaderboard from './Leaderboard';
 import * as apiModule from '../lib/api';
 
-jest.mock('../lib/api', () => ({
+jest.mock<typeof import('../lib/api')>('../lib/api', () => ({
   leaderboardApi: {
     get: jest.fn(async () => ({
       success: true,
@@ -39,20 +40,20 @@ const wrap = (ui: React.ReactElement) => (
   <QueryClientProvider client={new QueryClient()}>{ui}</QueryClientProvider>
 );
 
-describe('Leaderboard page', () => {
-  it('renders header', async () => {
+describe('leaderboard page', () => {
+  test('renders header', async () => {
     render(wrap(<Leaderboard />));
-    expect(await screen.findByText('Leaderboard')).toBeInTheDocument();
+    await expect(screen.findByText('Leaderboard')).resolves.toBeInTheDocument();
   });
 
-  it('renders podium and ranking list content', async () => {
+  test('renders podium and ranking list content', async () => {
     render(wrap(<Leaderboard />));
     const headings = await screen.findAllByText('U1');
     expect(headings.length).toBeGreaterThan(0);
     expect(screen.getAllByText('U2').length).toBeGreaterThan(0);
   });
 
-  it('shows streak-based subtitle when sortBy is streak_count', async () => {
+  test('shows streak-based subtitle when sortBy is streak_count', async () => {
     const {leaderboardApi} = jest.mocked(apiModule);
     leaderboardApi.get.mockResolvedValueOnce({
       success: true,
@@ -73,8 +74,8 @@ describe('Leaderboard page', () => {
       },
     });
     render(wrap(<Leaderboard />));
-    expect(
-      await screen.findByText(/Sorted by streak count/),
-    ).toBeInTheDocument();
+    await expect(
+      screen.findByText(/Sorted by streak count/u),
+    ).resolves.toBeInTheDocument();
   });
 });

@@ -1,9 +1,10 @@
+import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {List} from './List';
 import {ListRow} from './ListRow';
 
-describe('List & ListRow', () => {
-  it('renders list row content', () => {
+describe('list & ListRow', () => {
+  test('renders list row content', () => {
     render(
       <List>
         <ListRow description="Desc" right={<span>R</span>} title="Row" />

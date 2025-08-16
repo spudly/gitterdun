@@ -1,8 +1,9 @@
+import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {EmptyState} from './EmptyState';
 
-describe('EmptyState', () => {
-  it('renders title, description and action', () => {
+describe('emptyState', () => {
+  test('renders title, description and action', () => {
     render(
       <EmptyState
         action={<button type="button">A</button>}

@@ -1,17 +1,18 @@
+import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {ProgressBar} from './ProgressBar';
 
-describe('ProgressBar', () => {
-  it('shows percentage and clamps to 100%', () => {
+describe('progressBar', () => {
+  test('shows percentage and clamps to 100%', () => {
     const {rerender} = render(
       <ProgressBar max={100} showLabel showPercentage value={50} />,
     );
-    expect(screen.getByText(/50%/)).toBeInTheDocument();
+    expect(screen.getByText(/50%/u)).toBeInTheDocument();
     rerender(<ProgressBar max={100} showPercentage value={200} />);
-    expect(screen.getByText(/100%/)).toBeInTheDocument();
+    expect(screen.getByText(/100%/u)).toBeInTheDocument();
   });
 
-  it('renders size and variant combinations', () => {
+  test('renders size and variant combinations', () => {
     const {rerender} = render(
       <ProgressBar max={100} size="sm" value={10} variant="success" />,
     );

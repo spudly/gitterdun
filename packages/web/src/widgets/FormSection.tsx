@@ -22,8 +22,8 @@ export const FormSection: FC<FormSectionProps> = ({
 
   return (
     <div className={baseStyles}>
-      {title != null ? (
-        <h3 className="text-lg font-semibold mb-3 text-gray-900">{title}</h3>
+      {title ?  (
+        <h3 className="mb-3 text-lg font-semibold text-gray-900">{title}</h3>
       ) : null}
 
       {children}

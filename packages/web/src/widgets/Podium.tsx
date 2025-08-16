@@ -24,7 +24,7 @@ const MEDALS = {1: '🥇', 2: '🥈', 3: '🥉'};
 
 export const Podium: FC<PodiumProps> = ({items, showMedals = true}) => {
   return (
-    <div className={clsx('grid grid-cols-1 md:grid-cols-3 gap-6 mb-8')}>
+    <div className={clsx('mb-8 grid grid-cols-1 gap-6 md:grid-cols-3')}>
       {items.slice(0, 3).map(item => (
         <div
           className={clsx(
@@ -39,7 +39,7 @@ export const Podium: FC<PodiumProps> = ({items, showMedals = true}) => {
         >
           <div
             className={clsx(
-              'relative mx-auto w-24 h-24 rounded-full flex items-center justify-center text-2xl font-bold text-white',
+              'relative mx-auto flex size-24 items-center justify-center rounded-full text-2xl font-bold text-white',
               RANK_STYLES[item.rank],
             )}
           >
@@ -49,11 +49,11 @@ export const Podium: FC<PodiumProps> = ({items, showMedals = true}) => {
           <div className="mt-4">
             {item.content}
 
-            {item.score != null ? (
+            {item.score ?  (
               <p className="text-gray-600">{item.score} points</p>
             ) : null}
 
-            {item.subtitle != null ? (
+            {item.subtitle ?  (
               <p className="text-sm text-gray-500">{item.subtitle}</p>
             ) : null}
           </div>

@@ -31,7 +31,7 @@ const StatusBadgeDemo: FC = () => {
 
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600 w-16">Small:</span>
+            <span className="w-16 text-sm text-gray-600">Small:</span>
 
             <StatusBadge size="sm" status="success">
               Success
@@ -47,7 +47,7 @@ const StatusBadgeDemo: FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600 w-16">Medium:</span>
+            <span className="w-16 text-sm text-gray-600">Medium:</span>
 
             <StatusBadge size="md" status="success">
               Success
@@ -63,7 +63,7 @@ const StatusBadgeDemo: FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600 w-16">Large:</span>
+            <span className="w-16 text-sm text-gray-600">Large:</span>
 
             <StatusBadge size="lg" status="success">
               Success
@@ -123,8 +123,8 @@ const StatusBadgeDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Usage in Context</h3>
 
-        <div className="bg-gray-100 p-4 rounded-lg">
-          <div className="flex items-center justify-between mb-2">
+        <div className="rounded-lg bg-gray-100 p-4">
+          <div className="mb-2 flex items-center justify-between">
             <span className="font-medium">Task Status</span>
 
             <StatusBadge status="completed">Completed</StatusBadge>

@@ -23,7 +23,7 @@ router.get('/', async (req, res) => {
     const validatedQuery = GoalQuerySchema.parse(req.query);
     const {user_id: userId, status, page, limit} = validatedQuery;
 
-    if (userId == null) {
+    if (userId === undefined) {
       return res
         .status(400)
         .json({success: false, error: 'User ID is required'});
@@ -184,7 +184,7 @@ router.get('/:id', async (req, res) => {
       `)
       .get(goalId);
 
-    if (goal == null) {
+    if (goal === undefined) {
       return res.status(404).json({success: false, error: 'Goal not found'});
     }
 
@@ -223,7 +223,7 @@ router.put('/:id', async (req, res) => {
       `)
       .get(goalId);
 
-    if (existingGoal == null) {
+    if (existingGoal === undefined) {
       return res.status(404).json({success: false, error: 'Goal not found'});
     }
 
@@ -326,7 +326,7 @@ router.delete('/:id', async (req, res) => {
       `)
       .get(goalId);
 
-    if (existingGoal == null) {
+    if (existingGoal === undefined) {
       return res.status(404).json({success: false, error: 'Goal not found'});
     }
 

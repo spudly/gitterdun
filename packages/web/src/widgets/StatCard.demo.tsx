@@ -4,7 +4,7 @@ import {StatCard} from './StatCard.js';
 const StatCardDemo: FC = () => {
   return (
     <div
-      className="grid grid-cols-1 md:grid-cols-4 gap-6"
+      className="grid grid-cols-1 gap-6 md:grid-cols-4"
       data-testid="StatCardDemo"
     >
       <StatCard

@@ -63,19 +63,19 @@ const ProgressBarDemo: FC = () => {
 
         <div className="space-y-6">
           <div>
-            <h4 className="font-medium mb-2">Daily Chores</h4>
+            <h4 className="mb-2 font-medium">Daily Chores</h4>
 
             <ProgressBar max={5} showPercentage value={3} variant="success" />
           </div>
 
           <div>
-            <h4 className="font-medium mb-2">Weekly Goal</h4>
+            <h4 className="mb-2 font-medium">Weekly Goal</h4>
 
             <ProgressBar max={10} showPercentage value={7} variant="warning" />
           </div>
 
           <div>
-            <h4 className="font-medium mb-2">Monthly Challenge</h4>
+            <h4 className="mb-2 font-medium">Monthly Challenge</h4>
 
             <ProgressBar max={30} showPercentage value={15} variant="danger" />
           </div>
@@ -99,7 +99,7 @@ const ProgressBarDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Custom Styling</h3>
 
-        <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-4 rounded-lg">
+        <div className="rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 p-4">
           <ProgressBar max={100} padded value={75} />
         </div>
       </div>

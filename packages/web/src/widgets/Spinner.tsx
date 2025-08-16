@@ -38,7 +38,7 @@ export const Spinner: FC<SpinnerProps> = ({
   }
 
   const base = clsx(
-    'animate-spin rounded-full border-b-transparent border-indigo-600',
+    'animate-spin rounded-full border-indigo-600 border-b-transparent',
     SIZE_MAP[size],
     className,
   );

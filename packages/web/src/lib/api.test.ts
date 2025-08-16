@@ -1,3 +1,4 @@
+import {afterEach, describe, expect, jest, test} from '@jest/globals';
 import {z} from 'zod';
 import {
   api,
@@ -18,7 +19,7 @@ describe('api utils', () => {
     jest.restoreAllMocks();
   });
 
-  it('performs GET with params', async () => {
+  test('performs GET with params', async () => {
     const fetchSpy = jest.fn<
       ReturnType<typeof fetch>,
       Parameters<typeof fetch>
@@ -34,7 +35,7 @@ describe('api utils', () => {
     expect(res.success).toBe(true);
   });
 
-  it('handles non-ok response', async () => {
+  test('handles non-ok response', async () => {
     const fetchSpy = jest.fn<
       ReturnType<typeof fetch>,
       Parameters<typeof fetch>
@@ -49,7 +50,7 @@ describe('api utils', () => {
     await expect(api.get('/x', z.object())).rejects.toBeInstanceOf(ApiError);
   });
 
-  it('authApi routes', async () => {
+  test('authApi routes', async () => {
     const fetchSpy = jest.fn<
       ReturnType<typeof fetch>,
       Parameters<typeof fetch>
@@ -67,7 +68,7 @@ describe('api utils', () => {
     await authApi.me();
   });
 
-  it('skips undefined/null params in URL and supports all verbs', async () => {
+  test('skips undefined/null params in URL and supports all verbs', async () => {
     const calls: Array<Parameters<typeof fetch>[0]> = [];
     const fetchSpy = jest.fn(async (input: RequestInfo | URL) => {
       calls.push(input);
@@ -79,20 +80,20 @@ describe('api utils', () => {
     global.fetch = fetchSpy;
     await api.get(
       '/x',
-      z.object({a: z.number(), b: z.undefined(), c: z.null()}),
-      {a: 1, b: undefined, c: null},
+      z.object({field1: z.number(), field2: z.undefined(), field3: z.null()}),
+      {field1: 1, field2: undefined, field3: null},
     );
-    expect(calls[calls.length - 1]).toMatch(/a=1/);
-    expect(calls[calls.length - 1]).not.toMatch(/b=/);
-    expect(calls[calls.length - 1]).not.toMatch(/c=/);
+    expect(calls[calls.length - 1]).toMatch(/field1=1/u);
+    expect(calls[calls.length - 1]).not.toMatch(/field2=/u);
+    expect(calls[calls.length - 1]).not.toMatch(/field3=/u);
 
-    await api.post('/x', z.object({y: z.number()}));
-    await api.put('/x', z.object({y: z.number()}));
-    await api.patch('/x', z.object({y: z.number()}));
+    await api.post('/x', z.object({value: z.number()}));
+    await api.put('/x', z.object({value: z.number()}));
+    await api.patch('/x', z.object({value: z.number()}));
     await api.delete('/x', z.object({}));
   });
 
-  it('exercises all API endpoint wrappers (happy paths)', async () => {
+  test('exercises all API endpoint wrappers (happy paths)', async () => {
     const fetchSpy = jest.fn<
       ReturnType<typeof fetch>,
       Parameters<typeof fetch>
@@ -136,7 +137,7 @@ describe('api utils', () => {
     await invitationsApi.accept({token: 't', username: 'u', password: 'p'});
   });
 
-  it('handleResponse catch branch when error json fails', async () => {
+  test('handleResponse catch branch when error json fails', async () => {
     const failingJson = async () => {
       throw new Error('bad json');
     };
@@ -152,7 +153,7 @@ describe('api utils', () => {
     await expect(api.post('/x', z.object({}))).rejects.toBeInstanceOf(ApiError);
   });
 
-  it('posts to auth/reset and evaluates choresApi export (covers 154-157)', async () => {
+  test('posts to auth/reset and evaluates choresApi export (covers 154-157)', async () => {
     const fetchSpy = jest.fn<
       ReturnType<typeof fetch>,
       Parameters<typeof fetch>
@@ -167,7 +168,7 @@ describe('api utils', () => {
     // Call resetPassword → exercises the tail of authApi block
     await authApi.resetPassword({token: 't', password: 'p'});
     expect(fetchSpy).toHaveBeenCalledWith(
-      expect.stringMatching(/\/api\/auth\/reset$/),
+      expect.stringMatching(/\/api\/auth\/reset$/u),
       expect.objectContaining({method: 'POST'}),
     );
 
@@ -175,7 +176,7 @@ describe('api utils', () => {
     await choresApi.getAll();
   });
 
-  it('posts to auth/forgot (covers line 151)', async () => {
+  test('posts to auth/forgot (covers line 151)', async () => {
     const fetchSpy = jest.fn<
       ReturnType<typeof fetch>,
       Parameters<typeof fetch>
@@ -189,12 +190,12 @@ describe('api utils', () => {
     global.fetch = fetchSpy;
     await authApi.forgotPassword({email: 'test@example.com'});
     expect(fetchSpy).toHaveBeenCalledWith(
-      expect.stringMatching(/\/api\/auth\/forgot$/),
+      expect.stringMatching(/\/api\/auth\/forgot$/u),
       expect.objectContaining({method: 'POST'}),
     );
   });
 
-  it('uses null body when PUT data is falsy (covers line 83)', async () => {
+  test('uses null body when PUT data is falsy (covers line 83)', async () => {
     const fetchSpy = jest.fn<
       ReturnType<typeof fetch>,
       Parameters<typeof fetch>
@@ -213,7 +214,7 @@ describe('api utils', () => {
     );
   });
 
-  it('uses null body when PATCH data is falsy (covers line 106)', async () => {
+  test('uses null body when PATCH data is falsy (covers line 106)', async () => {
     const fetchSpy = jest.fn<
       ReturnType<typeof fetch>,
       Parameters<typeof fetch>

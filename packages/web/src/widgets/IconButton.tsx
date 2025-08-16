@@ -37,7 +37,7 @@ export const IconButton: FC<IconButtonProps> = ({
   ...props
 }) => {
   const baseStyles = clsx(
-    'inline-flex items-center justify-center font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors',
+    'inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
     VARIANT_STYLES[variant],
     SIZE_STYLES[size],
     rounded ? 'rounded-full' : 'rounded-md',

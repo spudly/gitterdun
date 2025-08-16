@@ -29,12 +29,12 @@ const Family: FC = () => {
   const myFamiliesQuery = useQuery({
     queryKey: ['families', 'mine'],
     queryFn: async () => familiesApi.myFamilies(),
-    enabled: !!user,
+    enabled: Boolean(user),
   });
 
   useEffect(() => {
     const first = myFamiliesQuery.data?.data?.[0];
-    if (first != null && selectedFamilyId == null) {
+    if (first !== undefined && selectedFamilyId === undefined) {
       const candidate = (first as {id?: unknown}).id;
       if (typeof candidate === 'number') {
         setSelectedFamilyId(candidate);
@@ -45,12 +45,12 @@ const Family: FC = () => {
   const membersQuery = useQuery({
     queryKey: ['families', selectedFamilyId, 'members'],
     queryFn: async () => {
-      if (selectedFamilyId == null) {
+      if (selectedFamilyId === undefined) {
         return {success: true, data: []};
       }
       return familiesApi.listMembers(selectedFamilyId);
     },
-    enabled: selectedFamilyId != null,
+    enabled: selectedFamilyId !== null,
   });
 
   const createFamilyMutation = useMutation({
@@ -59,26 +59,30 @@ const Family: FC = () => {
   });
 
   const createChildMutation = useMutation({
-    mutationFn: async (p: {
+    mutationFn: async (params: {
       familyId: number;
       username: string;
       email: string;
       password: string;
     }) =>
-      familiesApi.createChild(p.familyId, {
-        username: p.username,
-        email: p.email,
-        password: p.password,
+      familiesApi.createChild(params.familyId, {
+        username: params.username,
+        email: params.email,
+        password: params.password,
       }),
     onSuccess: async () => membersQuery.refetch(),
   });
 
   const inviteMutation = useMutation({
-    mutationFn: async (p: {
+    mutationFn: async (params: {
       familyId: number;
       email: string;
       role: 'parent' | 'child';
-    }) => invitationsApi.create(p.familyId, {email: p.email, role: p.role}),
+    }) =>
+      invitationsApi.create(params.familyId, {
+        email: params.email,
+        role: params.role,
+      }),
   });
 
   if (!user) {
@@ -102,9 +106,9 @@ const Family: FC = () => {
               Select a family
             </option>
 
-            {familyOptions.map(f => (
-              <option key={f.id} value={f.id}>
-                {f.name}
+            {familyOptions.map(family => (
+              <option key={family.id} value={family.id}>
+                {family.name}
               </option>
             ))}
           </SelectInput>
@@ -132,7 +136,7 @@ const Family: FC = () => {
         </Toolbar>
       </FormSection>
 
-      {selectedFamilyId != null ? (
+      {selectedFamilyId ?  (
         <GridContainer cols={2} gap="lg">
           <FormSection title="Members">
             {/* Parse API data using zod schema to avoid any */}

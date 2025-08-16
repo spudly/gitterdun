@@ -1,8 +1,9 @@
+import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {ListRow} from './ListRow';
 
-describe('ListRow', () => {
-  it('renders all regions when provided', () => {
+describe('listRow', () => {
+  test('renders all regions when provided', () => {
     render(
       <ListRow
         description="Desc"
@@ -21,7 +22,7 @@ describe('ListRow', () => {
     expect(screen.getByText('R')).toBeInTheDocument();
   });
 
-  it('renders minimal', () => {
+  test('renders minimal', () => {
     render(<ListRow title="Only" />);
     expect(screen.getByText('Only')).toBeInTheDocument();
   });

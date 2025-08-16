@@ -26,7 +26,7 @@ export const AvatarCircle: FC<AvatarCircleProps> = ({
     <div
       aria-label={label}
       className={clsx(
-        'rounded-full bg-gray-100 flex items-center justify-center font-medium text-gray-700',
+        'flex items-center justify-center rounded-full bg-gray-100 font-medium text-gray-700',
         SIZE_MAP[size],
         ring ? 'ring-2 ring-indigo-500' : null,
       )}

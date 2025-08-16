@@ -30,7 +30,7 @@ const ButtonDemo: FC = () => {
         <Button
           loading={loading}
           onClick={() => {
-            setLoading(v => !v);
+            setLoading(value => !value);
           }}
         >
           Toggle Loading

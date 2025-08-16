@@ -19,8 +19,8 @@ const AcceptInvitation: FC = () => {
   const navigate = useNavigate();
   const {safeAsync} = useToast();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setMessage(null);
     safeAsync(
       async () => {
@@ -50,8 +50,8 @@ const AcceptInvitation: FC = () => {
           <FormField htmlFor="username" label="Username" required>
             <TextInput
               id="username"
-              onChange={v => {
-                setUsername(v);
+              onChange={value => {
+                setUsername(value);
               }}
               required
               value={username}
@@ -62,8 +62,8 @@ const AcceptInvitation: FC = () => {
             <TextInput
               id="password"
               minLength={6}
-              onChange={v => {
-                setPassword(v);
+              onChange={value => {
+                setPassword(value);
               }}
               required
               type="password"
@@ -71,7 +71,7 @@ const AcceptInvitation: FC = () => {
             />
           </FormField>
 
-          {message != null && message !== '' ? (
+          {message !== undefined && message !== '' ? (
             <Alert type="info">{message}</Alert>
           ) : null}
 

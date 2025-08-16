@@ -67,7 +67,7 @@ export const useUser = () => {
       username,
       email,
       password,
-      ...(role !== undefined ? {role} : {}),
+      ...(role === undefined ? {} : {role}),
     });
   };
 

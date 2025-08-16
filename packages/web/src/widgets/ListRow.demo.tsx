@@ -7,7 +7,7 @@ import {Button} from './Button.js';
 const ListRowDemo: FC = () => {
   return (
     <div
-      className="divide-y divide-gray-200 bg-white rounded shadow"
+      className="divide-y divide-gray-200 rounded bg-white shadow"
       data-testid="ListRowDemo"
     >
       <ListRow

@@ -26,16 +26,16 @@ export const FormField: FC<FormFieldProps> = ({
       >
         {label}
 
-        {required ? <span className="text-red-500 ml-1">*</span> : null}
+        {required ? <span className="ml-1 text-red-500">*</span> : null}
       </label>
 
       {children}
 
-      {helpText != null ? (
+      {helpText ?  (
         <p className="text-sm text-gray-500">{helpText}</p>
       ) : null}
 
-      {error != null ? (
+      {error ?  (
         <p className="text-sm text-red-600" role="alert">
           {error}
         </p>

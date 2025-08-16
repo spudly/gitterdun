@@ -20,7 +20,7 @@ const router = express.Router();
 
 const getCookie = (req: express.Request, name: string): string | undefined => {
   const cookieHeader = req.headers.cookie;
-  if (cookieHeader == null) {
+  if (cookieHeader === undefined) {
     return undefined;
   }
   const cookieString = Array.isArray(cookieHeader)
@@ -30,7 +30,7 @@ const getCookie = (req: express.Request, name: string): string | undefined => {
     .split(';')
     .reduce<Record<string, string>>((acc, part) => {
       const [rawKey, ...rest] = part.trim().split('=');
-      if (rawKey == null || rawKey === '') {
+      if (!rawKey) {
         return acc;
       }
       const key = decodeURIComponent(rawKey);
@@ -43,7 +43,7 @@ const getCookie = (req: express.Request, name: string): string | undefined => {
 
 const requireUserId = (req: express.Request): number => {
   const sid = getCookie(req, 'sid');
-  if (sid == null) {
+  if (sid === undefined) {
     throw Object.assign(new Error('Not authenticated'), {status: 401});
   }
   const sessionRow = db
@@ -58,7 +58,7 @@ const requireUserId = (req: express.Request): number => {
     `)
     .get(sid);
   const session =
-    sessionRow != null ? SessionRowSchema.parse(sessionRow) : undefined;
+    sessionRow !== undefined ? SessionRowSchema.parse(sessionRow) : undefined;
   if (!session) {
     throw Object.assign(new Error('Not authenticated'), {status: 401});
   }
@@ -92,7 +92,7 @@ router.post('/:familyId', (req, res) => {
       `)
       .get(familyId, inviterId);
     const membership =
-      membershipRow != null ? RoleRowSchema.parse(membershipRow) : undefined;
+      membershipRow !== undefined ? RoleRowSchema.parse(membershipRow) : undefined;
     if (!membership || membership.role !== 'parent') {
       return res.status(403).json({success: false, error: 'Forbidden'});
     }
@@ -149,7 +149,7 @@ router.post('/accept', async (req, res) => {
       `)
       .get(token);
     const inv =
-      invRow != null ? FamilyInvitationRowSchema.parse(invRow) : undefined;
+      invRow !== undefined ? FamilyInvitationRowSchema.parse(invRow) : undefined;
 
     if (!inv) {
       return res.status(400).json({success: false, error: 'Invalid token'});
@@ -174,7 +174,7 @@ router.post('/accept', async (req, res) => {
       `)
       .get(inv.email);
     const existing =
-      existingRow != null
+      existingRow !== null
         ? UserPasswordHashRowSchema.parse(existingRow)
         : undefined;
 
@@ -214,7 +214,7 @@ router.post('/accept', async (req, res) => {
           AND user_id = ?
       `)
       .get(inv.family_id, userId);
-    if (member == null) {
+    if (member === undefined) {
       db.prepare(sql`
         INSERT INTO
           family_members (family_id, user_id, role)

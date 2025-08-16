@@ -50,9 +50,9 @@ export const DataTable = <T extends object>({
 }: DataTableProps<T>) => {
   if (loading) {
     return (
-      <div className="bg-white shadow overflow-hidden sm:rounded-md">
+      <div className="overflow-hidden bg-white shadow sm:rounded-md">
         <div className="px-4 py-8 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto" />
+          <div className="mx-auto size-8 animate-spin rounded-full border-b-2 border-indigo-600" />
 
           <p className="mt-2 text-gray-600">Loading...</p>
         </div>
@@ -62,7 +62,7 @@ export const DataTable = <T extends object>({
 
   if (data.length === 0) {
     return (
-      <div className="bg-white shadow overflow-hidden sm:rounded-md">
+      <div className="overflow-hidden bg-white shadow sm:rounded-md">
         <div className="px-4 py-8 text-center">
           <p className="text-gray-500">{emptyMessage}</p>
         </div>
@@ -71,14 +71,14 @@ export const DataTable = <T extends object>({
   }
 
   return (
-    <div className={clsx('bg-white shadow overflow-hidden sm:rounded-md')}>
+    <div className={clsx('overflow-hidden bg-white shadow sm:rounded-md')}>
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
             {columns.map(column => (
               <th
                 className={clsx(
-                  'px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider',
+                  'px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500',
                   {
                     left: 'text-left',
                     center: 'text-center',
@@ -93,7 +93,7 @@ export const DataTable = <T extends object>({
           </tr>
         </thead>
 
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className="divide-y divide-gray-200 bg-white">
           {data.map((item, index) => (
             <tr
               className={clsx(
@@ -108,7 +108,7 @@ export const DataTable = <T extends object>({
                 return (
                   <td
                     className={clsx(
-                      'px-6 py-4 whitespace-nowrap text-sm text-gray-900',
+                      'whitespace-nowrap px-6 py-4 text-sm text-gray-900',
                       {
                         left: 'text-left',
                         center: 'text-center',

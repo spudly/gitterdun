@@ -19,8 +19,8 @@ const ResetPassword: FC = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setMessage(null);
     const token = params.get('token') ?? '';
     if (!token) {
@@ -48,8 +48,8 @@ const ResetPassword: FC = () => {
             <TextInput
               id="new-password"
               minLength={6}
-              onChange={v => {
-                setPassword(v);
+              onChange={value => {
+                setPassword(value);
               }}
               required
               type="password"
@@ -65,7 +65,7 @@ const ResetPassword: FC = () => {
             <TextInput
               id="confirm-password"
               minLength={6}
-              onChange={v => {
+              onChange={value => {
                 setConfirm(v);
               }}
               required
@@ -74,7 +74,7 @@ const ResetPassword: FC = () => {
             />
           </FormField>
 
-          {message != null && message !== '' ? (
+          {message !== undefined && message !== '' ? (
             <Alert type="info">{message}</Alert>
           ) : null}
 

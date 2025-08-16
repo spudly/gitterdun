@@ -25,9 +25,9 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+      <header className="border-b bg-white shadow-sm">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
               <h1 className="text-2xl font-bold text-indigo-600">Gitterdun</h1>
 
@@ -61,7 +61,7 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
 
               {user ? (
                 <button
-                  className="text-sm text-red-600 border px-2 py-1 rounded"
+                  className="rounded border px-2 py-1 text-sm text-red-600"
                   // TODO: handle promise rejection
                   onClick={safeAsync(async () => {
                     await logout();
@@ -80,27 +80,25 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex space-x-8">
           {/* Sidebar Navigation */}
-          <div className="w-64 flex-shrink-0">
+          <div className="w-64 shrink-0">
             <nav className="space-y-1">
               {computedNavigation.map(item => {
                 const isActive = location.pathname === item.path;
                 return (
                   <Link
                     className={clsx(
-                      'group w-full flex items-center px-3 py-2 text-sm font-medium border-l-4 transition-colors duration-200',
+                      'group flex w-full items-center border-l-4 px-3 py-2 text-sm font-medium transition-colors duration-200',
                       isActive
-                        ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
+                        ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
                         : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900',
                     )}
                     key={item.name}
                     to={item.path}
                   >
-                    <span className="mr-3 flex-shrink-0 text-lg">
-                      {item.icon}
-                    </span>
+                    <span className="mr-3 shrink-0 text-lg">{item.icon}</span>
 
                     <span>{item.name}</span>
                   </Link>

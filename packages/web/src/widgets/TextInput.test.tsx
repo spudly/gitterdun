@@ -1,14 +1,13 @@
+import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen, fireEvent} from '@testing-library/react';
 import {TextInput} from './TextInput';
 import {FormField} from './FormField';
 import type {ChangeEvent} from 'react';
 
-describe('TextInput', () => {
-  it('handles change, icons and error', () => {
-    const onChange = jest.fn<
-      undefined,
-      [string, ChangeEvent<HTMLInputElement>]
-    >();
+describe('textInput', () => {
+  test('handles change, icons and error', () => {
+    const onChange =
+      jest.fn<(value: string, event: ChangeEvent<HTMLInputElement>) => void>();
     const {rerender} = render(
       <TextInput onChange={onChange} placeholder="p" value="" />,
     );
@@ -25,13 +24,13 @@ describe('TextInput', () => {
     expect(screen.getByText('err')).toBeInTheDocument();
   });
 
-  it('works with FormField', () => {
+  test('works with FormField', () => {
     render(
       <FormField error="E" helpText="H" htmlFor="f" label="L" required>
         <TextInput id="f" />
       </FormField>,
     );
-    expect(screen.getByLabelText(/l/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/l/iu)).toBeInTheDocument();
     expect(screen.getByText('H')).toBeInTheDocument();
     expect(screen.getByText('E')).toBeInTheDocument();
   });

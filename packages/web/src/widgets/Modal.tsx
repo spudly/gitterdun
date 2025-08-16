@@ -52,8 +52,8 @@ export const Modal: FC<ModalProps> = ({
   showCloseButton = true,
 }) => {
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
         onClose();
       }
     };
@@ -73,11 +73,13 @@ export const Modal: FC<ModalProps> = ({
     return null;
   }
 
-  const handleOverlayClick = (e: React.MouseEvent | React.KeyboardEvent) => {
+  const handleOverlayClick = (
+    event: React.MouseEvent | React.KeyboardEvent,
+  ) => {
     if (
       shouldCloseOnOverlayClick(
         closeOnOverlayClick,
-        e.target === e.currentTarget,
+        event.target === event.currentTarget,
       )
     ) {
       onClose();
@@ -91,9 +93,9 @@ export const Modal: FC<ModalProps> = ({
           aria-label="Close modal"
           className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
           onClick={handleOverlayClick}
-          onKeyDown={e => {
-            if (isOverlayKey(e.key)) {
-              handleOverlayClick(e);
+          onKeyDown={event => {
+            if (isOverlayKey(event.key)) {
+              handleOverlayClick(event);
             }
           }}
           tabIndex={0}
@@ -102,7 +104,7 @@ export const Modal: FC<ModalProps> = ({
 
         <div
           className={clsx(
-            'relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all',
+            'relative overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all',
             SIZE_STYLES[size],
             outlined
               ? {
@@ -118,9 +120,9 @@ export const Modal: FC<ModalProps> = ({
               : null,
           )}
         >
-          {title != null || showCloseButton ? (
+          {title !== null || showCloseButton ? (
             <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-              {title != null ? (
+              {title ?  (
                 <h3 className="text-lg font-medium text-gray-900">{title}</h3>
               ) : null}
 
@@ -133,7 +135,7 @@ export const Modal: FC<ModalProps> = ({
                   <span className="sr-only">Close</span>
 
                   <svg
-                    className="h-6 w-6"
+                    className="size-6"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

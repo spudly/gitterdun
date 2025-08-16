@@ -1,9 +1,10 @@
+import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {GridContainer} from './GridContainer';
 import {FormSection} from './FormSection';
 
-describe('GridContainer + FormSection', () => {
-  it('renders content', () => {
+describe('gridContainer + FormSection', () => {
+  test('renders content', () => {
     render(
       <GridContainer cols={2} gap="md">
         <FormSection title="S">
@@ -15,7 +16,7 @@ describe('GridContainer + FormSection', () => {
     expect(screen.getByText('c')).toBeInTheDocument();
   });
 
-  it('applies default cols=2 and gap=md and empty className', () => {
+  test('applies default cols=2 and gap=md and empty className', () => {
     render(
       <GridContainer>
         <div>child</div>

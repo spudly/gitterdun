@@ -96,7 +96,7 @@ const GridContainerDemo: FC = () => {
 
         <div className="space-y-6">
           <div>
-            <h4 className="font-medium mb-2">Small Gap</h4>
+            <h4 className="mb-2 font-medium">Small Gap</h4>
 
             <GridContainer cols={2} gap="sm">
               <Card>
@@ -114,7 +114,7 @@ const GridContainerDemo: FC = () => {
           </div>
 
           <div>
-            <h4 className="font-medium mb-2">Large Gap</h4>
+            <h4 className="mb-2 font-medium">Large Gap</h4>
 
             <GridContainer cols={2} gap="lg">
               <Card>
@@ -132,7 +132,7 @@ const GridContainerDemo: FC = () => {
           </div>
 
           <div>
-            <h4 className="font-medium mb-2">Extra Large Gap</h4>
+            <h4 className="mb-2 font-medium">Extra Large Gap</h4>
 
             <GridContainer cols={2} gap="xl">
               <Card>

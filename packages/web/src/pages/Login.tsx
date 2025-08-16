@@ -19,8 +19,8 @@ const Login: FC = () => {
   const [message, setMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setMessage(null);
     safeAsync(
       async () => {
@@ -39,8 +39,8 @@ const Login: FC = () => {
           <FormField htmlFor="email" label="Email" required>
             <TextInput
               id="email"
-              onChange={v => {
-                setEmail(v);
+              onChange={value => {
+                setEmail(value);
               }}
               required
               type="email"
@@ -51,8 +51,8 @@ const Login: FC = () => {
           <FormField htmlFor="password" label="Password" required>
             <TextInput
               id="password"
-              onChange={v => {
-                setPassword(v);
+              onChange={value => {
+                setPassword(value);
               }}
               required
               type="password"
@@ -60,11 +60,11 @@ const Login: FC = () => {
             />
           </FormField>
 
-          {message != null && message !== '' ? (
+          {message !== undefined && message !== '' ? (
             <Alert type="error">{message}</Alert>
           ) : null}
 
-          {loginError != null ? (
+          {loginError ?  (
             <Alert type="error">{loginError.message}</Alert>
           ) : null}
 

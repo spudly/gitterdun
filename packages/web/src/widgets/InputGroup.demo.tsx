@@ -13,11 +13,11 @@ const InputGroupDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Vertical Layout (Default)</h3>
 
-        <div className="space-y-4 max-w-md">
+        <div className="max-w-md space-y-4">
           <InputGroup>
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
                 htmlFor="email"
               >
                 Email Address
@@ -35,7 +35,7 @@ const InputGroupDemo: FC = () => {
           <InputGroup helpText="Must be at least 8 characters long">
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
                 htmlFor="password"
               >
                 Password
@@ -53,7 +53,7 @@ const InputGroupDemo: FC = () => {
           <InputGroup error="Please select a valid country">
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
                 htmlFor="country"
               >
                 Country
@@ -76,11 +76,11 @@ const InputGroupDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Horizontal Layout</h3>
 
-        <div className="space-y-4 max-w-2xl">
+        <div className="max-w-2xl space-y-4">
           <InputGroup layout="horizontal">
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
                 htmlFor="username"
               >
                 Username
@@ -93,7 +93,7 @@ const InputGroupDemo: FC = () => {
           <InputGroup layout="horizontal">
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
                 htmlFor="role"
               >
                 Role
@@ -114,7 +114,7 @@ const InputGroupDemo: FC = () => {
           <InputGroup helpText="Current account status" layout="horizontal">
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
                 htmlFor="status"
               >
                 Status
@@ -135,11 +135,11 @@ const InputGroupDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">With Error States</h3>
 
-        <div className="space-y-4 max-w-md">
+        <div className="max-w-md space-y-4">
           <InputGroup error="Please enter a valid email address">
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
                 htmlFor="email-error"
               >
                 Email
@@ -157,7 +157,7 @@ const InputGroupDemo: FC = () => {
           <InputGroup error="Password is required">
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
                 htmlFor="password-error"
               >
                 Password
@@ -178,11 +178,11 @@ const InputGroupDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">With Help Text</h3>
 
-        <div className="space-y-4 max-w-md">
+        <div className="max-w-md space-y-4">
           <InputGroup helpText="Your API key will be encrypted and stored securely">
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
                 htmlFor="api-key"
               >
                 API Key
@@ -199,14 +199,14 @@ const InputGroupDemo: FC = () => {
           <InputGroup helpText="Optional: Provide additional context for this item">
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
                 htmlFor="description"
               >
                 Description
               </label>
 
               <textarea
-                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full rounded border px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
                 id="description"
                 placeholder="Enter description"
                 rows={3}
@@ -219,11 +219,11 @@ const InputGroupDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Required Fields</h3>
 
-        <div className="space-y-4 max-w-md">
+        <div className="max-w-md space-y-4">
           <InputGroup>
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
                 htmlFor="first-name"
               >
                 First Name
@@ -240,7 +240,7 @@ const InputGroupDemo: FC = () => {
           <InputGroup>
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
                 htmlFor="last-name"
               >
                 Last Name
@@ -257,7 +257,7 @@ const InputGroupDemo: FC = () => {
           <InputGroup>
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
                 htmlFor="phone"
               >
                 Phone Number
@@ -280,7 +280,7 @@ const InputGroupDemo: FC = () => {
           <InputGroup>
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
                 htmlFor="custom-input"
               >
                 Custom Styled Input

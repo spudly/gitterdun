@@ -15,8 +15,8 @@ const ForgotPassword: FC = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setMessage(null);
     safeAsync(
       async () => {
@@ -38,8 +38,8 @@ const ForgotPassword: FC = () => {
             <FormField htmlFor="email" label="Email" required>
               <TextInput
                 id="email"
-                onChange={v => {
-                  setEmail(v);
+                onChange={value => {
+                  setEmail(value);
                 }}
                 required
                 type="email"
@@ -53,7 +53,7 @@ const ForgotPassword: FC = () => {
           </Stack>
         </form>
 
-        {message != null && message !== '' ? (
+        {message !== undefined && message !== '' ? (
           <Alert type="info">{message}</Alert>
         ) : null}
       </Stack>

@@ -1,8 +1,9 @@
+import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {Stack} from './Stack';
 
-describe('Stack', () => {
-  it('renders children', () => {
+describe('stack', () => {
+  test('renders children', () => {
     render(
       <Stack gap="lg">
         <div>child</div>
@@ -11,7 +12,7 @@ describe('Stack', () => {
     expect(screen.getByText('child')).toBeInTheDocument();
   });
 
-  it('covers all gap variants', () => {
+  test('covers all gap variants', () => {
     const {rerender, container} = render(
       <Stack gap="xs">
         <div>c</div>
@@ -44,7 +45,7 @@ describe('Stack', () => {
     expect(container.firstChild).toHaveClass('space-y-8');
   });
 
-  it('applies default gap=md when not provided', () => {
+  test('applies default gap=md when not provided', () => {
     const {container} = render(
       <Stack>
         <div>child</div>

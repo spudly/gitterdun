@@ -1,3 +1,4 @@
+import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen, fireEvent, act} from '@testing-library/react';
 import {MemoryRouter, useLocation} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
@@ -5,11 +6,11 @@ import Admin from './Admin';
 import * as useUserModule from '../hooks/useUser';
 import * as apiModule from '../lib/api';
 
-jest.mock('../hooks/useUser', () => ({
+jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
   useUser: jest.fn(() => ({user: {id: 1, role: 'admin'}})),
 }));
 
-jest.mock('../lib/api', () => ({
+jest.mock<typeof import('../lib/api')>('../lib/api', () => ({
   choresApi: {getAll: jest.fn(async () => ({success: true, data: []}))},
   familiesApi: {
     create: jest.fn(async () => ({success: true})),
@@ -26,13 +27,13 @@ const wrap = (ui: React.ReactElement) => (
   </QueryClientProvider>
 );
 
-describe('Admin page', () => {
-  it('renders admin header', async () => {
+describe('admin page', () => {
+  test('renders admin header', async () => {
     render(wrap(<Admin />));
-    expect(await screen.findByText('Admin Panel')).toBeInTheDocument();
+    await expect(screen.findByText('Admin Panel')).resolves.toBeInTheDocument();
   });
 
-  it('handles family creation and invitation flows', async () => {
+  test('handles family creation and invitation flows', async () => {
     const mocked = jest.mocked(apiModule);
     mocked.familiesApi.create.mockResolvedValueOnce({success: true});
     mocked.invitationsApi.create.mockResolvedValueOnce({success: true});
@@ -46,7 +47,9 @@ describe('Admin page', () => {
     await act(async () => {
       fireEvent.click(screen.getByRole('button', {name: 'Create Family'}));
     });
-    expect(await screen.findByText(/Family created/)).toBeInTheDocument();
+    await expect(
+      screen.findByText(/Family created/u),
+    ).resolves.toBeInTheDocument();
 
     // Invite flow validation then success
     fireEvent.change(screen.getByPlaceholderText('Family ID'), {
@@ -58,10 +61,12 @@ describe('Admin page', () => {
     await act(async () => {
       fireEvent.click(screen.getByRole('button', {name: 'Invite'}));
     });
-    expect(await screen.findByText(/Invitation created/)).toBeInTheDocument();
+    await expect(
+      screen.findByText(/Invitation created/u),
+    ).resolves.toBeInTheDocument();
   });
 
-  it('renders chore list and action buttons for completed status', async () => {
+  test('renders chore list and action buttons for completed status', async () => {
     const mocked = jest.mocked(apiModule);
     mocked.choresApi.getAll.mockResolvedValueOnce({
       success: true,
@@ -85,13 +90,13 @@ describe('Admin page', () => {
       ],
     });
     render(wrap(<Admin />));
-    expect(await screen.findByText('Admin Panel')).toBeInTheDocument();
-    expect(await screen.findByText('C')).toBeInTheDocument();
+    await expect(screen.findByText('Admin Panel')).resolves.toBeInTheDocument();
+    await expect(screen.findByText('C')).resolves.toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Approve'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Reject'})).toBeInTheDocument();
   });
 
-  it('renders pending chore and shows penalty/due meta', async () => {
+  test('renders pending chore and shows penalty/due meta', async () => {
     const mocked = jest.mocked(apiModule);
     mocked.choresApi.getAll.mockResolvedValueOnce({
       success: true,
@@ -113,15 +118,17 @@ describe('Admin page', () => {
       ],
     });
     render(wrap(<Admin />));
-    expect(await screen.findByText('Pending Item')).toBeInTheDocument();
+    await expect(
+      screen.findByText('Pending Item'),
+    ).resolves.toBeInTheDocument();
     // Meta content presence (penalty/due labels)
-    expect(screen.getByText(/Penalty:/)).toBeInTheDocument();
-    expect(screen.getByText(/Due:/)).toBeInTheDocument();
+    expect(screen.getByText(/Penalty:/u)).toBeInTheDocument();
+    expect(screen.getByText(/Due:/u)).toBeInTheDocument();
     // Pending actions show only Edit button in this branch
     expect(screen.getByRole('button', {name: 'Edit'})).toBeInTheDocument();
   });
 
-  it('requires admin privileges', async () => {
+  test('requires admin privileges', async () => {
     const mockedUseUser = jest.mocked(useUserModule.useUser);
     mockedUseUser.mockReturnValueOnce({
       user: {
@@ -148,10 +155,12 @@ describe('Admin page', () => {
       registerError: null,
     });
     render(wrap(<Admin />));
-    expect(await screen.findByText('Access Denied')).toBeInTheDocument();
+    await expect(
+      screen.findByText('Access Denied'),
+    ).resolves.toBeInTheDocument();
   });
 
-  it('validates and handles errors on family create and invite', async () => {
+  test('validates and handles errors on family create and invite', async () => {
     const {familiesApi, invitationsApi} = jest.mocked(apiModule);
 
     // Create Family: empty name should no-op (validation line)
@@ -169,17 +178,17 @@ describe('Admin page', () => {
     await act(async () => {
       fireEvent.click(screen.getByRole('button', {name: 'Create Family'}));
     });
-    expect(
-      await screen.findByText(/Failed to create family|Bad/),
-    ).toBeInTheDocument();
+    await expect(
+      screen.findByText(/Failed to create family|Bad/u),
+    ).resolves.toBeInTheDocument();
 
     // Invite: missing fields validation
     await act(async () => {
       fireEvent.click(screen.getByRole('button', {name: 'Invite'}));
     });
-    expect(
-      await screen.findByText('Enter family ID and email'),
-    ).toBeInTheDocument();
+    await expect(
+      screen.findByText('Enter family ID and email'),
+    ).resolves.toBeInTheDocument();
 
     // Change role to cover role select onChange (second combobox on the page)
     const roleSelect = screen.getByRole('combobox');
@@ -196,10 +205,12 @@ describe('Admin page', () => {
     await act(async () => {
       fireEvent.click(screen.getByRole('button', {name: 'Invite'}));
     });
-    expect(await screen.findByText('Failed to invite')).toBeInTheDocument();
+    await expect(
+      screen.findByText('Failed to invite'),
+    ).resolves.toBeInTheDocument();
   });
 
-  it('renders approved chore and bonus badge', async () => {
+  test('renders approved chore and bonus badge', async () => {
     const mocked = jest.mocked(apiModule);
     mocked.choresApi.getAll.mockResolvedValueOnce({
       success: true,
@@ -220,12 +231,12 @@ describe('Admin page', () => {
       ],
     });
     render(wrap(<Admin />));
-    expect(await screen.findByText('B')).toBeInTheDocument();
+    await expect(screen.findByText('B')).resolves.toBeInTheDocument();
     expect(screen.getByText('approved')).toBeInTheDocument();
     expect(screen.getByText('Bonus')).toBeInTheDocument();
   });
 
-  it('handles family create API rejection (catch path)', async () => {
+  test('handles family create API rejection (catch path)', async () => {
     const mocked = jest.mocked(apiModule);
     mocked.familiesApi.create.mockRejectedValueOnce(new Error('boom'));
     render(wrap(<Admin />));
@@ -236,12 +247,12 @@ describe('Admin page', () => {
     await act(async () => {
       fireEvent.click(screen.getByRole('button', {name: 'Create Family'}));
     });
-    expect(
-      await screen.findByText('Failed to create family'),
-    ).toBeInTheDocument();
+    await expect(
+      screen.findByText('Failed to create family'),
+    ).resolves.toBeInTheDocument();
   });
 
-  it('shows backup error message when create returns success=false without error', async () => {
+  test('shows backup error message when create returns success=false without error', async () => {
     const {familiesApi} = jest.mocked(apiModule);
     familiesApi.create.mockResolvedValueOnce({success: false});
     render(wrap(<Admin />));
@@ -252,12 +263,12 @@ describe('Admin page', () => {
     await act(async () => {
       fireEvent.click(screen.getByRole('button', {name: 'Create Family'}));
     });
-    expect(
-      await screen.findByText('Failed to create family'),
-    ).toBeInTheDocument();
+    await expect(
+      screen.findByText('Failed to create family'),
+    ).resolves.toBeInTheDocument();
   });
 
-  it('navigates to /family after successful create via setTimeout', async () => {
+  test('navigates to /family after successful create via setTimeout', async () => {
     jest.useFakeTimers();
     const {familiesApi} = jest.mocked(apiModule);
     familiesApi.create.mockResolvedValueOnce({success: true});

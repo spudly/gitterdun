@@ -13,12 +13,12 @@ export const FormCard: FC<FormCardProps> = ({children, title, size = 'md'}) => {
   return (
     <div
       className={clsx(
-        'mx-auto bg-white rounded-lg shadow p-6',
+        'mx-auto rounded-lg bg-white p-6 shadow',
         SIZE_STYLES[size],
       )}
     >
-      {title != null ? (
-        <h2 className="text-2xl font-semibold mb-4">{title}</h2>
+      {title ?  (
+        <h2 className="mb-4 text-2xl font-semibold">{title}</h2>
       ) : null}
 
       {children}

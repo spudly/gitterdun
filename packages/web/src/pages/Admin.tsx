@@ -39,7 +39,7 @@ const Admin: FC = () => {
   const {data: choresResponse, isLoading} = useQuery({
     queryKey: ['chores', 'admin'],
     queryFn: async () => choresApi.getAll(),
-    enabled: !!user && user.role === 'admin',
+    enabled: Boolean(user) && user.role === 'admin',
   });
 
   const chores = choresResponse?.data ?? [];
@@ -84,7 +84,7 @@ const Admin: FC = () => {
       <Stack gap="lg">
         {/* Family Management */}
         <FormSection title="Family Management">
-          {message != null && message !== '' ? (
+          {message !== undefined && message !== '' ? (
             <Alert type={messageType === 'success' ? 'success' : 'error'}>
               {message}
             </Alert>
@@ -92,8 +92,8 @@ const Admin: FC = () => {
 
           <Toolbar>
             <TextInput
-              onChange={v => {
-                setFamilyName(v);
+              onChange={value => {
+                setFamilyName(value);
               }}
               placeholder="Family name"
               value={familyName}
@@ -134,24 +134,25 @@ const Admin: FC = () => {
 
           <Toolbar>
             <TextInput
-              onChange={v => {
-                setInviteFamIdAdmin(v);
+              onChange={value => {
+                setInviteFamIdAdmin(value);
               }}
               placeholder="Family ID"
               value={inviteFamIdAdmin}
             />
 
             <TextInput
-              onChange={v => {
-                setInviteEmailAdmin(v);
+              onChange={value => {
+                setInviteEmailAdmin(value);
               }}
               placeholder="Invite email"
               value={inviteEmailAdmin}
             />
 
             <SelectInput
-              onChange={v => {
-                const role = v === 'parent' || v === 'child' ? v : 'parent';
+              onChange={value => {
+                const role =
+                  value === 'parent' || value === 'child' ? value : 'parent';
                 setInviteRoleAdmin(role);
               }}
               value={inviteRoleAdmin}
@@ -211,8 +212,9 @@ const Admin: FC = () => {
             icon={<ClockIcon />}
             label="Pending Approval"
             value={
-              chores.filter((c: ChoreWithUsername) => c.status === 'completed')
-                .length
+              chores.filter(
+                (chore: ChoreWithUsername) => chore.status === 'completed',
+              ).length
             }
           />
 
@@ -221,8 +223,9 @@ const Admin: FC = () => {
             icon={<CheckCircleIcon />}
             label="Approved"
             value={
-              chores.filter((c: ChoreWithUsername) => c.status === 'approved')
-                .length
+              chores.filter(
+                (chore: ChoreWithUsername) => chore.status === 'approved',
+              ).length
             }
           />
 
@@ -231,8 +234,9 @@ const Admin: FC = () => {
             icon={<SparklesIcon />}
             label="Bonus Chores"
             value={
-              chores.filter((c: ChoreWithUsername) => c.chore_type === 'bonus')
-                .length
+              chores.filter(
+                (chore: ChoreWithUsername) => chore.chore_type === 'bonus',
+              ).length
             }
           />
         </GridContainer>
@@ -274,7 +278,7 @@ const Admin: FC = () => {
                       <span>Penalty: -{chore.penalty_points}</span>
                     )}
 
-                    {chore.due_date != null ? (
+                    {chore.due_date ?  (
                       <span>
                         Due: {new Date(chore.due_date).toLocaleDateString()}
                       </span>

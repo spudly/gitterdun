@@ -58,8 +58,8 @@ const DataTableDemo: FC = () => {
       header: 'Name',
       render: user => (
         <div className="flex items-center">
-          <div className="flex-shrink-0 h-10 w-10">
-            <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+          <div className="size-10 shrink-0">
+            <div className="flex size-10 items-center justify-center rounded-full bg-gray-300">
               <span className="text-sm font-medium text-gray-700">
                 {user.name.charAt(0)}
               </span>
@@ -79,7 +79,7 @@ const DataTableDemo: FC = () => {
       key: 'role',
       header: 'Role',
       render: user => (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+        <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
           {user.role}
         </span>
       ),
@@ -145,7 +145,7 @@ const DataTableDemo: FC = () => {
         />
 
         {selectedUser ? (
-          <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+          <div className="rounded-md border border-blue-200 bg-blue-50 p-4">
             <p className="text-sm text-blue-800">
               Selected user: <strong>{selectedUser.name}</strong> (
               {selectedUser.email})
@@ -193,7 +193,7 @@ const DataTableDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Custom Styling</h3>
 
-        <div className="border-2 border-blue-200 rounded-md">
+        <div className="rounded-md border-2 border-blue-200">
           <DataTable columns={columns} data={sampleData} />
         </div>
       </div>

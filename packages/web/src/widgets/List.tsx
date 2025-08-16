@@ -8,7 +8,7 @@ export type ListProps = {
 
 export const List: FC<ListProps> = ({children, className = ''}) => {
   return (
-    <div className={clsx('bg-white rounded shadow', className)}>
+    <div className={clsx('rounded bg-white shadow', className)}>
       <div className="divide-y divide-gray-200">{children}</div>
     </div>
   );

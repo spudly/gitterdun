@@ -42,7 +42,7 @@ const registry: Record<string, FC> = {
 const Demos: FC = () => {
   const params = useParams();
   const {name} = params;
-  if (name != null && name !== '' && registry[name]) {
+  if (name !== undefined && name !== '' && registry[name]) {
     const Demo = registry[name];
     return (
       <PageContainer variant="wide">

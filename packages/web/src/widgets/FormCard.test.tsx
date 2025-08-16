@@ -1,8 +1,9 @@
+import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {FormCard} from './FormCard';
 
-describe('FormCard', () => {
-  it('renders title and children', () => {
+describe('formCard', () => {
+  test('renders title and children', () => {
     render(
       <FormCard title="T">
         <div>child</div>

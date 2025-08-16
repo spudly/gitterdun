@@ -1,8 +1,9 @@
+import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen, fireEvent} from '@testing-library/react';
 import {Alert} from './Alert';
 
-describe('Alert', () => {
-  it('shows types, title and dismiss', () => {
+describe('alert', () => {
+  test('shows types, title and dismiss', () => {
     const onDismiss = jest.fn();
     const {rerender} = render(
       <Alert onDismiss={onDismiss} title="T" type="info">
@@ -23,7 +24,7 @@ describe('Alert', () => {
     expect(screen.getByText('I')).toBeInTheDocument();
   });
 
-  it('defaults type to info when omitted', () => {
+  test('defaults type to info when omitted', () => {
     render(<Alert>Default</Alert>);
     const alert = screen.getByRole('alert');
     expect(alert).toHaveClass('bg-blue-50', 'border-blue-200', 'text-blue-800');

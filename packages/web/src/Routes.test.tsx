@@ -1,56 +1,57 @@
+import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
 
 import {Routes} from './Routes';
 
 // Mock all lazy-loaded pages to simple components so we only test route mapping here
-jest.mock('./pages/Dashboard', () => ({
+jest.mock<typeof import('./pages/Dashboard')>('./pages/Dashboard', () => ({
   __esModule: true,
   default: () => <div>Mock Dashboard</div>,
 }));
-jest.mock('./pages/Chores', () => ({
+jest.mock<typeof import('./pages/Chores')>('./pages/Chores', () => ({
   __esModule: true,
   default: () => <div>Mock Chores</div>,
 }));
-jest.mock('./pages/Goals', () => ({
+jest.mock<typeof import('./pages/Goals')>('./pages/Goals', () => ({
   __esModule: true,
   default: () => <div>Mock Goals</div>,
 }));
-jest.mock('./pages/Leaderboard', () => ({
+jest.mock<typeof import('./pages/Leaderboard')>('./pages/Leaderboard', () => ({
   __esModule: true,
   default: () => <div>Mock Leaderboard</div>,
 }));
-jest.mock('./pages/Admin', () => ({
+jest.mock<typeof import('./pages/Admin')>('./pages/Admin', () => ({
   __esModule: true,
   default: () => <div>Mock Admin</div>,
 }));
-jest.mock('./pages/Login', () => ({
+jest.mock<typeof import('./pages/Login')>('./pages/Login', () => ({
   __esModule: true,
   default: () => <div>Mock Login</div>,
 }));
-jest.mock('./pages/ForgotPassword', () => ({
-  __esModule: true,
-  default: () => <div>Mock Forgot Password</div>,
-}));
-jest.mock('./pages/ResetPassword', () => ({
-  __esModule: true,
-  default: () => <div>Mock Reset Password</div>,
-}));
-jest.mock('./pages/Family', () => ({
+jest.mock<typeof import('./pages/ForgotPassword')>(
+  './pages/ForgotPassword',
+  () => ({__esModule: true, default: () => <div>Mock Forgot Password</div>}),
+);
+jest.mock<typeof import('./pages/ResetPassword')>(
+  './pages/ResetPassword',
+  () => ({__esModule: true, default: () => <div>Mock Reset Password</div>}),
+);
+jest.mock<typeof import('./pages/Family')>('./pages/Family', () => ({
   __esModule: true,
   default: () => <div>Mock Family</div>,
 }));
-jest.mock('./pages/AcceptInvitation', () => ({
-  __esModule: true,
-  default: () => <div>Mock Accept Invitation</div>,
-}));
-jest.mock('./pages/Demos', () => ({
+jest.mock<typeof import('./pages/AcceptInvitation')>(
+  './pages/AcceptInvitation',
+  () => ({__esModule: true, default: () => <div>Mock Accept Invitation</div>}),
+);
+jest.mock<typeof import('./pages/Demos')>('./pages/Demos', () => ({
   __esModule: true,
   default: () => <div>Mock Demos</div>,
 }));
 
 // Make the Suspense fallback render synchronously without delay
-jest.mock('./widgets/Spinner', () => ({
+jest.mock<typeof import('./widgets/Spinner')>('./widgets/Spinner', () => ({
   __esModule: true,
   Spinner: () => <div aria-label="loading" />,
 }));
@@ -63,14 +64,14 @@ const renderAtPath = async (path: string) => {
   );
 };
 
-describe('Routes', () => {
-  it('shows Suspense fallback while lazy page loads', async () => {
+describe('routes', () => {
+  test('shows Suspense fallback while lazy page loads', async () => {
     await renderAtPath('/goals');
     expect(screen.queryByLabelText('loading')).toBeInTheDocument();
-    expect(await screen.findByText('Mock Goals')).toBeInTheDocument();
+    await expect(screen.findByText('Mock Goals')).resolves.toBeInTheDocument();
   });
 
-  it.each([
+  test.each([
     ['/', 'Mock Dashboard'],
     ['/chores', 'Mock Chores'],
     ['/goals', 'Mock Goals'],
@@ -85,6 +86,6 @@ describe('Routes', () => {
     ['/__demos/Button', 'Mock Demos'],
   ])('renders %s -> %s', async (path, expectedText) => {
     await renderAtPath(path);
-    expect(await screen.findByText(expectedText)).toBeInTheDocument();
+    await expect(screen.findByText(expectedText)).resolves.toBeInTheDocument();
   });
 });

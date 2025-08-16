@@ -1,33 +1,34 @@
-/* eslint-disable global-require */
+import {describe, expect, jest, test} from '@jest/globals';
 
 jest.mock('react-dom/client', () => {
-  return {createRoot: jest.fn(() => ({render: jest.fn()}))};
+  return {
+    createRoot: jest.fn(() => ({render: jest.fn(), unmount: jest.fn()})),
+    hydrateRoot: jest.fn(),
+  };
 });
 
 describe('main entry', () => {
-  it('mounts app when #root exists', () => {
+  test('mounts app when #root exists', async () => {
     const root = document.createElement('div');
     root.id = 'root';
     document.body.appendChild(root);
 
     // Import after setting up DOM
-    jest.isolateModules(() => {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      require('./main');
+    await jest.isolateModulesAsync(async () => {
+      await import('./main');
     });
 
-    const {createRoot}: any = require('react-dom/client');
+    const {createRoot} = await import('react-dom/client');
     // Ensure app attempted to mount without throwing
     expect(typeof createRoot).toBe('function');
   });
 
-  it('throws if #root is missing', () => {
+  test('throws if #root is missing', async () => {
     document.body.innerHTML = '';
-    expect(() => {
-      jest.isolateModules(() => {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        require('./main');
-      });
-    }).toThrow('Root element not found');
+    await expect(
+      jest.isolateModulesAsync(async () => {
+        await import('./main');
+      }),
+    ).rejects.toThrow('Root element not found');
   });
 });

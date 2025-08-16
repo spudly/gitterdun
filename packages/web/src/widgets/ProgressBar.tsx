@@ -45,7 +45,7 @@ export const ProgressBar: FC<ProgressBarProps> = ({
       ) : null}
 
       <div
-        className={clsx('w-full bg-gray-200 rounded-full', SIZE_STYLES[size])}
+        className={clsx('w-full rounded-full bg-gray-200', SIZE_STYLES[size])}
       >
         <div
           className={clsx(

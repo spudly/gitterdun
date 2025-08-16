@@ -1,8 +1,9 @@
+import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen, fireEvent} from '@testing-library/react';
 import {SelectInput} from './SelectInput';
 
-describe('SelectInput', () => {
-  it('changes and shows error', () => {
+describe('selectInput', () => {
+  test('changes and shows error', () => {
     const onChange = jest.fn();
     render(
       <SelectInput defaultValue="" error="bad" onChange={onChange}>
@@ -18,7 +19,7 @@ describe('SelectInput', () => {
     expect(select).toHaveClass('border-red-500');
   });
 
-  it('uses default border class when no error', () => {
+  test('uses default border class when no error', () => {
     render(
       <SelectInput defaultValue="">
         <option value="">-</option>

@@ -24,7 +24,7 @@ export const ListRow: FC<ListRowProps> = ({
     <div className={clsx('px-6 py-4', className)}>
       <div className="flex items-center justify-between">
         <div className="flex items-center">
-          {left != null ? <div className="mr-3">{left}</div> : null}
+          {left ?  <div className="mr-3">{left}</div> : null}
 
           <div>
             <div className="flex items-center gap-2">
@@ -33,12 +33,12 @@ export const ListRow: FC<ListRowProps> = ({
               {titleRight}
             </div>
 
-            {description != null ? (
-              <p className="text-sm text-gray-500 mt-1">{description}</p>
+            {description ?  (
+              <p className="mt-1 text-sm text-gray-500">{description}</p>
             ) : null}
 
-            {meta != null ? (
-              <div className="flex items-center mt-2 space-x-4 text-sm text-gray-500">
+            {meta ?  (
+              <div className="mt-2 flex items-center space-x-4 text-sm text-gray-500">
                 {meta}
               </div>
             ) : null}

@@ -1,3 +1,4 @@
+import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen, fireEvent} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
 
@@ -16,12 +17,12 @@ const mockUser: User = {
 };
 let user: User | null = mockUser;
 const mockLogout = jest.fn();
-jest.mock('../hooks/useUser', () => ({
-  useUser: () => ({user: user, logout: mockLogout}),
+jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
+  useUser: () => ({user, logout: mockLogout}),
 }));
 
-describe('Layout', () => {
-  it('renders nav and children', () => {
+describe('layout', () => {
+  test('renders nav and children', () => {
     render(
       <MemoryRouter initialEntries={['/']}>
         <Layout navigation={[{name: 'Dashboard', path: '/', icon: '🏠'}]}>
@@ -33,7 +34,7 @@ describe('Layout', () => {
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
   });
 
-  it('shows login when no user and hides admin link', () => {
+  test('shows login when no user and hides admin link', () => {
     user = null;
     render(
       <MemoryRouter initialEntries={['/']}>
@@ -45,7 +46,7 @@ describe('Layout', () => {
     expect(screen.getByText('Login')).toBeInTheDocument();
   });
 
-  it('calls logout when clicking Logout button', () => {
+  test('calls logout when clicking Logout button', () => {
     user = mockUser;
     mockLogout.mockClear();
     render(

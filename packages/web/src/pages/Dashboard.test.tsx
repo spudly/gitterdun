@@ -1,10 +1,13 @@
+import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Dashboard from './Dashboard';
 
-jest.mock('../hooks/useUser', () => ({useUser: () => ({user: {id: 1}})}));
+jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
+  useUser: () => ({user: {id: 1}}),
+}));
 
-jest.mock('../lib/api', () => ({
+jest.mock<typeof import('../lib/api')>('../lib/api', () => ({
   choresApi: {
     getAll: jest.fn(async () => ({
       success: true,
@@ -49,15 +52,15 @@ const wrap = (ui: React.ReactElement) => (
   <QueryClientProvider client={new QueryClient()}>{ui}</QueryClientProvider>
 );
 
-describe('Dashboard page', () => {
-  it('renders header', async () => {
+describe('dashboard page', () => {
+  test('renders header', async () => {
     render(wrap(<Dashboard />));
-    expect(await screen.findByText('Dashboard')).toBeInTheDocument();
+    await expect(screen.findByText('Dashboard')).resolves.toBeInTheDocument();
   });
 
-  it('computes stats and lists recent chores', async () => {
+  test('computes stats and lists recent chores', async () => {
     render(wrap(<Dashboard />));
-    expect(await screen.findByText('Dashboard')).toBeInTheDocument();
+    await expect(screen.findByText('Dashboard')).resolves.toBeInTheDocument();
     // Completed/Pending counts (multiple '1' exist; assert by nearby labels)
     expect(screen.getByText('Completed Chores').nextSibling).toHaveTextContent(
       '1',

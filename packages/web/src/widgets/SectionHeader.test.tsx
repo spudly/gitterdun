@@ -1,8 +1,9 @@
+import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {SectionHeader} from './SectionHeader';
 
-describe('SectionHeader', () => {
-  it('renders title, subtitle, children', () => {
+describe('sectionHeader', () => {
+  test('renders title, subtitle, children', () => {
     render(
       <SectionHeader subtitle="S" title="T">
         <button type="button">C</button>

@@ -14,7 +14,7 @@ const SectionHeaderDemo: FC = () => {
           <Button size="sm">Add User</Button>
         </SectionHeader>
 
-        <div className="p-4 bg-gray-100 rounded">
+        <div className="rounded bg-gray-100 p-4">
           <p>Content below the header</p>
         </div>
       </div>
@@ -30,7 +30,7 @@ const SectionHeaderDemo: FC = () => {
           <Button>Save Changes</Button>
         </SectionHeader>
 
-        <div className="p-4 bg-gray-100 rounded">
+        <div className="rounded bg-gray-100 p-4">
           <p>Content below the large header</p>
         </div>
       </div>
@@ -50,7 +50,7 @@ const SectionHeaderDemo: FC = () => {
           </div>
         </SectionHeader>
 
-        <div className="p-4 bg-gray-100 rounded">
+        <div className="rounded bg-gray-100 p-4">
           <p>Content below the compact header</p>
         </div>
       </div>
@@ -63,7 +63,7 @@ const SectionHeaderDemo: FC = () => {
           title="Data Export"
         />
 
-        <div className="p-4 bg-gray-100 rounded">
+        <div className="rounded bg-gray-100 p-4">
           <p>Content below the header with subtitle</p>
         </div>
       </div>
@@ -73,7 +73,7 @@ const SectionHeaderDemo: FC = () => {
 
         <SectionHeader title="Simple Section" />
 
-        <div className="p-4 bg-gray-100 rounded">
+        <div className="rounded bg-gray-100 p-4">
           <p>Content below the simple header</p>
         </div>
       </div>
@@ -85,7 +85,7 @@ const SectionHeaderDemo: FC = () => {
           <Button variant="secondary">Custom Action</Button>
         </SectionHeader>
 
-        <div className="p-4 bg-gray-100 rounded">
+        <div className="rounded bg-gray-100 p-4">
           <p>Content below the custom styled header</p>
         </div>
       </div>

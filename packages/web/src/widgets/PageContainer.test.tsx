@@ -1,8 +1,9 @@
+import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {PageContainer} from './PageContainer';
 
-describe('PageContainer', () => {
-  it('renders variants', () => {
+describe('pageContainer', () => {
+  test('renders variants', () => {
     const {rerender} = render(
       <PageContainer variant="centered">
         <div>c</div>

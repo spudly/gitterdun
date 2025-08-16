@@ -1,14 +1,15 @@
+import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen, fireEvent, act} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
 import AcceptInvitation from './AcceptInvitation';
 import * as apiModule from '../lib/api';
 
-jest.mock('../lib/api', () => ({
+jest.mock<typeof import('../lib/api')>('../lib/api', () => ({
   invitationsApi: {accept: jest.fn(async () => ({success: true}))},
 }));
 
-describe('AcceptInvitation page', () => {
-  it('shows missing token when none provided', () => {
+describe('acceptInvitation page', () => {
+  test('shows missing token when none provided', () => {
     render(
       <MemoryRouter initialEntries={['/accept-invitation']}>
         <AcceptInvitation />
@@ -17,7 +18,7 @@ describe('AcceptInvitation page', () => {
     expect(screen.getByText('Missing token.')).toBeInTheDocument();
   });
 
-  it('accepts invitation and navigates on success', async () => {
+  test('accepts invitation and navigates on success', async () => {
     jest.useFakeTimers();
     const mocked = jest.mocked(apiModule);
     mocked.invitationsApi.accept.mockResolvedValueOnce({success: true});
@@ -26,10 +27,10 @@ describe('AcceptInvitation page', () => {
         <AcceptInvitation />
       </MemoryRouter>,
     );
-    fireEvent.change(screen.getByLabelText(/Username/i), {
+    fireEvent.change(screen.getByLabelText(/Username/iu), {
       target: {value: 'u'},
     });
-    fireEvent.change(screen.getByLabelText(/Password/i), {
+    fireEvent.change(screen.getByLabelText(/Password/iu), {
       target: {value: 'p12345'},
     });
     await act(async () => {
@@ -39,14 +40,16 @@ describe('AcceptInvitation page', () => {
           .closest('form')!,
       );
     });
-    expect(await screen.findByText(/Invitation accepted/)).toBeInTheDocument();
+    await expect(
+      screen.findByText(/Invitation accepted/u),
+    ).resolves.toBeInTheDocument();
     act(() => {
       jest.runAllTimers();
     });
     jest.useRealTimers();
   });
 
-  it('shows error when API fails', async () => {
+  test('shows error when API fails', async () => {
     const mocked = jest.mocked(apiModule);
     mocked.invitationsApi.accept.mockRejectedValueOnce(new Error('fail'));
     render(
@@ -54,10 +57,10 @@ describe('AcceptInvitation page', () => {
         <AcceptInvitation />
       </MemoryRouter>,
     );
-    fireEvent.change(screen.getByLabelText(/Username/i), {
+    fireEvent.change(screen.getByLabelText(/Username/iu), {
       target: {value: 'u'},
     });
-    fireEvent.change(screen.getByLabelText(/Password/i), {
+    fireEvent.change(screen.getByLabelText(/Password/iu), {
       target: {value: 'p12345'},
     });
     await act(async () => {
@@ -67,10 +70,10 @@ describe('AcceptInvitation page', () => {
           .closest('form')!,
       );
     });
-    expect(screen.getByText(/Failed to accept/)).toBeInTheDocument();
+    expect(screen.getByText(/Failed to accept/u)).toBeInTheDocument();
   });
 
-  it('shows failure message when API returns success=false', async () => {
+  test('shows failure message when API returns success=false', async () => {
     const mocked = jest.mocked(apiModule);
     mocked.invitationsApi.accept.mockResolvedValueOnce({
       success: false,
@@ -81,10 +84,10 @@ describe('AcceptInvitation page', () => {
         <AcceptInvitation />
       </MemoryRouter>,
     );
-    fireEvent.change(screen.getByLabelText(/Username/i), {
+    fireEvent.change(screen.getByLabelText(/Username/iu), {
       target: {value: 'u'},
     });
-    fireEvent.change(screen.getByLabelText(/Password/i), {
+    fireEvent.change(screen.getByLabelText(/Password/iu), {
       target: {value: 'p12345'},
     });
     await act(async () => {
@@ -94,6 +97,6 @@ describe('AcceptInvitation page', () => {
           .closest('form')!,
       );
     });
-    expect(screen.getByText(/Failed to accept/)).toBeInTheDocument();
+    expect(screen.getByText(/Failed to accept/u)).toBeInTheDocument();
   });
 });

@@ -119,7 +119,7 @@ const IconButtonDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Common Icons</h3>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <IconButton
             icon={
               <svg fill="currentColor" viewBox="0 0 20 20">

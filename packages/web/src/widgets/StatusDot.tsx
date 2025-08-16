@@ -40,7 +40,7 @@ export const StatusDot: FC<StatusDotProps> = ({
   label,
   className = '',
 }) => {
-  if (label != null) {
+  if (label !== undefined) {
     return (
       <img
         alt={label}

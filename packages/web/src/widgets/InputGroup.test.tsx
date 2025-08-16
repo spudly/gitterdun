@@ -1,8 +1,9 @@
+import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {InputGroup} from './InputGroup';
 
-describe('InputGroup', () => {
-  it('renders help and error', () => {
+describe('inputGroup', () => {
+  test('renders help and error', () => {
     render(
       <InputGroup error="E" helpText="H">
         <input />
@@ -12,7 +13,7 @@ describe('InputGroup', () => {
     expect(screen.getByText('E')).toBeInTheDocument();
   });
 
-  it('supports horizontal layout', () => {
+  test('supports horizontal layout', () => {
     const {container} = render(
       <InputGroup layout="horizontal">
         <input />

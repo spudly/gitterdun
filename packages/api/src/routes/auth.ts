@@ -1,4 +1,5 @@
 import express from 'express';
+import type {Response} from 'express';
 import bcrypt from 'bcryptjs';
 import {
   LoginSchema,
@@ -18,28 +19,35 @@ import db from '../lib/db';
 import {logger} from '../utils/logger';
 import {sql} from '../utils/sql';
 
+type UserWithPasswordRow = z.infer<typeof UserWithPasswordRowSchema>;
+
 const router = express.Router();
+
+const parseCookieString = (cookieString: string): Record<string, string> => {
+  return cookieString.split(';').reduce<Record<string, string>>((acc, part) => {
+    const [rawKey, ...rest] = part.trim().split('=');
+    if (!rawKey) {
+      return acc;
+    }
+    const key = decodeURIComponent(rawKey);
+    const value = decodeURIComponent(rest.join('=') || '');
+    acc[key] = value;
+    return acc;
+  }, {});
+};
 
 const getCookie = (req: express.Request, name: string): string | undefined => {
   const cookieHeader = req.headers.cookie;
-  if (cookieHeader == null) {
+  if (cookieHeader === undefined) {
     return undefined;
   }
   const cookieString = Array.isArray(cookieHeader)
     ? cookieHeader.join(';')
     : cookieHeader;
-  const cookies = cookieString
-    .split(';')
-    .reduce<Record<string, string>>((acc, part) => {
-      const [rawKey, ...rest] = part.trim().split('=');
-      if (rawKey == null || !rawKey) {
-        return acc;
-      }
-      const key = decodeURIComponent(rawKey);
-      const value = decodeURIComponent(rest.join('=') || '');
-      acc[key] = value;
-      return acc;
-    }, {});
+  if (!cookieString) {
+    return undefined;
+  }
+  const cookies = parseCookieString(cookieString);
   return cookies[name];
 };
 
@@ -59,11 +67,8 @@ const createSession = (userId: number) => {
   return {sessionId, expiresAt};
 };
 
-const getUserFromSession = (req: express.Request) => {
-  const sessionId = getCookie(req, 'sid');
-  if (sessionId == null) {
-    return null;
-  }
+// Helper function to validate session
+const validateSession = (sessionId: string) => {
   const sessionRow = db
     .prepare(sql`
       SELECT
@@ -76,11 +81,13 @@ const getUserFromSession = (req: express.Request) => {
     `)
     .get(sessionId);
   const session =
-    sessionRow != null ? SessionRowSchema.parse(sessionRow) : undefined;
+    sessionRow === null ? undefined : SessionRowSchema.parse(sessionRow);
 
   if (!session) {
     return null;
   }
+
+  // Check if session is expired
   if (new Date(session.expires_at).getTime() < Date.now()) {
     db.prepare(sql`
       DELETE FROM sessions
@@ -90,6 +97,11 @@ const getUserFromSession = (req: express.Request) => {
     return null;
   }
 
+  return session;
+};
+
+// Helper function to get user by ID
+const getUserById = (userId: number) => {
   const user = db
     .prepare(sql`
       SELECT
@@ -106,43 +118,107 @@ const getUserFromSession = (req: express.Request) => {
       WHERE
         id = ?
     `)
-    .get(session.user_id);
-  if (user == null) {
+    .get(userId);
+  return user === undefined ? null : UserSchema.parse(user);
+};
+
+const getUserFromSession = (req: express.Request) => {
+  const sessionId = getCookie(req, 'sid');
+  if (sessionId === undefined) {
     return null;
   }
-  return UserSchema.parse(user);
+
+  const session = validateSession(sessionId);
+  if (!session) {
+    return null;
+  }
+
+  return getUserById(session.user_id);
 };
 
 // POST /api/auth/login - User login
 // eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
+// Helper function to find user by email
+const findUserByEmail = (email: string) => {
+  const userRow = db
+    .prepare(sql`
+      SELECT
+        id,
+        username,
+        email,
+        password_hash,
+        role,
+        points,
+        streak_count,
+        created_at,
+        updated_at
+      FROM
+        users
+      WHERE
+        email = ?
+    `)
+    .get(email);
+  return userRow === null
+    ? undefined
+    : UserWithPasswordRowSchema.parse(userRow);
+};
+
+// Helper function to set session cookie
+const setSessionCookie = (
+  res: Response,
+  sessionId: string,
+  expiresAt: Date,
+) => {
+  res.cookie('sid', sessionId, {
+    httpOnly: true,
+    secure: process.env['NODE_ENV'] === 'production',
+    sameSite: 'lax',
+    expires: expiresAt,
+    path: '/',
+  });
+};
+
+// Helper function to prepare user response data
+const prepareUserResponse = (user: UserWithPasswordRow) => {
+  return UserSchema.parse({
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    role: user.role,
+    points: user.points,
+    streak_count: user.streak_count,
+    created_at: user.created_at,
+    updated_at: user.updated_at,
+  });
+};
+
+const verifyUserPassword = async (
+  password: string,
+  hashedPassword: string,
+): Promise<boolean> => {
+  return bcrypt.compare(password, hashedPassword);
+};
+
+const createLoginSession = (res: Response, userId: number) => {
+  const {sessionId, expiresAt} = createSession(userId);
+  setSessionCookie(res, sessionId, expiresAt);
+  return {sessionId, expiresAt};
+};
+
+const prepareLoginResponse = (user: UserWithPasswordRow, email: string) => {
+  const validatedUser = prepareUserResponse(user);
+  logger.info(`User logged in: ${email}`);
+  return {success: true, data: validatedUser, message: 'Login successful'};
+};
+
 router.post('/login', async (req, res) => {
   try {
     // Validate request body
     const validatedBody = LoginSchema.parse(req.body);
     const {email, password} = validatedBody;
 
-    // Query user from database
-    const userRow = db
-      .prepare(sql`
-        SELECT
-          id,
-          username,
-          email,
-          password_hash,
-          role,
-          points,
-          streak_count,
-          created_at,
-          updated_at
-        FROM
-          users
-        WHERE
-          email = ?
-      `)
-      .get(email);
-    const user =
-      userRow != null ? UserWithPasswordRowSchema.parse(userRow) : undefined;
-
+    // Find user
+    const user = findUserByEmail(email);
     if (!user) {
       return res
         .status(401)
@@ -150,44 +226,20 @@ router.post('/login', async (req, res) => {
     }
 
     // Verify password
-    const isValidPassword = await bcrypt.compare(password, user.password_hash);
-
+    const isValidPassword = await verifyUserPassword(
+      password,
+      user.password_hash,
+    );
     if (!isValidPassword) {
       return res
         .status(401)
         .json({success: false, error: 'Invalid credentials'});
     }
 
-    // Create session
-    const {sessionId, expiresAt} = createSession(user.id);
-
-    // Set cookie (httpOnly for security; sameSite lax for simplicity here)
-    res.cookie('sid', sessionId, {
-      httpOnly: true,
-      secure: process.env['NODE_ENV'] === 'production',
-      sameSite: 'lax',
-      expires: expiresAt,
-      path: '/',
-    });
-
-    const validatedUser = UserSchema.parse({
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      role: user.role,
-      points: user.points,
-      streak_count: user.streak_count,
-      created_at: user.created_at,
-      updated_at: user.updated_at,
-    });
-
-    logger.info(`User logged in: ${email}`);
-
-    return res.json({
-      success: true,
-      data: validatedUser,
-      message: 'Login successful',
-    });
+    // Create session and prepare response
+    createLoginSession(res, user.id);
+    const response = prepareLoginResponse(user, email);
+    return res.json(response);
   } catch (error) {
     if (error instanceof z.ZodError) {
       logger.warn({error}, 'Login validation error');
@@ -205,6 +257,51 @@ router.post('/login', async (req, res) => {
 
 // POST /api/auth/register - Parent self-registration and family creation optional later
 // eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
+// Helper function to check if user already exists
+const checkUserExists = (email: string, username: string) => {
+  const existingUser = db
+    .prepare(sql`
+      SELECT
+        id
+      FROM
+        users
+      WHERE
+        email = ?
+        OR username = ?
+    `)
+    .get(email, username);
+  return existingUser !== null;
+};
+
+// Helper function to create new user
+const createNewUser = async (
+  username: string,
+  email: string,
+  password: string,
+  role: string,
+) => {
+  const saltRounds = 12;
+  const passwordHash = await bcrypt.hash(password, saltRounds);
+
+  const result = db
+    .prepare(sql`
+      INSERT INTO
+        users (username, email, password_hash, role)
+      VALUES
+        (?, ?, ?, ?) RETURNING id,
+        username,
+        email,
+        role,
+        points,
+        streak_count,
+        created_at,
+        updated_at
+    `)
+    .get(username, email, passwordHash, role);
+
+  return UserSchema.parse(result);
+};
+
 router.post('/register', async (req, res) => {
   try {
     // Validate request body
@@ -212,19 +309,7 @@ router.post('/register', async (req, res) => {
     const {username, email, password, role = 'user'} = validatedBody;
 
     // Check if user already exists
-    const existingUser = db
-      .prepare(sql`
-        SELECT
-          id
-        FROM
-          users
-        WHERE
-          email = ?
-          OR username = ?
-      `)
-      .get(email, username);
-
-    if (existingUser != null) {
+    if (checkUserExists(email, username)) {
       return res
         .status(409)
         .json({
@@ -233,29 +318,8 @@ router.post('/register', async (req, res) => {
         });
     }
 
-    // Hash password
-    const saltRounds = 12;
-    const passwordHash = await bcrypt.hash(password, saltRounds);
-
-    // Create user
-    const result = db
-      .prepare(sql`
-        INSERT INTO
-          users (username, email, password_hash, role)
-        VALUES
-          (?, ?, ?, ?) RETURNING id,
-          username,
-          email,
-          role,
-          points,
-          streak_count,
-          created_at,
-          updated_at
-      `)
-      .get(username, email, passwordHash, role);
-
-    const validatedUser = UserSchema.parse(result);
-
+    // Create new user
+    const validatedUser = await createNewUser(username, email, password, role);
     logger.info(`New user registered: ${email}`);
 
     return res
@@ -288,7 +352,7 @@ router.post('/register', async (req, res) => {
 router.post('/logout', (req, res) => {
   try {
     const sessionId = getCookie(req, 'sid');
-    if (sessionId != null) {
+    if (sessionId !== undefined) {
       db.prepare(sql`
         DELETE FROM sessions
         WHERE
@@ -321,46 +385,61 @@ router.get('/me', (req, res) => {
   }
 });
 
+// Helper function to create password reset token
+const createPasswordResetToken = (userId: number) => {
+  const token = crypto.randomBytes(32).toString('hex');
+  const expiresAt = new Date(Date.now() + 1000 * 60 * 15); // 15 minutes
+  db.prepare(sql`
+    INSERT INTO
+      password_resets (token, user_id, created_at, expires_at, used)
+    VALUES
+      (?, ?, CURRENT_TIMESTAMP, ?, 0)
+  `).run(token, userId, expiresAt.toISOString());
+  return token;
+};
+
+const findUserForReset = (email: string) => {
+  const row = db
+    .prepare(sql`
+      SELECT
+        id
+      FROM
+        users
+      WHERE
+        email = ?
+    `)
+    .get(email);
+  return row === null ? undefined : IdRowSchema.parse(row);
+};
+
+const handlePasswordResetRequest = (email: string, userId: number) => {
+  const token = createPasswordResetToken(userId);
+  // In a real app, send email. For now, log the token.
+  logger.info({email, token}, 'Password reset requested');
+  return {
+    success: true,
+    message: 'If the email exists, a reset link has been sent',
+  };
+};
+
 // POST /api/auth/forgot - request password reset
 router.post('/forgot', (req, res) => {
   try {
     const {email} = ForgotPasswordRequestSchema.parse(req.body);
-    const row = db
-      .prepare(sql`
-        SELECT
-          id
-        FROM
-          users
-        WHERE
-          email = ?
-      `)
-      .get(email);
-    const user = row != null ? IdRowSchema.parse(row) : undefined;
+    const user = findUserForReset(email);
 
     // Always respond with success to prevent enumeration
-    if (!user) {
-      return res.json({
-        success: true,
-        message: 'If the email exists, a reset link has been sent',
-      });
-    }
-
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 1000 * 60 * 15); // 15 minutes
-    db.prepare(sql`
-      INSERT INTO
-        password_resets (token, user_id, created_at, expires_at, used)
-      VALUES
-        (?, ?, CURRENT_TIMESTAMP, ?, 0)
-    `).run(token, user.id, expiresAt.toISOString());
-
-    // In a real app, send email. For now, log the token.
-    logger.info({email, token}, 'Password reset requested');
-
-    return res.json({
+    const response = {
       success: true,
       message: 'If the email exists, a reset link has been sent',
-    });
+    };
+
+    if (!user) {
+      return res.json(response);
+    }
+
+    const resetResponse = handlePasswordResetRequest(email, user.id);
+    return res.json(resetResponse);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res
@@ -376,47 +455,66 @@ router.post('/forgot', (req, res) => {
 
 // POST /api/auth/reset - reset password
 // eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
+// Helper function to validate password reset token
+const validatePasswordResetToken = (token: string) => {
+  const row = db
+    .prepare(sql`
+      SELECT
+        token,
+        user_id,
+        expires_at,
+        used
+      FROM
+        password_resets
+      WHERE
+        token = ?
+    `)
+    .get(token);
+  const found = row === null ? undefined : PasswordResetRowSchema.parse(row);
+
+  if (!found || found.used) {
+    return {isValid: false, error: 'Invalid token'};
+  }
+  if (new Date(found.expires_at).getTime() < Date.now()) {
+    return {isValid: false, error: 'Token expired'};
+  }
+
+  return {isValid: true, resetData: found};
+};
+
+// Helper function to reset user password
+const resetUserPassword = async (
+  userId: number,
+  password: string,
+  token: string,
+) => {
+  const hashed = await bcrypt.hash(password, 12);
+  db.prepare(sql`
+    UPDATE users
+    SET
+      password_hash = ?
+    WHERE
+      id = ?
+  `).run(hashed, userId);
+  db.prepare(sql`
+    UPDATE password_resets
+    SET
+      used = 1
+    WHERE
+      token = ?
+  `).run(token);
+};
+
 router.post('/reset', async (req, res) => {
   try {
     const {token, password} = ResetPasswordSchema.parse(req.body);
-    const row = db
-      .prepare(sql`
-        SELECT
-          token,
-          user_id,
-          expires_at,
-          used
-        FROM
-          password_resets
-        WHERE
-          token = ?
-      `)
-      .get(token);
-    const found = row != null ? PasswordResetRowSchema.parse(row) : undefined;
 
-    if (!found || found.used) {
-      return res.status(400).json({success: false, error: 'Invalid token'});
-    }
-    if (new Date(found.expires_at).getTime() < Date.now()) {
-      return res.status(400).json({success: false, error: 'Token expired'});
+    const validation = validatePasswordResetToken(token);
+    if (!validation.isValid) {
+      return res.status(400).json({success: false, error: validation.error});
     }
 
-    const hashed = await bcrypt.hash(password, 12);
-    db.prepare(sql`
-      UPDATE users
-      SET
-        password_hash = ?
-      WHERE
-        id = ?
-    `).run(hashed, found.user_id);
-    db.prepare(sql`
-      UPDATE password_resets
-      SET
-        used = 1
-      WHERE
-        token = ?
-    `).run(token);
-
+    await resetUserPassword(validation.resetData!.user_id, password, token);
     return res.json({success: true, message: 'Password has been reset'});
   } catch (error) {
     if (error instanceof z.ZodError) {

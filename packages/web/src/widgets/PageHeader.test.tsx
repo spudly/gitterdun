@@ -1,8 +1,9 @@
+import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {PageHeader} from './PageHeader';
 
-describe('PageHeader', () => {
-  it('renders title, subtitle and actions', () => {
+describe('pageHeader', () => {
+  test('renders title, subtitle and actions', () => {
     render(
       <PageHeader
         actions={<button type="button">A</button>}

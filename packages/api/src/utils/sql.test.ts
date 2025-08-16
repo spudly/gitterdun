@@ -1,7 +1,8 @@
+import {describe, expect, test} from '@jest/globals';
 import {sql} from './sql';
 
 describe('sql', () => {
-  it('returns the raw string when there are no substitutions', () => {
+  test('returns the raw string when there are no substitutions', () => {
     const result = sql`
       SELECT
         *
@@ -16,7 +17,7 @@ describe('sql', () => {
     `);
   });
 
-  it('includes substitutions as-is if specified', () => {
+  test('includes substitutions as-is if specified', () => {
     const col = 'user_id';
     expect(sql`
       SELECT

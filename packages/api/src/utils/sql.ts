@@ -3,10 +3,10 @@ export const sql = (
   ...values: Array<unknown>
 ): string => {
   let result = '';
-  for (let i = 0; i < strings.length; i++) {
-    result += strings[i];
-    if (i < values.length) {
-      result += String(values[i]);
+  for (let index = 0; index < strings.length; index++) {
+    result += strings[index];
+    if (index < values.length) {
+      result += String(values[index]);
     }
   }
   return result;

@@ -1,10 +1,11 @@
+import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen, fireEvent, act} from '@testing-library/react';
 import {MemoryRouter, useLocation} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import ResetPassword from './ResetPassword';
 import {useUser} from '../hooks/useUser';
 
-jest.mock('../hooks/useUser', () => ({
+jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
   useUser: jest.fn(() => ({resetPassword: jest.fn(async () => ({}))})),
 }));
 
@@ -14,8 +15,8 @@ const wrap = (ui: React.ReactElement, path = '/reset-password?token=t') => (
   </QueryClientProvider>
 );
 
-describe('ResetPassword page', () => {
-  it('validates token and passwords', () => {
+describe('resetPassword page', () => {
+  test('validates token and passwords', () => {
     render(wrap(<ResetPassword />, '/reset-password?token='));
     const submit = screen.getByRole('button', {name: 'Reset Password'});
     submit.click();
@@ -28,41 +29,41 @@ describe('ResetPassword page', () => {
     expect(msg).toBeInTheDocument();
   });
 
-  it('submits when valid', async () => {
+  test('submits when valid', async () => {
     render(wrap(<ResetPassword />));
-    fireEvent.change(screen.getByLabelText(/New Password/i), {
+    fireEvent.change(screen.getByLabelText(/New Password/iu), {
       target: {value: 'a'},
     });
-    fireEvent.change(screen.getByLabelText(/Confirm Password/i), {
+    fireEvent.change(screen.getByLabelText(/Confirm Password/iu), {
       target: {value: 'a'},
     });
     await act(async () => {
       fireEvent.click(screen.getByRole('button', {name: 'Reset Password'}));
     });
-    expect(
-      await screen.findByText(/Password reset successful/i),
-    ).toBeInTheDocument();
+    await expect(
+      screen.findByText(/Password reset successful/i),
+    ).resolves.toBeInTheDocument();
   });
 
-  it('shows message when passwords do not match', () => {
+  test('shows message when passwords do not match', () => {
     render(wrap(<ResetPassword />));
-    fireEvent.change(screen.getByLabelText(/New Password/i), {
+    fireEvent.change(screen.getByLabelText(/New Password/iu), {
       target: {value: 'a'},
     });
-    fireEvent.change(screen.getByLabelText(/Confirm Password/i), {
+    fireEvent.change(screen.getByLabelText(/Confirm Password/iu), {
       target: {value: 'b'},
     });
     fireEvent.click(screen.getByRole('button', {name: 'Reset Password'}));
-    expect(screen.getByText(/Passwords do not match/)).toBeInTheDocument();
+    expect(screen.getByText(/Passwords do not match/u)).toBeInTheDocument();
   });
 
-  it('executes missing-token branch', () => {
+  test('executes missing-token branch', () => {
     render(wrap(<ResetPassword />, '/reset-password?token='));
     fireEvent.click(screen.getByRole('button', {name: 'Reset Password'}));
     // Running this path is sufficient to cover the code branch across environments
   });
 
-  it('executes success branch and schedules redirect', async () => {
+  test('executes success branch and schedules redirect', async () => {
     jest.useFakeTimers();
     const LocationProbe = () => {
       const loc = useLocation();
@@ -77,18 +78,18 @@ describe('ResetPassword page', () => {
         </MemoryRouter>
       </QueryClientProvider>,
     );
-    fireEvent.change(screen.getByLabelText(/New Password/i), {
+    fireEvent.change(screen.getByLabelText(/New Password/iu), {
       target: {value: 'abcdef'},
     });
-    fireEvent.change(screen.getByLabelText(/Confirm Password/i), {
+    fireEvent.change(screen.getByLabelText(/Confirm Password/iu), {
       target: {value: 'abcdef'},
     });
     await act(async () => {
       fireEvent.click(screen.getByRole('button', {name: 'Reset Password'}));
     });
-    expect(
-      await screen.findByText(/Password reset successful/i),
-    ).toBeInTheDocument();
+    await expect(
+      screen.findByText(/Password reset successful/i),
+    ).resolves.toBeInTheDocument();
     act(() => {
       jest.runAllTimers();
     });
@@ -96,7 +97,7 @@ describe('ResetPassword page', () => {
     jest.useRealTimers();
   });
 
-  it('handles reset API rejection (catch branch)', async () => {
+  test('handles reset API rejection (catch branch)', async () => {
     jest.mocked(useUser).mockReturnValueOnce({
       user: null,
       isLoading: false,
@@ -115,10 +116,10 @@ describe('ResetPassword page', () => {
       registerError: null,
     } as ReturnType<typeof useUser>);
     render(wrap(<ResetPassword />));
-    fireEvent.change(screen.getByLabelText(/New Password/i), {
+    fireEvent.change(screen.getByLabelText(/New Password/iu), {
       target: {value: 'abcdef'},
     });
-    fireEvent.change(screen.getByLabelText(/Confirm Password/i), {
+    fireEvent.change(screen.getByLabelText(/Confirm Password/iu), {
       target: {value: 'abcdef'},
     });
     await act(async () => {
@@ -126,18 +127,18 @@ describe('ResetPassword page', () => {
     });
   });
 
-  it('uses default empty token when query param is absent and shows error', async () => {
+  test('uses default empty token when query param is absent and shows error', async () => {
     render(wrap(<ResetPassword />, '/reset-password'));
     // Fill valid passwords to satisfy required/minLength so submit handler runs
-    fireEvent.change(screen.getByLabelText(/New Password/i), {
+    fireEvent.change(screen.getByLabelText(/New Password/iu), {
       target: {value: 'abcdef'},
     });
-    fireEvent.change(screen.getByLabelText(/Confirm Password/i), {
+    fireEvent.change(screen.getByLabelText(/Confirm Password/iu), {
       target: {value: 'abcdef'},
     });
     await act(async () => {
       fireEvent.click(screen.getByRole('button', {name: 'Reset Password'}));
     });
-    expect(screen.getByText(/Missing token/)).toBeInTheDocument();
+    expect(screen.getByText(/Missing token/u)).toBeInTheDocument();
   });
 });

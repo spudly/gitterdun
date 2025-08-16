@@ -23,7 +23,7 @@ const Goals: FC = () => {
   const {data: goalsResponse, isLoading} = useQuery({
     queryKey: ['goals'],
     queryFn: async () => goalsApi.getAll({user_id: Number(user?.id)}),
-    enabled: user != null,
+    enabled: user !== null,
   });
 
   const goals = goalsResponse?.data ?? [];
@@ -58,7 +58,7 @@ const Goals: FC = () => {
             </SectionHeader>
 
             <Stack gap="sm">
-              {goal.description != null && goal.description !== '' ? (
+              {goal.description !== undefined && goal.description !== '' ? (
                 <Text muted>{goal.description}</Text>
               ) : null}
 

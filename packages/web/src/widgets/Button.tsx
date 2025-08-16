@@ -57,7 +57,7 @@ export const Button: FC<ButtonProps> = ({
       {loading ? (
         <span
           aria-hidden="true"
-          className="absolute inline-block animate-spin rounded-full border-2 border-b-transparent border-white w-4 h-4"
+          className="absolute inline-block size-4 animate-spin rounded-full border-2 border-white border-b-transparent"
         />
       ) : null}
       <span className={clsx('flex items-center gap-2', contentOpacity)}>

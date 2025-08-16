@@ -1,9 +1,10 @@
+import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {StatusBadge, getStatusClass} from './StatusBadge';
 import {StatusDot} from './StatusDot';
 
-describe('Status components', () => {
-  it('renders StatusBadge and StatusDot', () => {
+describe('status components', () => {
+  test('renders StatusBadge and StatusDot', () => {
     render(
       <div>
         <StatusBadge status="completed">Completed</StatusBadge>
@@ -14,7 +15,7 @@ describe('Status components', () => {
     expect(screen.getByText('Completed')).toBeInTheDocument();
   });
 
-  it('covers StatusBadge all statuses', () => {
+  test('covers StatusBadge all statuses', () => {
     const {rerender} = render(<StatusBadge status="success">s</StatusBadge>);
     rerender(<StatusBadge status="error">e</StatusBadge>);
     rerender(<StatusBadge status="warning">w</StatusBadge>);
@@ -24,7 +25,7 @@ describe('Status components', () => {
     rerender(<StatusBadge status="approved">a</StatusBadge>);
   });
 
-  it('StatusBadge helper covers all branches', () => {
+  test('statusBadge helper covers all branches', () => {
     expect(getStatusClass('success')).toBeTruthy();
     expect(getStatusClass('error')).toBeTruthy();
     expect(getStatusClass('warning')).toBeTruthy();
@@ -34,7 +35,7 @@ describe('Status components', () => {
     expect(getStatusClass('approved')).toBeTruthy();
   });
 
-  it('covers StatusDot all colors and unlabeled', () => {
+  test('covers StatusDot all colors and unlabeled', () => {
     const {rerender} = render(<StatusDot color="blue" label="b" size={8} />);
     rerender(<StatusDot color="yellow" label="y" size={8} />);
     rerender(<StatusDot color="red" label="r" size={8} />);

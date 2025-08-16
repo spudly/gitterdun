@@ -16,7 +16,7 @@ const FormCardDemo: FC = () => {
           <form className="space-y-4">
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
                 htmlFor="name"
               >
                 Full Name
@@ -31,7 +31,7 @@ const FormCardDemo: FC = () => {
 
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
                 htmlFor="email"
               >
                 Email Address
@@ -59,7 +59,7 @@ const FormCardDemo: FC = () => {
           <form className="space-y-4">
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
                 htmlFor="username"
               >
                 Username
@@ -70,7 +70,7 @@ const FormCardDemo: FC = () => {
 
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
                 htmlFor="password"
               >
                 Password
@@ -99,7 +99,7 @@ const FormCardDemo: FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="mb-2 block text-sm font-medium text-gray-700"
                   htmlFor="first-name"
                 >
                   First Name
@@ -114,7 +114,7 @@ const FormCardDemo: FC = () => {
 
               <div>
                 <label
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="mb-2 block text-sm font-medium text-gray-700"
                   htmlFor="last-name"
                 >
                   Last Name
@@ -130,14 +130,14 @@ const FormCardDemo: FC = () => {
 
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
                 htmlFor="bio"
               >
                 Bio
               </label>
 
               <textarea
-                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full rounded border px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 id="bio"
                 placeholder="Tell us about yourself"
                 rows={4}
@@ -157,10 +157,10 @@ const FormCardDemo: FC = () => {
         <h3 className="text-lg font-semibold">Without Title</h3>
 
         <FormCard>
-          <div className="text-center space-y-4">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+          <div className="space-y-4 text-center">
+            <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-green-100">
               <svg
-                className="h-6 w-6 text-green-600"
+                className="size-6 text-green-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -188,9 +188,9 @@ const FormCardDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Custom Styling</h3>
 
-        <div className="border-2 border-blue-200 bg-blue-50 rounded-lg p-2">
+        <div className="rounded-lg border-2 border-blue-200 bg-blue-50 p-2">
           <FormCard title="Custom Styled Form">
-            <p className="text-blue-800 mb-4">
+            <p className="mb-4 text-blue-800">
               This form card is wrapped to apply custom styling while
               maintaining the base structure.
             </p>

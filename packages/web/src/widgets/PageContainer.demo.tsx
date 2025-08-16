@@ -10,13 +10,13 @@ const PageContainerDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Default Variant (Full Width)</h3>
 
-        <div className="border-2 border-dashed border-gray-300 p-4 rounded-lg">
+        <div className="rounded-lg border-2 border-dashed border-gray-300 p-4">
           <PageContainer variant="default">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">
+            <h1 className="mb-8 text-3xl font-bold text-gray-900">
               Sample Page
             </h1>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               <Card>
                 <h3 className="font-semibold">Card 1</h3>
 
@@ -44,18 +44,18 @@ const PageContainerDemo: FC = () => {
           Centered Variant (Narrow Width)
         </h3>
 
-        <div className="border-2 border-dashed border-gray-300 p-4 rounded-lg">
+        <div className="rounded-lg border-2 border-dashed border-gray-300 p-4">
           <PageContainer variant="centered">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-2xl font-semibold mb-4">Centered Content</h2>
+            <div className="rounded-lg bg-white p-6 shadow">
+              <h2 className="mb-4 text-2xl font-semibold">Centered Content</h2>
 
-              <p className="text-gray-600 mb-4">
+              <p className="mb-4 text-gray-600">
                 This variant is perfect for forms, login pages, and focused
                 content.
               </p>
 
               <button
-                className="w-full bg-indigo-600 text-white py-2 rounded"
+                className="w-full rounded bg-indigo-600 py-2 text-white"
                 type="button"
               >
                 Sample Button
@@ -68,23 +68,23 @@ const PageContainerDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Narrow Variant (Medium Width)</h3>
 
-        <div className="border-2 border-dashed border-gray-300 p-4 rounded-lg">
+        <div className="rounded-lg border-2 border-dashed border-gray-300 p-4">
           <PageContainer variant="narrow">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">
+            <h1 className="mb-8 text-3xl font-bold text-gray-900">
               Narrow Layout
             </h1>
 
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-4">Content Section</h2>
+            <div className="rounded-lg bg-white p-6 shadow">
+              <h2 className="mb-4 text-xl font-semibold">Content Section</h2>
 
-              <p className="text-gray-600 mb-4">
+              <p className="mb-4 text-gray-600">
                 This variant provides a good balance between full-width and
                 centered layouts. It&apos;s ideal for content-heavy pages that
                 don&apos;t need the full screen width.
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 bg-gray-50 rounded">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="rounded bg-gray-50 p-4">
                   <h3 className="font-medium">Feature 1</h3>
 
                   <p className="text-sm text-gray-600">
@@ -92,7 +92,7 @@ const PageContainerDemo: FC = () => {
                   </p>
                 </div>
 
-                <div className="p-4 bg-gray-50 rounded">
+                <div className="rounded bg-gray-50 p-4">
                   <h3 className="font-medium">Feature 2</h3>
 
                   <p className="text-sm text-gray-600">
@@ -108,13 +108,13 @@ const PageContainerDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Custom Styling</h3>
 
-        <div className="border-2 border-dashed border-gray-300 p-4 rounded-lg">
+        <div className="rounded-lg border-2 border-dashed border-gray-300 p-4">
           <PageContainer gradient="indigo" variant="default">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">
+            <h1 className="mb-8 text-3xl font-bold text-gray-900">
               Custom Background
             </h1>
 
-            <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow p-6">
+            <div className="rounded-lg bg-white/80 p-6 shadow backdrop-blur-sm">
               <p className="text-gray-700">
                 This page container has custom background styling applied while
                 maintaining the base layout structure.

@@ -48,10 +48,10 @@ export const Alert: FC<AlertProps> = ({
   return (
     <div className={baseStyles} role="alert">
       <div className="flex">
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           {type === 'success' && (
             <svg
-              className={clsx('h-5 w-5', ICON_STYLES[type])}
+              className={clsx('size-5', ICON_STYLES[type])}
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -65,7 +65,7 @@ export const Alert: FC<AlertProps> = ({
 
           {type === 'error' && (
             <svg
-              className={clsx('h-5 w-5', ICON_STYLES[type])}
+              className={clsx('size-5', ICON_STYLES[type])}
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -79,7 +79,7 @@ export const Alert: FC<AlertProps> = ({
 
           {type === 'warning' && (
             <svg
-              className={clsx('h-5 w-5', ICON_STYLES[type])}
+              className={clsx('size-5', ICON_STYLES[type])}
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -93,7 +93,7 @@ export const Alert: FC<AlertProps> = ({
 
           {type === 'info' && (
             <svg
-              className={clsx('h-5 w-5', ICON_STYLES[type])}
+              className={clsx('size-5', ICON_STYLES[type])}
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -107,7 +107,7 @@ export const Alert: FC<AlertProps> = ({
         </div>
 
         <div className="ml-3 flex-1">
-          {title != null && title !== '' ? (
+          {title !== undefined && title !== '' ? (
             <h3 className="text-sm font-medium">{title}</h3>
           ) : null}
 
@@ -126,7 +126,7 @@ export const Alert: FC<AlertProps> = ({
             >
               <span className="sr-only">Dismiss</span>
 
-              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="size-5" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   clipRule="evenodd"
                   d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
