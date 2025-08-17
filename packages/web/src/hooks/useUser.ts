@@ -3,27 +3,44 @@ import {UserSchema} from '@gitterdun/shared';
 import type {User} from '@gitterdun/shared';
 import {authApi} from '../lib/api.js';
 
+const NO_DATA_SUCCESS = {__noData: true} as const;
+
+const isNoDataSuccess = (value: unknown): value is typeof NO_DATA_SUCCESS => {
+  if (value === null || typeof value !== 'object') {
+    return false;
+  }
+  return (
+    '__noData' in (value as Record<string, unknown>)
+    && (value as {__noData?: boolean}).__noData === true
+  );
+};
+
+type UserQueryData = User | null | typeof NO_DATA_SUCCESS;
+
 export const useUser = () => {
   const queryClient = useQueryClient();
 
   const {
-    data: user,
+    data: rawUser,
     isLoading,
     error,
-  } = useQuery({
+  } = useQuery<UserQueryData>({
     queryKey: ['user'],
-    queryFn: async (): Promise<User | null> => {
+    queryFn: async (): Promise<UserQueryData> => {
       try {
         const res = await authApi.me();
         if (res.success && res.data) {
           return UserSchema.parse(res.data);
+        }
+        if (res.success && res.data === undefined) {
+          return NO_DATA_SUCCESS;
         }
         return null;
       } catch (_error) {
         return null;
       }
     },
-    staleTime: 1000 * 60 * 60, // 1 hour
+    staleTime: 1000 * 60 * 60,
     retry: false,
   });
 
@@ -53,27 +70,32 @@ export const useUser = () => {
     },
   });
 
-  const login = async (email: string, password: string) => {
-    return loginMutation.mutateAsync({email, password});
-  };
+  const login = async (email: string, password: string) =>
+    loginMutation.mutateAsync({email, password});
 
   const register = async (
     username: string,
     email: string,
     password: string,
     role?: string,
-  ) => {
-    return registerMutation.mutateAsync({
+  ) =>
+    registerMutation.mutateAsync({
       username,
       email,
       password,
       ...(role === undefined ? {} : {role}),
     });
-  };
 
-  const logout = async () => {
-    return logoutMutation.mutateAsync();
-  };
+  const logout = async () => logoutMutation.mutateAsync();
+
+  let user: User | null | undefined;
+  if (rawUser === undefined) {
+    user = undefined;
+  } else if (isNoDataSuccess(rawUser)) {
+    user = undefined;
+  } else {
+    user = rawUser ?? null;
+  }
 
   return {
     user,

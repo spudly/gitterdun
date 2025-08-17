@@ -10,7 +10,7 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   collectCoverage: true,
   collectCoverageFrom: [
-    '**/src/**/*.{ts,tsx,js,jsx}',
+    '<rootDir>/src/**/*.{ts,tsx,js,jsx}',
     '!**/node_modules/**',
     '!**/dist/**',
     '!**/*.demo.*',

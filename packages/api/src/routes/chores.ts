@@ -16,6 +16,10 @@ import db from '../lib/db';
 import {logger} from '../utils/logger';
 import {sql} from '../utils/sql';
 
+type UpdateChore = z.infer<typeof UpdateChoreSchema>;
+type Chore = z.infer<typeof ChoreSchema>;
+type ChoreWithUsername = z.infer<typeof ChoreWithUsernameSchema>;
+
 const router = express.Router();
 
 // GET /api/chores - Get all chores
@@ -45,25 +49,6 @@ const getBaseChoresQuery = () => {
       1 = 1
   `;
 };
-
-const CHORE_FILTER_CONDITIONS = [
-  {
-    condition: (status: string | undefined) => status,
-    clause: ' AND c.status = ?',
-    getValue: (status: string | undefined) => status,
-  },
-  {
-    condition: (choreType: string | undefined) => choreType,
-    clause: ' AND c.chore_type = ?',
-    getValue: (choreType: string | undefined) => choreType,
-  },
-  {
-    condition: (userId: number | undefined) => userId !== undefined,
-    clause:
-      ' AND c.id IN (SELECT chore_id FROM chore_assignments WHERE user_id = ?)',
-    getValue: (userId: number | undefined) => userId,
-  },
-];
 
 const applyChoreFilters = (
   baseQuery: string,
@@ -122,25 +107,28 @@ const buildPaginatedChoresQuery = (
   return {finalQuery, finalParams};
 };
 
-const executeChoresQuery = (query: string, params: Array<string | number>) => {
+const executeChoresQuery = (
+  query: string,
+  params: Array<string | number>,
+): Array<ChoreWithUsername> => {
   const chores = db.prepare(query).all(...params);
   return chores.map(chore => ChoreWithUsernameSchema.parse(chore));
 };
 
 const formatChoresResponse = (
-  chores: Array<any>,
+  chores: Array<ChoreWithUsername>,
   page: number,
   limit: number,
   total: number,
 ) => {
   return {
-    success: true,
+    success: true as const,
     data: chores,
     pagination: {page, limit, total, totalPages: Math.ceil(total / limit)},
   };
 };
 
-const parseChoresQueryRequest = (req: any) => {
+const parseChoresQueryRequest = (req: express.Request) => {
   const validatedQuery = ChoreQuerySchema.parse(req.query);
   const {
     status,
@@ -171,20 +159,22 @@ const processChoresRequest = (
   return formatChoresResponse(validatedChores, page!, limit!, total);
 };
 
-const handleChoresQueryError = (error: unknown, res: any) => {
+const handleChoresQueryError = (error: unknown, res: express.Response) => {
   if (error instanceof z.ZodError) {
     logger.warn({error}, 'Chores query validation error');
     return res
       .status(400)
       .json({
-        success: false,
+        success: false as const,
         error: 'Invalid query parameters',
         details: error.stack,
       });
   }
 
   logger.error({error: asError(error)}, 'Get chores error');
-  return res.status(500).json({success: false, error: 'Internal server error'});
+  return res
+    .status(500)
+    .json({success: false as const, error: 'Internal server error'});
 };
 
 router.get('/', async (req, res) => {
@@ -323,7 +313,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-const parseGetChoreRequest = (req: any) => {
+const parseGetChoreRequest = (req: express.Request) => {
   const {id: choreId} = IdParamSchema.parse(req.params);
   return {choreId};
 };
@@ -367,17 +357,23 @@ const fetchChoreById = (choreId: number) => {
   return ChoreSchema.parse(chore);
 };
 
-const handleGetChoreError = (error: unknown, res: any) => {
+const handleGetChoreError = (error: unknown, res: express.Response) => {
   if (error instanceof Error && error.message === 'Invalid chore ID') {
-    return res.status(400).json({success: false, error: 'Invalid chore ID'});
+    return res
+      .status(400)
+      .json({success: false as const, error: 'Invalid chore ID'});
   }
 
   if (error instanceof Error && error.message === 'Chore not found') {
-    return res.status(404).json({success: false, error: 'Chore not found'});
+    return res
+      .status(404)
+      .json({success: false as const, error: 'Chore not found'});
   }
 
   logger.error({error: asError(error)}, 'Get chore error');
-  return res.status(500).json({success: false, error: 'Internal server error'});
+  return res
+    .status(500)
+    .json({success: false as const, error: 'Internal server error'});
 };
 
 // GET /api/chores/:id - Get a specific chore
@@ -430,14 +426,15 @@ const CHORE_UPDATE_FIELD_MAPPINGS = [
   {field: 'status', column: 'status'},
 ];
 
-const processChoreUpdateFields = (validatedBody: any) => {
+const processChoreUpdateFields = (validatedBody: UpdateChore) => {
   const updateFields: Array<string> = [];
-  const values: Array<string | number> = [];
+  const values: Array<string | number | null> = [];
 
   for (const {field, column} of CHORE_UPDATE_FIELD_MAPPINGS) {
-    if (validatedBody[field] !== undefined) {
+    const value = (validatedBody as Record<string, unknown>)[field];
+    if (value !== undefined) {
       updateFields.push(`${column} = ?`);
-      values.push(validatedBody[field]);
+      values.push(value as string | number | null);
     }
   }
 
@@ -448,7 +445,7 @@ const processChoreUpdateFields = (validatedBody: any) => {
   return {updateFields, values};
 };
 
-const buildChoreUpdateQuery = (validatedBody: any, choreId: number) => {
+const buildChoreUpdateQuery = (validatedBody: UpdateChore, choreId: number) => {
   const {updateFields, values} = processChoreUpdateFields(validatedBody);
 
   // Add updated_at and id to values
@@ -460,8 +457,8 @@ const buildChoreUpdateQuery = (validatedBody: any, choreId: number) => {
 
 const executeChoreUpdate = (
   updateFields: Array<string>,
-  values: Array<string | number>,
-) => {
+  values: Array<string | number | null>,
+): Chore => {
   const updateQuery = sql`
     UPDATE chores
     SET
@@ -473,13 +470,13 @@ const executeChoreUpdate = (
   return ChoreSchema.parse(updatedChore);
 };
 
-const parseUpdateChoreRequest = (req: any) => {
+const parseUpdateChoreRequest = (req: express.Request) => {
   const {id} = IdParamSchema.parse(req.params);
   const validatedBody = UpdateChoreSchema.parse(req.body);
   return {choreId: id, validatedBody};
 };
 
-const processChoreUpdate = (choreId: number, validatedBody: any) => {
+const processChoreUpdate = (choreId: number, validatedBody: UpdateChore) => {
   validateUpdateChoreInput(choreId);
   checkChoreExists(choreId);
 
@@ -490,20 +487,22 @@ const processChoreUpdate = (choreId: number, validatedBody: any) => {
   return validatedChore;
 };
 
-const handleUpdateChoreError = (error: unknown, res: any) => {
+const handleUpdateChoreError = (error: unknown, res: express.Response) => {
   if (error instanceof z.ZodError) {
     logger.warn({error}, 'Update chore validation error');
     return res
       .status(400)
       .json({
-        success: false,
+        success: false as const,
         error: 'Invalid request data',
         details: error.stack,
       });
   }
 
   logger.error({error: asError(error)}, 'Update chore error');
-  return res.status(500).json({success: false, error: 'Internal server error'});
+  return res
+    .status(500)
+    .json({success: false as const, error: 'Internal server error'});
 };
 
 // PUT /api/chores/:id - Update a chore
@@ -523,7 +522,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-const parseDeleteChoreRequest = (req: any) => {
+const parseDeleteChoreRequest = (req: express.Request) => {
   const {id} = IdParamSchema.parse(req.params);
   return {choreId: id};
 };
@@ -561,17 +560,23 @@ const processChoreDelete = (choreId: number) => {
   logger.info({choreId}, 'Chore deleted');
 };
 
-const handleDeleteChoreError = (error: unknown, res: any) => {
+const handleDeleteChoreError = (error: unknown, res: express.Response) => {
   if (error instanceof Error && error.message === 'Invalid chore ID') {
-    return res.status(400).json({success: false, error: 'Invalid chore ID'});
+    return res
+      .status(400)
+      .json({success: false as const, error: 'Invalid chore ID'});
   }
 
   if (error instanceof Error && error.message === 'Chore not found') {
-    return res.status(404).json({success: false, error: 'Chore not found'});
+    return res
+      .status(404)
+      .json({success: false as const, error: 'Chore not found'});
   }
 
   logger.error({error: asError(error)}, 'Delete chore error');
-  return res.status(500).json({success: false, error: 'Internal server error'});
+  return res
+    .status(500)
+    .json({success: false as const, error: 'Internal server error'});
 };
 
 // DELETE /api/chores/:id - Delete a chore
@@ -661,7 +666,7 @@ const getChoreForCompletion = (choreId: number) => {
   return ChoreSchema.parse(choreRow);
 };
 
-const calculateCompletionPoints = (chore: any) => {
+const calculateCompletionPoints = (chore: Chore) => {
   const pointsEarned = chore.point_reward;
   const bonusPointsEarned = 0; // TODO: Implement bonus logic
   const penaltyPointsEarned = 0; // TODO: Implement penalty logic
@@ -711,7 +716,7 @@ const updateUserPointsForChore = (userId: number, totalPoints: number) => {
 
 const createChoreCompletionNotification = (
   userId: number,
-  chore: any,
+  chore: Chore,
   choreId: number,
 ) => {
   db.prepare(sql`
@@ -728,7 +733,7 @@ const createChoreCompletionNotification = (
   );
 };
 
-const parseChoreCompletionRequest = (req: any) => {
+const parseChoreCompletionRequest = (req: express.Request) => {
   const {id} = IdParamSchema.parse(req.params);
   const {userId, notes} = CompleteChoreBodySchema.parse(req.body);
   return {choreId: id, userId, notes};
@@ -738,7 +743,7 @@ const executeChoreCompletionTransaction = (
   choreId: number,
   userId: number,
   notes?: string,
-) => {
+): {chore: Chore; pointsEarned: number} => {
   const transaction = db.transaction(() => {
     findChoreAssignment(choreId, userId);
     const chore = getChoreForCompletion(choreId);
@@ -758,17 +763,23 @@ const executeChoreCompletionTransaction = (
   return transaction();
 };
 
-const handleChoreCompletionError = (error: unknown, res: any) => {
+const handleChoreCompletionError = (error: unknown, res: express.Response) => {
   if (error instanceof Error && error.message.includes('not found')) {
-    return res.status(404).json({success: false, error: error.message});
+    return res
+      .status(404)
+      .json({success: false as const, error: error.message});
   }
 
   if (error instanceof Error && error.message.includes('already completed')) {
-    return res.status(400).json({success: false, error: error.message});
+    return res
+      .status(400)
+      .json({success: false as const, error: error.message});
   }
 
   logger.error({error: asError(error)}, 'Complete chore error');
-  return res.status(500).json({success: false, error: 'Internal server error'});
+  return res
+    .status(500)
+    .json({success: false as const, error: 'Internal server error'});
 };
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support

@@ -92,7 +92,9 @@ router.post('/:familyId', (req, res) => {
       `)
       .get(familyId, inviterId);
     const membership =
-      membershipRow !== undefined ? RoleRowSchema.parse(membershipRow) : undefined;
+      membershipRow !== undefined
+        ? RoleRowSchema.parse(membershipRow)
+        : undefined;
     if (!membership || membership.role !== 'parent') {
       return res.status(403).json({success: false, error: 'Forbidden'});
     }
@@ -149,7 +151,9 @@ router.post('/accept', async (req, res) => {
       `)
       .get(token);
     const inv =
-      invRow !== undefined ? FamilyInvitationRowSchema.parse(invRow) : undefined;
+      invRow !== undefined
+        ? FamilyInvitationRowSchema.parse(invRow)
+        : undefined;
 
     if (!inv) {
       return res.status(400).json({success: false, error: 'Invalid token'});

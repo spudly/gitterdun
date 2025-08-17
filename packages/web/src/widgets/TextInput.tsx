@@ -23,17 +23,24 @@ export const TextInput: FC<TextInputProps> = ({
 }) => {
   const base =
     'w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500';
-  const errorCls =
-    error === null ? 'border-gray-300' : 'border-red-500 focus:ring-red-500';
-  const paddingLeft = leftIcon === null ? '' : 'pl-9';
-  const paddingRight = rightIcon === null ? '' : 'pr-9';
+
+  const hasError = error !== undefined && error !== null && error !== '';
+  const errorCls = hasError
+    ? 'border-red-500 focus:ring-red-500'
+    : 'border-gray-300';
+
+  const hasLeftIcon = leftIcon !== undefined && leftIcon !== null;
+  const hasRightIcon = rightIcon !== undefined && rightIcon !== null;
+  const paddingLeft = hasLeftIcon ? 'pl-9' : '';
+  const paddingRight = hasRightIcon ? 'pr-9' : '';
+
   return (
     <div className={clsx('relative')}>
-      {leftIcon === undefined ? null : (
+      {hasLeftIcon ? (
         <span className="absolute inset-y-0 left-0 flex items-center pl-2 text-gray-400">
           {leftIcon}
         </span>
-      )}
+      ) : null}
 
       <input
         className={clsx(base, errorCls, paddingLeft, paddingRight)}
@@ -41,15 +48,15 @@ export const TextInput: FC<TextInputProps> = ({
         {...rest}
       />
 
-      {rightIcon === undefined ? null : (
+      {hasRightIcon ? (
         <span className="absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400">
           {rightIcon}
         </span>
-      )}
+      ) : null}
 
-      {error === undefined ? null : (
+      {hasError ? (
         <div className="mt-1 text-xs text-red-600">{error}</div>
-      )}
+      ) : null}
     </div>
   );
 };

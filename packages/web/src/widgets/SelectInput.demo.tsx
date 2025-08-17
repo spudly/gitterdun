@@ -35,7 +35,7 @@ const SelectInputDemo: FC = () => {
       <FormField
         htmlFor="with-error-select"
         label="With error"
-        {...(!value ? {error: 'Please choose'} : {})}
+        {...(value === '' ? {error: 'Please choose'} : {})}
       >
         <SelectInput
           id="with-error-select"

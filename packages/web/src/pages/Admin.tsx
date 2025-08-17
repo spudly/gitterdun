@@ -39,7 +39,7 @@ const Admin: FC = () => {
   const {data: choresResponse, isLoading} = useQuery({
     queryKey: ['chores', 'admin'],
     queryFn: async () => choresApi.getAll(),
-    enabled: user != null && user.role === 'admin',
+    enabled: user?.role === 'admin',
   });
 
   const chores = choresResponse?.data ?? [];

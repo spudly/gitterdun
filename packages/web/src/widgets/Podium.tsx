@@ -49,11 +49,11 @@ export const Podium: FC<PodiumProps> = ({items, showMedals = true}) => {
           <div className="mt-4">
             {item.content}
 
-            {item.score ?  (
+            {item.score ? (
               <p className="text-gray-600">{item.score} points</p>
             ) : null}
 
-            {item.subtitle ?  (
+            {item.subtitle ? (
               <p className="text-sm text-gray-500">{item.subtitle}</p>
             ) : null}
           </div>

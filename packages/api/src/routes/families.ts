@@ -175,7 +175,9 @@ router.post('/:id/children', async (req, res) => {
       `)
       .get(familyId, userId);
     const membership =
-      membershipRow !== undefined ? RoleRowSchema.parse(membershipRow) : undefined;
+      membershipRow !== undefined
+        ? RoleRowSchema.parse(membershipRow)
+        : undefined;
     if (!membership || membership.role !== 'parent') {
       return res.status(403).json({success: false, error: 'Forbidden'});
     }
