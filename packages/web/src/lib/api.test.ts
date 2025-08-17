@@ -20,10 +20,7 @@ describe('api utils', () => {
   });
 
   test('performs GET with params', async () => {
-    const fetchSpy = jest.fn<
-      ReturnType<typeof fetch>,
-      Parameters<typeof fetch>
-    >(
+    const fetchSpy = jest.fn<typeof fetch>(
       async () =>
         new Response(JSON.stringify({success: true, data: {ok: true}}), {
           status: 200,
@@ -36,10 +33,7 @@ describe('api utils', () => {
   });
 
   test('handles non-ok response', async () => {
-    const fetchSpy = jest.fn<
-      ReturnType<typeof fetch>,
-      Parameters<typeof fetch>
-    >(
+    const fetchSpy = jest.fn<typeof fetch>(
       async () =>
         new Response(JSON.stringify({error: 'bad'}), {
           status: 500,
@@ -51,10 +45,7 @@ describe('api utils', () => {
   });
 
   test('authApi routes', async () => {
-    const fetchSpy = jest.fn<
-      ReturnType<typeof fetch>,
-      Parameters<typeof fetch>
-    >(
+    const fetchSpy = jest.fn<typeof fetch>(
       async () =>
         new Response(JSON.stringify({success: true, data: {id: 1}}), {
           status: 200,
@@ -94,10 +85,7 @@ describe('api utils', () => {
   });
 
   test('exercises all API endpoint wrappers (happy paths)', async () => {
-    const fetchSpy = jest.fn<
-      ReturnType<typeof fetch>,
-      Parameters<typeof fetch>
-    >(
+    const fetchSpy = jest.fn<typeof fetch>(
       async () =>
         new Response(JSON.stringify({success: true, data: []}), {
           status: 200,
@@ -141,10 +129,9 @@ describe('api utils', () => {
     const failingJson = async () => {
       throw new Error('bad json');
     };
-    const fetchSpy = jest.fn<
-      ReturnType<typeof fetch>,
-      Parameters<typeof fetch>
-    >(async () => new Response('', {status: 400}));
+    const fetchSpy = jest.fn<typeof fetch>(
+      async () => new Response('', {status: 400}),
+    );
     // Override to simulate json() throwing while preserving Response shape
     const throwing = new Response('', {status: 400});
     jest.spyOn(throwing, 'json').mockImplementation(failingJson);
@@ -154,10 +141,7 @@ describe('api utils', () => {
   });
 
   test('posts to auth/reset and evaluates choresApi export (covers 154-157)', async () => {
-    const fetchSpy = jest.fn<
-      ReturnType<typeof fetch>,
-      Parameters<typeof fetch>
-    >(
+    const fetchSpy = jest.fn<typeof fetch>(
       async (_url, _init) =>
         new Response(JSON.stringify({success: true, data: {ok: true}}), {
           status: 200,
@@ -177,10 +161,7 @@ describe('api utils', () => {
   });
 
   test('posts to auth/forgot (covers line 151)', async () => {
-    const fetchSpy = jest.fn<
-      ReturnType<typeof fetch>,
-      Parameters<typeof fetch>
-    >(
+    const fetchSpy = jest.fn<typeof fetch>(
       async (_url, _init) =>
         new Response(JSON.stringify({success: true}), {
           status: 200,
@@ -196,10 +177,7 @@ describe('api utils', () => {
   });
 
   test('uses null body when PUT data is falsy (covers line 83)', async () => {
-    const fetchSpy = jest.fn<
-      ReturnType<typeof fetch>,
-      Parameters<typeof fetch>
-    >(
+    const fetchSpy = jest.fn<typeof fetch>(
       async (_url, _init) =>
         new Response(JSON.stringify({success: true}), {
           status: 200,
@@ -215,10 +193,7 @@ describe('api utils', () => {
   });
 
   test('uses null body when PATCH data is falsy (covers line 106)', async () => {
-    const fetchSpy = jest.fn<
-      ReturnType<typeof fetch>,
-      Parameters<typeof fetch>
-    >(
+    const fetchSpy = jest.fn<typeof fetch>(
       async (_url, _init) =>
         new Response(JSON.stringify({success: true}), {
           status: 200,

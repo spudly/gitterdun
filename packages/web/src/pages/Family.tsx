@@ -7,7 +7,6 @@ import {PageContainer} from '../widgets/PageContainer.js';
 import {FormSection} from '../widgets/FormSection.js';
 import {MembersList} from '../widgets/MembersList.js';
 import {Toolbar} from '../widgets/Toolbar.js';
-// import {FormField} from '../widgets/FormField.js';
 import {TextInput} from '../widgets/TextInput.js';
 import {SelectInput} from '../widgets/SelectInput.js';
 import {Button} from '../widgets/Button.js';
@@ -45,7 +44,7 @@ const Family: FC = () => {
   const membersQuery = useQuery({
     queryKey: ['families', selectedFamilyId, 'members'],
     queryFn: async () => {
-      if (selectedFamilyId === undefined) {
+      if (selectedFamilyId == null) {
         return {success: true, data: []};
       }
       return familiesApi.listMembers(selectedFamilyId);
@@ -136,7 +135,7 @@ const Family: FC = () => {
         </Toolbar>
       </FormSection>
 
-      {selectedFamilyId ?  (
+      {selectedFamilyId ? (
         <GridContainer cols={2} gap="lg">
           <FormSection title="Members">
             {/* Parse API data using zod schema to avoid any */}

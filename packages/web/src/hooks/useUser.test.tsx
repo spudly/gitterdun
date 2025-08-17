@@ -5,7 +5,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {useUser} from './useUser';
 import * as apis from '../lib/api';
 
-jest.mock<typeof import('../lib/api')>('../lib/api', () => {
+jest.mock('../lib/api', () => {
   return {
     authApi: {
       me: jest.fn(async () => ({

@@ -1,4 +1,4 @@
-import {describe, expect, jest, test} from '@jest/globals';
+import {beforeAll, describe, expect, jest, test} from '@jest/globals';
 import {render, screen, fireEvent} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
 
@@ -15,11 +15,15 @@ const mockUser: User = {
   created_at: '2023-01-01T00:00:00.000Z',
   updated_at: '2023-01-01T00:00:00.000Z',
 };
-let user: User | null = mockUser;
+let user: User | null = null;
 const mockLogout = jest.fn();
-jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
+jest.mock('../hooks/useUser', () => ({
   useUser: () => ({user, logout: mockLogout}),
 }));
+
+beforeAll(() => {
+  user = mockUser;
+});
 
 describe('layout', () => {
   test('renders nav and children', () => {

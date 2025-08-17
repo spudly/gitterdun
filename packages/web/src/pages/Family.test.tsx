@@ -5,11 +5,11 @@ import Family from './Family';
 import {useUser} from '../hooks/useUser';
 import * as apiModule from '../lib/api';
 
-jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
+jest.mock('../hooks/useUser', () => ({
   useUser: jest.fn(() => ({user: {id: 1}})),
 }));
 
-jest.mock<typeof import('../lib/api')>('../lib/api', () => ({
+jest.mock('../lib/api', () => ({
   familiesApi: {
     myFamilies: jest.fn(async () => ({
       success: true,

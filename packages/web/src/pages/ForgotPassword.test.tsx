@@ -4,7 +4,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import ForgotPassword from './ForgotPassword';
 import * as useUserModule from '../hooks/useUser';
 
-jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
+jest.mock('../hooks/useUser', () => ({
   useUser: jest.fn(() => ({forgotPassword: jest.fn(async () => ({}))})),
 }));
 
@@ -62,6 +62,6 @@ describe('forgotPassword page', () => {
       screen.findByText('Request failed'),
     ).resolves.toBeInTheDocument();
     // restore default implementation for subsequent tests
-    mocked.mockImplementation(defaultImpl);
+    mocked.mockImplementation(defaultImpl!);
   });
 });

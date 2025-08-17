@@ -80,9 +80,9 @@ const applyChoreFilters = (
     const filter = CHORE_FILTER_CONDITIONS[index];
     const value = filterValues[index];
 
-    if (filter.condition(value)) {
+    if (filter?.condition(value as any)) {
       query += filter.clause;
-      params.push(filter.getValue(value)!);
+      params.push(filter.getValue(value as any)!);
     }
   }
 
@@ -269,12 +269,12 @@ router.post('/', async (req, res) => {
     // Validate and extract request data
     const {
       title,
-      description,
+      description = '',
       point_reward: pointReward,
       bonus_points: bonusPoints = 0,
       penalty_points: penaltyPoints = 0,
-      due_date: dueDate,
-      recurrence_rule: recurrenceRule,
+      due_date: dueDate = null,
+      recurrence_rule: recurrenceRule = null,
       chore_type: choreType,
       assigned_users: assignedUsers = [],
     } = CreateChoreSchema.parse(req.body);

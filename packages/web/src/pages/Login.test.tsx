@@ -113,7 +113,7 @@ describe('login page', () => {
     await expect(
       screen.findByText('Login failed'),
     ).resolves.toBeInTheDocument();
-    mocked.mockImplementation(defaultImpl);
+    mocked.mockImplementation(defaultImpl!);
   });
 
   test('shows loading state when isLoggingIn is true', () => {

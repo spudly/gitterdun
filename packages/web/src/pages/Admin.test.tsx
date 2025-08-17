@@ -6,11 +6,11 @@ import Admin from './Admin';
 import * as useUserModule from '../hooks/useUser';
 import * as apiModule from '../lib/api';
 
-jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
+jest.mock('../hooks/useUser', () => ({
   useUser: jest.fn(() => ({user: {id: 1, role: 'admin'}})),
 }));
 
-jest.mock<typeof import('../lib/api')>('../lib/api', () => ({
+jest.mock('../lib/api', () => ({
   choresApi: {getAll: jest.fn(async () => ({success: true, data: []}))},
   familiesApi: {
     create: jest.fn(async () => ({success: true})),
@@ -143,11 +143,11 @@ describe('admin page', () => {
       },
       isLoading: false,
       error: null,
-      login: jest.fn(),
-      register: jest.fn(),
-      logout: jest.fn(),
-      forgotPassword: jest.fn(),
-      resetPassword: jest.fn(),
+      login: jest.fn() as any,
+      register: jest.fn() as any,
+      logout: jest.fn() as any,
+      forgotPassword: jest.fn() as any,
+      resetPassword: jest.fn() as any,
       isLoggingIn: false,
       isRegistering: false,
       isLoggingOut: false,

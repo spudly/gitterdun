@@ -279,6 +279,7 @@ const eslintConfig = [
             '**/karma.conf.{js,jsx,ts,tsx}',
             '**/.eslintrc.{js,jsx,ts,tsx}',
             '**/*.config.{js,jsx,ts,tsx}',
+            '**/*.d.ts',
           ],
           optionalDependencies: false,
         },
@@ -695,7 +696,7 @@ const eslintConfig = [
       'consistent-this': 'warn',
       'default-case': 'warn',
       'default-case-last': 'warn',
-      eqeqeq: 'warn',
+      eqeqeq: ['warn', 'always', {null: 'ignore'}],
       'for-direction': 'warn',
       'func-name-matching': 'warn',
       'func-names': 'warn',
@@ -800,7 +801,6 @@ const eslintConfig = [
       'no-template-curly-in-string': 'warn',
       'no-ternary': 'off',
       'no-undef-init': 'warn',
-      'no-undefined': 'off', // prefer undefined over null for TypeScript optional properties
       'no-unexpected-multiline': 'warn',
       'no-unmodified-loop-condition': 'warn',
       'no-unneeded-ternary': 'warn',
@@ -864,7 +864,7 @@ const eslintConfig = [
       'jest/no-duplicate-hooks': 'warn',
       'jest/no-export': 'warn',
       'jest/no-focused-tests': 'warn',
-      'jest/no-hooks': 'warn',
+      'jest/no-hooks': 'off', // no hooks? but why?
       'jest/no-identical-title': 'warn',
       'jest/no-interpolation-in-snapshots': 'warn',
       'jest/no-jasmine-globals': 'warn',
@@ -930,6 +930,7 @@ const eslintConfig = [
       '@typescript-eslint/no-non-null-assertion': 'off', // we can be more loose in unit tests
       '@typescript-eslint/no-unsafe-call': 'off', // we can be more loose in unit tests
       'react/no-multi-comp': 'off', // may need to create mini-components in unit tests
+      '@typescript-eslint/no-unsafe-member-access': 'off', // we can be more loose in unit tests
     },
   },
 ];

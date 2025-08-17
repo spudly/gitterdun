@@ -1,6 +1,3 @@
-/// <reference types="@testing-library/jest-dom" />
-import '@testing-library/jest-dom';
-
 // Provide a minimal WHATWG Response polyfill for tests that construct `new Response(...)`
 if (typeof global.Response === 'undefined') {
   class SimpleResponse {

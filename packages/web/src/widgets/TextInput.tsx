@@ -37,7 +37,7 @@ export const TextInput: FC<TextInputProps> = ({
 
       <input
         className={clsx(base, errorCls, paddingLeft, paddingRight)}
-        onChange={event => onChange?.(event.target.value, e)}
+        onChange={event => onChange?.(event.target.value, event)}
         {...rest}
       />
 
