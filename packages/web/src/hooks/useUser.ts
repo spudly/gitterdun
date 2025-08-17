@@ -10,7 +10,7 @@ const isNoDataSuccess = (value: unknown): value is typeof NO_DATA_SUCCESS => {
     return false;
   }
   return (
-    Object.prototype.hasOwnProperty.call(value, '__noData')
+    '__noData' in (value as Record<string, unknown>)
     && (value as {__noData?: boolean}).__noData === true
   );
 };
