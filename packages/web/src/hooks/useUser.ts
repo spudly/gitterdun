@@ -88,9 +88,14 @@ export const useUser = () => {
 
   const logout = async () => logoutMutation.mutateAsync();
 
-  const user: User | null | undefined = isNoDataSuccess(rawUser)
-    ? undefined
-    : (rawUser ?? null);
+  let user: User | null | undefined;
+  if (rawUser === undefined) {
+    user = undefined;
+  } else if (isNoDataSuccess(rawUser)) {
+    user = undefined;
+  } else {
+    user = rawUser ?? null;
+  }
 
   return {
     user,
