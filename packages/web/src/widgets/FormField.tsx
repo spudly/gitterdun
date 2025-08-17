@@ -18,6 +18,9 @@ export const FormField: FC<FormFieldProps> = ({
   error,
   helpText,
 }) => {
+  const hasHelpText = helpText !== undefined && helpText !== '';
+  const hasError = error !== undefined && error !== '';
+
   return (
     <div className={clsx('space-y-1')}>
       <label
@@ -31,9 +34,9 @@ export const FormField: FC<FormFieldProps> = ({
 
       {children}
 
-      {helpText ? <p className="text-sm text-gray-500">{helpText}</p> : null}
+      {hasHelpText ? <p className="text-sm text-gray-500">{helpText}</p> : null}
 
-      {error ? (
+      {hasError ? (
         <p className="text-sm text-red-600" role="alert">
           {error}
         </p>
