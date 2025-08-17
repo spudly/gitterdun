@@ -5,9 +5,15 @@ import {authApi} from '../lib/api.js';
 
 const NO_DATA_SUCCESS = {__noData: true} as const;
 
-function isNoDataSuccess(value: unknown): value is typeof NO_DATA_SUCCESS {
-  return Boolean((value as {__noData?: boolean} | null)?.__noData);
-}
+const isNoDataSuccess = (value: unknown): value is typeof NO_DATA_SUCCESS => {
+  if (value === null || typeof value !== 'object') {
+    return false;
+  }
+  return (
+    Object.prototype.hasOwnProperty.call(value, '__noData')
+    && (value as {__noData?: boolean}).__noData === true
+  );
+};
 
 type UserQueryData = User | null | typeof NO_DATA_SUCCESS;
 
@@ -64,31 +70,27 @@ export const useUser = () => {
     },
   });
 
-  const login = async (email: string, password: string) => {
-    return loginMutation.mutateAsync({email, password});
-  };
+  const login = async (email: string, password: string) =>
+    loginMutation.mutateAsync({email, password});
 
   const register = async (
     username: string,
     email: string,
     password: string,
     role?: string,
-  ) => {
-    return registerMutation.mutateAsync({
+  ) =>
+    registerMutation.mutateAsync({
       username,
       email,
       password,
       ...(role === undefined ? {} : {role}),
     });
-  };
 
-  const logout = async () => {
-    return logoutMutation.mutateAsync();
-  };
+  const logout = async () => logoutMutation.mutateAsync();
 
   const user: User | null | undefined = isNoDataSuccess(rawUser)
     ? undefined
-    : (rawUser as User | null | undefined);
+    : (rawUser ?? null);
 
   return {
     user,
