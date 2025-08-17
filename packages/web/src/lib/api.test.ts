@@ -160,7 +160,7 @@ describe('api utils', () => {
     await choresApi.getAll();
   });
 
-  test('posts to auth/forgot (covers line 151)', async () => {
+  test('posts to auth/forgot', async () => {
     const fetchSpy = jest.fn<typeof fetch>(
       async (_url, _init) =>
         new Response(JSON.stringify({success: true}), {
@@ -176,7 +176,7 @@ describe('api utils', () => {
     );
   });
 
-  test('uses null body when PUT data is falsy (covers line 83)', async () => {
+  test('uses null body when PUT data is falsy', async () => {
     const fetchSpy = jest.fn<typeof fetch>(
       async (_url, _init) =>
         new Response(JSON.stringify({success: true}), {
@@ -192,7 +192,7 @@ describe('api utils', () => {
     );
   });
 
-  test('uses null body when PATCH data is falsy (covers line 106)', async () => {
+  test('uses null body when PATCH data is falsy', async () => {
     const fetchSpy = jest.fn<typeof fetch>(
       async (_url, _init) =>
         new Response(JSON.stringify({success: true}), {

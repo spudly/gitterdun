@@ -71,12 +71,14 @@ describe('useUser', () => {
     });
   });
 
-  test('returns null when me succeeds without data (covers line 20)', async () => {
+  test('returns undefined when me succeeds without data', async () => {
     const {authApi} = apis;
-    jest.mocked(authApi.me).mockResolvedValueOnce({success: true});
+    jest
+      .mocked(authApi.me)
+      .mockResolvedValueOnce({success: true, data: undefined});
     const {result} = renderHook(() => useUser(), {wrapper});
     await waitFor(() => {
-      expect(result.current.user).toBeNull();
+      expect(result.current.user).toBeUndefined();
     });
   });
 
