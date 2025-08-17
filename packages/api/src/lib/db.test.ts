@@ -1,11 +1,4 @@
-import {
-  describe,
-  expect,
-  test,
-  beforeEach,
-  afterEach,
-  jest,
-} from '@jest/globals';
+import {describe, expect, test, beforeEach, jest} from '@jest/globals';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -27,7 +20,7 @@ describe('db module', () => {
     jest.clearAllMocks();
     jest.resetModules();
     // Reset environment variables
-    delete process.env.DB_PATH;
+    delete process.env['DB_PATH'];
   });
 
   test('should create database with default path when DB_PATH not set', async () => {
@@ -57,7 +50,7 @@ describe('db module', () => {
 
   test('should use DB_PATH environment variable when set', async () => {
     // Set environment variable
-    process.env.DB_PATH = '/custom/path/test.db';
+    process.env['DB_PATH'] = '/custom/path/test.db';
 
     // Setup mocks
     mockedPath.resolve.mockReturnValue('/custom/path/test.db');

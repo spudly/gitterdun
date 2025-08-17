@@ -50,6 +50,25 @@ const getBaseChoresQuery = () => {
   `;
 };
 
+const CHORE_FILTER_CONDITIONS = [
+  {
+    condition: (status: string | undefined) => status,
+    clause: ' AND c.status = ?',
+    getValue: (status: string | undefined) => status,
+  },
+  {
+    condition: (choreType: string | undefined) => choreType,
+    clause: ' AND c.chore_type = ?',
+    getValue: (choreType: string | undefined) => choreType,
+  },
+  {
+    condition: (userId: number | undefined) => userId !== undefined,
+    clause:
+      ' AND c.id IN (SELECT chore_id FROM chore_assignments WHERE user_id = ?)',
+    getValue: (userId: number | undefined) => userId,
+  },
+];
+
 const applyChoreFilters = (
   baseQuery: string,
   status?: string,
