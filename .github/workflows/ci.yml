@@ -46,7 +46,7 @@ jobs:
       - name: Run tests
         env:
           CI: true
-        run: turbo run test
+        run: npm test
 
   lint:
     name: Lint
@@ -66,7 +66,7 @@ jobs:
         run: npm ci
 
       - name: Run linting
-        run: turbo run lint
+        run: npm run lint
 
       - name: Check formatting
         run: npm run prettier:check

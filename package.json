@@ -14,7 +14,7 @@
     "build:web": "npm run build --workspace=packages/web",
     "start": "npm run start --workspace=packages/api",
     "lint": "turbo run lint",
-    "test": "npm run build && jest",
+    "test": "turbo run test",
     "test:changed": "jest --onlyChanged",
     "prettier:fix": "prettier --write .",
     "prettier:check": "prettier --check .",
