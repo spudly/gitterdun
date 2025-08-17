@@ -15,8 +15,8 @@ describe('logger module', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.resetModules();
-    delete process.env.LOG_LEVEL;
-    delete process.env.NODE_ENV;
+    delete process.env['LOG_LEVEL'];
+    delete process.env['NODE_ENV'];
   });
 
   afterEach(() => {
@@ -33,7 +33,7 @@ describe('logger module', () => {
   });
 
   test('should use LOG_LEVEL environment variable when set', async () => {
-    process.env.LOG_LEVEL = 'debug';
+    process.env['LOG_LEVEL'] = 'debug';
     const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
     mockPino.mockReturnValue(mockLoggerInstance);
 
@@ -43,7 +43,7 @@ describe('logger module', () => {
   });
 
   test('should add pretty transport in development', async () => {
-    process.env.NODE_ENV = 'development';
+    process.env['NODE_ENV'] = 'development';
     const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
     mockPino.mockReturnValue(mockLoggerInstance);
 
@@ -63,7 +63,7 @@ describe('logger module', () => {
   });
 
   test('should not add transport in production', async () => {
-    process.env.NODE_ENV = 'production';
+    process.env['NODE_ENV'] = 'production';
     const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
     mockPino.mockReturnValue(mockLoggerInstance);
 

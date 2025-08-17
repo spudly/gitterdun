@@ -33,7 +33,7 @@ const Family: FC = () => {
 
   useEffect(() => {
     const first = myFamiliesQuery.data?.data?.[0];
-    if (first !== undefined && selectedFamilyId === undefined) {
+    if (first != null && selectedFamilyId == null) {
       const candidate = (first as {id?: unknown}).id;
       if (typeof candidate === 'number') {
         setSelectedFamilyId(candidate);
@@ -135,7 +135,7 @@ const Family: FC = () => {
         </Toolbar>
       </FormSection>
 
-      {selectedFamilyId ? (
+      {selectedFamilyId != null ? (
         <GridContainer cols={2} gap="lg">
           <FormSection title="Members">
             {/* Parse API data using zod schema to avoid any */}
@@ -148,122 +148,123 @@ const Family: FC = () => {
             })()}
           </FormSection>
 
-        <FormSection>
-          <Stack gap="md">
-            <div>
-              <Stack gap="sm">
-                <Text as="h3" weight="semibold">
-                  Create Child Account
-                </Text>
-
+          <FormSection>
+            <Stack gap="md">
+              <div>
                 <Stack gap="sm">
-                  <TextInput
-                    onChange={val => {
-                      setChildUsername(val);
-                    }}
-                    placeholder="Username"
-                    value={childUsername}
-                  />
+                  <Text as="h3" weight="semibold">
+                    Create Child Account
+                  </Text>
 
-                  <TextInput
-                    onChange={val => {
-                      setChildEmail(val);
-                    }}
-                    placeholder="Email"
-                    type="email"
-                    value={childEmail}
-                  />
+                  <Stack gap="sm">
+                    <TextInput
+                      onChange={val => {
+                        setChildUsername(val);
+                      }}
+                      placeholder="Username"
+                      value={childUsername}
+                    />
 
-                  <TextInput
-                    onChange={val => {
-                      setChildPassword(val);
-                    }}
-                    placeholder="Password"
-                    type="password"
-                    value={childPassword}
-                  />
+                    <TextInput
+                      onChange={val => {
+                        setChildEmail(val);
+                      }}
+                      placeholder="Email"
+                      type="email"
+                      value={childEmail}
+                    />
 
-                  <Button
-                    onClick={() => {
-                      if (
-                        selectedFamilyId === null
-                        || childUsername === ''
-                        || childEmail === ''
-                        || childPassword === ''
-                      ) {
-                        return;
-                      }
-                      createChildMutation.mutate({
-                        familyId: selectedFamilyId,
-                        username: childUsername,
-                        email: childEmail,
-                        password: childPassword,
-                      });
-                      setChildUsername('');
-                      setChildEmail('');
-                      setChildPassword('');
-                    }}
-                    type="button"
-                    disabled={selectedFamilyId === null}
-                  >
-                    Create
-                  </Button>
+                    <TextInput
+                      onChange={val => {
+                        setChildPassword(val);
+                      }}
+                      placeholder="Password"
+                      type="password"
+                      value={childPassword}
+                    />
+
+                    <Button
+                      disabled={selectedFamilyId === null}
+                      onClick={() => {
+                        if (
+                          selectedFamilyId === null
+                          || childUsername === ''
+                          || childEmail === ''
+                          || childPassword === ''
+                        ) {
+                          return;
+                        }
+                        createChildMutation.mutate({
+                          familyId: selectedFamilyId,
+                          username: childUsername,
+                          email: childEmail,
+                          password: childPassword,
+                        });
+                        setChildUsername('');
+                        setChildEmail('');
+                        setChildPassword('');
+                      }}
+                      type="button"
+                    >
+                      Create
+                    </Button>
+                  </Stack>
                 </Stack>
-              </Stack>
-            </div>
+              </div>
 
-            <div>
-              <Stack gap="sm">
-                <Text as="h3" weight="semibold">
-                  Invite Member
-                </Text>
+              <div>
+                <Stack gap="sm">
+                  <Text as="h3" weight="semibold">
+                    Invite Member
+                  </Text>
 
-                <Toolbar>
-                  <TextInput
-                    onChange={val => {
-                      setInviteEmail(val);
-                    }}
-                    placeholder="Email"
-                    type="email"
-                    value={inviteEmail}
-                  />
+                  <Toolbar>
+                    <TextInput
+                      onChange={val => {
+                        setInviteEmail(val);
+                      }}
+                      placeholder="Email"
+                      type="email"
+                      value={inviteEmail}
+                    />
 
-                  <SelectInput
-                    onChange={val => {
-                      const role =
-                        val === 'parent' || val === 'child' ? val : 'parent';
-                      setInviteRole(role);
-                    }}
-                    value={inviteRole}
-                  >
-                    <option value="parent">Parent</option>
+                    <SelectInput
+                      onChange={val => {
+                        const role =
+                          val === 'parent' || val === 'child' ? val : 'parent';
+                        setInviteRole(role);
+                      }}
+                      value={inviteRole}
+                    >
+                      <option value="parent">Parent</option>
 
-                    <option value="child">Child</option>
-                  </SelectInput>
+                      <option value="child">Child</option>
+                    </SelectInput>
 
-                  <Button
-                    onClick={() => {
-                      if (selectedFamilyId === null || inviteEmail === '') {
-                        return;
-                      }
-                      inviteMutation.mutate({
-                        familyId: selectedFamilyId,
-                        email: inviteEmail,
-                        role: inviteRole,
-                      });
-                      setInviteEmail('');
-                    }}
-                    type="button"
-                    disabled={selectedFamilyId === null}
-                  >
-                    Send
-                  </Button>
-                </Toolbar>
-              </Stack>
-            </div>
-          </Stack>
-        </FormSection>
-      </GridContainer>
+                    <Button
+                      disabled={selectedFamilyId === null}
+                      onClick={() => {
+                        if (selectedFamilyId === null || inviteEmail === '') {
+                          return;
+                        }
+                        inviteMutation.mutate({
+                          familyId: selectedFamilyId,
+                          email: inviteEmail,
+                          role: inviteRole,
+                        });
+                        setInviteEmail('');
+                      }}
+                      type="button"
+                    >
+                      Send
+                    </Button>
+                  </Toolbar>
+                </Stack>
+              </div>
+            </Stack>
+          </FormSection>
+        </GridContainer>
+      ) : null}
     </PageContainer>
   );
 };

@@ -1,6 +1,17 @@
 import {describe, expect, test, beforeEach, jest} from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
+import {
+  CreateGoalSchema,
+  UpdateGoalSchema,
+  GoalQuerySchema,
+  GoalSchema,
+  CountRowSchema,
+  asError,
+  IdParamSchema,
+} from '@gitterdun/shared';
+
+import goalsRouter from './goals';
 
 // Mock dependencies
 const mockDb = {
@@ -14,17 +25,6 @@ const mockLogger = {info: jest.fn(), error: jest.fn(), warn: jest.fn()};
 jest.mock('../utils/logger', () => ({logger: mockLogger}));
 
 jest.mock('@gitterdun/shared');
-import {
-  CreateGoalSchema,
-  UpdateGoalSchema,
-  GoalQuerySchema,
-  GoalSchema,
-  CountRowSchema,
-  asError,
-  IdParamSchema,
-} from '@gitterdun/shared';
-
-import goalsRouter from './goals';
 
 const mockedCreateGoalSchema = jest.mocked(CreateGoalSchema);
 const mockedUpdateGoalSchema = jest.mocked(UpdateGoalSchema);
@@ -44,7 +44,7 @@ describe('goals routes', () => {
     app.use('/api/goals', goalsRouter);
   });
 
-  describe('GET /api/goals', () => {
+  describe('gET /api/goals', () => {
     test('should return paginated goals for user', async () => {
       const mockGoals = [
         {
@@ -78,7 +78,7 @@ describe('goals routes', () => {
       const response = await request(app).get('/api/goals?user_id=1');
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual({
+      expect(response.body).toStrictEqual({
         success: true,
         data: [mockGoals[0]],
         pagination: {page: 1, limit: 20, total: 1, totalPages: 1},
@@ -96,7 +96,7 @@ describe('goals routes', () => {
       const response = await request(app).get('/api/goals');
 
       expect(response.status).toBe(400);
-      expect(response.body).toEqual({
+      expect(response.body).toStrictEqual({
         success: false,
         error: 'User ID is required',
       });
@@ -167,7 +167,7 @@ describe('goals routes', () => {
     });
   });
 
-  describe('POST /api/goals', () => {
+  describe('pOST /api/goals', () => {
     test('should create a new goal successfully', async () => {
       const newGoal = {
         title: 'New Goal',
@@ -196,7 +196,7 @@ describe('goals routes', () => {
       const response = await request(app).post('/api/goals').send(newGoal);
 
       expect(response.status).toBe(201);
-      expect(response.body).toEqual({
+      expect(response.body).toStrictEqual({
         success: true,
         data: createdGoal,
         message: 'Goal created successfully',
@@ -219,7 +219,7 @@ describe('goals routes', () => {
       const response = await request(app).post('/api/goals').send(invalidGoal);
 
       expect(response.status).toBe(400);
-      expect(response.body).toEqual({
+      expect(response.body).toStrictEqual({
         success: false,
         error: 'Target points must be greater than 0',
       });
@@ -248,7 +248,7 @@ describe('goals routes', () => {
     });
   });
 
-  describe('GET /api/goals/:id', () => {
+  describe('gET /api/goals/:id', () => {
     test('should return specific goal', async () => {
       const mockGoal = {
         id: 1,
@@ -270,7 +270,7 @@ describe('goals routes', () => {
       const response = await request(app).get('/api/goals/1');
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual({success: true, data: mockGoal});
+      expect(response.body).toStrictEqual({success: true, data: mockGoal});
     });
 
     test('should return 404 for non-existent goal', async () => {
@@ -282,7 +282,10 @@ describe('goals routes', () => {
       const response = await request(app).get('/api/goals/999');
 
       expect(response.status).toBe(404);
-      expect(response.body).toEqual({success: false, error: 'Goal not found'});
+      expect(response.body).toStrictEqual({
+        success: false,
+        error: 'Goal not found',
+      });
     });
 
     test('should return 400 for invalid goal ID', async () => {
@@ -291,11 +294,14 @@ describe('goals routes', () => {
       const response = await request(app).get('/api/goals/invalid');
 
       expect(response.status).toBe(400);
-      expect(response.body).toEqual({success: false, error: 'Invalid goal ID'});
+      expect(response.body).toStrictEqual({
+        success: false,
+        error: 'Invalid goal ID',
+      });
     });
   });
 
-  describe('PUT /api/goals/:id', () => {
+  describe('pUT /api/goals/:id', () => {
     test('should update goal successfully', async () => {
       const updateData = {title: 'Updated Goal', target_points: 150};
 
@@ -323,7 +329,7 @@ describe('goals routes', () => {
       const response = await request(app).put('/api/goals/1').send(updateData);
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual({
+      expect(response.body).toStrictEqual({
         success: true,
         data: updatedGoal,
         message: 'Goal updated successfully',
@@ -342,7 +348,10 @@ describe('goals routes', () => {
         .send({title: 'Test'});
 
       expect(response.status).toBe(404);
-      expect(response.body).toEqual({success: false, error: 'Goal not found'});
+      expect(response.body).toStrictEqual({
+        success: false,
+        error: 'Goal not found',
+      });
     });
 
     test('should return 400 when no fields to update', async () => {
@@ -355,14 +364,14 @@ describe('goals routes', () => {
       const response = await request(app).put('/api/goals/1').send({});
 
       expect(response.status).toBe(400);
-      expect(response.body).toEqual({
+      expect(response.body).toStrictEqual({
         success: false,
         error: 'No fields to update',
       });
     });
   });
 
-  describe('DELETE /api/goals/:id', () => {
+  describe('dELETE /api/goals/:id', () => {
     test('should delete goal successfully', async () => {
       const mockCheckStatement = {get: jest.fn().mockReturnValue({id: 1})};
       const mockDeleteStatement = {run: jest.fn()};
@@ -375,7 +384,7 @@ describe('goals routes', () => {
       const response = await request(app).delete('/api/goals/1');
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual({
+      expect(response.body).toStrictEqual({
         success: true,
         message: 'Goal deleted successfully',
       });
@@ -392,7 +401,10 @@ describe('goals routes', () => {
       const response = await request(app).delete('/api/goals/999');
 
       expect(response.status).toBe(404);
-      expect(response.body).toEqual({success: false, error: 'Goal not found'});
+      expect(response.body).toStrictEqual({
+        success: false,
+        error: 'Goal not found',
+      });
     });
 
     test('should return 400 for invalid goal ID', async () => {
@@ -401,7 +413,10 @@ describe('goals routes', () => {
       const response = await request(app).delete('/api/goals/invalid');
 
       expect(response.status).toBe(400);
-      expect(response.body).toEqual({success: false, error: 'Invalid goal ID'});
+      expect(response.body).toStrictEqual({
+        success: false,
+        error: 'Invalid goal ID',
+      });
     });
   });
 });

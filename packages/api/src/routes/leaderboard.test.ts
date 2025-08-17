@@ -1,40 +1,82 @@
-import {describe, expect, test, beforeEach, jest} from '@jest/globals';
-import request from 'supertest';
+import {
+  describe,
+  expect,
+  test,
+  beforeEach,
+  afterEach,
+  jest,
+} from '@jest/globals';
 import express from 'express';
-
-// Mock dependencies
-const mockDb = {prepare: jest.fn().mockReturnValue({all: jest.fn()})};
-jest.mock('../lib/db', () => ({__esModule: true, default: mockDb}));
-
-const mockLogger = {info: jest.fn(), error: jest.fn(), warn: jest.fn()};
-jest.mock('../utils/logger', () => ({logger: mockLogger}));
-
-jest.mock('@gitterdun/shared');
+import {Server} from 'node:http';
+import nock from 'nock';
+import type {Statement} from 'better-sqlite3';
 import {
   LeaderboardRowSchema,
   LeaderboardQuerySchema,
   LeaderboardEntrySchema,
   asError,
 } from '@gitterdun/shared';
-
 import leaderboardRouter from './leaderboard';
+import db from '../lib/db';
+import {logger} from '../utils/logger';
+import {ZodError} from 'zod';
 
+// Mock dependencies
+jest.mock('../lib/db', () => ({
+  __esModule: true,
+  default: {prepare: jest.fn()},
+}));
+
+jest.mock('../utils/logger', () => ({
+  logger: {info: jest.fn(), error: jest.fn(), warn: jest.fn()},
+}));
+
+jest.mock('@gitterdun/shared');
+
+const mockDb = jest.mocked(db);
+const mockLogger = jest.mocked(logger);
 const mockedLeaderboardRowSchema = jest.mocked(LeaderboardRowSchema);
 const mockedLeaderboardQuerySchema = jest.mocked(LeaderboardQuerySchema);
 const mockedLeaderboardEntrySchema = jest.mocked(LeaderboardEntrySchema);
 const mockedAsError = jest.mocked(asError);
 
 describe('leaderboard routes', () => {
-  let app: express.Application;
+  let app: express.Application | undefined;
+  let server: Server | undefined;
+  let baseUrl: string | undefined;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
+    nock.cleanAll();
+
     app = express();
     app.use(express.json());
     app.use('/api/leaderboard', leaderboardRouter);
+
+    // Start server on a random port
+    server = app.listen(0);
+    const address = server.address();
+    if (address === null) {
+      throw new Error('Failed to get server address');
+    }
+    if (typeof address === 'string') {
+      throw new Error(`Server address is a string: ${address}`);
+    }
+    baseUrl = `http://localhost:${address.port}`;
   });
 
-  describe('GET /api/leaderboard', () => {
+  afterEach(async () => {
+    if (server) {
+      await new Promise<void>(resolve => {
+        server!.close(() => {
+          resolve();
+        });
+      });
+    }
+    nock.cleanAll();
+  });
+
+  describe('gET /api/leaderboard', () => {
     test('should return leaderboard data with default parameters', async () => {
       const mockLeaderboardData = [
         {
@@ -57,7 +99,7 @@ describe('leaderboard routes', () => {
 
       const mockPreparedStatement = {
         all: jest.fn().mockReturnValue(mockLeaderboardData),
-      };
+      } as unknown as Statement;
       mockDb.prepare.mockReturnValue(mockPreparedStatement);
 
       mockedLeaderboardQuerySchema.parse.mockReturnValue({
@@ -66,17 +108,18 @@ describe('leaderboard routes', () => {
       });
 
       mockedLeaderboardRowSchema.parse
-        .mockReturnValueOnce(mockLeaderboardData[0])
-        .mockReturnValueOnce(mockLeaderboardData[1]);
+        .mockReturnValueOnce(mockLeaderboardData[0]!)
+        .mockReturnValueOnce(mockLeaderboardData[1]!);
 
       mockedLeaderboardEntrySchema.parse
-        .mockReturnValueOnce({rank: 1, ...mockLeaderboardData[0]})
-        .mockReturnValueOnce({rank: 2, ...mockLeaderboardData[1]});
+        .mockReturnValueOnce({rank: 1, ...mockLeaderboardData[0]!})
+        .mockReturnValueOnce({rank: 2, ...mockLeaderboardData[1]!});
 
-      const response = await request(app).get('/api/leaderboard');
+      const response = await fetch(`${baseUrl!}/api/leaderboard`);
+      const body = await response.json();
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual({
+      expect(body).toEqual({
         success: true,
         data: {
           leaderboard: [
@@ -88,6 +131,7 @@ describe('leaderboard routes', () => {
         },
       });
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- not being called
       expect(mockPreparedStatement.all).toHaveBeenCalledWith(10);
       expect(mockLogger.info).toHaveBeenCalledWith(
         {sortBy: 'points', limit: 10, totalUsers: 2},
@@ -109,7 +153,7 @@ describe('leaderboard routes', () => {
 
       const mockPreparedStatement = {
         all: jest.fn().mockReturnValue(mockLeaderboardData),
-      };
+      } as unknown as Statement;
       mockDb.prepare.mockReturnValue(mockPreparedStatement);
 
       mockedLeaderboardQuerySchema.parse.mockReturnValue({
@@ -118,24 +162,28 @@ describe('leaderboard routes', () => {
       });
 
       mockedLeaderboardRowSchema.parse.mockReturnValueOnce(
-        mockLeaderboardData[0],
+        mockLeaderboardData[0]!,
       );
       mockedLeaderboardEntrySchema.parse.mockReturnValueOnce({
         rank: 1,
-        ...mockLeaderboardData[0],
+        ...mockLeaderboardData[0]!,
       });
 
-      const response = await request(app).get(
-        '/api/leaderboard?sortBy=streak&limit=5',
+      const response = await fetch(
+        `${baseUrl!}/api/leaderboard?sortBy=streak&limit=5`,
       );
+      const body = await response.json();
 
       expect(response.status).toBe(200);
-      expect(response.body.data.sortBy).toBe('streak');
+      expect(body.data.sortBy).toBe('streak');
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- not being called
       expect(mockPreparedStatement.all).toHaveBeenCalledWith(5);
     });
 
     test('should handle empty leaderboard', async () => {
-      const mockPreparedStatement = {all: jest.fn().mockReturnValue([])};
+      const mockPreparedStatement = {
+        all: jest.fn().mockReturnValue([]),
+      } as unknown as Statement;
       mockDb.prepare.mockReturnValue(mockPreparedStatement);
 
       mockedLeaderboardQuerySchema.parse.mockReturnValue({
@@ -143,10 +191,11 @@ describe('leaderboard routes', () => {
         sortBy: 'points',
       });
 
-      const response = await request(app).get('/api/leaderboard');
+      const response = await fetch(`${baseUrl!}/api/leaderboard`);
+      const body = await response.json();
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual({
+      expect(body).toEqual({
         success: true,
         data: {leaderboard: [], sortBy: 'points', totalUsers: 0},
       });
@@ -154,26 +203,38 @@ describe('leaderboard routes', () => {
 
     test('should handle validation errors', async () => {
       // Import z to get real ZodError constructor
-      const {z} = await import('zod');
+      const {z: zod} = await import('zod');
       mockedLeaderboardQuerySchema.parse.mockImplementation(() => {
-        throw new z.ZodError([
+        throw new zod.ZodError([
           {
             code: 'invalid_type',
             expected: 'number',
-            received: 'string',
             path: ['limit'],
             message: 'Expected number, received string',
           },
         ]);
       });
 
-      const response = await request(app).get('/api/leaderboard?limit=invalid');
+      const response = await fetch(`${baseUrl!}/api/leaderboard?limit=invalid`);
+      const body = await response.json();
 
       expect(response.status).toBe(400);
-      expect(response.body.success).toBe(false);
-      expect(response.body.error).toBe('Invalid query parameters');
+      expect(body.success).toBe(false);
+      expect(body.error).toBe('Invalid query parameters');
 
-      expect(mockLogger.warn).toHaveBeenCalled();
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        {
+          error: new ZodError([
+            {
+              code: 'invalid_type',
+              expected: 'number',
+              path: ['limit'],
+              message: 'Expected number, received string',
+            },
+          ]),
+        },
+        'Leaderboard query validation error',
+      );
     });
 
     test('should handle database errors', async () => {
@@ -182,7 +243,7 @@ describe('leaderboard routes', () => {
         all: jest.fn().mockImplementation(() => {
           throw dbError;
         }),
-      };
+      } as unknown as Statement;
       mockDb.prepare.mockReturnValue(mockPreparedStatement);
 
       mockedLeaderboardQuerySchema.parse.mockReturnValue({
@@ -192,13 +253,11 @@ describe('leaderboard routes', () => {
 
       mockedAsError.mockReturnValue(dbError);
 
-      const response = await request(app).get('/api/leaderboard');
+      const response = await fetch(`${baseUrl!}/api/leaderboard`);
+      const body = await response.json();
 
       expect(response.status).toBe(500);
-      expect(response.body).toEqual({
-        success: false,
-        error: 'Internal server error',
-      });
+      expect(body).toEqual({success: false, error: 'Internal server error'});
 
       expect(mockLogger.error).toHaveBeenCalledWith(
         {error: dbError},
@@ -220,7 +279,7 @@ describe('leaderboard routes', () => {
 
       const mockPreparedStatement = {
         all: jest.fn().mockReturnValue(mockLeaderboardData),
-      };
+      } as unknown as Statement;
       mockDb.prepare.mockReturnValue(mockPreparedStatement);
 
       mockedLeaderboardQuerySchema.parse.mockReturnValue({
@@ -234,13 +293,11 @@ describe('leaderboard routes', () => {
       });
       mockedAsError.mockReturnValue(parseError);
 
-      const response = await request(app).get('/api/leaderboard');
+      const response = await fetch(`${baseUrl!}/api/leaderboard`);
+      const body = await response.json();
 
       expect(response.status).toBe(500);
-      expect(response.body).toEqual({
-        success: false,
-        error: 'Internal server error',
-      });
+      expect(body).toEqual({success: false, error: 'Internal server error'});
     });
   });
 });

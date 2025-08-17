@@ -6,7 +6,6 @@ import {
   afterEach,
   jest,
 } from '@jest/globals';
-import request from 'supertest';
 
 // Mock dependencies before importing server
 jest.mock('./lib/db', () => ({
@@ -31,22 +30,12 @@ jest.mock('dotenv');
 import {initializeDatabase} from './lib/initDb';
 import {logger} from './utils/logger';
 import authRoutes from './routes/auth';
-import choreRoutes from './routes/chores';
-import goalRoutes from './routes/goals';
-import leaderboardRoutes from './routes/leaderboard';
-import familyRoutes from './routes/families';
-import invitationRoutes from './routes/invitations';
 import {asError} from '@gitterdun/shared';
 import dotenv from 'dotenv';
 
 const mockedInitializeDatabase = jest.mocked(initializeDatabase);
 const mockedLogger = jest.mocked(logger);
 const mockedAuthRoutes = jest.mocked(authRoutes);
-const mockedChoreRoutes = jest.mocked(choreRoutes);
-const mockedGoalRoutes = jest.mocked(goalRoutes);
-const mockedLeaderboardRoutes = jest.mocked(leaderboardRoutes);
-const mockedFamilyRoutes = jest.mocked(familyRoutes);
-const mockedInvitationRoutes = jest.mocked(invitationRoutes);
 const mockedAsError = jest.mocked(asError);
 const mockedDotenv = jest.mocked(dotenv);
 
@@ -58,10 +47,10 @@ describe('server', () => {
     process.env = {...originalEnv};
 
     // Mock router implementations
-    mockedAuthRoutes.mockImplementation(() => ({
-      get: jest.fn(),
-      post: jest.fn(),
-    }));
+    mockedAuthRoutes.mockImplementation((() => ({
+      get: jest.fn() as any,
+      post: jest.fn() as any,
+    })) as any);
 
     // Mock logger methods
     mockedLogger.info = jest.fn();
@@ -99,23 +88,23 @@ describe('server', () => {
   });
 
   test('should configure CORS in development', () => {
-    process.env.NODE_ENV = 'development';
+    process.env['NODE_ENV'] = 'development';
 
     // Test would require more complex Express app mocking
     // This is a placeholder for the CORS configuration test
-    expect(process.env.NODE_ENV).toBe('development');
+    expect(process.env['NODE_ENV']).toBe('development');
   });
 
   test('should not configure CORS in production', () => {
-    process.env.NODE_ENV = 'production';
+    process.env['NODE_ENV'] = 'production';
 
-    expect(process.env.NODE_ENV).toBe('production');
+    expect(process.env['NODE_ENV']).toBe('production');
   });
 
   test('should use custom PORT from environment', () => {
-    process.env.PORT = '8080';
+    process.env['PORT'] = '8080';
 
-    expect(process.env.PORT).toBe('8080');
+    expect(process.env['PORT']).toBe('8080');
   });
 
   // Note: Testing Express app configuration requires more complex mocking

@@ -163,7 +163,10 @@ const eslintConfig = [
       indent: 'off', // using Prettier for styling
       'jsx-a11y/interactive-supports-focus': 'error',
       'react/jsx-curly-newline': 'off', // using Prettier for styling
-      'react/jsx-filename-extension': 'off', // using Prettier for styling
+      'react/jsx-filename-extension': [
+        'warn',
+        {allow: 'as-needed', extensions: ['.tsx']},
+      ],
       'react/jsx-first-prop-new-line': 'off',
       'react/jsx-indent': 'off',
       'react/jsx-indent-props': 'off',
@@ -474,7 +477,7 @@ const eslintConfig = [
       '@typescript-eslint/explicit-function-return-type': 'off', // too verbose
       '@typescript-eslint/explicit-member-accessibility': 'warn',
       '@typescript-eslint/explicit-module-boundary-types': 'off', // too verbose
-      '@typescript-eslint/init-declarations': 'warn',
+      '@typescript-eslint/init-declarations': 'off', // typescript makes sure variables are initialized before use
       '@typescript-eslint/max-params': ['warn', {max: 5}],
       '@typescript-eslint/member-ordering': 'warn',
       '@typescript-eslint/method-signature-style': 'warn',
@@ -707,7 +710,7 @@ const eslintConfig = [
       'id-denylist': 'warn',
       'id-length': 'warn',
       'id-match': 'warn',
-      'init-declarations': 'warn',
+      'init-declarations': 'off', // typescript makes sure variables are initialized before use
       'line-comment-position': 'off', // use Prettier for styling
       'logical-assignment-operators': 'warn',
       'max-classes-per-file': 'warn',
@@ -773,7 +776,7 @@ const eslintConfig = [
       'no-misleading-character-class': 'warn',
       'no-multi-assign': 'warn',
       'no-multi-str': 'warn',
-      'no-negated-condition': 'warn',
+      'no-negated-condition': 'off',
       'no-new': 'warn',
       'no-new-native-nonconstructor': 'warn',
       'no-new-wrappers': 'warn',
@@ -923,7 +926,13 @@ const eslintConfig = [
       'tailwindcss/no-unnecessary-arbitrary-value': 'warn',
     },
   },
-  {files: ['**/*.tsx'], rules: {'max-lines-per-function': 'off'}},
+  {
+    files: ['**/*.tsx'],
+    rules: {
+      'max-lines-per-function': 'off', // TODO: re-enable this after fixing other issues
+      'max-statements': 'off', // TODO: re-enable this after fixing other issues
+    },
+  },
   {
     files: ['**/*.test.ts', '**/*.test.tsx'],
     rules: {
@@ -986,7 +995,7 @@ const eslintConfig = [
       'jest/prefer-mock-promise-shorthand': 'warn',
       'jest/prefer-snapshot-hint': 'warn',
       'jest/prefer-spy-on': 'warn',
-      'jest/prefer-strict-equal': 'warn',
+      'jest/prefer-strict-equal': 'off', // i like this idea, but toStrictEqual has issues with arrays being created from inside a jest worker, resulting in false positive errors
       'jest/prefer-to-be': 'warn',
       'jest/prefer-to-contain': 'warn',
       'jest/prefer-to-have-length': 'warn',
@@ -999,6 +1008,7 @@ const eslintConfig = [
       'jest/valid-expect': 'warn',
       'jest/valid-expect-in-promise': 'warn',
       'jest/valid-title': 'warn',
+      '@typescript-eslint/no-unsafe-assignment': 'off', // we can be more loose in unit tests
     },
   },
 ];
