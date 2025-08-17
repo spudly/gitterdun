@@ -261,6 +261,7 @@ const eslintConfig = [
             '**/spec/**',
             '**/__tests__/**',
             '**/__mocks__/**',
+            '**/*.test.{js,jsx,ts,tsx}',
             '**/test.{js,jsx,ts,tsx}',
             '**/test-*.{js,jsx,ts,tsx}',
             '**/*{.,_}{test,spec}.{js,jsx,ts,tsx}',
@@ -934,6 +935,7 @@ const eslintConfig = [
       'max-lines': 'off', // test files can be longer for comprehensive coverage
       'max-lines-per-function': 'off', // test describe blocks can have many test cases
       'max-statements': 'off', // test describe blocks can have many test statements
+      '@typescript-eslint/no-unsafe-type-assertion': 'off', // we can be more loose in unit tests
     },
   },
 ];

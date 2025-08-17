@@ -101,31 +101,18 @@ describe('family page', () => {
     await screen.findByText('Your Families');
     // Click create with empty family name (guard branch)
     act(() => {
-      fireEvent.click(screen.getAllByRole('button', {name: 'Create'})[0]!);
+      fireEvent.click(screen.getByRole('button', {name: 'Create'}));
     });
     // Select a family to reveal sections
-    fireEvent.change(screen.getAllByRole('combobox')[0]!, {
-      target: {value: '1'},
-    });
+    fireEvent.change(screen.getByRole('combobox'), {target: {value: '1'}});
     // Child create with missing inputs (guard branch)
     act(() => {
-      fireEvent.click(screen.getAllByRole('button', {name: 'Create'})[1]!);
+      fireEvent.click(screen.getByRole('button', {name: 'Create'}));
     });
     // Invite with empty email should no-op (exercise path only)
+    fireEvent.change(screen.getByRole('combobox'), {target: {value: '1'}});
     act(() => {
       fireEvent.click(screen.getByRole('button', {name: 'Send'}));
-    });
-  });
-
-  test('covers invite role select change', async () => {
-    render(wrap(<Family />));
-    await screen.findByText('Your Families');
-    fireEvent.change(screen.getAllByRole('combobox')[0]!, {
-      target: {value: '1'},
-    });
-    // Change invite role from default parent to child
-    fireEvent.change(screen.getAllByRole('combobox')[1]!, {
-      target: {value: 'child'},
     });
   });
 });

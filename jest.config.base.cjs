@@ -8,12 +8,14 @@ module.exports = {
     ],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
+  collectCoverage: true,
   collectCoverageFrom: [
-    '**/*.{ts,tsx,js,jsx}',
+    '**/src/**/*.{ts,tsx,js,jsx}',
     '!**/node_modules/**',
     '!**/dist/**',
     '!**/*.demo.*',
     '!**/*.config.*',
+    '!**/coverage/**',
   ],
   coverageThreshold: {
     global: {branches: 100, functions: 100, lines: 100, statements: 100},

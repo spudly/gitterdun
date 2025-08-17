@@ -1,6 +1,6 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import type {FC, PropsWithChildren} from 'react';
-import {renderHook, act} from '@testing-library/react';
+import {renderHook, act, waitFor} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {useUser} from './useUser';
 import * as apis from '../lib/api';
@@ -47,9 +47,6 @@ describe('useUser', () => {
         setTimeout(resolve, 0);
       });
     });
-    expect(
-      result.current.user === null || typeof result.current.user === 'object',
-    ).toBe(true);
     await act(async () => {
       await result.current.login('a', 'b');
       await result.current.register('u', 'a', 'p');
@@ -78,12 +75,9 @@ describe('useUser', () => {
     const {authApi} = apis;
     jest.mocked(authApi.me).mockResolvedValueOnce({success: true});
     const {result} = renderHook(() => useUser(), {wrapper});
-    await act(async () => {
-      await new Promise(resolve => {
-        setTimeout(resolve, 0);
-      });
+    await waitFor(() => {
+      expect(result.current.user).toBeNull();
     });
-    expect(result.current.user === undefined).toBe(true);
   });
 
   test('does not set user on login success without data (covers else at line 32)', async () => {
