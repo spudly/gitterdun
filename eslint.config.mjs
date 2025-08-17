@@ -782,7 +782,7 @@ const eslintConfig = [
       'no-octal': 'warn',
       'no-octal-escape': 'warn',
       'no-param-reassign': 'warn',
-      'no-plusplus': 'warn',
+      'no-plusplus': 'off', // these are only confusing if you don't know the language
       'no-promise-executor-return': 'warn',
       'no-proto': 'warn',
       'no-prototype-builtins': 'warn',
