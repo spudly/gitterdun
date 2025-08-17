@@ -1,47 +1,76 @@
-import {describe, expect, test, beforeEach, jest} from '@jest/globals';
-import request from 'supertest';
+import {
+  describe,
+  expect,
+  test,
+  beforeEach,
+  afterEach,
+  jest,
+} from '@jest/globals';
 import express from 'express';
+import {Server} from 'node:http';
+import nock from 'nock';
+import type {Statement} from 'better-sqlite3';
 import {
   CreateGoalSchema,
   UpdateGoalSchema,
   GoalQuerySchema,
   GoalSchema,
   CountRowSchema,
-  asError,
   IdParamSchema,
 } from '@gitterdun/shared';
-
 import goalsRouter from './goals';
+import db from '../lib/db';
 
 // Mock dependencies
-const mockDb = {
-  prepare: jest
-    .fn()
-    .mockReturnValue({get: jest.fn(), all: jest.fn(), run: jest.fn()}),
-};
-jest.mock('../lib/db', () => ({__esModule: true, default: mockDb}));
-
-const mockLogger = {info: jest.fn(), error: jest.fn(), warn: jest.fn()};
-jest.mock('../utils/logger', () => ({logger: mockLogger}));
+jest.mock('../lib/db', () => ({
+  __esModule: true,
+  default: {prepare: jest.fn()},
+}));
 
 jest.mock('@gitterdun/shared');
 
+const mockDb = jest.mocked(db);
 const mockedCreateGoalSchema = jest.mocked(CreateGoalSchema);
 const mockedUpdateGoalSchema = jest.mocked(UpdateGoalSchema);
 const mockedGoalQuerySchema = jest.mocked(GoalQuerySchema);
 const mockedGoalSchema = jest.mocked(GoalSchema);
 const mockedCountRowSchema = jest.mocked(CountRowSchema);
-const mockedAsError = jest.mocked(asError);
 const mockedIdParamSchema = jest.mocked(IdParamSchema);
 
 describe('goals routes', () => {
-  let app: express.Application;
+  let app: express.Application | undefined;
+  let server: Server | undefined;
+  let baseUrl: string | undefined;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
+    nock.cleanAll();
+
     app = express();
     app.use(express.json());
     app.use('/api/goals', goalsRouter);
+
+    // Start server on a random port
+    server = app.listen(0);
+    const address = server.address();
+    if (address === null) {
+      throw new Error('Failed to get server address');
+    }
+    if (typeof address === 'string') {
+      throw new Error(`Server address is a string: ${address}`);
+    }
+    baseUrl = `http://localhost:${address.port}`;
+  });
+
+  afterEach(async () => {
+    if (server) {
+      await new Promise<void>(resolve => {
+        server!.close(() => {
+          resolve();
+        });
+      });
+    }
+    nock.cleanAll();
   });
 
   describe('gET /api/goals', () => {
@@ -63,7 +92,7 @@ describe('goals routes', () => {
       const mockPreparedStatement = {
         get: jest.fn().mockReturnValue({total: 1}),
         all: jest.fn().mockReturnValue(mockGoals),
-      };
+      } as unknown as Statement;
       mockDb.prepare.mockReturnValue(mockPreparedStatement);
 
       mockedGoalQuerySchema.parse.mockReturnValue({
@@ -73,12 +102,13 @@ describe('goals routes', () => {
         limit: 20,
       });
       mockedCountRowSchema.parse.mockReturnValue({count: 1});
-      mockedGoalSchema.parse.mockReturnValue(mockGoals[0]);
+      mockedGoalSchema.parse.mockReturnValue(mockGoals[0]!);
 
-      const response = await request(app).get('/api/goals?user_id=1');
+      const response = await fetch(`${baseUrl!}/api/goals?user_id=1`);
+      const body = await response.json();
 
       expect(response.status).toBe(200);
-      expect(response.body).toStrictEqual({
+      expect(body).toEqual({
         success: true,
         data: [mockGoals[0]],
         pagination: {page: 1, limit: 20, total: 1, totalPages: 1},
@@ -93,13 +123,11 @@ describe('goals routes', () => {
         limit: 20,
       });
 
-      const response = await request(app).get('/api/goals');
+      const response = await fetch(`${baseUrl!}/api/goals`);
+      const body = await response.json();
 
       expect(response.status).toBe(400);
-      expect(response.body).toStrictEqual({
-        success: false,
-        error: 'User ID is required',
-      });
+      expect(body).toEqual({success: false, error: 'User ID is required'});
     });
 
     test('should filter goals by status', async () => {
@@ -119,7 +147,7 @@ describe('goals routes', () => {
       const mockPreparedStatement = {
         get: jest.fn().mockReturnValue({total: 1}),
         all: jest.fn().mockReturnValue(mockGoals),
-      };
+      } as unknown as Statement;
       mockDb.prepare.mockReturnValue(mockPreparedStatement);
 
       mockedGoalQuerySchema.parse.mockReturnValue({
@@ -129,13 +157,14 @@ describe('goals routes', () => {
         limit: 20,
       });
       mockedCountRowSchema.parse.mockReturnValue({count: 1});
-      mockedGoalSchema.parse.mockReturnValue(mockGoals[0]);
+      mockedGoalSchema.parse.mockReturnValue(mockGoals[0]!);
 
-      const response = await request(app).get(
-        '/api/goals?user_id=1&status=active',
+      const response = await fetch(
+        `${baseUrl!}/api/goals?user_id=1&status=active`,
       );
 
       expect(response.status).toBe(200);
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- not being called
       expect(mockPreparedStatement.all).toHaveBeenCalledWith(
         1,
         'active',
@@ -145,25 +174,25 @@ describe('goals routes', () => {
     });
 
     test('should handle validation errors', async () => {
-      // Import z to get real ZodError constructor
-      const {z} = await import('zod');
+      // Import zod to get real ZodError constructor
+      const {z: zod} = await import('zod');
       mockedGoalQuerySchema.parse.mockImplementation(() => {
-        throw new z.ZodError([
+        throw new zod.ZodError([
           {
             code: 'invalid_type',
             expected: 'string',
-            received: 'undefined',
             path: ['invalid'],
             message: 'Required',
           },
         ]);
       });
 
-      const response = await request(app).get('/api/goals?invalid=param');
+      const response = await fetch(`${baseUrl!}/api/goals?invalid=param`);
+      const body = await response.json();
 
       expect(response.status).toBe(400);
-      expect(response.body.success).toBe(false);
-      expect(response.body.error).toBe('Invalid query parameters');
+      expect(body.success).toBe(false);
+      expect(body.error).toBe('Invalid query parameters');
     });
   });
 
@@ -187,21 +216,27 @@ describe('goals routes', () => {
 
       const mockPreparedStatement = {
         get: jest.fn().mockReturnValue(createdGoal),
-      };
+      } as unknown as Statement;
       mockDb.prepare.mockReturnValue(mockPreparedStatement);
 
       mockedCreateGoalSchema.parse.mockReturnValue(newGoal);
       mockedGoalSchema.parse.mockReturnValue(createdGoal);
 
-      const response = await request(app).post('/api/goals').send(newGoal);
+      const response = await fetch(`${baseUrl!}/api/goals`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(newGoal),
+      });
+      const body = await response.json();
 
       expect(response.status).toBe(201);
-      expect(response.body).toStrictEqual({
+      expect(body).toEqual({
         success: true,
         data: createdGoal,
         message: 'Goal created successfully',
       });
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- not being called
       expect(mockPreparedStatement.get).toHaveBeenCalledWith(
         'New Goal',
         'Test goal',
@@ -216,35 +251,44 @@ describe('goals routes', () => {
 
       mockedCreateGoalSchema.parse.mockReturnValue(invalidGoal);
 
-      const response = await request(app).post('/api/goals').send(invalidGoal);
+      const response = await fetch(`${baseUrl!}/api/goals`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(invalidGoal),
+      });
+      const body = await response.json();
 
       expect(response.status).toBe(400);
-      expect(response.body).toStrictEqual({
+      expect(body).toEqual({
         success: false,
         error: 'Target points must be greater than 0',
       });
     });
 
     test('should handle validation errors', async () => {
-      // Import z to get real ZodError constructor
-      const {z} = await import('zod');
+      // Import zod to get real ZodError constructor
+      const {z: zod} = await import('zod');
       mockedCreateGoalSchema.parse.mockImplementation(() => {
-        throw new z.ZodError([
+        throw new zod.ZodError([
           {
             code: 'invalid_type',
             expected: 'string',
-            received: 'undefined',
             path: ['title'],
             message: 'Required',
           },
         ]);
       });
 
-      const response = await request(app).post('/api/goals').send({});
+      const response = await fetch(`${baseUrl!}/api/goals`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({}),
+      });
+      const body = await response.json();
 
       expect(response.status).toBe(400);
-      expect(response.body.success).toBe(false);
-      expect(response.body.error).toBe('Invalid request data');
+      expect(body.success).toBe(false);
+      expect(body.error).toBe('Invalid request data');
     });
   });
 
@@ -261,43 +305,44 @@ describe('goals routes', () => {
         updated_at: '2024-01-01T00:00:00.000Z',
       };
 
-      const mockPreparedStatement = {get: jest.fn().mockReturnValue(mockGoal)};
+      const mockPreparedStatement = {
+        get: jest.fn().mockReturnValue(mockGoal),
+      } as unknown as Statement;
       mockDb.prepare.mockReturnValue(mockPreparedStatement);
 
       mockedIdParamSchema.parse.mockReturnValue({id: 1});
       mockedGoalSchema.parse.mockReturnValue(mockGoal);
 
-      const response = await request(app).get('/api/goals/1');
+      const response = await fetch(`${baseUrl!}/api/goals/1`);
+      const body = await response.json();
 
       expect(response.status).toBe(200);
-      expect(response.body).toStrictEqual({success: true, data: mockGoal});
+      expect(body).toEqual({success: true, data: mockGoal});
     });
 
     test('should return 404 for non-existent goal', async () => {
-      const mockPreparedStatement = {get: jest.fn().mockReturnValue(undefined)};
+      const mockPreparedStatement = {
+        get: jest.fn().mockReturnValue(undefined),
+      } as unknown as Statement;
       mockDb.prepare.mockReturnValue(mockPreparedStatement);
 
       mockedIdParamSchema.parse.mockReturnValue({id: 999});
 
-      const response = await request(app).get('/api/goals/999');
+      const response = await fetch(`${baseUrl!}/api/goals/999`);
+      const body = await response.json();
 
       expect(response.status).toBe(404);
-      expect(response.body).toStrictEqual({
-        success: false,
-        error: 'Goal not found',
-      });
+      expect(body).toEqual({success: false, error: 'Goal not found'});
     });
 
     test('should return 400 for invalid goal ID', async () => {
       mockedIdParamSchema.parse.mockReturnValue({id: NaN});
 
-      const response = await request(app).get('/api/goals/invalid');
+      const response = await fetch(`${baseUrl!}/api/goals/invalid`);
+      const body = await response.json();
 
       expect(response.status).toBe(400);
-      expect(response.body).toStrictEqual({
-        success: false,
-        error: 'Invalid goal ID',
-      });
+      expect(body).toEqual({success: false, error: 'Invalid goal ID'});
     });
   });
 
@@ -316,8 +361,12 @@ describe('goals routes', () => {
         updated_at: '2024-01-01T12:00:00.000Z',
       };
 
-      const mockCheckStatement = {get: jest.fn().mockReturnValue({id: 1})};
-      const mockUpdateStatement = {get: jest.fn().mockReturnValue(updatedGoal)};
+      const mockCheckStatement = {
+        get: jest.fn().mockReturnValue({id: 1}),
+      } as unknown as Statement;
+      const mockUpdateStatement = {
+        get: jest.fn().mockReturnValue(updatedGoal),
+      } as unknown as Statement;
       mockDb.prepare
         .mockReturnValueOnce(mockCheckStatement) // Check existence
         .mockReturnValueOnce(mockUpdateStatement); // Update
@@ -326,10 +375,15 @@ describe('goals routes', () => {
       mockedUpdateGoalSchema.parse.mockReturnValue(updateData);
       mockedGoalSchema.parse.mockReturnValue(updatedGoal);
 
-      const response = await request(app).put('/api/goals/1').send(updateData);
+      const response = await fetch(`${baseUrl!}/api/goals/1`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(updateData),
+      });
+      const body = await response.json();
 
       expect(response.status).toBe(200);
-      expect(response.body).toStrictEqual({
+      expect(body).toEqual({
         success: true,
         data: updatedGoal,
         message: 'Goal updated successfully',
@@ -337,86 +391,100 @@ describe('goals routes', () => {
     });
 
     test('should return 404 for non-existent goal', async () => {
-      const mockCheckStatement = {get: jest.fn().mockReturnValue(undefined)};
+      const mockCheckStatement = {
+        get: jest.fn().mockReturnValue(undefined),
+      } as unknown as Statement;
       mockDb.prepare.mockReturnValue(mockCheckStatement);
 
       mockedIdParamSchema.parse.mockReturnValue({id: 999});
       mockedUpdateGoalSchema.parse.mockReturnValue({title: 'Test'});
 
-      const response = await request(app)
-        .put('/api/goals/999')
-        .send({title: 'Test'});
+      const response = await fetch(`${baseUrl!}/api/goals/999`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({title: 'Test'}),
+      });
+      const body = await response.json();
 
       expect(response.status).toBe(404);
-      expect(response.body).toStrictEqual({
-        success: false,
-        error: 'Goal not found',
-      });
+      expect(body).toEqual({success: false, error: 'Goal not found'});
     });
 
     test('should return 400 when no fields to update', async () => {
-      const mockCheckStatement = {get: jest.fn().mockReturnValue({id: 1})};
+      const mockCheckStatement = {
+        get: jest.fn().mockReturnValue({id: 1}),
+      } as unknown as Statement;
       mockDb.prepare.mockReturnValue(mockCheckStatement);
 
       mockedIdParamSchema.parse.mockReturnValue({id: 1});
       mockedUpdateGoalSchema.parse.mockReturnValue({});
 
-      const response = await request(app).put('/api/goals/1').send({});
+      const response = await fetch(`${baseUrl!}/api/goals/1`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({}),
+      });
+      const body = await response.json();
 
       expect(response.status).toBe(400);
-      expect(response.body).toStrictEqual({
-        success: false,
-        error: 'No fields to update',
-      });
+      expect(body).toEqual({success: false, error: 'No fields to update'});
     });
   });
 
   describe('dELETE /api/goals/:id', () => {
     test('should delete goal successfully', async () => {
-      const mockCheckStatement = {get: jest.fn().mockReturnValue({id: 1})};
-      const mockDeleteStatement = {run: jest.fn()};
+      const mockCheckStatement = {
+        get: jest.fn().mockReturnValue({id: 1}),
+      } as unknown as Statement;
+      const mockDeleteStatement = {run: jest.fn()} as unknown as Statement;
       mockDb.prepare
         .mockReturnValueOnce(mockCheckStatement) // Check existence
         .mockReturnValueOnce(mockDeleteStatement); // Delete
 
       mockedIdParamSchema.parse.mockReturnValue({id: 1});
 
-      const response = await request(app).delete('/api/goals/1');
+      const response = await fetch(`${baseUrl!}/api/goals/1`, {
+        method: 'DELETE',
+      });
+      const body = await response.json();
 
       expect(response.status).toBe(200);
-      expect(response.body).toStrictEqual({
+      expect(body).toEqual({
         success: true,
         message: 'Goal deleted successfully',
       });
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- not being called
       expect(mockDeleteStatement.run).toHaveBeenCalledWith(1);
     });
 
     test('should return 404 for non-existent goal', async () => {
-      const mockCheckStatement = {get: jest.fn().mockReturnValue(undefined)};
+      const mockCheckStatement = {
+        get: jest.fn().mockReturnValue(undefined),
+      } as unknown as Statement;
       mockDb.prepare.mockReturnValue(mockCheckStatement);
 
       mockedIdParamSchema.parse.mockReturnValue({id: 999});
 
-      const response = await request(app).delete('/api/goals/999');
+      const response = await fetch(`${baseUrl!}/api/goals/999`, {
+        method: 'DELETE',
+      });
+      const body = await response.json();
 
       expect(response.status).toBe(404);
-      expect(response.body).toStrictEqual({
-        success: false,
-        error: 'Goal not found',
-      });
+      expect(body).toEqual({success: false, error: 'Goal not found'});
     });
 
     test('should return 400 for invalid goal ID', async () => {
       mockedIdParamSchema.parse.mockReturnValue({id: NaN});
 
-      const response = await request(app).delete('/api/goals/invalid');
+      const response = await fetch(`${baseUrl!}/api/goals/invalid`, {
+        method: 'DELETE',
+      });
+      const body = await response.json();
 
       expect(response.status).toBe(400);
-      expect(response.body).toStrictEqual({
-        success: false,
-        error: 'Invalid goal ID',
-      });
+      expect(body).toEqual({success: false, error: 'Invalid goal ID'});
     });
   });
 });
