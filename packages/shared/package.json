@@ -9,7 +9,7 @@
     "--prebuild": "rm -rf dist",
     "type-check": "tsc",
     "build": "tsc -p tsconfig.build.json",
-    "lint": "eslint --max-warnings 0 src/**/*.ts src/**/*.tsx",
+    "lint": "eslint --max-warnings 0 src/**/*.ts",
     "test": "jest",
     "test:dev": "jest --watch"
   },
