@@ -23,14 +23,20 @@ export const TextInput: FC<TextInputProps> = ({
 }) => {
   const base =
     'w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500';
-  const errorCls = error
+
+  const hasError = error !== undefined && error !== null && error !== '';
+  const errorCls = hasError
     ? 'border-red-500 focus:ring-red-500'
     : 'border-gray-300';
-  const paddingLeft = leftIcon ? 'pl-9' : '';
-  const paddingRight = rightIcon ? 'pr-9' : '';
+
+  const hasLeftIcon = leftIcon !== undefined && leftIcon !== null;
+  const hasRightIcon = rightIcon !== undefined && rightIcon !== null;
+  const paddingLeft = hasLeftIcon ? 'pl-9' : '';
+  const paddingRight = hasRightIcon ? 'pr-9' : '';
+
   return (
     <div className={clsx('relative')}>
-      {leftIcon !== undefined ? (
+      {hasLeftIcon ? (
         <span className="absolute inset-y-0 left-0 flex items-center pl-2 text-gray-400">
           {leftIcon}
         </span>
@@ -42,13 +48,13 @@ export const TextInput: FC<TextInputProps> = ({
         {...rest}
       />
 
-      {rightIcon !== undefined ? (
+      {hasRightIcon ? (
         <span className="absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400">
           {rightIcon}
         </span>
       ) : null}
 
-      {error !== undefined ? (
+      {hasError ? (
         <div className="mt-1 text-xs text-red-600">{error}</div>
       ) : null}
     </div>
