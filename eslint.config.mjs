@@ -931,6 +931,9 @@ const eslintConfig = [
       '@typescript-eslint/no-unsafe-call': 'off', // we can be more loose in unit tests
       'react/no-multi-comp': 'off', // may need to create mini-components in unit tests
       '@typescript-eslint/no-unsafe-member-access': 'off', // we can be more loose in unit tests
+      'max-lines': 'off', // test files can be longer for comprehensive coverage
+      'max-lines-per-function': 'off', // test describe blocks can have many test cases
+      'max-statements': 'off', // test describe blocks can have many test statements
     },
   },
 ];
