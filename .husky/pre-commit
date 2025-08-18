@@ -1,4 +1,4 @@
 npm run build
-npm run depcheck
+npm run knip
 npm run test:changed
 npm run lint-staged

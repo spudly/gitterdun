@@ -72,8 +72,8 @@ jobs:
       - name: Check formatting
         run: npm run prettier:check
 
-  depcheck:
-    name: Dependency Check
+  knip:
+    name: Knip
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -90,4 +90,4 @@ jobs:
         run: npm ci
 
       - name: Check dependencies
-        run: npm run depcheck
+        run: npm run knip

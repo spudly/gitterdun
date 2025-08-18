@@ -21,10 +21,10 @@
     "dev": {"dependsOn": ["^build"], "cache": false, "persistent": true},
     "type-check": {"dependsOn": ["^build"], "cache": false},
     "//#prettier:check": {"cache": false},
-    "//#depcheck": {
+    "//#knip": {
       "inputs": [
         "src/**/*.{ts,tsx,js,jsx,json,css}",
-        ".depcheckrc.json",
+        "knip.config.ts",
         "package.json"
       ]
     },
@@ -37,10 +37,10 @@
       "inputs": ["src/**/*.{ts,tsx,js,jsx,json,css}", "jest.config.js"]
     },
     "precommit:check": {
-      "dependsOn": ["//#depcheck", "build", "//#test:changed", "//#lint-staged"]
+      "dependsOn": ["//#knip", "build", "//#test:changed", "//#lint-staged"]
     },
     "ci:check": {
-      "dependsOn": ["//#depcheck", "build", "test", "lint", "//#prettier:check"]
+      "dependsOn": ["//#knip", "build", "test", "lint", "//#prettier:check"]
     }
   }
 }
