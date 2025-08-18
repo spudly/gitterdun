@@ -1,4 +1,4 @@
-import {describe, expect, jest, test} from '@jest/globals';
+import {beforeEach, describe, expect, jest, test} from '@jest/globals';
 import type {FC, PropsWithChildren} from 'react';
 import {renderHook, act, waitFor} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
@@ -39,8 +39,12 @@ const wrapper: FC<PropsWithChildren> = ({children}) => {
 };
 
 describe('useUser', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   test('loads user and supports auth helpers', async () => {
-    const {result, rerender} = renderHook(() => useUser(), {wrapper});
+    const {result} = renderHook(() => useUser(), {wrapper});
     // wait a tick for query to resolve
     await act(async () => {
       await new Promise(resolve => {
@@ -52,8 +56,10 @@ describe('useUser', () => {
       await result.current.register({username: 'u', email: 'a', password: 'p'});
       await result.current.logout();
     });
-    rerender();
-    expect(result.current.isLoading).toBe(false);
+    // Wait for query to settle after logout clears the cache
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
   });
 
   test('returns null on me error and covers forgot/reset helpers', async () => {
@@ -87,6 +93,9 @@ describe('useUser', () => {
 
   test('does not set user on login success without data (covers else at line 32)', async () => {
     const {authApi} = apis;
+    jest
+      .mocked(authApi.me)
+      .mockResolvedValueOnce({success: true, data: undefined});
     jest.mocked(authApi.login).mockResolvedValueOnce({success: true});
     const client = new QueryClient();
     const clientSpy = jest.spyOn(client, 'setQueryData');
@@ -94,6 +103,9 @@ describe('useUser', () => {
       <QueryClientProvider client={client}>{children}</QueryClientProvider>
     );
     const {result} = renderHook(() => useUser(), {wrapper: LocalWrapper});
+    await waitFor(() => {
+      expect(result.current.user).toBeUndefined();
+    });
     await act(async () => {
       await result.current.login('a', 'b');
     });
