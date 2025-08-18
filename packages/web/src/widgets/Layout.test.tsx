@@ -21,11 +21,11 @@ jest.mock('../hooks/useUser', () => ({
   useUser: () => ({user, logout: mockLogout}),
 }));
 
-beforeAll(() => {
-  user = mockUser;
-});
-
 describe('layout', () => {
+  beforeAll(() => {
+    user = mockUser;
+  });
+
   test('renders nav and children', () => {
     render(
       <MemoryRouter initialEntries={['/']}>
@@ -61,6 +61,6 @@ describe('layout', () => {
       </MemoryRouter>,
     );
     fireEvent.click(screen.getByRole('button', {name: /logout/i}));
-    expect(mockLogout).toHaveBeenCalled();
+    expect(mockLogout).toHaveBeenCalledWith();
   });
 });

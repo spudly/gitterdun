@@ -9,7 +9,7 @@ export type PodiumItem = {
   subtitle?: string;
 };
 
-export type PodiumProps = {
+type PodiumProps = {
   readonly items: Array<PodiumItem>;
   readonly showMedals?: boolean;
 };
@@ -49,11 +49,12 @@ export const Podium: FC<PodiumProps> = ({items, showMedals = true}) => {
           <div className="mt-4">
             {item.content}
 
-            {item.score ? (
+            {typeof item.score === 'number'
+            || (typeof item.score === 'string' && item.score.length > 0) ? (
               <p className="text-gray-600">{item.score} points</p>
             ) : null}
 
-            {item.subtitle ? (
+            {typeof item.subtitle === 'string' && item.subtitle.length > 0 ? (
               <p className="text-sm text-gray-500">{item.subtitle}</p>
             ) : null}
           </div>
@@ -62,5 +63,3 @@ export const Podium: FC<PodiumProps> = ({items, showMedals = true}) => {
     </div>
   );
 };
-
-export default Podium;

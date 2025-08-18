@@ -1,7 +1,7 @@
 import type {ChangeEvent, FC, SelectHTMLAttributes} from 'react';
 import clsx from 'clsx';
 
-export type SelectInputProps = Omit<
+type SelectInputProps = Omit<
   SelectHTMLAttributes<HTMLSelectElement>,
   'onChange'
 > & {
@@ -41,5 +41,3 @@ export const SelectInput: FC<SelectInputProps> = ({
     </div>
   );
 };
-
-export default SelectInput;

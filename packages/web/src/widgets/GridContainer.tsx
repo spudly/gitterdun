@@ -1,7 +1,7 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type GridContainerProps = {
+type GridContainerProps = {
   readonly children: ReactNode;
   readonly cols?: 1 | 2 | 3 | 4 | 5 | 6;
   readonly gap?: 'sm' | 'md' | 'lg' | 'xl';
@@ -27,5 +27,3 @@ export const GridContainer: FC<GridContainerProps> = ({
 
   return <div className={baseStyles}>{children}</div>;
 };
-
-export default GridContainer;

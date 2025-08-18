@@ -1,7 +1,7 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type StatusType =
+type StatusType =
   | 'success'
   | 'error'
   | 'warning'
@@ -10,7 +10,7 @@ export type StatusType =
   | 'completed'
   | 'approved';
 
-export type StatusBadgeProps = {
+type StatusBadgeProps = {
   readonly status: StatusType;
   readonly children?: ReactNode;
   readonly size?: 'sm' | 'md' | 'lg';
@@ -89,5 +89,3 @@ export const StatusBadge: FC<StatusBadgeProps> = ({
 
   return <span className={baseStyles}>{children ?? status}</span>;
 };
-
-export default StatusBadge;

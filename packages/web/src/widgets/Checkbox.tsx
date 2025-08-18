@@ -1,6 +1,6 @@
 import type {ChangeEvent, FC, ReactNode} from 'react';
 
-export type CheckboxProps = {
+type CheckboxProps = {
   readonly id?: string;
   readonly label: ReactNode;
   readonly checked?: boolean;
@@ -31,5 +31,3 @@ export const Checkbox: FC<CheckboxProps> = ({
     </label>
   );
 };
-
-export default Checkbox;

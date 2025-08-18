@@ -1,7 +1,7 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type SectionHeaderProps = {
+type SectionHeaderProps = {
   readonly title: string;
   readonly subtitle?: string;
   readonly children?: ReactNode;
@@ -45,14 +45,14 @@ export const SectionHeader: FC<SectionHeaderProps> = ({
       <div>
         <h3 className={baseStyles}>{title}</h3>
 
-        {subtitle ? <p className="text-sm text-gray-600">{subtitle}</p> : null}
+        {typeof subtitle === 'string' && subtitle.length > 0 ? (
+          <p className="text-sm text-gray-600">{subtitle}</p>
+        ) : null}
       </div>
 
-      {children ? (
+      {children != null ? (
         <div className="flex items-center gap-2">{children}</div>
       ) : null}
     </div>
   );
 };
-
-export default SectionHeader;

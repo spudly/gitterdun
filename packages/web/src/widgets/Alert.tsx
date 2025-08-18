@@ -1,9 +1,9 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type AlertType = 'success' | 'error' | 'warning' | 'info';
+type AlertType = 'success' | 'error' | 'warning' | 'info';
 
-export type AlertProps = {
+type AlertProps = {
   readonly type?: AlertType;
   readonly title?: string;
   readonly children: ReactNode;
@@ -121,7 +121,9 @@ export const Alert: FC<AlertProps> = ({
                 'inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2',
                 ICON_STYLES[type],
               )}
-              onClick={onDismiss}
+              onClick={() => {
+                onDismiss();
+              }}
               type="button"
             >
               <span className="sr-only">Dismiss</span>
@@ -140,5 +142,3 @@ export const Alert: FC<AlertProps> = ({
     </div>
   );
 };
-
-export default Alert;

@@ -1,7 +1,7 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type EmptyStateProps = {
+type EmptyStateProps = {
   readonly icon?: ReactNode;
   readonly title: ReactNode;
   readonly description?: ReactNode;
@@ -33,5 +33,3 @@ export const EmptyState: FC<EmptyStateProps> = ({
     </div>
   );
 };
-
-export default EmptyState;

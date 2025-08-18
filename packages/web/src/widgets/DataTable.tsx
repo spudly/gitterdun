@@ -9,7 +9,7 @@ export type Column<T> = {
   align?: 'left' | 'center' | 'right';
 };
 
-export type DataTableProps<T> = {
+type DataTableProps<T> = {
   readonly data: Array<T>;
   readonly columns: Array<Column<T>>;
   readonly emptyMessage?: string;
@@ -132,5 +132,3 @@ export const DataTable = <T extends object>({
     </div>
   );
 };
-
-export default DataTable;

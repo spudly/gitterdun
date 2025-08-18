@@ -18,5 +18,6 @@ describe('progressBar', () => {
     );
     rerender(<ProgressBar max={100} size="lg" value={10} variant="warning" />);
     rerender(<ProgressBar max={100} size="md" value={10} variant="danger" />);
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 });

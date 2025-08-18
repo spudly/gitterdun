@@ -9,7 +9,7 @@ type BadgeVariant =
   | 'purple'
   | 'neutral';
 
-export type BadgeProps = {
+type BadgeProps = {
   readonly children: ReactNode;
   readonly variant?: BadgeVariant;
   readonly className?: string;
@@ -41,5 +41,3 @@ export const Badge: FC<BadgeProps> = ({
     </span>
   );
 };
-
-export default Badge;

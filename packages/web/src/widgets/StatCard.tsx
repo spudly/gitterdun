@@ -31,7 +31,7 @@ export const getStatColorClass = (color: StatColor = 'gray'): string => {
   }
 };
 
-export type StatCardProps = {
+type StatCardProps = {
   readonly icon?: ReactNode;
   readonly label: ReactNode;
   readonly value: ReactNode;
@@ -64,5 +64,3 @@ export const StatCard: FC<StatCardProps> = ({
     </div>
   );
 };
-
-export default StatCard;

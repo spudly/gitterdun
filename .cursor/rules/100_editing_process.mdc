@@ -20,3 +20,4 @@ Additional constraints:
 * Do not change the configuration for typescript, eslint, jest, or prettier unless explicitly told to do so or after requesting and receiving confirmation.
 * Do not add comments to the file to ignore or disable typescript, eslint, jest, or prettier errors or warnings unless explicitly told to do so or after requesting and receiving confirmation.
 * Following the steps outlined above in order is your highest priority even if the change seems trivial or you're trying to go fast. If you are unable to do so, stop and say so.
+* Do not install or uninstall dependencies unless explicitly told to do so or after requesting and receiving confirmation.

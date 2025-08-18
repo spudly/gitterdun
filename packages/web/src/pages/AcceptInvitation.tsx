@@ -71,7 +71,7 @@ const AcceptInvitation: FC = () => {
             />
           </FormField>
 
-          {message !== undefined && message !== '' ? (
+          {message !== null && message !== '' ? (
             <Alert type="info">{message}</Alert>
           ) : null}
 

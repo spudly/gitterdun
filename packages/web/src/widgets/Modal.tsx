@@ -2,7 +2,7 @@ import type {FC, ReactNode} from 'react';
 import {useEffect} from 'react';
 import clsx from 'clsx';
 
-export type ModalProps = {
+type ModalProps = {
   readonly isOpen: boolean;
   readonly onClose: () => void;
   readonly title?: string;
@@ -91,7 +91,7 @@ export const Modal: FC<ModalProps> = ({
       <div className="flex min-h-full items-center justify-center p-4 text-center">
         <button
           aria-label="Close modal"
-          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+          className="fixed inset-0 bg-gray-500/75 transition-opacity"
           onClick={handleOverlayClick}
           onKeyDown={event => {
             if (isOverlayKey(event.key)) {
@@ -120,9 +120,10 @@ export const Modal: FC<ModalProps> = ({
               : null,
           )}
         >
-          {title !== null || showCloseButton ? (
+          {(typeof title === 'string' && title.length > 0)
+          || showCloseButton ? (
             <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-              {title ? (
+              {typeof title === 'string' && title.length > 0 ? (
                 <h3 className="text-lg font-medium text-gray-900">{title}</h3>
               ) : null}
 
@@ -158,5 +159,3 @@ export const Modal: FC<ModalProps> = ({
     </div>
   );
 };
-
-export default Modal;

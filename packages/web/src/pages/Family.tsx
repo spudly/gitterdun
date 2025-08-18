@@ -135,7 +135,7 @@ const Family: FC = () => {
         </Toolbar>
       </FormSection>
 
-      {selectedFamilyId != null ? (
+      {selectedFamilyId !== null ? (
         <GridContainer cols={2} gap="lg">
           <FormSection title="Members">
             {/* Parse API data using zod schema to avoid any */}
@@ -184,13 +184,11 @@ const Family: FC = () => {
                     />
 
                     <Button
-                      disabled={selectedFamilyId === null}
                       onClick={() => {
                         if (
-                          selectedFamilyId === null
-                          || childUsername === ''
-                          || childEmail === ''
-                          || childPassword === ''
+                          childUsername.trim() === ''
+                          || childEmail.trim() === ''
+                          || childPassword.trim() === ''
                         ) {
                           return;
                         }
@@ -242,9 +240,8 @@ const Family: FC = () => {
                     </SelectInput>
 
                     <Button
-                      disabled={selectedFamilyId === null}
                       onClick={() => {
-                        if (selectedFamilyId === null || inviteEmail === '') {
+                        if (inviteEmail.trim() === '') {
                           return;
                         }
                         inviteMutation.mutate({

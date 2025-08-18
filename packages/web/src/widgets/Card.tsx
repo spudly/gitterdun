@@ -1,7 +1,7 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type CardProps = {
+type CardProps = {
   readonly children: ReactNode;
   readonly className?: string;
   readonly padded?: boolean;
@@ -35,5 +35,3 @@ export const Card: FC<CardProps> = ({
     </div>
   );
 };
-
-export default Card;

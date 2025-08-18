@@ -47,6 +47,11 @@ describe('acceptInvitation page', () => {
       jest.runAllTimers();
     });
     jest.useRealTimers();
+    expect(mocked.invitationsApi.accept).toHaveBeenCalledWith({
+      token: 'abc',
+      username: 'u',
+      password: 'p12345',
+    });
   });
 
   test('shows error when API fails', async () => {

@@ -9,7 +9,7 @@ const SIZE_MAP: Record<AvatarSize, string> = {
   lg: 'w-12 h-12 text-base',
 };
 
-export type AvatarCircleProps = {
+type AvatarCircleProps = {
   readonly label: string;
   readonly emoji?: string;
   readonly size?: AvatarSize;
@@ -36,5 +36,3 @@ export const AvatarCircle: FC<AvatarCircleProps> = ({
     </div>
   );
 };
-
-export default AvatarCircle;

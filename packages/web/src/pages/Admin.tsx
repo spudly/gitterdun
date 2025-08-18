@@ -84,7 +84,7 @@ const Admin: FC = () => {
       <Stack gap="lg">
         {/* Family Management */}
         <FormSection title="Family Management">
-          {message !== undefined && message !== '' ? (
+          {message !== null && message !== '' ? (
             <Alert type={messageType === 'success' ? 'success' : 'error'}>
               {message}
             </Alert>
@@ -278,7 +278,8 @@ const Admin: FC = () => {
                       <span>Penalty: -{chore.penalty_points}</span>
                     )}
 
-                    {chore.due_date ? (
+                    {typeof chore.due_date === 'string'
+                    && chore.due_date.length > 0 ? (
                       <span>
                         Due: {new Date(chore.due_date).toLocaleDateString()}
                       </span>

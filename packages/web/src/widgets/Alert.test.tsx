@@ -13,7 +13,7 @@ describe('alert', () => {
     expect(screen.getByText('T')).toBeInTheDocument();
     expect(screen.getByText('Body')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', {name: /dismiss/i}));
-    expect(onDismiss).toHaveBeenCalled();
+    expect(onDismiss).toHaveBeenCalledWith();
     rerender(<Alert type="success">S</Alert>);
     expect(screen.getByText('S')).toBeInTheDocument();
     rerender(<Alert type="error">E</Alert>);

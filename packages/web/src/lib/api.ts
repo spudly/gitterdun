@@ -3,7 +3,7 @@
 // Note: Avoid direct `import.meta` so tests (CJS) can parse this file.
 import {z} from 'zod';
 import {
-  ApiResponseSchema,
+  ApiResponseSchema as createApiResponseSchema,
   ChoreSchema,
   ChoreWithUsernameSchema,
   GoalSchema,
@@ -38,10 +38,10 @@ class ApiError extends Error {
   }
 }
 
-async function handleResponseWithSchema<TData>(
+const handleResponseWithSchema = async <TData>(
   response: Response,
   dataSchema: z.ZodType<TData>,
-): Promise<ApiResponse<TData>> {
+): Promise<ApiResponse<TData>> => {
   if (!response.ok) {
     const errorData: unknown = await response
       .json()
@@ -50,7 +50,7 @@ async function handleResponseWithSchema<TData>(
   }
 
   const raw = (await response.json()) as unknown;
-  const parsed = ApiResponseSchema(dataSchema).safeParse(raw);
+  const parsed = createApiResponseSchema(dataSchema).safeParse(raw);
   if (parsed.success) {
     const out: ApiResponse<TData> = parsed.data;
     return out;
@@ -92,7 +92,7 @@ async function handleResponseWithSchema<TData>(
   }
   // If validation truly fails, rethrow the ZodError for visibility
   throw parsed.error;
-}
+};
 
 export const api = {
   // GET request
@@ -354,4 +354,3 @@ export const invitationsApi = {
 };
 
 export {ApiError};
-export type {ApiResponse};

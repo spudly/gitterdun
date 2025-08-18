@@ -1,7 +1,7 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type PageHeaderProps = {
+type PageHeaderProps = {
   readonly title: ReactNode;
   readonly subtitle?: ReactNode;
   readonly actions?: ReactNode;
@@ -35,5 +35,3 @@ export const PageHeader: FC<PageHeaderProps> = ({
     </div>
   );
 };
-
-export default PageHeader;

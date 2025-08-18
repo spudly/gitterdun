@@ -16,7 +16,7 @@ module.exports = {
     '!**/*.config.*',
     '!**/coverage/**',
   ],
-  collectCoverage: true,
+  collectCoverage: true, // jest cli says this is a mistake but it is not. jest has a bug causing this warning to be shown
   coverageThreshold: {
     // global: {branches: 100, functions: 100, lines: 100, statements: 100},
   },

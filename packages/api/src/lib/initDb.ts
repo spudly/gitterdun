@@ -55,5 +55,3 @@ export const initializeDatabase = async (): Promise<void> => {
     throw error;
   }
 };
-
-export default initializeDatabase;

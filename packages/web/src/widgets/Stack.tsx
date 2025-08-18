@@ -1,7 +1,7 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type StackGap = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+type StackGap = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 const GAP_MAP: Record<StackGap, string> = {
   xs: 'space-y-1',
@@ -11,13 +11,8 @@ const GAP_MAP: Record<StackGap, string> = {
   xl: 'space-y-8',
 };
 
-export type StackProps = {
-  readonly children: ReactNode;
-  readonly gap?: StackGap;
-};
+type StackProps = {readonly children: ReactNode; readonly gap?: StackGap};
 
 export const Stack: FC<StackProps> = ({children, gap = 'md'}) => {
   return <div className={clsx(GAP_MAP[gap])}>{children}</div>;
 };
-
-export default Stack;

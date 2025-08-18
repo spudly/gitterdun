@@ -53,7 +53,7 @@ const ForgotPassword: FC = () => {
           </Stack>
         </form>
 
-        {message !== undefined && message !== '' ? (
+        {message !== null && message !== '' ? (
           <Alert type="info">{message}</Alert>
         ) : null}
       </Stack>

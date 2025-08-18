@@ -1,4 +1,4 @@
-import {pick} from './pick';
+import {pick} from './pick.js';
 
 export const withProperties = <FN extends () => Promise<void> | void>(
   obj: object,

@@ -33,7 +33,7 @@ export const getDensityClass = (density: Density = 'tight'): string => {
   }
 };
 
-export type BulletListProps = {
+type BulletListProps = {
   readonly children: ReactNode;
   readonly indent?: Indent;
   readonly density?: Density;
@@ -50,5 +50,3 @@ export const BulletList: FC<BulletListProps> = ({
     <ul className={clsx('list-disc', indentClass, densityClass)}>{children}</ul>
   );
 };
-
-export default BulletList;

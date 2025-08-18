@@ -23,6 +23,7 @@ describe('status components', () => {
     rerender(<StatusBadge status="pending">p</StatusBadge>);
     rerender(<StatusBadge status="completed">c</StatusBadge>);
     rerender(<StatusBadge status="approved">a</StatusBadge>);
+    expect(screen.getByText('a')).toBeInTheDocument();
   });
 
   test('statusBadge helper covers all branches', () => {
@@ -33,6 +34,7 @@ describe('status components', () => {
     expect(getStatusClass('pending')).toBeTruthy();
     expect(getStatusClass('completed')).toBeTruthy();
     expect(getStatusClass('approved')).toBeTruthy();
+    expect(getStatusClass('info')).toBeTruthy();
   });
 
   test('covers StatusDot all colors and unlabeled', () => {
@@ -40,5 +42,6 @@ describe('status components', () => {
     rerender(<StatusDot color="yellow" label="y" size={8} />);
     rerender(<StatusDot color="red" label="r" size={8} />);
     rerender(<StatusDot color="gray" size={8} />);
+    expect(document.querySelector('span')).toBeTruthy();
   });
 });

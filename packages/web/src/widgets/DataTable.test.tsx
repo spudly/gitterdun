@@ -15,7 +15,10 @@ describe('dataTable', () => {
       <DataTable columns={columns} data={data} onRowClick={onRowClick} />,
     );
     fireEvent.click(screen.getByText('N'));
-    expect(onRowClick).toHaveBeenCalled();
+    expect(onRowClick).toHaveBeenCalledWith(
+      expect.objectContaining({id: 1, name: 'N'}),
+      0, // index parameter
+    );
     rerender(<DataTable columns={columns} data={[]} loading />);
     expect(screen.getByText('Loading...')).toBeInTheDocument();
     rerender(<DataTable columns={columns} data={[]} />);

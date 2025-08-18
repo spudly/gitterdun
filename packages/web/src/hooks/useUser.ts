@@ -9,10 +9,12 @@ const isNoDataSuccess = (value: unknown): value is typeof NO_DATA_SUCCESS => {
   if (value === null || typeof value !== 'object') {
     return false;
   }
-  return (
-    '__noData' in (value as Record<string, unknown>)
-    && (value as {__noData?: boolean}).__noData === true
-  );
+  // Narrow using in-operator safely
+  if (!('__noData' in value)) {
+    return false;
+  }
+  // At this point, value has an __noData property of unknown type
+  return value.__noData === true;
 };
 
 type UserQueryData = User | null | typeof NO_DATA_SUCCESS;
@@ -74,17 +76,10 @@ export const useUser = () => {
     loginMutation.mutateAsync({email, password});
 
   const register = async (
-    username: string,
-    email: string,
-    password: string,
-    role?: string,
-  ) =>
-    registerMutation.mutateAsync({
-      username,
-      email,
-      password,
-      ...(role === undefined ? {} : {role}),
-    });
+    params:
+      | {username: string; email: string; password: string}
+      | {username: string; email: string; password: string; role: string},
+  ) => registerMutation.mutateAsync(params);
 
   const logout = async () => logoutMutation.mutateAsync();
 

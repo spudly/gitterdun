@@ -980,7 +980,7 @@ const eslintConfig = [
       'jest/prefer-called-with': 'warn',
       'jest/prefer-comparison-matcher': 'warn',
       'jest/prefer-each': 'warn',
-      'jest/prefer-ending-with-an-expect': 'warn',
+      'jest/prefer-ending-with-an-expect': 'off', // false positive when expect is in a loop
       'jest/prefer-equality-matcher': 'warn',
       'jest/prefer-expect-assertions': 'off', // annoying
       'jest/prefer-expect-resolves': 'warn',
@@ -1006,6 +1006,8 @@ const eslintConfig = [
       'jest/valid-expect-in-promise': 'warn',
       'jest/valid-title': 'warn',
       '@typescript-eslint/no-unsafe-assignment': 'off', // we can be more loose in unit tests
+      '@typescript-eslint/no-unsafe-argument': 'off', // we can be more loose in unit tests
+      '@typescript-eslint/no-explicit-any': 'off', // we can be more loose in unit tests
     },
   },
 ];

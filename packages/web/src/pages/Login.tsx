@@ -60,7 +60,7 @@ const Login: FC = () => {
             />
           </FormField>
 
-          {message !== undefined && message !== '' ? (
+          {message !== null && message !== '' ? (
             <Alert type="error">{message}</Alert>
           ) : null}
 

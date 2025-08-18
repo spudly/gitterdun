@@ -1,7 +1,7 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type FormSectionProps = {
+type FormSectionProps = {
   readonly title?: string;
   readonly children: ReactNode;
   readonly variant?: 'default' | 'compact' | 'spacious';
@@ -22,7 +22,7 @@ export const FormSection: FC<FormSectionProps> = ({
 
   return (
     <div className={baseStyles}>
-      {title ? (
+      {typeof title === 'string' && title.length > 0 ? (
         <h3 className="mb-3 text-lg font-semibold text-gray-900">{title}</h3>
       ) : null}
 
@@ -30,5 +30,3 @@ export const FormSection: FC<FormSectionProps> = ({
     </div>
   );
 };
-
-export default FormSection;

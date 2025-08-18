@@ -1,7 +1,7 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type FormFieldProps = {
+type FormFieldProps = {
   readonly label: string;
   readonly htmlFor: string;
   readonly children: ReactNode;
@@ -44,5 +44,3 @@ export const FormField: FC<FormFieldProps> = ({
     </div>
   );
 };
-
-export default FormField;

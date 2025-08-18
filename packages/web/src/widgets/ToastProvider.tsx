@@ -74,7 +74,7 @@ export const ToastProvider: FC<{readonly children: ReactNode}> = ({
       onError?: (userMessage: string) => void,
     ) => {
       return (...args: Args) => {
-        void fn(...args).catch((error: unknown) => {
+        fn(...args).catch((error: unknown) => {
           // Log raw error for developers
           // eslint-disable-next-line no-console -- dev error logging
           console.error(error);
@@ -97,7 +97,7 @@ export const ToastProvider: FC<{readonly children: ReactNode}> = ({
     <ToastContext.Provider value={value}>
       {children}
       {/* Toast viewport */}
-      <div className="fixed right-4 top-4 z-50 w-[min(92vw,360px)] space-y-2">
+      <div className="fixed right-4 top-4 z-50 w-full max-w-sm space-y-2 md:max-w-md">
         {toasts.map(toast => (
           <Alert
             key={toast.id}
@@ -131,11 +131,13 @@ export const useToast = (): ToastContextValue => {
         onError,
       ) => {
         return (...args) => {
-          void fn(...args).catch(() => {
-            if (onError) {
-              onError(userMessage);
-            }
-          });
+          fn(...args)
+            .then(() => undefined)
+            .catch(() => {
+              if (onError) {
+                onError(userMessage);
+              }
+            });
         };
       };
       return {addToast, safeAsync};

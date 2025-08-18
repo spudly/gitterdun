@@ -1,7 +1,7 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type InputGroupProps = {
+type InputGroupProps = {
   readonly children: ReactNode;
   readonly error?: string;
   readonly helpText?: string;
@@ -22,9 +22,11 @@ export const InputGroup: FC<InputGroupProps> = ({
     <div className={baseStyles}>
       <div className={layout === 'horizontal' ? 'flex-1' : ''}>{children}</div>
 
-      {helpText ? <p className="text-sm text-gray-500">{helpText}</p> : null}
+      {typeof helpText === 'string' && helpText.length > 0 ? (
+        <p className="text-sm text-gray-500">{helpText}</p>
+      ) : null}
 
-      {error ? (
+      {typeof error === 'string' && error.length > 0 ? (
         <p className="text-sm text-red-600" role="alert">
           {error}
         </p>
@@ -32,5 +34,3 @@ export const InputGroup: FC<InputGroupProps> = ({
     </div>
   );
 };
-
-export default InputGroup;

@@ -1,7 +1,7 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type FormCardProps = {
+type FormCardProps = {
   readonly children: ReactNode;
   readonly title?: string;
   readonly size?: 'sm' | 'md' | 'lg';
@@ -17,11 +17,11 @@ export const FormCard: FC<FormCardProps> = ({children, title, size = 'md'}) => {
         SIZE_STYLES[size],
       )}
     >
-      {title ? <h2 className="mb-4 text-2xl font-semibold">{title}</h2> : null}
+      {typeof title === 'string' && title.length > 0 ? (
+        <h2 className="mb-4 text-2xl font-semibold">{title}</h2>
+      ) : null}
 
       {children}
     </div>
   );
 };
-
-export default FormCard;
