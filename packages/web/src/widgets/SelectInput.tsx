@@ -41,5 +41,3 @@ export const SelectInput: FC<SelectInputProps> = ({
     </div>
   );
 };
-
-export default SelectInput;

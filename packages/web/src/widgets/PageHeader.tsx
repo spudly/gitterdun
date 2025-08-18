@@ -35,5 +35,3 @@ export const PageHeader: FC<PageHeaderProps> = ({
     </div>
   );
 };
-
-export default PageHeader;

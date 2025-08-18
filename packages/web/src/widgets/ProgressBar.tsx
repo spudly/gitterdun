@@ -59,5 +59,3 @@ export const ProgressBar: FC<ProgressBarProps> = ({
     </div>
   );
 };
-
-export default ProgressBar;

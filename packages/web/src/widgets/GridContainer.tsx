@@ -27,5 +27,3 @@ export const GridContainer: FC<GridContainerProps> = ({
 
   return <div className={baseStyles}>{children}</div>;
 };
-
-export default GridContainer;

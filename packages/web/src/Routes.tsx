@@ -3,21 +3,17 @@ import {Suspense, lazy} from 'react';
 import {Routes as RouterRoutes, Route} from 'react-router-dom';
 import {Spinner} from './widgets/Spinner';
 
-export const Dashboard = lazy(async () => import('./pages/Dashboard'));
-export const Chores = lazy(async () => import('./pages/Chores'));
-export const Goals = lazy(async () => import('./pages/Goals'));
-export const Leaderboard = lazy(async () => import('./pages/Leaderboard'));
-export const Admin = lazy(async () => import('./pages/Admin'));
-export const Login = lazy(async () => import('./pages/Login'));
-export const ForgotPassword = lazy(
-  async () => import('./pages/ForgotPassword'),
-);
-export const ResetPassword = lazy(async () => import('./pages/ResetPassword'));
-export const Family = lazy(async () => import('./pages/Family'));
-export const AcceptInvitation = lazy(
-  async () => import('./pages/AcceptInvitation'),
-);
-export const Demos = lazy(async () => import('./pages/Demos'));
+const Dashboard = lazy(async () => import('./pages/Dashboard'));
+const Chores = lazy(async () => import('./pages/Chores'));
+const Goals = lazy(async () => import('./pages/Goals'));
+const Leaderboard = lazy(async () => import('./pages/Leaderboard'));
+const Admin = lazy(async () => import('./pages/Admin'));
+const Login = lazy(async () => import('./pages/Login'));
+const ForgotPassword = lazy(async () => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(async () => import('./pages/ResetPassword'));
+const Family = lazy(async () => import('./pages/Family'));
+const AcceptInvitation = lazy(async () => import('./pages/AcceptInvitation'));
+const Demos = lazy(async () => import('./pages/Demos'));
 
 export const Routes: FC = () => {
   return (

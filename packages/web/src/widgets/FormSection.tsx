@@ -30,5 +30,3 @@ export const FormSection: FC<FormSectionProps> = ({
     </div>
   );
 };
-
-export default FormSection;

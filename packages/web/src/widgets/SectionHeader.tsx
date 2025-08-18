@@ -56,5 +56,3 @@ export const SectionHeader: FC<SectionHeaderProps> = ({
     </div>
   );
 };
-
-export default SectionHeader;

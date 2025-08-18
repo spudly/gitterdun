@@ -54,5 +54,3 @@ export const ListRow: FC<ListRowProps> = ({
     </div>
   );
 };
-
-export default ListRow;

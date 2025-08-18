@@ -10,5 +10,3 @@ export const List: FC<ListProps> = ({children, className = ''}) => {
     </div>
   );
 };
-
-export default List;

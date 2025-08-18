@@ -104,5 +104,3 @@ export const RankingList: FC<RankingListProps> = ({
     </div>
   );
 };
-
-export default RankingList;

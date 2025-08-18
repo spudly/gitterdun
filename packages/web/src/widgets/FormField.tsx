@@ -44,5 +44,3 @@ export const FormField: FC<FormFieldProps> = ({
     </div>
   );
 };
-
-export default FormField;

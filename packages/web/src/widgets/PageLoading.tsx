@@ -12,5 +12,3 @@ export const PageLoading: FC<PageLoadingProps> = ({message = 'Loading...'}) => {
     </div>
   );
 };
-
-export default PageLoading;

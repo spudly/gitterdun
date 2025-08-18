@@ -55,5 +55,3 @@ export const Text: FC<TextProps> = ({
     </Element>
   );
 };
-
-export default Text;

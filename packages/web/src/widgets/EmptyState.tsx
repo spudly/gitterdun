@@ -33,5 +33,3 @@ export const EmptyState: FC<EmptyStateProps> = ({
     </div>
   );
 };
-
-export default EmptyState;

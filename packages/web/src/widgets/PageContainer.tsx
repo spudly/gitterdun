@@ -42,5 +42,3 @@ export const PageContainer: FC<PageContainerProps> = ({
     </div>
   );
 };
-
-export default PageContainer;

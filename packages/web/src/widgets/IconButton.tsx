@@ -60,5 +60,3 @@ export const IconButton: FC<IconButtonProps> = ({
     </button>
   );
 };
-
-export default IconButton;

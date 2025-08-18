@@ -31,5 +31,3 @@ export const Checkbox: FC<CheckboxProps> = ({
     </label>
   );
 };
-
-export default Checkbox;

@@ -36,5 +36,3 @@ export const AvatarCircle: FC<AvatarCircleProps> = ({
     </div>
   );
 };
-
-export default AvatarCircle;

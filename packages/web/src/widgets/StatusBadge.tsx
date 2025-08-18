@@ -89,5 +89,3 @@ export const StatusBadge: FC<StatusBadgeProps> = ({
 
   return <span className={baseStyles}>{children ?? status}</span>;
 };
-
-export default StatusBadge;

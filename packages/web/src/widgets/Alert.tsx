@@ -140,5 +140,3 @@ export const Alert: FC<AlertProps> = ({
     </div>
   );
 };
-
-export default Alert;

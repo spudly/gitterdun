@@ -63,5 +63,3 @@ export const Podium: FC<PodiumProps> = ({items, showMedals = true}) => {
     </div>
   );
 };
-
-export default Podium;

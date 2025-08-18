@@ -60,5 +60,3 @@ export const TextInput: FC<TextInputProps> = ({
     </div>
   );
 };
-
-export default TextInput;

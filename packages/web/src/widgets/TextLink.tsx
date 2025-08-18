@@ -19,5 +19,3 @@ export const TextLink: FC<TextLinkProps> = ({
     </Link>
   );
 };
-
-export default TextLink;

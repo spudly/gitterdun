@@ -132,5 +132,3 @@ export const DataTable = <T extends object>({
     </div>
   );
 };
-
-export default DataTable;

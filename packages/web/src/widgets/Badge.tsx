@@ -41,5 +41,3 @@ export const Badge: FC<BadgeProps> = ({
     </span>
   );
 };
-
-export default Badge;

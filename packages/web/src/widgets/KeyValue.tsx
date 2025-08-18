@@ -11,5 +11,3 @@ export const KeyValue: FC<KeyValueProps> = ({label, value}) => {
     </div>
   );
 };
-
-export default KeyValue;

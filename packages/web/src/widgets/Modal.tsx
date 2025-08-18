@@ -159,5 +159,3 @@ export const Modal: FC<ModalProps> = ({
     </div>
   );
 };
-
-export default Modal;

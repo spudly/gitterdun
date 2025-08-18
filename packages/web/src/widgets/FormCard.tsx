@@ -25,5 +25,3 @@ export const FormCard: FC<FormCardProps> = ({children, title, size = 'md'}) => {
     </div>
   );
 };
-
-export default FormCard;

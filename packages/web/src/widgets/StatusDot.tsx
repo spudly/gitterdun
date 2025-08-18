@@ -68,5 +68,3 @@ export const StatusDot: FC<StatusDotProps> = ({
     />
   );
 };
-
-export default StatusDot;

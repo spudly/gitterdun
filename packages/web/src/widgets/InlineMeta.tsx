@@ -9,5 +9,3 @@ export const InlineMeta: FC<InlineMetaProps> = ({children}) => {
     </div>
   );
 };
-
-export default InlineMeta;

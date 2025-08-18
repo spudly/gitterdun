@@ -34,5 +34,3 @@ export const InputGroup: FC<InputGroupProps> = ({
     </div>
   );
 };
-
-export default InputGroup;

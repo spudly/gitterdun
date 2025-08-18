@@ -98,15 +98,6 @@ describe('logger module', () => {
     expect(logger).toBe(mockLoggerInstance);
   });
 
-  test('should export default logger instance', async () => {
-    const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
-    mockPino.mockReturnValue(mockLoggerInstance);
-
-    const loggerModule = await import('./logger');
-
-    expect(loggerModule.default).toBe(mockLoggerInstance);
-  });
-  
   test('ensures tests end with an expectation (placeholder)', () => {
     expect(true).toBe(true);
   });

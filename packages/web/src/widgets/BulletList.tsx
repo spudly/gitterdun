@@ -50,5 +50,3 @@ export const BulletList: FC<BulletListProps> = ({
     <ul className={clsx('list-disc', indentClass, densityClass)}>{children}</ul>
   );
 };
-
-export default BulletList;

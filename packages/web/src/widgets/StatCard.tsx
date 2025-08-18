@@ -64,5 +64,3 @@ export const StatCard: FC<StatCardProps> = ({
     </div>
   );
 };
-
-export default StatCard;

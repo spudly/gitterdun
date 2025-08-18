@@ -18,5 +18,3 @@ const devTransport =
     : {};
 
 export const logger = pino({...baseOptions, ...devTransport});
-
-export default logger;

@@ -24,5 +24,3 @@ export const MembersList: FC<MembersListProps> = ({members}) => {
     </ul>
   );
 };
-
-export default MembersList;
