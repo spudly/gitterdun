@@ -163,7 +163,10 @@ const eslintConfig = [
       indent: 'off', // using Prettier for styling
       'jsx-a11y/interactive-supports-focus': 'error',
       'react/jsx-curly-newline': 'off', // using Prettier for styling
-      'react/jsx-filename-extension': 'off', // using Prettier for styling
+      'react/jsx-filename-extension': [
+        'warn',
+        {allow: 'as-needed', extensions: ['.tsx']},
+      ],
       'react/jsx-first-prop-new-line': 'off',
       'react/jsx-indent': 'off',
       'react/jsx-indent-props': 'off',
@@ -261,6 +264,7 @@ const eslintConfig = [
             '**/spec/**',
             '**/__tests__/**',
             '**/__mocks__/**',
+            '**/*.test.{js,jsx,ts,tsx}',
             '**/test.{js,jsx,ts,tsx}',
             '**/test-*.{js,jsx,ts,tsx}',
             '**/*{.,_}{test,spec}.{js,jsx,ts,tsx}',
@@ -279,6 +283,7 @@ const eslintConfig = [
             '**/karma.conf.{js,jsx,ts,tsx}',
             '**/.eslintrc.{js,jsx,ts,tsx}',
             '**/*.config.{js,jsx,ts,tsx}',
+            '**/*.d.ts',
           ],
           optionalDependencies: false,
         },
@@ -472,7 +477,7 @@ const eslintConfig = [
       '@typescript-eslint/explicit-function-return-type': 'off', // too verbose
       '@typescript-eslint/explicit-member-accessibility': 'warn',
       '@typescript-eslint/explicit-module-boundary-types': 'off', // too verbose
-      '@typescript-eslint/init-declarations': 'warn',
+      '@typescript-eslint/init-declarations': 'off', // typescript makes sure variables are initialized before use
       '@typescript-eslint/max-params': ['warn', {max: 5}],
       '@typescript-eslint/member-ordering': 'warn',
       '@typescript-eslint/method-signature-style': 'warn',
@@ -695,7 +700,7 @@ const eslintConfig = [
       'consistent-this': 'warn',
       'default-case': 'warn',
       'default-case-last': 'warn',
-      eqeqeq: 'warn',
+      eqeqeq: ['warn', 'always', {null: 'ignore'}],
       'for-direction': 'warn',
       'func-name-matching': 'warn',
       'func-names': 'warn',
@@ -705,19 +710,16 @@ const eslintConfig = [
       'id-denylist': 'warn',
       'id-length': 'warn',
       'id-match': 'warn',
-      'init-declarations': 'warn',
+      'init-declarations': 'off', // typescript makes sure variables are initialized before use
       'line-comment-position': 'off', // use Prettier for styling
       'logical-assignment-operators': 'warn',
       'max-classes-per-file': 'warn',
       'max-depth': 'warn',
-      'max-lines': ['warn', 150],
-      'max-lines-per-function': [
-        'warn',
-        {max: 20, skipBlankLines: true, skipComments: true, IIFEs: true},
-      ],
+      'max-lines': 'off', //['warn', 150],// TODO: re-enable & refactor to fix
+      'max-lines-per-function': 'off', // ['warn', {max: 20, skipBlankLines: true, skipComments: true, IIFEs: true},], // TODO: re-enable
       'max-nested-callbacks': 'warn',
       'max-params': 'warn',
-      'max-statements': 'warn',
+      'max-statements': 'off', // 'warn', // TODO: re-enable
       'multiline-comment-style': 'off', // use Prettier for styling
       'new-cap': 'warn',
       'no-alert': 'warn',
@@ -771,7 +773,7 @@ const eslintConfig = [
       'no-misleading-character-class': 'warn',
       'no-multi-assign': 'warn',
       'no-multi-str': 'warn',
-      'no-negated-condition': 'warn',
+      'no-negated-condition': 'off',
       'no-new': 'warn',
       'no-new-native-nonconstructor': 'warn',
       'no-new-wrappers': 'warn',
@@ -780,7 +782,7 @@ const eslintConfig = [
       'no-octal': 'warn',
       'no-octal-escape': 'warn',
       'no-param-reassign': 'warn',
-      'no-plusplus': 'warn',
+      'no-plusplus': 'off', // these are only confusing if you don't know the language
       'no-promise-executor-return': 'warn',
       'no-proto': 'warn',
       'no-prototype-builtins': 'warn',
@@ -800,7 +802,6 @@ const eslintConfig = [
       'no-template-curly-in-string': 'warn',
       'no-ternary': 'off',
       'no-undef-init': 'warn',
-      'no-undefined': 'off', // prefer undefined over null for TypeScript optional properties
       'no-unexpected-multiline': 'warn',
       'no-unmodified-loop-condition': 'warn',
       'no-unneeded-ternary': 'warn',
@@ -819,7 +820,7 @@ const eslintConfig = [
       'no-useless-return': 'warn',
       'no-var': 'warn',
       'no-void': 'warn',
-      'no-warning-comments': 'warn',
+      'no-warning-comments': 'off', // TODO: re-enable
       'no-with': 'warn',
       'object-shorthand': 'warn',
       'one-var': 'off', // use Prettier for styling
@@ -839,7 +840,7 @@ const eslintConfig = [
       'prefer-template': 'warn',
       radix: 'warn',
       'require-atomic-updates': 'warn',
-      'require-unicode-regexp': 'warn',
+      'require-unicode-regexp': 'off', // almost always unnecessary
       'require-yield': 'warn',
       'sort-imports': 'off', // handled by import/order
       'sort-keys': 'off', // order affects readability. we can always sort on-demand
@@ -849,9 +850,101 @@ const eslintConfig = [
       'use-isnan': 'warn',
       'vars-on-top': 'warn',
       yoda: 'warn',
+      'jest/consistent-test-it': 'off', // for tests only
+      'jest/expect-expect': 'off', // for tests only
+      'jest/max-expects': 'off', // for tests only
+      'jest/max-nested-describe': 'off', // for tests only
+      'jest/no-alias-methods': 'off', // for tests only
+      'jest/no-commented-out-tests': 'off', // for tests only
+      'jest/no-conditional-expect': 'off', // for tests only
+      'jest/no-conditional-in-test': 'off', // for tests only
+      'jest/no-confusing-set-timeout': 'off', // for tests only
+      'jest/no-deprecated-functions': 'off', // for tests only
+      'jest/no-disabled-tests': 'off', // for tests only
+      'jest/no-done-callback': 'off', // for tests only
+      'jest/no-duplicate-hooks': 'off', // for tests only
+      'jest/no-export': 'off', // for tests only
+      'jest/no-focused-tests': 'off', // for tests only
+      'jest/no-hooks': 'off', // for tests only
+      'jest/no-identical-title': 'off', // for tests only
+      'jest/no-interpolation-in-snapshots': 'off', // for tests only
+      'jest/no-jasmine-globals': 'off', // for tests only
+      'jest/no-large-snapshots': 'off', // for tests only
+      'jest/no-mocks-import': 'off', // for tests only
+      'jest/no-restricted-jest-methods': 'off', // for tests only
+      'jest/no-restricted-matchers': 'off', // for tests only
+      'jest/no-standalone-expect': 'off', // for tests only
+      'jest/no-test-prefixes': 'off', // for tests only
+      'jest/no-test-return-statement': 'off', // for tests only
+      'jest/no-untyped-mock-factory': 'off', // for tests only
+      'jest/padding-around-after-all-blocks': 'off', // for tests only
+      'jest/padding-around-after-each-blocks': 'off', // for tests only
+      'jest/padding-around-all': 'off', // for tests only
+      'jest/padding-around-before-all-blocks': 'off', // for tests only
+      'jest/padding-around-before-each-blocks': 'off', // for tests only
+      'jest/padding-around-describe-blocks': 'off', // for tests only
+      'jest/padding-around-expect-groups': 'off', // for tests only
+      'jest/padding-around-test-blocks': 'off', // for tests only
+      'jest/prefer-called-with': 'off', // for tests only
+      'jest/prefer-comparison-matcher': 'off', // for tests only
+      'jest/prefer-each': 'off', // for tests only
+      'jest/prefer-ending-with-an-expect': 'off', // for tests only
+      'jest/prefer-equality-matcher': 'off', // for tests only
+      'jest/prefer-expect-assertions': 'off', // for tests only
+      'jest/prefer-expect-resolves': 'off', // for tests only
+      'jest/prefer-hooks-in-order': 'off', // for tests only
+      'jest/prefer-hooks-on-top': 'off', // for tests only
+      'jest/prefer-importing-jest-globals': 'off', // for tests only
+      'jest/prefer-jest-mocked': 'off', // for tests only
+      'jest/prefer-lowercase-title': 'off', // for tests only
+      'jest/prefer-mock-promise-shorthand': 'off', // for tests only
+      'jest/prefer-snapshot-hint': 'off', // for tests only
+      'jest/prefer-spy-on': 'off', // for tests only
+      'jest/prefer-strict-equal': 'off', // for tests only
+      'jest/prefer-to-be': 'off', // for tests only
+      'jest/prefer-to-contain': 'off', // for tests only
+      'jest/prefer-to-have-length': 'off', // for tests only
+      'jest/prefer-todo': 'off', // for tests only
+      'jest/require-hook': 'off', // for tests only
+      'jest/require-to-throw-message': 'off', // for tests only
+      'jest/require-top-level-describe': 'off', // for tests only
+      'jest/unbound-method': 'off', // for tests only
+      'jest/valid-describe-callback': 'off', // for tests only
+      'jest/valid-expect': 'off', // for tests only
+      'jest/valid-expect-in-promise': 'off', // for tests only
+      'jest/valid-title': 'off', // for tests only
+      'tailwindcss/classnames-order': 'off', // using prettier-plugin-tailwindcss for this
+      'tailwindcss/enforces-negative-arbitrary-values': 'warn',
+      'tailwindcss/enforces-shorthand': 'warn',
+      'tailwindcss/migration-from-tailwind-2': 'warn',
+      'tailwindcss/no-arbitrary-value': 'warn',
+      'tailwindcss/no-contradicting-classname': 'warn',
+      'tailwindcss/no-custom-classname': 'warn',
+      'tailwindcss/no-unnecessary-arbitrary-value': 'warn',
+    },
+  },
+  {
+    files: ['**/*.tsx'],
+    rules: {
+      'max-lines-per-function': 'off', // TODO: re-enable this after fixing other issues
+      'max-statements': 'off', // TODO: re-enable this after fixing other issues
+    },
+  },
+  {
+    files: ['**/*.test.ts', '**/*.test.tsx'],
+    rules: {
+      'import/no-namespace': 'off', // useful for mocking in jest
+      '@typescript-eslint/no-non-null-assertion': 'off', // we can be more loose in unit tests
+      '@typescript-eslint/no-unsafe-call': 'off', // we can be more loose in unit tests
+      'react/no-multi-comp': 'off', // may need to create mini-components in unit tests
+      '@typescript-eslint/no-unsafe-member-access': 'off', // we can be more loose in unit tests
+      'max-lines': 'off', // test files can be longer for comprehensive coverage
+      'max-lines-per-function': 'off', // test describe blocks can have many test cases
+      'max-statements': 'off', // test describe blocks can have many test statements
+      '@typescript-eslint/no-unsafe-type-assertion': 'off', // we can be more loose in unit tests
       'jest/consistent-test-it': ['warn', {fn: 'test', withinDescribe: 'test'}],
       'jest/expect-expect': 'warn',
-      'jest/max-expects': 'warn',
+      'jest/max-expects': 'off', // more expects is fine by me
       'jest/max-nested-describe': 'warn',
       'jest/no-alias-methods': 'warn',
       'jest/no-commented-out-tests': 'warn',
@@ -864,7 +957,7 @@ const eslintConfig = [
       'jest/no-duplicate-hooks': 'warn',
       'jest/no-export': 'warn',
       'jest/no-focused-tests': 'warn',
-      'jest/no-hooks': 'warn',
+      'jest/no-hooks': 'off', // no hooks? but why?
       'jest/no-identical-title': 'warn',
       'jest/no-interpolation-in-snapshots': 'warn',
       'jest/no-jasmine-globals': 'warn',
@@ -899,7 +992,7 @@ const eslintConfig = [
       'jest/prefer-mock-promise-shorthand': 'warn',
       'jest/prefer-snapshot-hint': 'warn',
       'jest/prefer-spy-on': 'warn',
-      'jest/prefer-strict-equal': 'warn',
+      'jest/prefer-strict-equal': 'off', // i like this idea, but toStrictEqual has issues with arrays being created from inside a jest worker, resulting in false positive errors
       'jest/prefer-to-be': 'warn',
       'jest/prefer-to-contain': 'warn',
       'jest/prefer-to-have-length': 'warn',
@@ -912,24 +1005,7 @@ const eslintConfig = [
       'jest/valid-expect': 'warn',
       'jest/valid-expect-in-promise': 'warn',
       'jest/valid-title': 'warn',
-      'tailwindcss/classnames-order': 'off', // using prettier-plugin-tailwindcss for this
-      'tailwindcss/enforces-negative-arbitrary-values': 'warn',
-      'tailwindcss/enforces-shorthand': 'warn',
-      'tailwindcss/migration-from-tailwind-2': 'warn',
-      'tailwindcss/no-arbitrary-value': 'warn',
-      'tailwindcss/no-contradicting-classname': 'warn',
-      'tailwindcss/no-custom-classname': 'warn',
-      'tailwindcss/no-unnecessary-arbitrary-value': 'warn',
-    },
-  },
-  {files: ['**/*.tsx'], rules: {'max-lines-per-function': 'off'}},
-  {
-    files: ['**/*.test.ts', '**/*.test.tsx'],
-    rules: {
-      'import/no-namespace': 'off', // useful for mocking in jest
-      '@typescript-eslint/no-non-null-assertion': 'off', // we can be more loose in unit tests
-      '@typescript-eslint/no-unsafe-call': 'off', // we can be more loose in unit tests
-      'react/no-multi-comp': 'off', // may need to create mini-components in unit tests
+      '@typescript-eslint/no-unsafe-assignment': 'off', // we can be more loose in unit tests
     },
   },
 ];

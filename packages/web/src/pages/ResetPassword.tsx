@@ -66,7 +66,7 @@ const ResetPassword: FC = () => {
               id="confirm-password"
               minLength={6}
               onChange={value => {
-                setConfirm(v);
+                setConfirm(value);
               }}
               required
               type="password"
@@ -74,7 +74,7 @@ const ResetPassword: FC = () => {
             />
           </FormField>
 
-          {message !== undefined && message !== '' ? (
+          {message != null && message !== '' ? (
             <Alert type="info">{message}</Alert>
           ) : null}
 

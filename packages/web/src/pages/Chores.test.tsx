@@ -4,11 +4,9 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Chores from './Chores';
 import * as apiModule from '../lib/api';
 
-jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
-  useUser: () => ({user: {id: 1}}),
-}));
+jest.mock('../hooks/useUser', () => ({useUser: () => ({user: {id: 1}})}));
 
-jest.mock<typeof import('../lib/api')>('../lib/api', () => ({
+jest.mock('../lib/api', () => ({
   choresApi: {
     getAll: jest.fn(async () => ({
       success: true,

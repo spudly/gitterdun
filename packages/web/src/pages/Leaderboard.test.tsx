@@ -4,7 +4,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Leaderboard from './Leaderboard';
 import * as apiModule from '../lib/api';
 
-jest.mock<typeof import('../lib/api')>('../lib/api', () => ({
+jest.mock('../lib/api', () => ({
   leaderboardApi: {
     get: jest.fn(async () => ({
       success: true,

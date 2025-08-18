@@ -9,8 +9,8 @@
 - [x] Use padding/gap. Do not use margins
 - [x] Use `test` instead of `it` for jest tests. maybe there's a eslint rule for
       this
-- [ ] add depcheck
-- [ ] comment reasons for disabling eslint rules
+- [x] add depcheck
+- [x] comment reasons for disabling eslint rules
   - [x] stylistic rules not necessary because of prettier
   - [x] add unused eslint rules
 - [x] use types, not interfaces

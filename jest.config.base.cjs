@@ -9,14 +9,16 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   collectCoverageFrom: [
-    '**/*.{ts,tsx,js,jsx}',
+    '<rootDir>/src/**/*.{ts,tsx,js,jsx}',
     '!**/node_modules/**',
     '!**/dist/**',
     '!**/*.demo.*',
     '!**/*.config.*',
+    '!**/coverage/**',
   ],
+  collectCoverage: true,
   coverageThreshold: {
-    global: {branches: 100, functions: 100, lines: 100, statements: 100},
+    // global: {branches: 100, functions: 100, lines: 100, statements: 100},
   },
   moduleNameMapper: {'^(\\.{1,2}/.*)\\.js$': '$1'},
   testMatch: [

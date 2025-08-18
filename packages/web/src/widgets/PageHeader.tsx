@@ -14,18 +14,21 @@ export const PageHeader: FC<PageHeaderProps> = ({
   actions,
   className = '',
 }) => {
+  const hasSubtitle = subtitle !== null && subtitle !== undefined;
+  const hasActions = actions !== null && actions !== undefined;
+
   return (
     <div className={clsx('mb-8', className)}>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
 
-          {subtitle ?  (
+          {hasSubtitle ? (
             <p className="mt-1 text-gray-600">{subtitle}</p>
           ) : null}
         </div>
 
-        {actions ?  (
+        {hasActions ? (
           <div className="flex items-center gap-2">{actions}</div>
         ) : null}
       </div>

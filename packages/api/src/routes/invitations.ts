@@ -16,6 +16,7 @@ import bcrypt from 'bcryptjs';
 import db from '../lib/db';
 import {sql} from '../utils/sql';
 
+// eslint-disable-next-line new-cap -- express.Router() is a factory function
 const router = express.Router();
 
 const getCookie = (req: express.Request, name: string): string | undefined => {
@@ -30,7 +31,7 @@ const getCookie = (req: express.Request, name: string): string | undefined => {
     .split(';')
     .reduce<Record<string, string>>((acc, part) => {
       const [rawKey, ...rest] = part.trim().split('=');
-      if (!rawKey) {
+      if (rawKey === undefined || rawKey === '') {
         return acc;
       }
       const key = decodeURIComponent(rawKey);
@@ -92,7 +93,9 @@ router.post('/:familyId', (req, res) => {
       `)
       .get(familyId, inviterId);
     const membership =
-      membershipRow !== undefined ? RoleRowSchema.parse(membershipRow) : undefined;
+      membershipRow !== undefined
+        ? RoleRowSchema.parse(membershipRow)
+        : undefined;
     if (!membership || membership.role !== 'parent') {
       return res.status(403).json({success: false, error: 'Forbidden'});
     }
@@ -149,7 +152,9 @@ router.post('/accept', async (req, res) => {
       `)
       .get(token);
     const inv =
-      invRow !== undefined ? FamilyInvitationRowSchema.parse(invRow) : undefined;
+      invRow !== undefined
+        ? FamilyInvitationRowSchema.parse(invRow)
+        : undefined;
 
     if (!inv) {
       return res.status(400).json({success: false, error: 'Invalid token'});

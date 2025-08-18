@@ -3,11 +3,9 @@ import {render, screen} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Dashboard from './Dashboard';
 
-jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
-  useUser: () => ({user: {id: 1}}),
-}));
+jest.mock('../hooks/useUser', () => ({useUser: () => ({user: {id: 1}})}));
 
-jest.mock<typeof import('../lib/api')>('../lib/api', () => ({
+jest.mock('../lib/api', () => ({
   choresApi: {
     getAll: jest.fn(async () => ({
       success: true,

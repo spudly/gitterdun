@@ -4,7 +4,7 @@ import {MemoryRouter} from 'react-router-dom';
 import AcceptInvitation from './AcceptInvitation';
 import * as apiModule from '../lib/api';
 
-jest.mock<typeof import('../lib/api')>('../lib/api', () => ({
+jest.mock('../lib/api', () => ({
   invitationsApi: {accept: jest.fn(async () => ({success: true}))},
 }));
 

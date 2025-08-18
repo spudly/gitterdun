@@ -22,7 +22,7 @@ const appRootDir = path.resolve();
 const isProduction = process.env['NODE_ENV'] === 'production';
 const PORT = process.env['PORT'] ?? 3000;
 
-async function createServer() {
+const createServer = async (): Promise<void> => {
   try {
     logger.info('Starting server initialization...');
 
@@ -79,6 +79,7 @@ async function createServer() {
 
     // Error handling middleware
     app.use(
+      // eslint-disable-next-line max-params -- Express error handlers require 4 parameters
       (
         err: unknown,
         _req: express.Request,
@@ -123,7 +124,7 @@ async function createServer() {
     logger.error({error}, 'Error during server setup');
     throw error;
   }
-}
+};
 
 createServer().catch((err: unknown) => {
   logger.error({error: asError(err)}, 'Failed to start server');

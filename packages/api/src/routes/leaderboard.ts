@@ -10,6 +10,7 @@ import db from '../lib/db';
 import {logger} from '../utils/logger';
 import {sql} from '../utils/sql';
 
+// eslint-disable-next-line new-cap -- not my function
 const router = express.Router();
 
 // Schemas moved to shared

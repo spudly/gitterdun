@@ -4,11 +4,9 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Goals from './Goals';
 import * as apiModule from '../lib/api';
 
-jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
-  useUser: () => ({user: {id: 1}}),
-}));
+jest.mock('../hooks/useUser', () => ({useUser: () => ({user: {id: 1}})}));
 
-jest.mock<typeof import('../lib/api')>('../lib/api', () => ({
+jest.mock('../lib/api', () => ({
   goalsApi: {
     getAll: jest.fn(async () => ({
       success: true,
@@ -92,30 +90,24 @@ describe('goals page', () => {
 
   test('uses fallback empty data when user is null (covers queryFn else branch)', async () => {
     await jest.isolateModulesAsync(async () => {
-      jest.doMock<typeof import('../hooks/useUser')>(
-        '../hooks/useUser',
-        () => ({useUser: () => ({user: null})}),
-      );
-      jest.doMock<typeof import('@tanstack/react-query')>(
-        '@tanstack/react-query',
-        () => {
-          const actual = jest.requireActual<
-            typeof import('@tanstack/react-query')
-          >('@tanstack/react-query');
-          type UseQueryOpts<T> = {queryFn?: () => T};
-          type QueryResult = {data: {data: Array<unknown>}; isLoading: false};
-          return {
-            ...actual,
-            useQuery: (opts: UseQueryOpts<unknown>): QueryResult => {
-              if (typeof opts.queryFn === 'function') {
-                // Execute the queryFn so the else branch in Goals.tsx runs
-                opts.queryFn();
-              }
-              return {data: {data: []}, isLoading: false};
-            },
-          };
-        },
-      );
+      jest.doMock('../hooks/useUser', () => ({useUser: () => ({user: null})}));
+      jest.doMock('@tanstack/react-query', () => {
+        const actual = jest.requireActual<
+          typeof import('@tanstack/react-query')
+        >('@tanstack/react-query');
+        type UseQueryOpts<T> = {queryFn?: () => T};
+        type QueryResult = {data: {data: Array<unknown>}; isLoading: false};
+        return {
+          ...actual,
+          useQuery: (opts: UseQueryOpts<unknown>): QueryResult => {
+            if (typeof opts.queryFn === 'function') {
+              // Execute the queryFn so the else branch in Goals.tsx runs
+              opts.queryFn();
+            }
+            return {data: {data: []}, isLoading: false};
+          },
+        };
+      });
       const mod = await import('./Goals');
       render(wrap(<mod.default />));
     });

@@ -13,6 +13,7 @@ import db from '../lib/db';
 import {logger} from '../utils/logger';
 import {sql} from '../utils/sql';
 
+// eslint-disable-next-line new-cap -- express.Router() is a factory function
 const router = express.Router();
 
 // GET /api/goals - Get all goals for a user

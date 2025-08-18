@@ -7,6 +7,6 @@
     "emitDeclarationOnly": false,
     "sourceMap": true
   },
-  "include": ["**/*.tsx", "**/*.ts", "jest.setup.ts", "src/setupTests.d.ts"],
+  "include": ["**/*.tsx", "**/*.ts", "jest.setup.ts"],
   "exclude": ["node_modules", "**/dist", "**/build"]
 }

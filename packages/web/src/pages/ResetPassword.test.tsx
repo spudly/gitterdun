@@ -5,7 +5,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import ResetPassword from './ResetPassword';
 import {useUser} from '../hooks/useUser';
 
-jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
+jest.mock('../hooks/useUser', () => ({
   useUser: jest.fn(() => ({resetPassword: jest.fn(async () => ({}))})),
 }));
 

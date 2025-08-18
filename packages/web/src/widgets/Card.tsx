@@ -23,13 +23,13 @@ export const Card: FC<CardProps> = ({
   const elevation = elevated ? 'shadow' : 'border';
   return (
     <div className={clsx(base, elevation, className)}>
-      {header ?  (
+      {header !== null && header !== undefined ? (
         <div className="border-b border-gray-200 px-6 py-4">{header}</div>
       ) : null}
 
       <div className={pad}>{children}</div>
 
-      {footer ?  (
+      {footer !== null && footer !== undefined ? (
         <div className="border-t border-gray-200 px-6 py-4">{footer}</div>
       ) : null}
     </div>

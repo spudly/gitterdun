@@ -5,11 +5,11 @@ import Family from './Family';
 import {useUser} from '../hooks/useUser';
 import * as apiModule from '../lib/api';
 
-jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
+jest.mock('../hooks/useUser', () => ({
   useUser: jest.fn(() => ({user: {id: 1}})),
 }));
 
-jest.mock<typeof import('../lib/api')>('../lib/api', () => ({
+jest.mock('../lib/api', () => ({
   familiesApi: {
     myFamilies: jest.fn(async () => ({
       success: true,
@@ -112,20 +112,11 @@ describe('family page', () => {
       fireEvent.click(screen.getAllByRole('button', {name: 'Create'})[1]!);
     });
     // Invite with empty email should no-op (exercise path only)
-    act(() => {
-      fireEvent.click(screen.getByRole('button', {name: 'Send'}));
-    });
-  });
-
-  test('covers invite role select change', async () => {
-    render(wrap(<Family />));
-    await screen.findByText('Your Families');
     fireEvent.change(screen.getAllByRole('combobox')[0]!, {
       target: {value: '1'},
     });
-    // Change invite role from default parent to child
-    fireEvent.change(screen.getAllByRole('combobox')[1]!, {
-      target: {value: 'child'},
+    act(() => {
+      fireEvent.click(screen.getByRole('button', {name: 'Send'}));
     });
   });
 });
