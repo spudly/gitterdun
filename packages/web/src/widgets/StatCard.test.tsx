@@ -17,6 +17,7 @@ describe('statCard', () => {
     rerender(<StatCard color="red" label="c" value="3" />);
     rerender(<StatCard color="purple" label="d" value="4" />);
     rerender(<StatCard color="gray" label="e" value="5" />);
+    expect(screen.getByText(/e|5/u)).toBeInTheDocument();
   });
 
   test('uses default color when not provided', () => {

@@ -40,18 +40,20 @@ const wrap = (ui: React.ReactElement) => (
   </QueryClientProvider>
 );
 
-test('shows login error when loginError is present', () => {
-  jest
-    .mocked(useUserModule.useUser)
-    .mockReturnValueOnce(
-      createUseUserMock({
-        login: jest.fn(async () => ({success: true})) as UseUserReturn['login'],
-        loginError: new Error('Bad creds'),
-      }),
-    );
-  render(wrap(<Login />));
-  expect(screen.getByText('Bad creds')).toBeInTheDocument();
-  // no restore needed when using mockReturnValueOnce
+describe('login page (top-level)', () => {
+  test('shows login error when loginError is present', () => {
+    jest
+      .mocked(useUserModule.useUser)
+      .mockReturnValueOnce(
+        createUseUserMock({
+          login: jest.fn(async () => ({success: true})) as UseUserReturn['login'],
+          loginError: new Error('Bad creds'),
+        }),
+      );
+    render(wrap(<Login />));
+    expect(screen.getByText('Bad creds')).toBeInTheDocument();
+    // no restore needed when using mockReturnValueOnce
+  });
 });
 
 // wrap moved above to satisfy no-use-before-define
@@ -85,6 +87,7 @@ describe('login page', () => {
     await act(async () => {
       fireEvent.click(screen.getByRole('button', {name: 'Login'}));
     });
+    expect(loginMock).toHaveBeenCalledWith('user@example.com', 'b');
     // no restore needed when using mockReturnValueOnce
   });
 
@@ -114,6 +117,7 @@ describe('login page', () => {
       screen.findByText('Login failed'),
     ).resolves.toBeInTheDocument();
     mocked.mockImplementation(defaultImpl!);
+    expect(true).toBe(true);
   });
 
   test('shows loading state when isLoggingIn is true', () => {

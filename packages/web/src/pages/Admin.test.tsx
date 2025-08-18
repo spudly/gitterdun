@@ -143,11 +143,11 @@ describe('admin page', () => {
       },
       isLoading: false,
       error: null,
-      login: jest.fn() as any,
-      register: jest.fn() as any,
-      logout: jest.fn() as any,
-      forgotPassword: jest.fn() as any,
-      resetPassword: jest.fn() as any,
+      login: jest.fn(async () => ({success: true})) as ReturnType<typeof useUserModule.useUser>['login'],
+      register: jest.fn(async () => ({success: true})) as ReturnType<typeof useUserModule.useUser>['register'],
+      logout: jest.fn(async () => ({success: true})) as ReturnType<typeof useUserModule.useUser>['logout'],
+      forgotPassword: jest.fn(async () => ({success: true})) as ReturnType<typeof useUserModule.useUser>['forgotPassword'],
+      resetPassword: jest.fn(async () => ({success: true})) as ReturnType<typeof useUserModule.useUser>['resetPassword'],
       isLoggingIn: false,
       isRegistering: false,
       isLoggingOut: false,
@@ -301,5 +301,6 @@ describe('admin page', () => {
     });
     expect(screen.getByTestId('loc').textContent).toBe('/family');
     jest.useRealTimers();
+    expect(screen.getByText('Admin Panel')).toBeInTheDocument();
   });
 });

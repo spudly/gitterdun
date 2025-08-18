@@ -16,17 +16,13 @@ const wrap = (ui: React.ReactElement, path = '/reset-password?token=t') => (
 );
 
 describe('resetPassword page', () => {
-  test('validates token and passwords', () => {
+  test('validates token and passwords', async () => {
     render(wrap(<ResetPassword />, '/reset-password?token='));
     const submit = screen.getByRole('button', {name: 'Reset Password'});
     submit.click();
-    // Message may render asynchronously due to state updates, use query with regex and fallback
-    const msg = screen.queryByText(/Missing token/i);
-    if (!msg) {
-      // No assertion if environment timing differs; the branch is still exercised by click
-      return;
-    }
-    expect(msg).toBeInTheDocument();
+    await expect(
+      screen.findByText(/Missing token/i),
+    ).resolves.toBeInTheDocument();
   });
 
   test('submits when valid', async () => {
@@ -57,10 +53,15 @@ describe('resetPassword page', () => {
     expect(screen.getByText(/Passwords do not match/u)).toBeInTheDocument();
   });
 
-  test('executes missing-token branch', () => {
+  test('executes missing-token branch', async () => {
     render(wrap(<ResetPassword />, '/reset-password?token='));
     fireEvent.click(screen.getByRole('button', {name: 'Reset Password'}));
-    // Running this path is sufficient to cover the code branch across environments
+    await expect(
+      screen.findByText(/Missing token/i),
+    ).resolves.toBeInTheDocument();
+    expect(screen.getByLabelText(/New Password/iu)).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /Reset Password/i})).toBeInTheDocument();
+    expect(screen.getByText(/Reset Password/i)).toBeInTheDocument();
   });
 
   test('executes success branch and schedules redirect', async () => {
@@ -125,6 +126,7 @@ describe('resetPassword page', () => {
     await act(async () => {
       fireEvent.click(screen.getByRole('button', {name: 'Reset Password'}));
     });
+    expect(screen.getByText(/Failed to reset password|Error/u)).toBeInTheDocument();
   });
 
   test('uses default empty token when query param is absent and shows error', async () => {

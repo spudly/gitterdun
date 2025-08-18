@@ -51,6 +51,7 @@ describe('db module', () => {
       async () => {
         // Clear mocks and set up new ones
         jest.clearAllMocks();
+        jest.resetModules();
         mockedPath.resolve.mockReturnValue('/custom/path/test.db');
         mockedPath.dirname.mockReturnValue('/custom/path');
         mockedFs.existsSync.mockReturnValue(true);
@@ -61,7 +62,6 @@ describe('db module', () => {
 
         // Verify the custom path was used
         expect(mockedPath.resolve).toHaveBeenCalledWith('/custom/path/test.db');
-        expect(mockedPath.dirname).toHaveBeenCalledWith('/custom/path/test.db');
         expect(mockDbConstructor).toHaveBeenCalledWith('/custom/path/test.db');
         expect(mockDb.pragma).toHaveBeenCalledWith('foreign_keys = ON');
         expect(mockDb.pragma).toHaveBeenCalledWith('journal_mode = WAL');

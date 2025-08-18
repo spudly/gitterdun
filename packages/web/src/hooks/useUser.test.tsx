@@ -49,10 +49,11 @@ describe('useUser', () => {
     });
     await act(async () => {
       await result.current.login('a', 'b');
-      await result.current.register('u', 'a', 'p');
+      await result.current.register({username: 'u', email: 'a', password: 'p'});
       await result.current.logout();
     });
     rerender();
+    expect(result.current.isLoading).toBe(false);
   });
 
   test('returns null on me error and covers forgot/reset helpers', async () => {
@@ -64,11 +65,12 @@ describe('useUser', () => {
         setTimeout(resolve, 0);
       });
     });
-    expect(result.current.user ?? null).toBeNull();
+    expect(result.current.user).toBeNull();
     await act(async () => {
       await result.current.forgotPassword('x@example.com');
       await result.current.resetPassword('t', 'p');
     });
+    expect(result.current.error).toBeNull();
   });
 
   test('returns undefined when me succeeds without data', async () => {
@@ -80,6 +82,7 @@ describe('useUser', () => {
     await waitFor(() => {
       expect(result.current.user).toBeUndefined();
     });
+    expect(result.current.isLoading).toBe(false);
   });
 
   test('does not set user on login success without data (covers else at line 32)', async () => {
@@ -95,6 +98,7 @@ describe('useUser', () => {
       await result.current.login('a', 'b');
     });
     expect(clientSpy).not.toHaveBeenCalled();
+    expect(result.current.user).toBeUndefined();
   });
 
   test('does not set user on register success without data (covers else at line 41)', async () => {
@@ -107,9 +111,10 @@ describe('useUser', () => {
     );
     const {result} = renderHook(() => useUser(), {wrapper: LocalWrapper});
     await act(async () => {
-      await result.current.register('u', 'e', 'p');
+      await result.current.register({username: 'u', email: 'e', password: 'p'});
     });
     expect(clientSpy).not.toHaveBeenCalled();
+    expect(result.current.user).toBeUndefined();
   });
 
   test('includes role in register payload when provided (covers ternary at line 69)', async () => {
@@ -117,9 +122,10 @@ describe('useUser', () => {
     const spy = jest.spyOn(authApi, 'register');
     const {result} = renderHook(() => useUser(), {wrapper});
     await act(async () => {
-      await result.current.register('u', 'e@x.com', 'p', 'parent');
+      await result.current.register({username: 'u', email: 'e@x.com', password: 'p', role: 'parent'});
     });
     expect(spy).toHaveBeenCalledWith(expect.objectContaining({role: 'parent'}));
     spy.mockRestore();
+    expect(result.current.isRegistering).toBe(false);
   });
 });

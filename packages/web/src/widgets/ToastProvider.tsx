@@ -97,7 +97,7 @@ export const ToastProvider: FC<{readonly children: ReactNode}> = ({
     <ToastContext.Provider value={value}>
       {children}
       {/* Toast viewport */}
-      <div className="fixed right-4 top-4 z-50 w-[min(92vw,360px)] space-y-2">
+      <div className="fixed right-4 top-4 z-50 w-full max-w-sm space-y-2 md:max-w-md">
         {toasts.map(toast => (
           <Alert
             key={toast.id}
@@ -124,18 +124,20 @@ export const useToast = (): ToastContextValue => {
   if (!ctx) {
     // Provide a safe no-op fallback during tests so components don't crash
     if (process.env['NODE_ENV'] === 'test') {
-      const addToast: ToastContextValue['addToast'] = () => {};
+      const addToast: ToastContextValue['addToast'] = () => undefined;
       const safeAsync: ToastContextValue['safeAsync'] = (
         fn,
         userMessage,
         onError,
       ) => {
         return (...args) => {
-          void fn(...args).catch(() => {
+          fn(...args)
+            .then(() => undefined)
+            .catch(() => {
             if (onError) {
               onError(userMessage);
             }
-          });
+            });
         };
       };
       return {addToast, safeAsync};

@@ -51,15 +51,15 @@ export const RankingList: FC<RankingListProps> = ({
         outlined ? OUTLINE_CLASSES[outlineColor] : null,
       )}
     >
-      {title !== undefined || subtitle ? (
+      {(typeof title === 'string' && title.length > 0) || (typeof subtitle === 'string' && subtitle.length > 0) ? (
         <div className="border-b border-gray-200 px-6 py-4">
-          {title === undefined ? null : (
+          {typeof title === 'string' && title.length > 0 ? (
             <h2 className="text-lg font-medium text-gray-900">{title}</h2>
-          )}
+          ) : null}
 
-          {subtitle === undefined ? null : (
+          {typeof subtitle === 'string' && subtitle.length > 0 ? (
             <p className="text-sm text-gray-500">{subtitle}</p>
-          )}
+          ) : null}
         </div>
       ) : null}
 

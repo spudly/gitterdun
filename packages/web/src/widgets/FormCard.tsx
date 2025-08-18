@@ -17,7 +17,9 @@ export const FormCard: FC<FormCardProps> = ({children, title, size = 'md'}) => {
         SIZE_STYLES[size],
       )}
     >
-      {title ? <h2 className="mb-4 text-2xl font-semibold">{title}</h2> : null}
+      {typeof title === 'string' && title.length > 0 ? (
+        <h2 className="mb-4 text-2xl font-semibold">{title}</h2>
+      ) : null}
 
       {children}
     </div>

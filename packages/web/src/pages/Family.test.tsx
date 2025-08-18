@@ -94,6 +94,16 @@ describe('family page', () => {
     act(() => {
       fireEvent.click(screen.getByRole('button', {name: 'Send'}));
     });
+    expect(familiesApi.create).toHaveBeenCalledWith({name: 'NewFam'});
+    expect(familiesApi.createChild).toHaveBeenCalledWith(1, {
+      username: 'kid',
+      email: 'kid@ex.com',
+      password: 'pw',
+    });
+    expect(invitationsApi.create).toHaveBeenCalledWith(1, {
+      email: 'm@ex.com',
+      role: 'parent',
+    });
   });
 
   test('skips actions when inputs are empty (validation branches)', async () => {
@@ -118,5 +128,7 @@ describe('family page', () => {
     act(() => {
       fireEvent.click(screen.getByRole('button', {name: 'Send'}));
     });
+    // Nothing to assert on API; ensure page is still rendered
+    expect(screen.getByText('Your Families')).toBeInTheDocument();
   });
 });

@@ -24,6 +24,9 @@ describe('forgotPassword page', () => {
     });
     const msgs = await screen.findAllByText(/reset link/);
     expect(msgs.length).toBeGreaterThan(0);
+    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /send reset link/i})).toBeInTheDocument();
+    expect(screen.getByText(/Forgot Password/i)).toBeInTheDocument();
   });
 
   test('shows error message when request rejects (catch path)', async () => {

@@ -1,3 +1,3 @@
-export * from './asError';
-export * from './pick';
-export * from './withProperties';
+export * from './asError.js';
+export * from './pick.js';
+export * from './withProperties.js';

@@ -57,6 +57,10 @@ describe('api utils', () => {
     await authApi.register({username: 'u', email: 'a', password: 'b'});
     await authApi.logout();
     await authApi.me();
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expect.stringMatching(/\/api\//u),
+      expect.objectContaining({headers: expect.any(Object)}),
+    );
   });
 
   test('skips undefined/null params in URL and supports all verbs', async () => {
@@ -82,6 +86,7 @@ describe('api utils', () => {
     await api.put('/x', z.object({value: z.number()}));
     await api.patch('/x', z.object({value: z.number()}));
     await api.delete('/x', z.object({}));
+    expect(calls.length).toBeGreaterThan(0);
   });
 
   test('exercises all API endpoint wrappers (happy paths)', async () => {
@@ -123,6 +128,10 @@ describe('api utils', () => {
 
     await invitationsApi.create(1, {email: 'e', role: 'parent'});
     await invitationsApi.accept({token: 't', username: 'u', password: 'p'});
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expect.stringMatching(/\/api\//u),
+      expect.objectContaining({method: expect.any(String)}),
+    );
   });
 
   test('handleResponse catch branch when error json fails', async () => {
@@ -158,6 +167,10 @@ describe('api utils', () => {
 
     // Touch choresApi to ensure export is evaluated
     await choresApi.getAll();
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expect.stringMatching(/\/api\//u),
+      expect.objectContaining({method: 'GET'}),
+    );
   });
 
   test('posts to auth/forgot', async () => {

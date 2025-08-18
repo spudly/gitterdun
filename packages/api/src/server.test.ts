@@ -29,15 +29,21 @@ jest.mock('./routes/goals');
 jest.mock('./routes/leaderboard');
 jest.mock('./routes/families');
 jest.mock('./routes/invitations');
-jest.mock('@gitterdun/shared', () => ({
-  asError: jest.fn(),
-  withProperties: jest.requireActual('@gitterdun/shared').withProperties,
-}));
+jest.mock('@gitterdun/shared', () => {
+  const actual = jest.requireActual<typeof import('@gitterdun/shared')>(
+    '@gitterdun/shared',
+  );
+  return {
+    asError: jest.fn(),
+    withProperties: actual.withProperties,
+  };
+});
 jest.mock('dotenv');
 
 const mockedInitializeDatabase = jest.mocked(initializeDatabase);
 const mockedLogger = jest.mocked(logger);
-const mockedAuthRoutes = jest.mocked(authRoutes);
+// Intentionally unused; keeping for completeness if route mocking expands
+void authRoutes;
 const mockedAsError = jest.mocked(asError);
 const mockedDotenv = jest.mocked(dotenv);
 
@@ -48,24 +54,20 @@ describe('server', () => {
     jest.clearAllMocks();
     process.env = {...originalEnv};
 
-    // Mock router implementations
-    type MockRouter = {
-      get: jest.MockedFunction<() => void>;
-      post: jest.MockedFunction<() => void>;
-    };
-    mockedAuthRoutes.mockImplementation(
-      () => ({get: jest.fn(), post: jest.fn()}) as MockRouter,
-    );
 
     // Mock logger methods
     jest.spyOn(mockedLogger, 'info').mockImplementation(jest.fn());
     jest.spyOn(mockedLogger, 'error').mockImplementation(jest.fn());
 
     // Mock dotenv
-    jest.spyOn(mockedDotenv, 'config').mockImplementation(jest.fn());
+    jest
+      .spyOn(mockedDotenv, 'config')
+      .mockImplementation(
+        () => ({parsed: undefined, error: undefined} as unknown as dotenv.DotenvConfigOutput),
+      );
 
     // Mock asError
-    mockedAsError.mockImplementation(err => err as Error);
+    mockedAsError.mockImplementation((err: unknown) => err as Error);
   });
 
   afterEach(() => {

@@ -17,7 +17,7 @@ describe('modal', () => {
     fireEvent.keyDown(document, {key: 'Escape'});
     const closeButton = screen.getByRole('button', {name: 'Close'});
     fireEvent.click(closeButton);
-    expect(onClose).toHaveBeenCalled();
+    expect(onClose).toHaveBeenCalledWith();
   });
 
   test('respects props and closed state', () => {
@@ -68,6 +68,7 @@ describe('modal', () => {
     );
     const overlay3 = screen.getByRole('button', {name: 'Close modal'});
     fireEvent.click(overlay3);
+    expect(onClose).toHaveBeenCalledWith();
   });
 
   test('overlay key helper covers both branches', () => {
@@ -97,7 +98,7 @@ describe('modal', () => {
     const overlay = screen.getByRole('button', {name: 'Close modal'});
     // Triggers onKeyDown branch (line 83) and should close because closeOnOverlayClick=true
     fireEvent.keyDown(overlay, {key: 'Enter'});
-    expect(onClose).toHaveBeenCalled();
+    expect(onClose).toHaveBeenCalledWith();
   });
 
   test('does not close on non-overlay keydown', () => {

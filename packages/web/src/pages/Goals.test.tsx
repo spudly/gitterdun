@@ -100,10 +100,9 @@ describe('goals page', () => {
         return {
           ...actual,
           useQuery: (opts: UseQueryOpts<unknown>): QueryResult => {
-            if (typeof opts.queryFn === 'function') {
-              // Execute the queryFn so the else branch in Goals.tsx runs
-              opts.queryFn();
-            }
+            // Execute the queryFn so the else branch in Goals.tsx runs
+            // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -- intentional optional invocation for test coverage
+            opts.queryFn?.();
             return {data: {data: []}, isLoading: false};
           },
         };
@@ -114,5 +113,6 @@ describe('goals page', () => {
     await expect(
       screen.findByText('No goals yet'),
     ).resolves.toBeInTheDocument();
+    expect(screen.getByText('No goals yet')).toBeInTheDocument();
   });
 });

@@ -15,7 +15,7 @@ describe('button', () => {
       </Button>,
     );
     fireEvent.click(screen.getByRole('button', {name: /go/i}));
-    expect(onClick).toHaveBeenCalled();
+    expect(onClick).toHaveBeenCalledWith(expect.any(Object));
     rerender(<Button loading>Go</Button>);
     expect(screen.getByRole('button')).toBeDisabled();
   });
