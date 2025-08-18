@@ -30,7 +30,6 @@ export const ProgressBar: FC<ProgressBarProps> = ({
   padded = false,
 }) => {
   const percentage = Math.min((value / max) * 100, 100);
-  const progressWidth = `${percentage}%`;
 
   return (
     <div className={clsx('space-y-2', padded ? 'p-4' : null)}>
@@ -44,23 +43,21 @@ export const ProgressBar: FC<ProgressBarProps> = ({
         </div>
       ) : null}
 
-      <div
-        aria-label="Progress"
-        aria-valuemax={max}
-        aria-valuemin={0}
-        aria-valuenow={value}
-        className={clsx('w-full rounded-full bg-gray-200', SIZE_STYLES[size])}
-        role="progressbar"
-      >
-        <div
-          className={clsx(
-            'rounded-full transition-all duration-300',
-            VARIANT_STYLES[variant],
-            SIZE_STYLES[size],
-          )}
-          style={{width: progressWidth}}
-        />
-      </div>
+      <progress
+        className={clsx(
+          'w-full appearance-none overflow-hidden rounded-full',
+          SIZE_STYLES[size],
+          // Progress element styling
+          '[&::-webkit-progress-bar]:rounded-full [&::-webkit-progress-bar]:bg-gray-200',
+          '[&::-webkit-progress-value]:rounded-full [&::-webkit-progress-value]:transition-all [&::-webkit-progress-value]:duration-300',
+          `[&::-webkit-progress-value]:${VARIANT_STYLES[variant]}`,
+          // Firefox styling
+          '[&::-moz-progress-bar]:rounded-full [&::-moz-progress-bar]:transition-all [&::-moz-progress-bar]:duration-300',
+          `[&::-moz-progress-bar]:${VARIANT_STYLES[variant]}`,
+        )}
+        max={max}
+        value={value}
+      />
     </div>
   );
 };
