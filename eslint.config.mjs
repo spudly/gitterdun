@@ -1006,6 +1006,8 @@ const eslintConfig = [
       'jest/valid-expect-in-promise': 'warn',
       'jest/valid-title': 'warn',
       '@typescript-eslint/no-unsafe-assignment': 'off', // we can be more loose in unit tests
+      '@typescript-eslint/no-unsafe-argument': 'off', // we can be more loose in unit tests
+      '@typescript-eslint/no-explicit-any': 'off', // we can be more loose in unit tests
     },
   },
 ];

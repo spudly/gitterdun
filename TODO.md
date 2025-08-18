@@ -25,3 +25,4 @@
       checks: eslint, jest, typescript, prettier
 - [ ] audit all the eslint-disable rules that AI added; make sure they're not
       for stupid reasons
+- [ ] where possible, use user-event instead of fireEvent

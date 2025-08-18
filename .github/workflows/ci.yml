@@ -69,7 +69,24 @@ jobs:
       - name: Run linting
         run: npm run lint
 
-      - name: Check formatting
+  prettier:
+    name: Prettier
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prettier Check
         run: npm run prettier:check
 
   knip:
