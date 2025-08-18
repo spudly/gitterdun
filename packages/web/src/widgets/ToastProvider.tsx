@@ -74,7 +74,7 @@ export const ToastProvider: FC<{readonly children: ReactNode}> = ({
       onError?: (userMessage: string) => void,
     ) => {
       return (...args: Args) => {
-        void fn(...args).catch((error: unknown) => {
+        fn(...args).catch((error: unknown) => {
           // Log raw error for developers
           // eslint-disable-next-line no-console -- dev error logging
           console.error(error);
@@ -134,9 +134,9 @@ export const useToast = (): ToastContextValue => {
           fn(...args)
             .then(() => undefined)
             .catch(() => {
-            if (onError) {
-              onError(userMessage);
-            }
+              if (onError) {
+                onError(userMessage);
+              }
             });
         };
       };

@@ -1,8 +1,8 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen, act} from '@testing-library/react';
 import {MemoryRouter, Routes, Route} from 'react-router-dom';
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import Demos from './Demos';
 
 describe('demos page', () => {

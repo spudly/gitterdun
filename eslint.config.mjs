@@ -980,7 +980,7 @@ const eslintConfig = [
       'jest/prefer-called-with': 'warn',
       'jest/prefer-comparison-matcher': 'warn',
       'jest/prefer-each': 'warn',
-      'jest/prefer-ending-with-an-expect': 'warn',
+      'jest/prefer-ending-with-an-expect': 'off', // false positive when expect is in a loop
       'jest/prefer-equality-matcher': 'warn',
       'jest/prefer-expect-assertions': 'off', // annoying
       'jest/prefer-expect-resolves': 'warn',
