@@ -45,11 +45,9 @@ describe('useUser', () => {
 
   test('loads user and supports auth helpers', async () => {
     const {result} = renderHook(() => useUser(), {wrapper});
-    // wait a tick for query to resolve
-    await act(async () => {
-      await new Promise(resolve => {
-        setTimeout(resolve, 0);
-      });
+    // Wait for initial query to resolve
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
     });
     await act(async () => {
       await result.current.login('a', 'b');
@@ -66,12 +64,9 @@ describe('useUser', () => {
     const {authApi} = apis;
     jest.mocked(authApi.me).mockRejectedValueOnce(new Error('boom'));
     const {result} = renderHook(() => useUser(), {wrapper});
-    await act(async () => {
-      await new Promise(resolve => {
-        setTimeout(resolve, 0);
-      });
+    await waitFor(() => {
+      expect(result.current.user).toBeNull();
     });
-    expect(result.current.user).toBeNull();
     await act(async () => {
       await result.current.forgotPassword('x@example.com');
       await result.current.resetPassword('t', 'p');
