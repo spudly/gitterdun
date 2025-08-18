@@ -121,7 +121,7 @@ export const Alert: FC<AlertProps> = ({
                 'inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2',
                 ICON_STYLES[type],
               )}
-              onClick={onDismiss}
+              onClick={() => onDismiss()}
               type="button"
             >
               <span className="sr-only">Dismiss</span>
