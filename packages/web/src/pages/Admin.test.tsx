@@ -143,11 +143,21 @@ describe('admin page', () => {
       },
       isLoading: false,
       error: null,
-      login: jest.fn(async () => ({success: true})) as ReturnType<typeof useUserModule.useUser>['login'],
-      register: jest.fn(async () => ({success: true})) as ReturnType<typeof useUserModule.useUser>['register'],
-      logout: jest.fn(async () => ({success: true})) as ReturnType<typeof useUserModule.useUser>['logout'],
-      forgotPassword: jest.fn(async () => ({success: true})) as ReturnType<typeof useUserModule.useUser>['forgotPassword'],
-      resetPassword: jest.fn(async () => ({success: true})) as ReturnType<typeof useUserModule.useUser>['resetPassword'],
+      login: jest.fn(async () => ({success: true})) as ReturnType<
+        typeof useUserModule.useUser
+      >['login'],
+      register: jest.fn(async () => ({success: true})) as ReturnType<
+        typeof useUserModule.useUser
+      >['register'],
+      logout: jest.fn(async () => ({success: true})) as ReturnType<
+        typeof useUserModule.useUser
+      >['logout'],
+      forgotPassword: jest.fn(async () => ({success: true})) as ReturnType<
+        typeof useUserModule.useUser
+      >['forgotPassword'],
+      resetPassword: jest.fn(async () => ({success: true})) as ReturnType<
+        typeof useUserModule.useUser
+      >['resetPassword'],
       isLoggingIn: false,
       isRegistering: false,
       isLoggingOut: false,

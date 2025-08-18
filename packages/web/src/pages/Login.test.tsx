@@ -46,7 +46,9 @@ describe('login page (top-level)', () => {
       .mocked(useUserModule.useUser)
       .mockReturnValueOnce(
         createUseUserMock({
-          login: jest.fn(async () => ({success: true})) as UseUserReturn['login'],
+          login: jest.fn(async () => ({
+            success: true,
+          })) as UseUserReturn['login'],
           loginError: new Error('Bad creds'),
         }),
       );

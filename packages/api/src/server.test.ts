@@ -30,13 +30,9 @@ jest.mock('./routes/leaderboard');
 jest.mock('./routes/families');
 jest.mock('./routes/invitations');
 jest.mock('@gitterdun/shared', () => {
-  const actual = jest.requireActual<typeof import('@gitterdun/shared')>(
-    '@gitterdun/shared',
-  );
-  return {
-    asError: jest.fn(),
-    withProperties: actual.withProperties,
-  };
+  const actual =
+    jest.requireActual<typeof import('@gitterdun/shared')>('@gitterdun/shared');
+  return {asError: jest.fn(), withProperties: actual.withProperties};
 });
 jest.mock('dotenv');
 
@@ -54,7 +50,6 @@ describe('server', () => {
     jest.clearAllMocks();
     process.env = {...originalEnv};
 
-
     // Mock logger methods
     jest.spyOn(mockedLogger, 'info').mockImplementation(jest.fn());
     jest.spyOn(mockedLogger, 'error').mockImplementation(jest.fn());
@@ -63,7 +58,11 @@ describe('server', () => {
     jest
       .spyOn(mockedDotenv, 'config')
       .mockImplementation(
-        () => ({parsed: undefined, error: undefined} as unknown as dotenv.DotenvConfigOutput),
+        () =>
+          ({
+            parsed: undefined,
+            error: undefined,
+          }) as unknown as dotenv.DotenvConfigOutput,
       );
 
     // Mock asError
