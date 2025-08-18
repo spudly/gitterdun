@@ -1,7 +1,7 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type SectionHeaderProps = {
+type SectionHeaderProps = {
   readonly title: string;
   readonly subtitle?: string;
   readonly children?: ReactNode;

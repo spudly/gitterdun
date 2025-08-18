@@ -1,7 +1,7 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type FormSectionProps = {
+type FormSectionProps = {
   readonly title?: string;
   readonly children: ReactNode;
   readonly variant?: 'default' | 'compact' | 'spacious';

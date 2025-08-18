@@ -1,13 +1,13 @@
 import type {FC} from 'react';
 
-export type MemberItem = {
+type MemberItem = {
   user_id: number | string;
   username: string;
   email: string;
   role: string;
 };
 
-export type MembersListProps = {readonly members: Array<MemberItem>};
+type MembersListProps = {readonly members: Array<MemberItem>};
 
 export const MembersList: FC<MembersListProps> = ({members}) => {
   return (

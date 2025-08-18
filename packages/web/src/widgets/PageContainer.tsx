@@ -1,7 +1,7 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type PageContainerProps = {
+type PageContainerProps = {
   readonly children: ReactNode;
   readonly variant?: 'default' | 'centered' | 'narrow' | 'wide';
   readonly gradient?: 'none' | 'indigo' | 'blue' | 'purple' | 'pink';

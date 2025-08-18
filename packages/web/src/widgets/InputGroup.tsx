@@ -1,7 +1,7 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type InputGroupProps = {
+type InputGroupProps = {
   readonly children: ReactNode;
   readonly error?: string;
   readonly helpText?: string;

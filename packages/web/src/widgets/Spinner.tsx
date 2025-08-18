@@ -4,7 +4,7 @@ import clsx from 'clsx';
 
 type SpinnerSize = 'sm' | 'md' | 'lg';
 
-export type SpinnerProps = {
+type SpinnerProps = {
   readonly size?: SpinnerSize;
   readonly inline?: boolean;
   readonly className?: string;

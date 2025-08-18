@@ -1,9 +1,9 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type AlertType = 'success' | 'error' | 'warning' | 'info';
+type AlertType = 'success' | 'error' | 'warning' | 'info';
 
-export type AlertProps = {
+type AlertProps = {
   readonly type?: AlertType;
   readonly title?: string;
   readonly children: ReactNode;

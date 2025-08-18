@@ -1,7 +1,7 @@
 import type {ChangeEvent, FC, InputHTMLAttributes, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type TextInputProps = Omit<
+type TextInputProps = Omit<
   InputHTMLAttributes<HTMLInputElement>,
   'onChange' | 'className'
 > & {

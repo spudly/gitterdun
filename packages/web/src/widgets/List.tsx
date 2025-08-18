@@ -1,10 +1,7 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type ListProps = {
-  readonly children: ReactNode;
-  readonly className?: string;
-};
+type ListProps = {readonly children: ReactNode; readonly className?: string};
 
 export const List: FC<ListProps> = ({children, className = ''}) => {
   return (

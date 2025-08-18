@@ -1,7 +1,7 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type FormCardProps = {
+type FormCardProps = {
   readonly children: ReactNode;
   readonly title?: string;
   readonly size?: 'sm' | 'md' | 'lg';

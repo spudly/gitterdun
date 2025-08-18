@@ -1,7 +1,7 @@
 import type {FC} from 'react';
 import {Spinner} from './Spinner.js';
 
-export type PageLoadingProps = {readonly message?: string};
+type PageLoadingProps = {readonly message?: string};
 
 export const PageLoading: FC<PageLoadingProps> = ({message = 'Loading...'}) => {
   return (

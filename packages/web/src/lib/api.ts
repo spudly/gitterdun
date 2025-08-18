@@ -354,4 +354,3 @@ export const invitationsApi = {
 };
 
 export {ApiError};
-export type {ApiResponse};

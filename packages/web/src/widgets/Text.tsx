@@ -21,7 +21,7 @@ const WEIGHT: Record<TextWeight, string> = {
   bold: 'font-bold',
 };
 
-export type TextProps = {
+type TextProps = {
   readonly children: ReactNode;
   readonly as?: AllowedAs;
   readonly size?: TextSize;

@@ -4,7 +4,7 @@ import clsx from 'clsx';
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
-export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   readonly variant?: ButtonVariant;
   readonly size?: ButtonSize;
   readonly fullWidth?: boolean;

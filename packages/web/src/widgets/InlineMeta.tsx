@@ -1,6 +1,6 @@
 import type {FC, ReactNode} from 'react';
 
-export type InlineMetaProps = {readonly children: ReactNode};
+type InlineMetaProps = {readonly children: ReactNode};
 
 export const InlineMeta: FC<InlineMetaProps> = ({children}) => {
   return (

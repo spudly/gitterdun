@@ -1,7 +1,7 @@
 import type {FC} from 'react';
 import clsx from 'clsx';
 
-export type ProgressBarProps = {
+type ProgressBarProps = {
   readonly value: number;
   readonly max: number;
   readonly size?: 'sm' | 'md' | 'lg';

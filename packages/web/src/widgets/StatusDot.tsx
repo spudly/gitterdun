@@ -3,7 +3,7 @@ import clsx from 'clsx';
 
 type StatusColor = 'green' | 'blue' | 'yellow' | 'red' | 'gray';
 
-export type StatusDotProps = {
+type StatusDotProps = {
   readonly color?: StatusColor;
   readonly size?: number;
   readonly label?: string;

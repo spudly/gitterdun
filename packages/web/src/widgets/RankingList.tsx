@@ -10,7 +10,7 @@ export type RankingItem = {
   metadata?: ReactNode;
 };
 
-export type RankingListProps = {
+type RankingListProps = {
   readonly items: Array<RankingItem>;
   readonly title?: string;
   readonly subtitle?: string;
@@ -51,7 +51,8 @@ export const RankingList: FC<RankingListProps> = ({
         outlined ? OUTLINE_CLASSES[outlineColor] : null,
       )}
     >
-      {(typeof title === 'string' && title.length > 0) || (typeof subtitle === 'string' && subtitle.length > 0) ? (
+      {(typeof title === 'string' && title.length > 0)
+      || (typeof subtitle === 'string' && subtitle.length > 0) ? (
         <div className="border-b border-gray-200 px-6 py-4">
           {typeof title === 'string' && title.length > 0 ? (
             <h2 className="text-lg font-medium text-gray-900">{title}</h2>

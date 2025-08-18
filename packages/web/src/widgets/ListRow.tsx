@@ -1,7 +1,7 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
-export type ListRowProps = {
+type ListRowProps = {
   readonly left?: ReactNode;
   readonly title: ReactNode;
   readonly titleRight?: ReactNode;
