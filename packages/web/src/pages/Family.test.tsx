@@ -74,7 +74,9 @@ describe('family page', () => {
     // Simulate a selection by setting state indirectly
     const selects = screen.getAllByRole('combobox');
     const familySelect = selects[0]!;
-    fireEvent.change(familySelect, {target: {value: '1'}});
+    await act(async () => {
+      fireEvent.change(familySelect, {target: {value: '1'}});
+    });
     // Create child
     // Since members section depends on selection, skip the child creation inputs if not present
     const usernameInput = await screen.findByPlaceholderText('Username');
@@ -85,13 +87,13 @@ describe('family page', () => {
     fireEvent.change(screen.getAllByPlaceholderText('Password')[0]!, {
       target: {value: 'pw'},
     });
-    act(() => {
+    await act(async () => {
       fireEvent.click(screen.getAllByRole('button', {name: 'Create'})[1]!);
     });
     // Invite
     const inviteEmailInput = screen.getAllByPlaceholderText('Email')[1]!;
     fireEvent.change(inviteEmailInput, {target: {value: 'm@ex.com'}});
-    act(() => {
+    await act(async () => {
       fireEvent.click(screen.getByRole('button', {name: 'Send'}));
     });
     expect(familiesApi.create).toHaveBeenCalledWith({name: 'NewFam'});
