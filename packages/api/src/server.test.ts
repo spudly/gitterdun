@@ -8,7 +8,6 @@ import {
 } from '@jest/globals';
 import {initializeDatabase} from './lib/initDb';
 import {logger} from './utils/logger';
-import authRoutes from './routes/auth';
 import {asError, withProperties} from '@gitterdun/shared';
 import dotenv from 'dotenv';
 
@@ -38,8 +37,6 @@ jest.mock('dotenv');
 
 const mockedInitializeDatabase = jest.mocked(initializeDatabase);
 const mockedLogger = jest.mocked(logger);
-// Intentionally unused; keeping for completeness if route mocking expands
-void authRoutes;
 const mockedAsError = jest.mocked(asError);
 const mockedDotenv = jest.mocked(dotenv);
 

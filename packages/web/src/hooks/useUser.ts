@@ -13,9 +13,8 @@ const isNoDataSuccess = (value: unknown): value is typeof NO_DATA_SUCCESS => {
   if (!('__noData' in value)) {
     return false;
   }
-  // At this point, value has an __noData property of unknown type; coerce to boolean comparison
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- comparing unknown to boolean literal for a narrow check
-  return (value as {__noData: unknown}).__noData === true;
+  // At this point, value has an __noData property of unknown type
+  return value.__noData === true;
 };
 
 type UserQueryData = User | null | typeof NO_DATA_SUCCESS;

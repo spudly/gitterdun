@@ -124,7 +124,7 @@ export const useToast = (): ToastContextValue => {
   if (!ctx) {
     // Provide a safe no-op fallback during tests so components don't crash
     if (process.env['NODE_ENV'] === 'test') {
-      const addToast: ToastContextValue['addToast'] = () => undefined;
+      const addToast: ToastContextValue['addToast'] = () => {};
       const safeAsync: ToastContextValue['safeAsync'] = (
         fn,
         userMessage,

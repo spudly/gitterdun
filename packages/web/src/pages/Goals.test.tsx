@@ -101,7 +101,6 @@ describe('goals page', () => {
           ...actual,
           useQuery: (opts: UseQueryOpts<unknown>): QueryResult => {
             // Execute the queryFn so the else branch in Goals.tsx runs
-            // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -- intentional optional invocation for test coverage
             opts.queryFn?.();
             return {data: {data: []}, isLoading: false};
           },

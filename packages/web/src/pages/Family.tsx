@@ -184,7 +184,6 @@ const Family: FC = () => {
                     />
 
                     <Button
-                      disabled={false}
                       onClick={() => {
                         if (
                           childUsername.trim() === ''
@@ -241,7 +240,6 @@ const Family: FC = () => {
                     </SelectInput>
 
                     <Button
-                      disabled={false}
                       onClick={() => {
                         if (inviteEmail.trim() === '') {
                           return;
