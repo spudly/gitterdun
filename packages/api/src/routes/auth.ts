@@ -18,6 +18,7 @@ import crypto from 'node:crypto';
 import db from '../lib/db';
 import {logger} from '../utils/logger';
 import {sql} from '../utils/sql';
+import {handleRouteError} from '../utils/errorHandling';
 
 type UserWithPasswordRow = z.infer<typeof UserWithPasswordRowSchema>;
 
@@ -44,15 +45,21 @@ const parseCookieString = (cookieString: string): Record<string, string> => {
   }, {});
 };
 
-const getCookie = (req: express.Request, name: string): string | undefined => {
-  const cookieHeader = req.headers.cookie;
+const extractCookieString = (
+  cookieHeader: string | Array<string> | undefined,
+): string | undefined => {
   if (cookieHeader === undefined) {
     return undefined;
   }
   const cookieString = Array.isArray(cookieHeader)
     ? cookieHeader.join(';')
     : cookieHeader;
-  if (!cookieString) {
+  return cookieString || undefined;
+};
+
+const getCookie = (req: express.Request, name: string): string | undefined => {
+  const cookieString = extractCookieString(req.headers.cookie);
+  if (cookieString === undefined || cookieString === '') {
     return undefined;
   }
   const cookies = parseCookieString(cookieString);
@@ -75,8 +82,7 @@ const createSession = (userId: number) => {
   return {sessionId, expiresAt};
 };
 
-// Helper function to validate session
-const validateSession = (sessionId: string) => {
+const fetchSessionFromDb = (sessionId: string) => {
   const sessionRow = db
     .prepare(sql`
       SELECT
@@ -88,20 +94,37 @@ const validateSession = (sessionId: string) => {
         s.id = ?
     `)
     .get(sessionId);
-  const session =
-    sessionRow === null ? undefined : SessionRowSchema.parse(sessionRow);
+  return sessionRow === null ? undefined : SessionRowSchema.parse(sessionRow);
+};
+
+const removeExpiredSession = (sessionId: string): void => {
+  db.prepare(sql`
+    DELETE FROM sessions
+    WHERE
+      id = ?
+  `).run(sessionId);
+};
+
+const validateSessionExpiry = (
+  session: {expires_at: string},
+  sessionId: string,
+): boolean => {
+  if (new Date(session.expires_at).getTime() < Date.now()) {
+    removeExpiredSession(sessionId);
+    return false;
+  }
+  return true;
+};
+
+// Helper function to validate session
+const validateSession = (sessionId: string) => {
+  const session = fetchSessionFromDb(sessionId);
 
   if (!session) {
     return null;
   }
 
-  // Check if session is expired
-  if (new Date(session.expires_at).getTime() < Date.now()) {
-    db.prepare(sql`
-      DELETE FROM sessions
-      WHERE
-        id = ?
-    `).run(sessionId);
+  if (!validateSessionExpiry(session, sessionId)) {
     return null;
   }
 
@@ -236,24 +259,6 @@ const authenticateUser = async (email: string, password: string) => {
   return user;
 };
 
-const handleLoginError = (
-  res: express.Response,
-  error: unknown,
-): express.Response => {
-  if (error instanceof z.ZodError) {
-    logger.warn({error}, 'Login validation error');
-    return res
-      .status(400)
-      .json({success: false, error: 'Invalid request data', details: error});
-  }
-
-  const errorObj = asError(error);
-  const status = (error as any)?.status ?? 500;
-  const message = errorObj?.message ?? 'Internal server error';
-  logger.error({error: errorObj}, 'Login error');
-  return res.status(status).json({success: false, error: message});
-};
-
 // eslint-disable-next-line @typescript-eslint/no-misused-promises -- properly handled with try-catch
 router.post('/login', async (req, res) => {
   try {
@@ -264,7 +269,7 @@ router.post('/login', async (req, res) => {
     const response = prepareLoginResponse(user, email);
     return res.json(response);
   } catch (error) {
-    return handleLoginError(res, error);
+    return handleRouteError(res, error, 'Login');
   }
 });
 
@@ -325,28 +330,6 @@ const validateRegistrationData = (body: unknown) => {
   return {username, email, password, role};
 };
 
-const handleRegistrationError = (
-  res: express.Response,
-  error: unknown,
-): express.Response => {
-  if (error instanceof z.ZodError) {
-    logger.warn({error}, 'Registration validation error');
-    return res
-      .status(400)
-      .json({
-        success: false,
-        error: 'Invalid request data',
-        details: error.stack,
-      });
-  }
-
-  const errorObj = asError(error);
-  const status = (error as any)?.status ?? 500;
-  const message = errorObj?.message ?? 'Internal server error';
-  logger.error({error: errorObj}, 'Registration error');
-  return res.status(status).json({success: false, error: message});
-};
-
 // eslint-disable-next-line @typescript-eslint/no-misused-promises -- properly handled with try-catch
 router.post('/register', async (req, res) => {
   try {
@@ -369,7 +352,7 @@ router.post('/register', async (req, res) => {
         message: 'User registered successfully',
       });
   } catch (error) {
-    return handleRegistrationError(res, error);
+    return handleRouteError(res, error, 'Registration');
   }
 });
 
@@ -452,20 +435,6 @@ const getSecuritySafeResponse = () => ({
   message: 'If the email exists, a reset link has been sent',
 });
 
-const handleAuthError = (
-  res: express.Response,
-  error: unknown,
-  operation: string,
-): express.Response => {
-  if (error instanceof z.ZodError) {
-    return res
-      .status(400)
-      .json({success: false, error: 'Invalid request data'});
-  }
-  logger.error({error: asError(error)}, `${operation} error`);
-  return res.status(500).json({success: false, error: 'Internal server error'});
-};
-
 // POST /api/auth/forgot - request password reset
 router.post('/forgot', (req, res) => {
   try {
@@ -480,7 +449,7 @@ router.post('/forgot', (req, res) => {
     const resetResponse = handlePasswordResetRequest(email, user.id);
     return res.json(resetResponse);
   } catch (error) {
-    return handleAuthError(res, error, 'Forgot password');
+    return handleRouteError(res, error, 'Forgot password');
   }
 });
 
@@ -554,7 +523,7 @@ router.post('/reset', async (req, res) => {
     await resetUserPassword(resetData.user_id, password, token);
     return res.json({success: true, message: 'Password has been reset'});
   } catch (error) {
-    return handleAuthError(res, error, 'Reset password');
+    return handleRouteError(res, error, 'Reset password');
   }
 });
 

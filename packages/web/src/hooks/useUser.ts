@@ -19,8 +19,42 @@ const isNoDataSuccess = (value: unknown): value is typeof NO_DATA_SUCCESS => {
 
 type UserQueryData = User | null | typeof NO_DATA_SUCCESS;
 
+const createUserQueryFn = (): (() => Promise<UserQueryData>) => {
+  return async (): Promise<UserQueryData> => {
+    try {
+      const res = await authApi.me();
+      if (res.success && res.data) {
+        return UserSchema.parse(res.data);
+      }
+      if (res.success && res.data === undefined) {
+        return NO_DATA_SUCCESS;
+      }
+      return null;
+    } catch (_error) {
+      return null;
+    }
+  };
+};
+
+const processRawUserData = (
+  rawUser: UserQueryData | undefined,
+): User | null | undefined => {
+  if (rawUser === undefined) {
+    return undefined;
+  }
+  if (isNoDataSuccess(rawUser)) {
+    return undefined;
+  }
+  return rawUser;
+};
+
+type RegisterParams =
+  | {username: string; email: string; password: string}
+  | {username: string; email: string; password: string; role: string};
+
 export const useUser = () => {
   const queryClient = useQueryClient();
+  const queryFn = createUserQueryFn();
 
   const {
     data: rawUser,
@@ -28,20 +62,7 @@ export const useUser = () => {
     error,
   } = useQuery<UserQueryData>({
     queryKey: ['user'],
-    queryFn: async (): Promise<UserQueryData> => {
-      try {
-        const res = await authApi.me();
-        if (res.success && res.data) {
-          return UserSchema.parse(res.data);
-        }
-        if (res.success && res.data === undefined) {
-          return NO_DATA_SUCCESS;
-        }
-        return null;
-      } catch (_error) {
-        return null;
-      }
-    },
+    queryFn,
     staleTime: 1000 * 60 * 60,
     retry: false,
   });
@@ -72,33 +93,17 @@ export const useUser = () => {
     },
   });
 
-  const login = async (email: string, password: string) =>
-    loginMutation.mutateAsync({email, password});
-
-  const register = async (
-    params:
-      | {username: string; email: string; password: string}
-      | {username: string; email: string; password: string; role: string},
-  ) => registerMutation.mutateAsync(params);
-
-  const logout = async () => logoutMutation.mutateAsync();
-
-  let user: User | null | undefined;
-  if (rawUser === undefined) {
-    user = undefined;
-  } else if (isNoDataSuccess(rawUser)) {
-    user = undefined;
-  } else {
-    user = rawUser ?? null;
-  }
+  const user = processRawUserData(rawUser);
 
   return {
     user,
     isLoading,
     error,
-    login,
-    register,
-    logout,
+    login: async (email: string, password: string) =>
+      loginMutation.mutateAsync({email, password}),
+    register: async (params: RegisterParams) =>
+      registerMutation.mutateAsync(params),
+    logout: async () => logoutMutation.mutateAsync(),
     forgotPassword: async (email: string) => authApi.forgotPassword({email}),
     resetPassword: async (token: string, password: string) =>
       authApi.resetPassword({token, password}),

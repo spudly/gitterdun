@@ -1,6 +1,5 @@
 import express from 'express';
 import crypto from 'node:crypto';
-import {z} from 'zod';
 import {
   CreateInvitationSchema,
   AcceptInvitationSchema,
@@ -8,13 +7,13 @@ import {
   FamilyInvitationRowSchema,
   UserPasswordHashRowSchema,
   IdRowSchema,
-  asError,
   FamilyIdParamSchema,
 } from '@gitterdun/shared';
 import bcrypt from 'bcryptjs';
 import db from '../lib/db';
 import {sql} from '../utils/sql';
 import {requireUserId} from '../utils/auth';
+import {handleRouteError} from '../utils/errorHandling';
 
 // eslint-disable-next-line new-cap -- express.Router() is a factory function
 const router = express.Router();
@@ -76,21 +75,6 @@ const createInvitation = (params: CreateInvitationParams): void => {
   `).run(token, familyId, email, role, inviterId, expiresAt.toISOString());
 };
 
-const handleInvitationError = (
-  res: express.Response,
-  error: unknown,
-): express.Response => {
-  if (error instanceof z.ZodError) {
-    return res.status(400).json({success: false, error: 'Invalid request'});
-  }
-  const errorObj = asError(error);
-  const errorWithStatus = error as {status?: number; message?: string};
-  const status = errorWithStatus?.status ?? 500;
-  const message =
-    errorObj?.message ?? errorWithStatus?.message ?? 'Server error';
-  return res.status(status).json({success: false, error: message});
-};
-
 // POST /api/invitations/:familyId - invite by email as parent or child
 router.post('/:familyId', (req, res) => {
   try {
@@ -106,7 +90,7 @@ router.post('/:familyId', (req, res) => {
     // Email sending would go here; return token for dev
     return res.json({success: true, message: 'Invitation created', token});
   } catch (error) {
-    return handleInvitationError(res, error);
+    return handleRouteError(res, error, 'Create invitation');
   }
 });
 
@@ -253,21 +237,6 @@ const markInvitationAccepted = (token: string): void => {
   `).run(token);
 };
 
-const handleAcceptInvitationError = (
-  res: express.Response,
-  error: unknown,
-): express.Response => {
-  if (error instanceof z.ZodError) {
-    return res.status(400).json({success: false, error: 'Invalid request'});
-  }
-  const errorObj = asError(error);
-  const errorWithStatus = error as {status?: number; message?: string};
-  const status = errorWithStatus?.status ?? 500;
-  const message =
-    errorObj?.message ?? errorWithStatus?.message ?? 'Server error';
-  return res.status(status).json({success: false, error: message});
-};
-
 // POST /api/invitations/accept - accept an invitation and create/link account
 // eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
 router.post('/accept', async (req, res) => {
@@ -286,6 +255,6 @@ router.post('/accept', async (req, res) => {
 
     return res.json({success: true, message: 'Invitation accepted'});
   } catch (error) {
-    return handleAcceptInvitationError(res, error);
+    return handleRouteError(res, error, 'Accept invitation');
   }
 });

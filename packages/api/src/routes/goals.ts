@@ -5,13 +5,12 @@ import {
   GoalQuerySchema,
   GoalSchema,
   CountRowSchema,
-  asError,
   IdParamSchema,
 } from '@gitterdun/shared';
-import {z} from 'zod';
 import db from '../lib/db';
 import {logger} from '../utils/logger';
 import {sql} from '../utils/sql';
+import {handleRouteError} from '../utils/errorHandling';
 
 // eslint-disable-next-line new-cap -- express.Router() is a factory function
 const router = express.Router();
@@ -76,12 +75,14 @@ const getTotalGoalsCount = (
   return total;
 };
 
+type PaginationConfig = {page: number; limit: number};
+
 const addPaginationToQuery = (
   baseQuery: string,
   params: Array<string | number>,
-  page: number,
-  limit: number,
+  pagination: PaginationConfig,
 ): QueryWithParams => {
+  const {page, limit} = pagination;
   const query = `${baseQuery} ORDER BY created_at DESC LIMIT ? OFFSET ?`;
   const offset = (page - 1) * limit;
   const paginatedParams = [...params, limit, offset];
@@ -94,30 +95,6 @@ const fetchAndValidateGoals = (
 ) => {
   const goals = db.prepare(query).all(...params);
   return goals.map(goal => GoalSchema.parse(goal));
-};
-
-const handleGoalsQueryError = (
-  res: express.Response,
-  error: unknown,
-): express.Response => {
-  if (error instanceof z.ZodError) {
-    logger.warn({error}, 'Goals query validation error');
-    return res
-      .status(400)
-      .json({
-        success: false,
-        error: 'Invalid query parameters',
-        details: error.stack,
-      });
-  }
-
-  const errorObj = asError(error);
-  const errorWithStatus = error as {status?: number; message?: string};
-  const status = errorWithStatus?.status ?? 500;
-  const message =
-    errorObj?.message ?? errorWithStatus?.message ?? 'Internal server error';
-  logger.error({error: errorObj}, 'Get goals error');
-  return res.status(status).json({success: false, error: message});
 };
 
 const checkGoalExists = (goalId: number): boolean => {
@@ -147,8 +124,7 @@ router.get('/', async (req, res) => {
     const {query: paginatedQuery, params: finalParams} = addPaginationToQuery(
       baseQuery,
       baseParams,
-      page,
-      limit,
+      {page, limit},
     );
     const validatedGoals = fetchAndValidateGoals(paginatedQuery, finalParams);
 
@@ -158,7 +134,7 @@ router.get('/', async (req, res) => {
       pagination: {page, limit, total, totalPages: Math.ceil(total / limit)},
     });
   } catch (error) {
-    return handleGoalsQueryError(res, error);
+    return handleRouteError(res, error, 'Get goals');
   }
 });
 
@@ -198,30 +174,6 @@ const createGoalInDatabase = (
   return GoalSchema.parse(result);
 };
 
-const handleCreateGoalError = (
-  res: express.Response,
-  error: unknown,
-): express.Response => {
-  if (error instanceof z.ZodError) {
-    logger.warn({error}, 'Create goal validation error');
-    return res
-      .status(400)
-      .json({
-        success: false,
-        error: 'Invalid request data',
-        details: error.stack,
-      });
-  }
-
-  const errorObj = asError(error);
-  const errorWithStatus = error as {status?: number; message?: string};
-  const status = errorWithStatus?.status ?? 500;
-  const message =
-    errorObj?.message ?? errorWithStatus?.message ?? 'Internal server error';
-  logger.error({error: errorObj}, 'Create goal error');
-  return res.status(status).json({success: false, error: message});
-};
-
 // POST /api/goals - Create a new goal
 // eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
 router.post('/', async (req, res) => {
@@ -246,7 +198,7 @@ router.post('/', async (req, res) => {
         message: 'Goal created successfully',
       });
   } catch (error) {
-    return handleCreateGoalError(res, error);
+    return handleRouteError(res, error, 'Create goal');
   }
 });
 
@@ -277,19 +229,6 @@ const fetchGoalById = (goalId: number) => {
     .get(goalId);
 };
 
-const handleGoalError = (
-  res: express.Response,
-  error: unknown,
-): express.Response => {
-  const errorObj = asError(error);
-  const errorWithStatus = error as {status?: number; message?: string};
-  const status = errorWithStatus?.status ?? 500;
-  const message =
-    errorObj?.message ?? errorWithStatus?.message ?? 'Internal server error';
-  logger.error({error: errorObj}, 'Goal operation error');
-  return res.status(status).json({success: false, error: message});
-};
-
 // GET /api/goals/:id - Get a specific goal
 // eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
 router.get('/:id', async (req, res) => {
@@ -305,7 +244,7 @@ router.get('/:id', async (req, res) => {
     const validatedGoal = GoalSchema.parse(goal);
     return res.json({success: true, data: validatedGoal});
   } catch (error) {
-    return handleGoalError(res, error);
+    return handleRouteError(res, error, 'Get goal');
   }
 });
 
@@ -376,30 +315,6 @@ const executeGoalUpdate = (goalId: number, builder: UpdateQueryBuilder) => {
   return GoalSchema.parse(updatedGoal);
 };
 
-const handleUpdateGoalError = (
-  res: express.Response,
-  error: unknown,
-): express.Response => {
-  if (error instanceof z.ZodError) {
-    logger.warn({error}, 'Update goal validation error');
-    return res
-      .status(400)
-      .json({
-        success: false,
-        error: 'Invalid request data',
-        details: error.stack,
-      });
-  }
-
-  const errorObj = asError(error);
-  const errorWithStatus = error as {status?: number; message?: string};
-  const status = errorWithStatus?.status ?? 500;
-  const message =
-    errorObj?.message ?? errorWithStatus?.message ?? 'Internal server error';
-  logger.error({error: errorObj}, 'Update goal error');
-  return res.status(status).json({success: false, error: message});
-};
-
 // PUT /api/goals/:id - Update a goal
 // eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
 router.put('/:id', async (req, res) => {
@@ -421,7 +336,7 @@ router.put('/:id', async (req, res) => {
       message: 'Goal updated successfully',
     });
   } catch (error) {
-    return handleUpdateGoalError(res, error);
+    return handleRouteError(res, error, 'Update goal');
   }
 });
 
@@ -449,7 +364,7 @@ router.delete('/:id', async (req, res) => {
 
     return res.json({success: true, message: 'Goal deleted successfully'});
   } catch (error) {
-    return handleGoalError(res, error);
+    return handleRouteError(res, error, 'Delete goal');
   }
 });
 
