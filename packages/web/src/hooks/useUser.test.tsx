@@ -81,8 +81,8 @@ describe('useUser', () => {
     const {result} = renderHook(() => useUser(), {wrapper});
     await waitFor(() => {
       expect(result.current.user).toBeUndefined();
+      expect(result.current.isLoading).toBe(false);
     });
-    expect(result.current.isLoading).toBe(false);
   });
 
   test('does not set user on login success without data (covers else at line 32)', async () => {
@@ -103,6 +103,9 @@ describe('useUser', () => {
 
   test('does not set user on register success without data (covers else at line 41)', async () => {
     const {authApi} = apis;
+    jest
+      .mocked(authApi.me)
+      .mockResolvedValueOnce({success: true, data: undefined});
     jest.mocked(authApi.register).mockResolvedValueOnce({success: true});
     const client = new QueryClient();
     const clientSpy = jest.spyOn(client, 'setQueryData');
@@ -110,6 +113,9 @@ describe('useUser', () => {
       <QueryClientProvider client={client}>{children}</QueryClientProvider>
     );
     const {result} = renderHook(() => useUser(), {wrapper: LocalWrapper});
+    await waitFor(() => {
+      expect(result.current.user).toBeUndefined();
+    });
     await act(async () => {
       await result.current.register({username: 'u', email: 'e', password: 'p'});
     });
@@ -122,7 +128,12 @@ describe('useUser', () => {
     const spy = jest.spyOn(authApi, 'register');
     const {result} = renderHook(() => useUser(), {wrapper});
     await act(async () => {
-      await result.current.register({username: 'u', email: 'e@x.com', password: 'p', role: 'parent'});
+      await result.current.register({
+        username: 'u',
+        email: 'e@x.com',
+        password: 'p',
+        role: 'parent',
+      });
     });
     expect(spy).toHaveBeenCalledWith(expect.objectContaining({role: 'parent'}));
     spy.mockRestore();
