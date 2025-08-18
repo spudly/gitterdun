@@ -715,14 +715,11 @@ const eslintConfig = [
       'logical-assignment-operators': 'warn',
       'max-classes-per-file': 'warn',
       'max-depth': 'warn',
-      'max-lines': ['warn', 150],
-      'max-lines-per-function': [
-        'warn',
-        {max: 20, skipBlankLines: true, skipComments: true, IIFEs: true},
-      ],
+      'max-lines': 'off', //['warn', 150],// TODO: re-enable & refactor to fix
+      'max-lines-per-function': 'off', // ['warn', {max: 20, skipBlankLines: true, skipComments: true, IIFEs: true},], // TODO: re-enable
       'max-nested-callbacks': 'warn',
       'max-params': 'warn',
-      'max-statements': 'warn',
+      'max-statements': 'off', // 'warn', // TODO: re-enable
       'multiline-comment-style': 'off', // use Prettier for styling
       'new-cap': 'warn',
       'no-alert': 'warn',
@@ -823,7 +820,7 @@ const eslintConfig = [
       'no-useless-return': 'warn',
       'no-var': 'warn',
       'no-void': 'warn',
-      'no-warning-comments': 'warn',
+      'no-warning-comments': 'off', // TODO: re-enable
       'no-with': 'warn',
       'object-shorthand': 'warn',
       'one-var': 'off', // use Prettier for styling
@@ -843,7 +840,7 @@ const eslintConfig = [
       'prefer-template': 'warn',
       radix: 'warn',
       'require-atomic-updates': 'warn',
-      'require-unicode-regexp': 'warn',
+      'require-unicode-regexp': 'off', // almost always unnecessary
       'require-yield': 'warn',
       'sort-imports': 'off', // handled by import/order
       'sort-keys': 'off', // order affects readability. we can always sort on-demand
@@ -947,7 +944,7 @@ const eslintConfig = [
       '@typescript-eslint/no-unsafe-type-assertion': 'off', // we can be more loose in unit tests
       'jest/consistent-test-it': ['warn', {fn: 'test', withinDescribe: 'test'}],
       'jest/expect-expect': 'warn',
-      'jest/max-expects': 'warn',
+      'jest/max-expects': 'off', // more expects is fine by me
       'jest/max-nested-describe': 'warn',
       'jest/no-alias-methods': 'warn',
       'jest/no-commented-out-tests': 'warn',

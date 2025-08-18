@@ -20,6 +20,58 @@ type UpdateChore = z.infer<typeof UpdateChoreSchema>;
 type Chore = z.infer<typeof ChoreSchema>;
 type ChoreWithUsername = z.infer<typeof ChoreWithUsernameSchema>;
 
+type ChoreFilters = {
+  status?: string | undefined;
+  choreType?: string | undefined;
+  userId?: number | undefined;
+};
+
+type PaginatedQueryParams = {
+  baseQuery: string;
+  params: Array<string | number>;
+  page: number;
+  limit: number;
+};
+
+type ChoresResponseParams = {
+  chores: Array<ChoreWithUsername>;
+  page: number;
+  limit: number;
+  total: number;
+};
+
+type ProcessChoresParams = {
+  status?: string | undefined;
+  choreType?: string | undefined;
+  userId?: number | undefined;
+  page?: number | undefined;
+  limit?: number | undefined;
+};
+
+type ChoreCompletionParams = {
+  choreId: number;
+  userId: number;
+  points: {
+    pointsEarned: number;
+    bonusPointsEarned: number;
+    penaltyPointsEarned: number;
+  };
+  notes?: string | undefined;
+};
+
+type CreateChoreParams = {
+  title: string;
+  description: string;
+  pointReward: number;
+  bonusPoints: number;
+  penaltyPoints: number;
+  dueDate: string | null;
+  recurrenceRule: string | null;
+  choreType: string;
+  createdBy: number;
+};
+
+// eslint-disable-next-line new-cap -- express.Router() is a factory function
 const router = express.Router();
 
 // GET /api/chores - Get all chores
@@ -50,44 +102,24 @@ const getBaseChoresQuery = () => {
   `;
 };
 
-const CHORE_FILTER_CONDITIONS = [
-  {
-    condition: (status: string | undefined) => status,
-    clause: ' AND c.status = ?',
-    getValue: (status: string | undefined) => status,
-  },
-  {
-    condition: (choreType: string | undefined) => choreType,
-    clause: ' AND c.chore_type = ?',
-    getValue: (choreType: string | undefined) => choreType,
-  },
-  {
-    condition: (userId: number | undefined) => userId !== undefined,
-    clause:
-      ' AND c.id IN (SELECT chore_id FROM chore_assignments WHERE user_id = ?)',
-    getValue: (userId: number | undefined) => userId,
-  },
-];
-
 const applyChoreFilters = (
   baseQuery: string,
-  status?: string,
-  choreType?: string,
-  userId?: number,
+  {status, choreType, userId}: ChoreFilters,
 ) => {
   let query = baseQuery;
   const params: Array<string | number> = [];
 
-  const filterValues = [status, choreType, userId];
-
-  for (let index = 0; index < CHORE_FILTER_CONDITIONS.length; index++) {
-    const filter = CHORE_FILTER_CONDITIONS[index];
-    const value = filterValues[index];
-
-    if (filter?.condition(value as any)) {
-      query += filter.clause;
-      params.push(filter.getValue(value as any)!);
-    }
+  if (status != null) {
+    query += ' AND c.status = ?';
+    params.push(status);
+  }
+  if (choreType != null) {
+    query += ' AND c.chore_type = ?';
+  }
+  if (userId != null) {
+    query +=
+      ' AND c.id IN (SELECT chore_id FROM chore_assignments WHERE user_id = ?)';
+    params.push(userId);
   }
 
   return {query, params};
@@ -100,7 +132,7 @@ const buildChoresQuery = (
   userId?: number,
 ) => {
   const baseQuery = getBaseChoresQuery();
-  return applyChoreFilters(baseQuery, status, choreType, userId);
+  return applyChoreFilters(baseQuery, {status, choreType, userId});
 };
 
 // Helper function to get total count for pagination
@@ -114,15 +146,11 @@ const getChoresCount = (query: string, params: Array<string | number>) => {
   return total;
 };
 
-const buildPaginatedChoresQuery = (
-  baseQuery: string,
-  params: Array<string | number>,
-  page: number,
-  limit: number,
-) => {
+const buildPaginatedChoresQuery = (params: PaginatedQueryParams) => {
+  const {baseQuery, params: queryParams, page, limit} = params;
   const finalQuery = `${baseQuery} ORDER BY c.created_at DESC LIMIT ? OFFSET ?`;
   const offset = (page - 1) * limit;
-  const finalParams = [...params, limit, offset];
+  const finalParams = [...queryParams, limit, offset];
   return {finalQuery, finalParams};
 };
 
@@ -134,12 +162,8 @@ const executeChoresQuery = (
   return chores.map(chore => ChoreWithUsernameSchema.parse(chore));
 };
 
-const formatChoresResponse = (
-  chores: Array<ChoreWithUsername>,
-  page: number,
-  limit: number,
-  total: number,
-) => {
+const formatChoresResponse = (params: ChoresResponseParams) => {
+  const {chores, page, limit, total} = params;
   return {
     success: true as const,
     data: chores,
@@ -159,23 +183,32 @@ const parseChoresQueryRequest = (req: express.Request) => {
   return {status, choreType, userId, page, limit};
 };
 
-const processChoresRequest = (
-  status?: string,
-  choreType?: string,
-  userId?: number,
-  page?: number,
-  limit?: number,
-) => {
-  const {query, params} = buildChoresQuery(status, choreType, userId);
-  const total = getChoresCount(query, params);
-  const {finalQuery, finalParams} = buildPaginatedChoresQuery(
-    query,
-    params,
-    page!,
-    limit!,
+const processChoresRequest = (params: ProcessChoresParams) => {
+  const {status, choreType, userId, page, limit} = params;
+  const {query, params: queryParams} = buildChoresQuery(
+    status,
+    choreType,
+    userId,
   );
+  const total = getChoresCount(query, queryParams);
+
+  // Provide default values for pagination
+  const safePage = page ?? 1;
+  const safeLimit = limit ?? 10;
+
+  const {finalQuery, finalParams} = buildPaginatedChoresQuery({
+    baseQuery: query,
+    params: queryParams,
+    page: safePage,
+    limit: safeLimit,
+  });
   const validatedChores = executeChoresQuery(finalQuery, finalParams);
-  return formatChoresResponse(validatedChores, page!, limit!, total);
+  return formatChoresResponse({
+    chores: validatedChores,
+    page: safePage,
+    limit: safeLimit,
+    total,
+  });
 };
 
 const handleChoresQueryError = (error: unknown, res: express.Response) => {
@@ -196,17 +229,18 @@ const handleChoresQueryError = (error: unknown, res: express.Response) => {
     .json({success: false as const, error: 'Internal server error'});
 };
 
+// eslint-disable-next-line @typescript-eslint/no-misused-promises -- properly handled with try-catch
 router.get('/', async (req, res) => {
   try {
     const {status, choreType, userId, page, limit} =
       parseChoresQueryRequest(req);
-    const response = processChoresRequest(
+    const response = processChoresRequest({
       status,
       choreType,
       userId,
       page,
       limit,
-    );
+    });
     return res.json(response);
   } catch (error) {
     return handleChoresQueryError(error, res);
@@ -216,17 +250,18 @@ router.get('/', async (req, res) => {
 // POST /api/chores - Create a new chore
 // eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
 // Helper function to create chore in database
-const createChoreInDb = (
-  title: string,
-  description: string,
-  pointReward: number,
-  bonusPoints: number,
-  penaltyPoints: number,
-  dueDate: string | null,
-  recurrenceRule: string | null,
-  choreType: string,
-  createdBy: number,
-) => {
+const createChoreInDb = (params: CreateChoreParams) => {
+  const {
+    title,
+    description,
+    pointReward,
+    bonusPoints,
+    penaltyPoints,
+    dueDate,
+    recurrenceRule,
+    choreType,
+    createdBy,
+  } = params;
   const createdRow = db
     .prepare(sql`
       INSERT INTO
@@ -273,6 +308,7 @@ const assignChoreToUsers = (choreId: number, assignedUsers: Array<number>) => {
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-misused-promises -- properly handled with try-catch
 router.post('/', async (req, res) => {
   try {
     // Validate and extract request data
@@ -290,7 +326,7 @@ router.post('/', async (req, res) => {
 
     // Create chore with transaction
     const newChore = db.transaction(() => {
-      const chore = createChoreInDb(
+      const chore = createChoreInDb({
         title,
         description,
         pointReward,
@@ -299,8 +335,8 @@ router.post('/', async (req, res) => {
         dueDate,
         recurrenceRule,
         choreType,
-        1,
-      );
+        createdBy: 1,
+      });
       assignChoreToUsers(chore.id, assignedUsers);
       return chore;
     })();
@@ -453,6 +489,7 @@ const processChoreUpdateFields = (validatedBody: UpdateChore) => {
     const value = (validatedBody as Record<string, unknown>)[field];
     if (value !== undefined) {
       updateFields.push(`${column} = ?`);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- safe cast from validated input
       values.push(value as string | number | null);
     }
   }
@@ -692,16 +729,8 @@ const calculateCompletionPoints = (chore: Chore) => {
   return {pointsEarned, bonusPointsEarned, penaltyPointsEarned};
 };
 
-const updateChoreAssignmentCompletion = (
-  choreId: number,
-  userId: number,
-  points: {
-    pointsEarned: number;
-    bonusPointsEarned: number;
-    penaltyPointsEarned: number;
-  },
-  notes?: string,
-) => {
+const updateChoreAssignmentCompletion = (params: ChoreCompletionParams) => {
+  const {choreId, userId, points, notes} = params;
   db.prepare(sql`
     UPDATE chore_assignments
     SET
@@ -768,7 +797,7 @@ const executeChoreCompletionTransaction = (
     const chore = getChoreForCompletion(choreId);
     const points = calculateCompletionPoints(chore);
 
-    updateChoreAssignmentCompletion(choreId, userId, points, notes);
+    updateChoreAssignmentCompletion({choreId, userId, points, notes});
     const totalPoints =
       points.pointsEarned
       + points.bonusPointsEarned

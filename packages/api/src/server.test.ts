@@ -6,6 +6,11 @@ import {
   afterEach,
   jest,
 } from '@jest/globals';
+import {initializeDatabase} from './lib/initDb';
+import {logger} from './utils/logger';
+import authRoutes from './routes/auth';
+import {asError, withProperties} from '@gitterdun/shared';
+import dotenv from 'dotenv';
 
 // Mock dependencies before importing server
 jest.mock('./lib/db', () => ({
@@ -24,14 +29,11 @@ jest.mock('./routes/goals');
 jest.mock('./routes/leaderboard');
 jest.mock('./routes/families');
 jest.mock('./routes/invitations');
-jest.mock('@gitterdun/shared');
+jest.mock('@gitterdun/shared', () => ({
+  asError: jest.fn(),
+  withProperties: jest.requireActual('@gitterdun/shared').withProperties,
+}));
 jest.mock('dotenv');
-
-import {initializeDatabase} from './lib/initDb';
-import {logger} from './utils/logger';
-import authRoutes from './routes/auth';
-import {asError} from '@gitterdun/shared';
-import dotenv from 'dotenv';
 
 const mockedInitializeDatabase = jest.mocked(initializeDatabase);
 const mockedLogger = jest.mocked(logger);
@@ -47,17 +49,20 @@ describe('server', () => {
     process.env = {...originalEnv};
 
     // Mock router implementations
-    mockedAuthRoutes.mockImplementation((() => ({
-      get: jest.fn() as any,
-      post: jest.fn() as any,
-    })) as any);
+    type MockRouter = {
+      get: jest.MockedFunction<() => void>;
+      post: jest.MockedFunction<() => void>;
+    };
+    mockedAuthRoutes.mockImplementation(
+      () => ({get: jest.fn(), post: jest.fn()}) as MockRouter,
+    );
 
     // Mock logger methods
-    mockedLogger.info = jest.fn();
-    mockedLogger.error = jest.fn();
+    jest.spyOn(mockedLogger, 'info').mockImplementation(jest.fn());
+    jest.spyOn(mockedLogger, 'error').mockImplementation(jest.fn());
 
     // Mock dotenv
-    mockedDotenv.config = jest.fn();
+    jest.spyOn(mockedDotenv, 'config').mockImplementation(jest.fn());
 
     // Mock asError
     mockedAsError.mockImplementation(err => err as Error);
@@ -75,7 +80,7 @@ describe('server', () => {
     await import('./server');
 
     // Verify dotenv.config was called during module import
-    expect(mockedDotenv.config).toHaveBeenCalled();
+    expect(mockedDotenv.config).toHaveBeenCalledWith();
   });
 
   test('should handle database initialization failure', () => {
@@ -88,29 +93,29 @@ describe('server', () => {
   });
 
   test('should configure CORS in development', () => {
-    process.env['NODE_ENV'] = 'development';
-
-    // Test would require more complex Express app mocking
-    // This is a placeholder for the CORS configuration test
-    expect(process.env['NODE_ENV']).toBe('development');
+    withProperties(process.env, {NODE_ENV: 'development'}, () => {
+      // Test would require more complex Express app mocking
+      // This is a placeholder for the CORS configuration test
+      expect(process.env['NODE_ENV']).toBe('development');
+    });
   });
 
   test('should not configure CORS in production', () => {
-    process.env['NODE_ENV'] = 'production';
-
-    expect(process.env['NODE_ENV']).toBe('production');
+    withProperties(process.env, {NODE_ENV: 'production'}, () => {
+      expect(process.env['NODE_ENV']).toBe('production');
+    });
   });
 
   test('should use custom PORT from environment', () => {
-    process.env['PORT'] = '8080';
-
-    expect(process.env['PORT']).toBe('8080');
+    withProperties(process.env, {PORT: '8080'}, () => {
+      expect(process.env['PORT']).toBe('8080');
+    });
   });
 
   // Note: Testing Express app configuration requires more complex mocking
   // The following would be integration tests if we had a test server setup
 
-  describe('API endpoints (would require test server)', () => {
+  describe('api endpoints (would require test server)', () => {
     test('should handle health check endpoint', () => {
       // This would test: GET /api/health
       // Returns: {status: 'OK', timestamp: string, uptime: number}

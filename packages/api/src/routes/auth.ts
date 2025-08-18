@@ -21,12 +21,20 @@ import {sql} from '../utils/sql';
 
 type UserWithPasswordRow = z.infer<typeof UserWithPasswordRowSchema>;
 
+type CreateUserParams = {
+  username: string;
+  email: string;
+  password: string;
+  role: string;
+};
+
+// eslint-disable-next-line new-cap -- express.Router() is a factory function
 const router = express.Router();
 
 const parseCookieString = (cookieString: string): Record<string, string> => {
   return cookieString.split(';').reduce<Record<string, string>>((acc, part) => {
     const [rawKey, ...rest] = part.trim().split('=');
-    if (!rawKey) {
+    if (rawKey === undefined || rawKey === '') {
       return acc;
     }
     const key = decodeURIComponent(rawKey);
@@ -211,6 +219,7 @@ const prepareLoginResponse = (user: UserWithPasswordRow, email: string) => {
   return {success: true, data: validatedUser, message: 'Login successful'};
 };
 
+// eslint-disable-next-line @typescript-eslint/no-misused-promises -- properly handled with try-catch
 router.post('/login', async (req, res) => {
   try {
     // Validate request body
@@ -274,12 +283,8 @@ const checkUserExists = (email: string, username: string) => {
 };
 
 // Helper function to create new user
-const createNewUser = async (
-  username: string,
-  email: string,
-  password: string,
-  role: string,
-) => {
+const createNewUser = async (params: CreateUserParams) => {
+  const {username, email, password, role} = params;
   const saltRounds = 12;
   const passwordHash = await bcrypt.hash(password, saltRounds);
 
@@ -302,6 +307,7 @@ const createNewUser = async (
   return UserSchema.parse(result);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-misused-promises -- properly handled with try-catch
 router.post('/register', async (req, res) => {
   try {
     // Validate request body
@@ -319,7 +325,12 @@ router.post('/register', async (req, res) => {
     }
 
     // Create new user
-    const validatedUser = await createNewUser(username, email, password, role);
+    const validatedUser = await createNewUser({
+      username,
+      email,
+      password,
+      role,
+    });
     logger.info(`New user registered: ${email}`);
 
     return res
@@ -505,16 +516,18 @@ const resetUserPassword = async (
   `).run(token);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-misused-promises -- properly handled with try-catch
 router.post('/reset', async (req, res) => {
   try {
     const {token, password} = ResetPasswordSchema.parse(req.body);
 
     const validation = validatePasswordResetToken(token);
-    if (!validation.isValid) {
-      return res.status(400).json({success: false, error: validation.error});
+    if (!validation.isValid || !validation.resetData) {
+      const errorMessage = validation.error ?? 'Invalid token';
+      return res.status(400).json({success: false, error: errorMessage});
     }
 
-    await resetUserPassword(validation.resetData!.user_id, password, token);
+    await resetUserPassword(validation.resetData.user_id, password, token);
     return res.json({success: true, message: 'Password has been reset'});
   } catch (error) {
     if (error instanceof z.ZodError) {

@@ -1,4 +1,5 @@
 import {describe, expect, test, jest} from '@jest/globals';
+import {withProperties} from '@gitterdun/shared';
 
 // Mock better-sqlite3 before importing db
 const mockDb = {pragma: jest.fn()};
@@ -41,38 +42,33 @@ describe('db module', () => {
     expect(db).toBe(mockDb);
   });
 
-  test('should use DB_PATH environment variable when set', () => {
-    // Create a new test environment with DB_PATH set
-    const originalEnv = process.env['DB_PATH'];
+  test('should use DB_PATH environment variable when set', async () => {
+    let dbResult;
 
-    try {
-      process.env['DB_PATH'] = '/custom/path/test.db';
+    await withProperties(
+      process.env,
+      {DB_PATH: '/custom/path/test.db'},
+      async () => {
+        // Clear mocks and set up new ones
+        jest.clearAllMocks();
+        mockedPath.resolve.mockReturnValue('/custom/path/test.db');
+        mockedPath.dirname.mockReturnValue('/custom/path');
+        mockedFs.existsSync.mockReturnValue(true);
 
-      // Clear mocks and set up new ones
-      jest.clearAllMocks();
-      mockedPath.resolve.mockReturnValue('/custom/path/test.db');
-      mockedPath.dirname.mockReturnValue('/custom/path');
-      mockedFs.existsSync.mockReturnValue(true);
+        // Import the module with custom DB_PATH - this will execute the module code
+        const {default: db} = await import('./db');
+        dbResult = db;
 
-      // Simulate the path resolution logic from db.ts
-      const expectedPath = '/custom/path/test.db';
-      const expectedDir = '/custom/path';
+        // Verify the custom path was used
+        expect(mockedPath.resolve).toHaveBeenCalledWith('/custom/path/test.db');
+        expect(mockedPath.dirname).toHaveBeenCalledWith('/custom/path/test.db');
+        expect(mockDbConstructor).toHaveBeenCalledWith('/custom/path/test.db');
+        expect(mockDb.pragma).toHaveBeenCalledWith('foreign_keys = ON');
+        expect(mockDb.pragma).toHaveBeenCalledWith('journal_mode = WAL');
+      },
+    );
 
-      // Verify the logic would work correctly
-      expect(process.env['DB_PATH']).toBe('/custom/path/test.db');
-
-      // Test the path resolution
-      const resolvedPath = mockedPath.resolve('/custom/path/test.db');
-      const dirname = mockedPath.dirname(resolvedPath);
-
-      expect(resolvedPath).toBe(expectedPath);
-      expect(dirname).toBe(expectedDir);
-      expect(mockedPath.resolve).toHaveBeenCalledWith('/custom/path/test.db');
-      expect(mockedPath.dirname).toHaveBeenCalledWith('/custom/path/test.db');
-    } finally {
-      // Restore environment
-      process.env['DB_PATH'] = originalEnv;
-    }
+    expect(dbResult).toBe(mockDb);
   });
 
   test('should create directory if it does not exist', () => {

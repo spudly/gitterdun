@@ -6,6 +6,7 @@ import {
   afterEach,
   jest,
 } from '@jest/globals';
+import {withProperties} from '@gitterdun/shared';
 
 // Mock pino before importing
 const mockPino = jest.fn();
@@ -33,43 +34,46 @@ describe('logger module', () => {
   });
 
   test('should use LOG_LEVEL environment variable when set', async () => {
-    process.env['LOG_LEVEL'] = 'debug';
-    const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
-    mockPino.mockReturnValue(mockLoggerInstance);
+    await withProperties(process.env, {LOG_LEVEL: 'debug'}, async () => {
+      const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
+      mockPino.mockReturnValue(mockLoggerInstance);
 
-    await import('./logger');
+      await import('./logger');
 
-    expect(mockPino).toHaveBeenCalledWith({level: 'debug'});
+      expect(mockPino).toHaveBeenCalledWith({level: 'debug'});
+    });
   });
 
   test('should add pretty transport in development', async () => {
-    process.env['NODE_ENV'] = 'development';
-    const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
-    mockPino.mockReturnValue(mockLoggerInstance);
+    await withProperties(process.env, {NODE_ENV: 'development'}, async () => {
+      const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
+      mockPino.mockReturnValue(mockLoggerInstance);
 
-    await import('./logger');
+      await import('./logger');
 
-    expect(mockPino).toHaveBeenCalledWith({
-      level: 'info',
-      transport: {
-        target: 'pino-pretty',
-        options: {
-          colorize: true,
-          translateTime: 'SYS:standard',
-          ignore: 'pid,hostname',
+      expect(mockPino).toHaveBeenCalledWith({
+        level: 'info',
+        transport: {
+          target: 'pino-pretty',
+          options: {
+            colorize: true,
+            translateTime: 'SYS:standard',
+            ignore: 'pid,hostname',
+          },
         },
-      },
+      });
     });
   });
 
   test('should not add transport in production', async () => {
-    process.env['NODE_ENV'] = 'production';
-    const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
-    mockPino.mockReturnValue(mockLoggerInstance);
+    await withProperties(process.env, {NODE_ENV: 'production'}, async () => {
+      const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
+      mockPino.mockReturnValue(mockLoggerInstance);
 
-    await import('./logger');
+      await import('./logger');
 
-    expect(mockPino).toHaveBeenCalledWith({level: 'info'});
+      expect(mockPino).toHaveBeenCalledWith({level: 'info'});
+    });
   });
 
   test('should not add transport when NODE_ENV is undefined', async () => {
