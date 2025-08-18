@@ -6,7 +6,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "nodemon --exec tsx src/server.tsx",
-    "prebuild": "rm -rf dist; rm tsconfig.build.tsbuildinfo",
+    "prebuild": "rm -rf dist; rm -f tsconfig.build.tsbuildinfo",
     "type-check": "tsc",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/server.js",
