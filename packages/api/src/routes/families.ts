@@ -5,7 +5,6 @@ import {
   FamilySchema,
   CreateChildSchema,
   FamilyMemberSchema,
-  SessionRowSchema,
   RoleRowSchema,
   IdRowSchema,
   IdParamSchema,
@@ -14,65 +13,12 @@ import {
 import bcrypt from 'bcryptjs';
 import db from '../lib/db';
 import {sql} from '../utils/sql';
+import {requireUserId} from '../utils/auth';
 
 // eslint-disable-next-line new-cap -- express.Router() is a factory function
 const router = express.Router();
 
-// Helper: require auth via session cookie
-const getCookie = (req: express.Request, name: string): string | undefined => {
-  const cookieHeader = req.headers.cookie;
-  if (cookieHeader === undefined) {
-    return undefined;
-  }
-  const cookieString = Array.isArray(cookieHeader)
-    ? cookieHeader.join(';')
-    : cookieHeader;
-  const cookies = cookieString
-    .split(';')
-    .reduce<Record<string, string>>((acc, part) => {
-      const [rawKey, ...rest] = part.trim().split('=');
-      if (rawKey === undefined || rawKey === '') {
-        return acc;
-      }
-      const key = decodeURIComponent(rawKey);
-      const value = decodeURIComponent(rest.join('=') || '');
-      acc[key] = value;
-      return acc;
-    }, {});
-  return cookies[name];
-};
-
-const requireUserId = (req: express.Request): number => {
-  const sid = getCookie(req, 'sid');
-  if (sid === undefined) {
-    throw Object.assign(new Error('Not authenticated'), {status: 401});
-  }
-  const sessionRow = db
-    .prepare(sql`
-      SELECT
-        user_id,
-        expires_at
-      FROM
-        sessions
-      WHERE
-        id = ?
-    `)
-    .get(sid);
-  const session =
-    sessionRow !== undefined ? SessionRowSchema.parse(sessionRow) : undefined;
-  if (!session) {
-    throw Object.assign(new Error('Not authenticated'), {status: 401});
-  }
-  if (new Date(session.expires_at).getTime() < Date.now()) {
-    db.prepare(sql`
-      DELETE FROM sessions
-      WHERE
-        id = ?
-    `).run(sid);
-    throw Object.assign(new Error('Session expired'), {status: 401});
-  }
-  return session.user_id;
-};
+// Authentication utility moved to ../utils/auth
 
 // POST /api/families - create a family; creator becomes owner and parent member
 router.post('/', (req, res) => {
@@ -156,74 +102,115 @@ router.get('/:id/members', (req, res) => {
   }
 });
 
+const validateParentMembership = (userId: number, familyId: number): void => {
+  const membershipRow = db
+    .prepare(sql`
+      SELECT
+        role
+      FROM
+        family_members
+      WHERE
+        family_id = ?
+        AND user_id = ?
+    `)
+    .get(familyId, userId);
+  const membership =
+    membershipRow !== undefined
+      ? RoleRowSchema.parse(membershipRow)
+      : undefined;
+  if (!membership || membership.role !== 'parent') {
+    throw Object.assign(new Error('Forbidden'), {status: 403});
+  }
+};
+
+const checkUserExists = (email: string, username: string): boolean => {
+  const existing = db
+    .prepare(sql`
+      SELECT
+        1
+      FROM
+        users
+      WHERE
+        email = ?
+        OR username = ?
+    `)
+    .get(email, username);
+  return existing !== undefined;
+};
+
+const createChildUser = async (
+  username: string,
+  email: string,
+  password: string,
+): Promise<number> => {
+  const passwordHash = await bcrypt.hash(password, 12);
+  const userRow = db
+    .prepare(sql`
+      INSERT INTO
+        users (username, email, password_hash, role)
+      VALUES
+        (?, ?, ?, 'user') RETURNING id
+    `)
+    .get(username, email, passwordHash);
+  const user = IdRowSchema.parse(userRow);
+  return user.id;
+};
+
+const addChildToFamily = (familyId: number, childId: number): void => {
+  db.prepare(sql`
+    INSERT INTO
+      family_members (family_id, user_id, role)
+    VALUES
+      (?, ?, ?)
+  `).run(familyId, childId, 'child');
+};
+
+const handleRouteError = (
+  res: express.Response,
+  error: unknown,
+): express.Response => {
+  if (error instanceof z.ZodError) {
+    return res.status(400).json({success: false, error: 'Invalid request'});
+  }
+  return res
+    .status(asError(error).status ?? 500)
+    .json({success: false, error: asError(error).message || 'Server error'});
+};
+
+type CreateChildRequest = {
+  userId: number;
+  familyId: number;
+  username: string;
+  email: string;
+  password: string;
+};
+
+const parseCreateChildRequest = (req: express.Request): CreateChildRequest => {
+  const userId = requireUserId(req);
+  const {id: familyId} = IdParamSchema.parse(req.params);
+  const {username, email, password} = CreateChildSchema.parse(req.body);
+  return {userId, familyId, username, email, password};
+};
+
 // POST /api/families/:id/children - owner or parent creates a child account directly
 // eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
 router.post('/:id/children', async (req, res) => {
   try {
-    const userId = requireUserId(req);
-    const {id: familyId} = IdParamSchema.parse(req.params);
-    const {username, email, password} = CreateChildSchema.parse(req.body);
+    const {userId, familyId, username, email, password} =
+      parseCreateChildRequest(req);
 
-    const membershipRow = db
-      .prepare(sql`
-        SELECT
-          role
-        FROM
-          family_members
-        WHERE
-          family_id = ?
-          AND user_id = ?
-      `)
-      .get(familyId, userId);
-    const membership =
-      membershipRow !== undefined
-        ? RoleRowSchema.parse(membershipRow)
-        : undefined;
-    if (!membership || membership.role !== 'parent') {
-      return res.status(403).json({success: false, error: 'Forbidden'});
-    }
+    validateParentMembership(userId, familyId);
 
-    const existing = db
-      .prepare(sql`
-        SELECT
-          1
-        FROM
-          users
-        WHERE
-          email = ?
-          OR username = ?
-      `)
-      .get(email, username);
-    if (existing !== undefined) {
+    if (checkUserExists(email, username)) {
       return res.status(409).json({success: false, error: 'User exists'});
     }
 
-    const passwordHash = await bcrypt.hash(password, 12);
-    const userRow = db
-      .prepare(sql`
-        INSERT INTO
-          users (username, email, password_hash, role)
-        VALUES
-          (?, ?, ?, 'user') RETURNING id
-      `)
-      .get(username, email, passwordHash);
-    const user = IdRowSchema.parse(userRow);
-
-    db.prepare(sql`
-      INSERT INTO
-        family_members (family_id, user_id, role)
-      VALUES
-        (?, ?, ?)
-    `).run(familyId, user.id, 'child');
+    const childId = await createChildUser(username, email, password);
+    addChildToFamily(familyId, childId);
 
     return res.status(201).json({success: true, message: 'Child created'});
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({success: false, error: 'Invalid request'});
-    }
-    return res
-      .status(asError(error).status ?? 500)
-      .json({success: false, error: asError(error).message || 'Server error'});
+    return handleRouteError(res, error);
   }
 });
 

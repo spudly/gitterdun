@@ -102,25 +102,48 @@ const getBaseChoresQuery = () => {
   `;
 };
 
+type FilterResult = {queryAddition: string; param?: string | number};
+
+const getStatusFilter = (status?: string): FilterResult => {
+  return status != null
+    ? {queryAddition: ' AND c.status = ?', param: status}
+    : {queryAddition: ''};
+};
+
+const getChoreTypeFilter = (choreType?: string): FilterResult => {
+  return choreType != null
+    ? {queryAddition: ' AND c.chore_type = ?', param: choreType}
+    : {queryAddition: ''};
+};
+
+const getUserIdFilter = (userId?: number): FilterResult => {
+  return userId != null
+    ? {
+        queryAddition:
+          ' AND c.id IN (SELECT chore_id FROM chore_assignments WHERE user_id = ?)',
+        param: userId,
+      }
+    : {queryAddition: ''};
+};
+
 const applyChoreFilters = (
   baseQuery: string,
   {status, choreType, userId}: ChoreFilters,
 ) => {
-  let query = baseQuery;
-  const params: Array<string | number> = [];
+  const statusFilter = getStatusFilter(status);
+  const choreTypeFilter = getChoreTypeFilter(choreType);
+  const userIdFilter = getUserIdFilter(userId);
 
-  if (status != null) {
-    query += ' AND c.status = ?';
-    params.push(status);
-  }
-  if (choreType != null) {
-    query += ' AND c.chore_type = ?';
-  }
-  if (userId != null) {
-    query +=
-      ' AND c.id IN (SELECT chore_id FROM chore_assignments WHERE user_id = ?)';
-    params.push(userId);
-  }
+  const query =
+    baseQuery
+    + statusFilter.queryAddition
+    + choreTypeFilter.queryAddition
+    + userIdFilter.queryAddition;
+  const params = [
+    statusFilter.param,
+    choreTypeFilter.param,
+    userIdFilter.param,
+  ].filter(param => param !== undefined);
 
   return {query, params};
 };

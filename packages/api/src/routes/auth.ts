@@ -219,48 +219,52 @@ const prepareLoginResponse = (user: UserWithPasswordRow, email: string) => {
   return {success: true, data: validatedUser, message: 'Login successful'};
 };
 
+const authenticateUser = async (email: string, password: string) => {
+  const user = findUserByEmail(email);
+  if (!user) {
+    throw Object.assign(new Error('Invalid credentials'), {status: 401});
+  }
+
+  const isValidPassword = await verifyUserPassword(
+    password,
+    user.password_hash,
+  );
+  if (!isValidPassword) {
+    throw Object.assign(new Error('Invalid credentials'), {status: 401});
+  }
+
+  return user;
+};
+
+const handleLoginError = (
+  res: express.Response,
+  error: unknown,
+): express.Response => {
+  if (error instanceof z.ZodError) {
+    logger.warn({error}, 'Login validation error');
+    return res
+      .status(400)
+      .json({success: false, error: 'Invalid request data', details: error});
+  }
+
+  const errorObj = asError(error);
+  const status = (error as any)?.status ?? 500;
+  const message = errorObj?.message ?? 'Internal server error';
+  logger.error({error: errorObj}, 'Login error');
+  return res.status(status).json({success: false, error: message});
+};
+
 // eslint-disable-next-line @typescript-eslint/no-misused-promises -- properly handled with try-catch
 router.post('/login', async (req, res) => {
   try {
-    // Validate request body
-    const validatedBody = LoginSchema.parse(req.body);
-    const {email, password} = validatedBody;
+    const {email, password} = LoginSchema.parse(req.body);
+    const user = await authenticateUser(email, password);
 
-    // Find user
-    const user = findUserByEmail(email);
-    if (!user) {
-      return res
-        .status(401)
-        .json({success: false, error: 'Invalid credentials'});
-    }
-
-    // Verify password
-    const isValidPassword = await verifyUserPassword(
-      password,
-      user.password_hash,
-    );
-    if (!isValidPassword) {
-      return res
-        .status(401)
-        .json({success: false, error: 'Invalid credentials'});
-    }
-
-    // Create session and prepare response
     createLoginSession(res, user.id);
     const response = prepareLoginResponse(user, email);
     return res.json(response);
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      logger.warn({error}, 'Login validation error');
-      return res
-        .status(400)
-        .json({success: false, error: 'Invalid request data', details: error});
-    }
-
-    logger.error({error: asError(error)}, 'Login error');
-    return res
-      .status(500)
-      .json({success: false, error: 'Internal server error'});
+    return handleLoginError(res, error);
   }
 });
 
@@ -307,32 +311,56 @@ const createNewUser = async (params: CreateUserParams) => {
   return UserSchema.parse(result);
 };
 
+const validateRegistrationData = (body: unknown) => {
+  const validatedBody = CreateUserSchema.parse(body);
+  const {username, email, password, role = 'user'} = validatedBody;
+
+  if (checkUserExists(email, username)) {
+    throw Object.assign(
+      new Error('User with this email or username already exists'),
+      {status: 409},
+    );
+  }
+
+  return {username, email, password, role};
+};
+
+const handleRegistrationError = (
+  res: express.Response,
+  error: unknown,
+): express.Response => {
+  if (error instanceof z.ZodError) {
+    logger.warn({error}, 'Registration validation error');
+    return res
+      .status(400)
+      .json({
+        success: false,
+        error: 'Invalid request data',
+        details: error.stack,
+      });
+  }
+
+  const errorObj = asError(error);
+  const status = (error as any)?.status ?? 500;
+  const message = errorObj?.message ?? 'Internal server error';
+  logger.error({error: errorObj}, 'Registration error');
+  return res.status(status).json({success: false, error: message});
+};
+
 // eslint-disable-next-line @typescript-eslint/no-misused-promises -- properly handled with try-catch
 router.post('/register', async (req, res) => {
   try {
-    // Validate request body
-    const validatedBody = CreateUserSchema.parse(req.body);
-    const {username, email, password, role = 'user'} = validatedBody;
-
-    // Check if user already exists
-    if (checkUserExists(email, username)) {
-      return res
-        .status(409)
-        .json({
-          success: false,
-          error: 'User with this email or username already exists',
-        });
-    }
-
-    // Create new user
+    const {username, email, password, role} = validateRegistrationData(
+      req.body,
+    );
     const validatedUser = await createNewUser({
       username,
       email,
       password,
       role,
     });
-    logger.info(`New user registered: ${email}`);
 
+    logger.info(`New user registered: ${email}`);
     return res
       .status(201)
       .json({
@@ -341,21 +369,7 @@ router.post('/register', async (req, res) => {
         message: 'User registered successfully',
       });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      logger.warn({error}, 'Registration validation error');
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: 'Invalid request data',
-          details: error.stack,
-        });
-    }
-
-    logger.error({error: asError(error)}, 'Registration error');
-    return res
-      .status(500)
-      .json({success: false, error: 'Internal server error'});
+    return handleRegistrationError(res, error);
   }
 });
 
@@ -433,17 +447,31 @@ const handlePasswordResetRequest = (email: string, userId: number) => {
   };
 };
 
+const getSecuritySafeResponse = () => ({
+  success: true,
+  message: 'If the email exists, a reset link has been sent',
+});
+
+const handleAuthError = (
+  res: express.Response,
+  error: unknown,
+  operation: string,
+): express.Response => {
+  if (error instanceof z.ZodError) {
+    return res
+      .status(400)
+      .json({success: false, error: 'Invalid request data'});
+  }
+  logger.error({error: asError(error)}, `${operation} error`);
+  return res.status(500).json({success: false, error: 'Internal server error'});
+};
+
 // POST /api/auth/forgot - request password reset
 router.post('/forgot', (req, res) => {
   try {
     const {email} = ForgotPasswordRequestSchema.parse(req.body);
     const user = findUserForReset(email);
-
-    // Always respond with success to prevent enumeration
-    const response = {
-      success: true,
-      message: 'If the email exists, a reset link has been sent',
-    };
+    const response = getSecuritySafeResponse();
 
     if (!user) {
       return res.json(response);
@@ -452,15 +480,7 @@ router.post('/forgot', (req, res) => {
     const resetResponse = handlePasswordResetRequest(email, user.id);
     return res.json(resetResponse);
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res
-        .status(400)
-        .json({success: false, error: 'Invalid request data'});
-    }
-    logger.error({error: asError(error)}, 'Forgot password error');
-    return res
-      .status(500)
-      .json({success: false, error: 'Internal server error'});
+    return handleAuthError(res, error, 'Forgot password');
   }
 });
 
@@ -516,29 +536,25 @@ const resetUserPassword = async (
   `).run(token);
 };
 
+const validateResetToken = (token: string) => {
+  const validation = validatePasswordResetToken(token);
+  if (!validation.isValid || !validation.resetData) {
+    const errorMessage = validation.error ?? 'Invalid token';
+    throw Object.assign(new Error(errorMessage), {status: 400});
+  }
+  return validation.resetData;
+};
+
 // eslint-disable-next-line @typescript-eslint/no-misused-promises -- properly handled with try-catch
 router.post('/reset', async (req, res) => {
   try {
     const {token, password} = ResetPasswordSchema.parse(req.body);
+    const resetData = validateResetToken(token);
 
-    const validation = validatePasswordResetToken(token);
-    if (!validation.isValid || !validation.resetData) {
-      const errorMessage = validation.error ?? 'Invalid token';
-      return res.status(400).json({success: false, error: errorMessage});
-    }
-
-    await resetUserPassword(validation.resetData.user_id, password, token);
+    await resetUserPassword(resetData.user_id, password, token);
     return res.json({success: true, message: 'Password has been reset'});
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res
-        .status(400)
-        .json({success: false, error: 'Invalid request data'});
-    }
-    logger.error({error: asError(error)}, 'Reset password error');
-    return res
-      .status(500)
-      .json({success: false, error: 'Internal server error'});
+    return handleAuthError(res, error, 'Reset password');
   }
 });
 

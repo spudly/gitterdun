@@ -22,103 +22,121 @@ const appRootDir = path.resolve();
 const isProduction = process.env['NODE_ENV'] === 'production';
 const PORT = process.env['PORT'] ?? 3000;
 
+const initializeApp = async (): Promise<express.Express> => {
+  logger.info('Starting server initialization...');
+  const app = express();
+
+  logger.info('Initializing database...');
+  await initializeDatabase();
+  logger.info('Database initialization complete');
+
+  return app;
+};
+
+const setupSecurityMiddleware = (app: express.Express): void => {
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          scriptSrc: ["'self'"],
+          imgSrc: ["'self'", 'data:', 'https:'],
+        },
+      },
+    }),
+  );
+};
+
+const setupBasicMiddleware = (app: express.Express): void => {
+  app.use(compression());
+  if (!isProduction) {
+    app.use(cors({origin: [/^http:\/\/localhost:\d+$/], credentials: true}));
+  }
+  app.use(express.json({limit: '10mb'}));
+  app.use(express.urlencoded({extended: true, limit: '10mb'}));
+};
+
+const setupStaticServing = (app: express.Express): void => {
+  if (isProduction) {
+    app.use(express.static(path.join(appRootDir, 'dist/client')));
+  }
+};
+
+const setupRoutes = (app: express.Express): void => {
+  app.use('/api/auth', authRoutes);
+  app.use('/api/chores', choreRoutes);
+  app.use('/api/goals', goalRoutes);
+  app.use('/api/leaderboard', leaderboardRoutes);
+  app.use('/api/families', familyRoutes);
+  app.use('/api/invitations', invitationRoutes);
+
+  app.get('/api/health', (_req: express.Request, res: express.Response) => {
+    res.json({
+      status: 'OK',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+    });
+  });
+};
+
+const setupErrorHandling = (app: express.Express): void => {
+  app.use(
+    // eslint-disable-next-line max-params -- Express error handlers require 4 parameters
+    (
+      err: unknown,
+      _req: express.Request,
+      res: express.Response,
+      _next: express.NextFunction,
+    ) => {
+      logger.error({error: err}, 'Error');
+
+      if (asError(err).type === 'entity.parse.failed') {
+        return res
+          .status(400)
+          .json({success: false, error: 'Invalid JSON payload'});
+      }
+
+      return res
+        .status(asError(err).status ?? 500)
+        .json({
+          success: false,
+          error:
+            process.env['NODE_ENV'] === 'production'
+              ? 'Internal server error'
+              : asError(err).message,
+        });
+    },
+  );
+
+  app.use('/api/*', (_req: express.Request, res: express.Response) => {
+    res.status(404).json({success: false, error: 'API endpoint not found'});
+  });
+};
+
+const startServer = (app: express.Express): void => {
+  app.listen(Number(PORT), () => {
+    logger.info(`🚀 Gitterdun server running on port ${PORT}`);
+    logger.info(`📱 Frontend: http://localhost:${PORT}`);
+    logger.info(`🔌 API: http://localhost:${PORT}/api`);
+    logger.info(`🏥 Health: http://localhost:${PORT}/api/health`);
+  });
+};
+
+const setupAllMiddleware = (app: express.Express): void => {
+  logger.info('Setting up middleware...');
+  setupSecurityMiddleware(app);
+  setupBasicMiddleware(app);
+  setupStaticServing(app);
+  setupRoutes(app);
+  setupErrorHandling(app);
+};
+
 const createServer = async (): Promise<void> => {
   try {
-    logger.info('Starting server initialization...');
-
-    const app = express();
-
-    // Initialize database
-    logger.info('Initializing database...');
-    await initializeDatabase();
-    logger.info('Database initialization complete');
-
-    // Middleware
-    logger.info('Setting up middleware...');
-    app.use(
-      helmet({
-        contentSecurityPolicy: {
-          directives: {
-            defaultSrc: ["'self'"],
-            styleSrc: ["'self'", "'unsafe-inline'"],
-            scriptSrc: ["'self'"],
-            imgSrc: ["'self'", 'data:', 'https:'],
-          },
-        },
-      }),
-    );
-
-    app.use(compression());
-    if (!isProduction) {
-      app.use(cors({origin: [/^http:\/\/localhost:\d+$/], credentials: true}));
-    }
-    app.use(express.json({limit: '10mb'}));
-    app.use(express.urlencoded({extended: true, limit: '10mb'}));
-
-    if (isProduction) {
-      // Production: Serve built files
-      app.use(express.static(path.join(appRootDir, 'dist/client')));
-    }
-
-    // API Routes
-    app.use('/api/auth', authRoutes);
-    app.use('/api/chores', choreRoutes);
-    app.use('/api/goals', goalRoutes);
-    app.use('/api/leaderboard', leaderboardRoutes);
-    app.use('/api/families', familyRoutes);
-    app.use('/api/invitations', invitationRoutes);
-
-    // Health check endpoint
-    app.get('/api/health', (_req: express.Request, res: express.Response) => {
-      res.json({
-        status: 'OK',
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-      });
-    });
-
-    // Error handling middleware
-    app.use(
-      // eslint-disable-next-line max-params -- Express error handlers require 4 parameters
-      (
-        err: unknown,
-        _req: express.Request,
-        res: express.Response,
-        _next: express.NextFunction,
-      ) => {
-        logger.error({error: err}, 'Error');
-
-        if (asError(err).type === 'entity.parse.failed') {
-          return res
-            .status(400)
-            .json({success: false, error: 'Invalid JSON payload'});
-        }
-
-        return res
-          .status(asError(err).status ?? 500)
-          .json({
-            success: false,
-            error:
-              process.env['NODE_ENV'] === 'production'
-                ? 'Internal server error'
-                : asError(err).message,
-          });
-      },
-    );
-
-    // 404 handler for API routes
-    app.use('/api/*', (_req: express.Request, res: express.Response) => {
-      res.status(404).json({success: false, error: 'API endpoint not found'});
-    });
-
-    // Start server
-    app.listen(Number(PORT), () => {
-      logger.info(`🚀 Gitterdun server running on port ${PORT}`);
-      logger.info(`📱 Frontend: http://localhost:${PORT}`);
-      logger.info(`🔌 API: http://localhost:${PORT}/api`);
-      logger.info(`🏥 Health: http://localhost:${PORT}/api/health`);
-    });
-
+    const app = await initializeApp();
+    setupAllMiddleware(app);
+    startServer(app);
     logger.info('Server setup complete');
   } catch (error) {
     logger.error({error}, 'Error during server setup');
@@ -126,7 +144,13 @@ const createServer = async (): Promise<void> => {
   }
 };
 
-createServer().catch((err: unknown) => {
-  logger.error({error: asError(err)}, 'Failed to start server');
-  process.exit(1);
-});
+// Only start server if this file is run directly (not imported for tests)
+if (require.main === module) {
+  createServer().catch((err: unknown) => {
+    logger.error({error: asError(err)}, 'Failed to start server');
+    process.exit(1);
+  });
+}
+
+// Export for testing
+export {createServer};

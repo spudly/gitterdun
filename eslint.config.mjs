@@ -10,8 +10,6 @@ import commentsPlugin from 'eslint-plugin-eslint-comments';
 import jestPlugin from 'eslint-plugin-jest';
 import tailwindcssPlugin from 'eslint-plugin-tailwindcss';
 
-// TODO: get rid of these
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -719,7 +717,7 @@ const eslintConfig = [
       'max-lines-per-function': 'off', // ['warn', {max: 20, skipBlankLines: true, skipComments: true, IIFEs: true},], // TODO: re-enable
       'max-nested-callbacks': 'warn',
       'max-params': 'warn',
-      'max-statements': 'off', // 'warn', // TODO: re-enable
+      'max-statements': 'warn',
       'multiline-comment-style': 'off', // use Prettier for styling
       'new-cap': 'warn',
       'no-alert': 'warn',

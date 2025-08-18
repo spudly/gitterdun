@@ -25,4 +25,5 @@ module.exports = {
     '<rootDir>/src/**/__tests__/**/*.(spec|test).(ts|tsx|js|jsx)',
     '<rootDir>/src/**/*.(spec|test).(ts|tsx|js|jsx)',
   ],
+  forceExit: true,
 };
