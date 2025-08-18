@@ -26,4 +26,5 @@
 - [ ] audit all the eslint-disable rules that AI added; make sure they're not
       for stupid reasons
 - [ ] where possible, use user-event instead of fireEvent
-- [ ] jest - configure clearAllMocks (or better?) in the jest config so it doesn't have to be se everwhere
+- [ ] jest - configure clearAllMocks (or better?) in the jest config so it
+      doesn't have to be se everwhere
