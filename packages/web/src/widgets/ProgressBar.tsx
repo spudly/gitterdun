@@ -45,7 +45,12 @@ export const ProgressBar: FC<ProgressBarProps> = ({
       ) : null}
 
       <div
+        aria-label="Progress"
+        aria-valuemax={max}
+        aria-valuemin={0}
+        aria-valuenow={value}
         className={clsx('w-full rounded-full bg-gray-200', SIZE_STYLES[size])}
+        role="progressbar"
       >
         <div
           className={clsx(
