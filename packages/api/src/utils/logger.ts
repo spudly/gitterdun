@@ -1,5 +1,5 @@
 import type {LoggerOptions} from 'pino';
-import pino from 'pino';
+import pinoLogger from 'pino';
 
 const baseOptions: LoggerOptions = {level: process.env['LOG_LEVEL'] ?? 'info'};
 
@@ -17,4 +17,4 @@ const devTransport =
       }
     : {};
 
-export const logger = pino({...baseOptions, ...devTransport});
+export const logger = pinoLogger({...baseOptions, ...devTransport});

@@ -28,7 +28,7 @@ const useInvitationSubmit = (params: InvitationSubmitParams) => {
   return (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setMessage(null);
-    safeAsync(
+    const run = safeAsync(
       async () => {
         const res = await invitationsApi.accept({token, username, password});
         if (res.success) {
@@ -42,7 +42,8 @@ const useInvitationSubmit = (params: InvitationSubmitParams) => {
       },
       'Failed to accept',
       setMessage,
-    )();
+    );
+    run();
   };
 };
 

@@ -31,13 +31,14 @@ const ResetPassword: FC = () => {
       setMessage('Passwords do not match');
       return;
     }
-    safeAsync(async () => {
+    const run = safeAsync(async () => {
       await resetPassword(token, password);
       setMessage('Password reset successful. Redirecting...');
       setTimeout(() => {
         navigate('/login');
       }, 1200);
-    }, 'Could not reset password. Please try again.')();
+    }, 'Could not reset password. Please try again.');
+    run();
   };
 
   return (

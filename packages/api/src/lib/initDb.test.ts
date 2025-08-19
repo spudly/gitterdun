@@ -136,7 +136,6 @@ describe('initializeDatabase', () => {
 
     await expect(initializeDatabase()).rejects.toThrow('File not found');
 
-    // eslint-disable-next-line @typescript-eslint/unbound-method -- Mocked function context is not relevant
     expect(mockedLogger.error).toHaveBeenCalledWith(
       {error: readError},
       'Failed to initialize database',
@@ -172,7 +171,6 @@ describe('initializeDatabase', () => {
 
     await expect(initializeDatabase()).rejects.toThrow('Insert failed');
 
-    // eslint-disable-next-line @typescript-eslint/unbound-method -- Mocked function context is not relevant
     expect(mockedLogger.error).toHaveBeenCalledWith(
       {error: insertError},
       'Failed to initialize database',

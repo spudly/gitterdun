@@ -22,14 +22,15 @@ const Login: FC = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setMessage(null);
-    safeAsync(
+    const run = safeAsync(
       async () => {
         await login(email, password);
         navigate('/');
       },
       'Login failed',
       setMessage,
-    )();
+    );
+    run();
   };
 
   return (
