@@ -288,7 +288,6 @@ describe('admin page', () => {
   });
 
   test('navigates to /family after successful create via setTimeout', async () => {
-    jest.useFakeTimers();
     const {familiesApi} = jest.mocked(apiModule);
     familiesApi.create.mockResolvedValueOnce({success: true});
 
@@ -319,11 +318,12 @@ describe('admin page', () => {
       );
     });
 
+    jest.useFakeTimers();
     await act(async () => {
-      jest.runAllTimers();
+      jest.advanceTimersByTime(1200);
     });
-    expect(screen.getByTestId('loc').textContent).toBe('/family');
     jest.useRealTimers();
+    expect(screen.getByTestId('loc').textContent).toBe('/family');
     expect(screen.getByText('Admin Panel')).toBeInTheDocument();
   });
 });
