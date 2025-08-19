@@ -45,11 +45,7 @@ const ResetPassword: FC = () => {
 
   return (
     <FormCard title="Reset Password">
-      <form
-        onSubmit={event => {
-          handleSubmit(event);
-        }}
-      >
+      <form onSubmit={handleSubmit}>
         <Stack gap="md">
           <FormField htmlFor="new-password" label="New Password" required>
             <TextInput

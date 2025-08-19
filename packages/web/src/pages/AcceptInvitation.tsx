@@ -86,12 +86,7 @@ const AcceptInvitation: FC = () => {
 
   return (
     <FormCard title="Accept Invitation">
-      <form
-        onSubmit={event => {
-          // Ensure a synchronous void-returning handler
-          handleSubmit(event);
-        }}
-      >
+      <form onSubmit={handleSubmit}>
         <Stack gap="md">
           <FormField htmlFor="username" label="Username" required>
             <TextInput
