@@ -1,11 +1,17 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen, act} from '@testing-library/react';
+import {render, screen, act, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {MemoryRouter} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Admin from './Admin';
-import * as useUserModule from '../hooks/useUser';
 import * as apiModule from '../lib/api';
+
+const mockNavigate = jest.fn();
+jest.mock('react-router-dom', () => {
+  const actual =
+    jest.requireActual<typeof import('react-router-dom')>('react-router-dom');
+  return {...actual, useNavigate: () => mockNavigate};
+});
 
 jest.mock('../hooks/useUser', () => ({
   useUser: jest.fn(() => ({user: {id: 1, role: 'admin'}})),
@@ -29,10 +35,10 @@ const wrap = (ui: React.ReactElement) => (
 );
 
 describe('admin page', () => {
-  // other tests above...
-  test('navigates to /family after successful create via setTimeout (shows redirect message)', async () => {
+  test('navigates to /family after successful create via setTimeout', async () => {
     const {familiesApi} = jest.mocked(apiModule);
     familiesApi.create.mockResolvedValueOnce({success: true});
+    mockNavigate.mockClear();
 
     render(wrap(<Admin />));
     await screen.findByText('Admin Panel');
@@ -46,9 +52,17 @@ describe('admin page', () => {
         screen.getByRole('button', {name: 'Create Family'}),
       );
     });
+
     await expect(
       screen.findByText('Family created. Redirecting...'),
     ).resolves.toBeInTheDocument();
     expect(familiesApi.create).toHaveBeenCalledWith({name: 'TimerFam'});
+
+    await waitFor(
+      () => {
+        expect(mockNavigate).toHaveBeenCalledWith('/family');
+      },
+      {timeout: 2000},
+    );
   });
 });
