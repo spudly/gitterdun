@@ -1,9 +1,10 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen, fireEvent} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {Modal, isOverlayKey, shouldCloseOnOverlayClick} from './Modal';
 
 describe('modal', () => {
-  test('opens and closes via overlay, escape and close button', () => {
+  test('opens and closes via overlay, escape and close button', async () => {
     const onClose = jest.fn();
     render(
       <Modal isOpen onClose={onClose} title="M">
@@ -13,14 +14,14 @@ describe('modal', () => {
     expect(screen.getByText('M')).toBeInTheDocument();
     expect(screen.getByText('Body')).toBeInTheDocument();
     const overlay = screen.getByRole('button', {name: 'Close modal'});
-    fireEvent.click(overlay);
-    fireEvent.keyDown(document, {key: 'Escape'});
+    await userEvent.click(overlay);
+    await userEvent.keyboard('{Escape}');
     const closeButton = screen.getByRole('button', {name: 'Close'});
-    fireEvent.click(closeButton);
+    await userEvent.click(closeButton);
     expect(onClose).toHaveBeenCalledWith();
   });
 
-  test('respects props and closed state', () => {
+  test('respects props and closed state', async () => {
     const onClose = jest.fn();
     const {rerender} = render(
       <Modal isOpen={false} onClose={onClose}>
@@ -39,9 +40,9 @@ describe('modal', () => {
       </Modal>,
     );
     const overlay = screen.getByRole('button', {name: 'Close modal'});
-    fireEvent.keyDown(overlay, {key: 'Enter'});
+    await userEvent.type(overlay, '{Enter}');
     // also hit Space branch
-    fireEvent.keyDown(overlay, {key: ' '});
+    await userEvent.type(overlay, ' ');
     // now enable closeOnOverlayClick and click overlay directly
     rerender(
       <Modal
@@ -54,7 +55,7 @@ describe('modal', () => {
       </Modal>,
     );
     const overlay2 = screen.getByRole('button', {name: 'Close modal'});
-    fireEvent.click(overlay2);
+    await userEvent.click(overlay2);
     // ensure when disabled, clicking overlay does not call onClose
     rerender(
       <Modal
@@ -67,7 +68,7 @@ describe('modal', () => {
       </Modal>,
     );
     const overlay3 = screen.getByRole('button', {name: 'Close modal'});
-    fireEvent.click(overlay3);
+    await userEvent.click(overlay3);
     expect(onClose).toHaveBeenCalledWith();
   });
 
@@ -83,7 +84,7 @@ describe('modal', () => {
     expect(shouldCloseOnOverlayClick(false, true)).toBe(false);
   });
 
-  test('closes on overlay keydown when enabled', () => {
+  test('closes on overlay keydown when enabled', async () => {
     const onClose = jest.fn();
     render(
       <Modal
@@ -97,11 +98,11 @@ describe('modal', () => {
     );
     const overlay = screen.getByRole('button', {name: 'Close modal'});
     // Triggers onKeyDown branch (line 83) and should close because closeOnOverlayClick=true
-    fireEvent.keyDown(overlay, {key: 'Enter'});
+    await userEvent.type(overlay, '{Enter}');
     expect(onClose).toHaveBeenCalledWith();
   });
 
-  test('does not close on non-overlay keydown', () => {
+  test('does not close on non-overlay keydown', async () => {
     const onClose = jest.fn();
     render(
       <Modal

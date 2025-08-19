@@ -1,5 +1,6 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen, fireEvent, act} from '@testing-library/react';
+import {render, screen, act} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import ForgotPassword from './ForgotPassword';
 import * as useUserModule from '../hooks/useUser';
@@ -16,11 +17,9 @@ describe('forgotPassword page', () => {
   test('submits and shows message', async () => {
     render(wrap(<ForgotPassword />));
     const input = screen.getByLabelText(/email/iu);
-    fireEvent.change(input, {target: {value: 'e'}});
+    await userEvent.type(input, 'e');
     await act(async () => {
-      fireEvent.submit(
-        screen.getByRole('button', {name: 'Send reset link'}).closest('form')!,
-      );
+      await userEvent.click(screen.getByRole('button', {name: 'Send reset link'}));
     });
     const msgs = await screen.findAllByText(/reset link/);
     expect(msgs.length).toBeGreaterThan(0);
@@ -55,13 +54,9 @@ describe('forgotPassword page', () => {
         }) as ReturnType<typeof useUserModule.useUser>,
     );
     render(wrap(<ForgotPassword />));
-    fireEvent.change(screen.getByLabelText(/email/iu), {
-      target: {value: 'x@example.com'},
-    });
+    await userEvent.type(screen.getByLabelText(/email/iu), 'x@example.com');
     await act(async () => {
-      fireEvent.submit(
-        screen.getByRole('button', {name: 'Send reset link'}).closest('form')!,
-      );
+      await userEvent.click(screen.getByRole('button', {name: 'Send reset link'}));
     });
     await expect(
       screen.findByText('Request failed'),

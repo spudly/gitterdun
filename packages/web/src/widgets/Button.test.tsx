@@ -1,9 +1,10 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {Button} from './Button';
 
 describe('button', () => {
-  test('supports icons, loading and clicks', () => {
+  test('supports icons, loading and clicks', async () => {
     const onClick = jest.fn();
     const {rerender} = render(
       <Button
@@ -14,7 +15,7 @@ describe('button', () => {
         Go
       </Button>,
     );
-    fireEvent.click(screen.getByRole('button', {name: /go/i}));
+    await userEvent.click(screen.getByRole('button', {name: /go/i}));
     expect(onClick).toHaveBeenCalledWith(expect.any(Object));
     rerender(<Button loading>Go</Button>);
     expect(screen.getByRole('button')).toBeDisabled();

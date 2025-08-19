@@ -1,5 +1,6 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen, fireEvent, act} from '@testing-library/react';
+import {render, screen, act} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {MemoryRouter, useLocation} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Admin from './Admin';
@@ -41,25 +42,22 @@ describe('admin page', () => {
     render(wrap(<Admin />));
     await screen.findByText('Admin Panel');
     // Create Family
-    fireEvent.change(screen.getByPlaceholderText('Family name'), {
-      target: {value: 'Smiths'},
-    });
+    await userEvent.clear(screen.getByPlaceholderText('Family name'));
+    await userEvent.type(screen.getByPlaceholderText('Family name'), 'Smiths');
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', {name: 'Create Family'}));
+      await userEvent.click(screen.getByRole('button', {name: 'Create Family'}));
     });
     await expect(
       screen.findByText(/Family created/u),
     ).resolves.toBeInTheDocument();
 
     // Invite flow validation then success
-    fireEvent.change(screen.getByPlaceholderText('Family ID'), {
-      target: {value: '1'},
-    });
-    fireEvent.change(screen.getByPlaceholderText('Invite email'), {
-      target: {value: 'a@b.com'},
-    });
+    await userEvent.clear(screen.getByPlaceholderText('Family ID'));
+    await userEvent.type(screen.getByPlaceholderText('Family ID'), '1');
+    await userEvent.clear(screen.getByPlaceholderText('Invite email'));
+    await userEvent.type(screen.getByPlaceholderText('Invite email'), 'a@b.com');
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', {name: 'Invite'}));
+      await userEvent.click(screen.getByRole('button', {name: 'Invite'}));
     });
     await expect(
       screen.findByText(/Invitation created/u),
@@ -177,16 +175,15 @@ describe('admin page', () => {
     render(wrap(<Admin />));
     await screen.findByText('Admin Panel');
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', {name: 'Create Family'}));
+      await userEvent.click(screen.getByRole('button', {name: 'Create Family'}));
     });
 
     // Create Family: API returns success=false
     familiesApi.create.mockResolvedValueOnce({success: false, error: 'Bad'});
-    fireEvent.change(screen.getByPlaceholderText('Family name'), {
-      target: {value: 'A'},
-    });
+    await userEvent.clear(screen.getByPlaceholderText('Family name'));
+    await userEvent.type(screen.getByPlaceholderText('Family name'), 'A');
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', {name: 'Create Family'}));
+      await userEvent.click(screen.getByRole('button', {name: 'Create Family'}));
     });
     await expect(
       screen.findByText(/Failed to create family|Bad/u),
@@ -194,7 +191,7 @@ describe('admin page', () => {
 
     // Invite: missing fields validation
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', {name: 'Invite'}));
+      await userEvent.click(screen.getByRole('button', {name: 'Invite'}));
     });
     await expect(
       screen.findByText('Enter family ID and email'),
@@ -202,18 +199,16 @@ describe('admin page', () => {
 
     // Change role to cover role select onChange (second combobox on the page)
     const roleSelect = screen.getByRole('combobox');
-    fireEvent.change(roleSelect, {target: {value: 'child'}});
+    await userEvent.selectOptions(roleSelect, 'child');
 
     // Invite: API rejects -> catch branch
-    fireEvent.change(screen.getByPlaceholderText('Family ID'), {
-      target: {value: '123'},
-    });
-    fireEvent.change(screen.getByPlaceholderText('Invite email'), {
-      target: {value: 'x@y.com'},
-    });
+    await userEvent.clear(screen.getByPlaceholderText('Family ID'));
+    await userEvent.type(screen.getByPlaceholderText('Family ID'), '123');
+    await userEvent.clear(screen.getByPlaceholderText('Invite email'));
+    await userEvent.type(screen.getByPlaceholderText('Invite email'), 'x@y.com');
     invitationsApi.create.mockRejectedValueOnce(new Error('nope'));
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', {name: 'Invite'}));
+      await userEvent.click(screen.getByRole('button', {name: 'Invite'}));
     });
     await expect(
       screen.findByText('Failed to invite'),
@@ -251,11 +246,10 @@ describe('admin page', () => {
     mocked.familiesApi.create.mockRejectedValueOnce(new Error('boom'));
     render(wrap(<Admin />));
     await screen.findByText('Admin Panel');
-    fireEvent.change(screen.getByPlaceholderText('Family name'), {
-      target: {value: 'Err'},
-    });
+    await userEvent.clear(screen.getByPlaceholderText('Family name'));
+    await userEvent.type(screen.getByPlaceholderText('Family name'), 'Err');
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', {name: 'Create Family'}));
+      await userEvent.click(screen.getByRole('button', {name: 'Create Family'}));
     });
     await expect(
       screen.findByText('Failed to create family'),
@@ -267,11 +261,10 @@ describe('admin page', () => {
     familiesApi.create.mockResolvedValueOnce({success: false});
     render(wrap(<Admin />));
     await screen.findByText('Admin Panel');
-    fireEvent.change(screen.getByPlaceholderText('Family name'), {
-      target: {value: 'X'},
-    });
+    await userEvent.clear(screen.getByPlaceholderText('Family name'));
+    await userEvent.type(screen.getByPlaceholderText('Family name'), 'X');
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', {name: 'Create Family'}));
+      await userEvent.click(screen.getByRole('button', {name: 'Create Family'}));
     });
     await expect(
       screen.findByText('Failed to create family'),
@@ -299,11 +292,10 @@ describe('admin page', () => {
     );
 
     await screen.findByText('Admin Panel');
-    fireEvent.change(screen.getByPlaceholderText('Family name'), {
-      target: {value: 'TimerFam'},
-    });
+    await userEvent.clear(screen.getByPlaceholderText('Family name'));
+    await userEvent.type(screen.getByPlaceholderText('Family name'), 'TimerFam');
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', {name: 'Create Family'}));
+      await userEvent.click(screen.getByRole('button', {name: 'Create Family'}));
     });
 
     await act(async () => {

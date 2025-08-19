@@ -1,9 +1,10 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {SelectInput} from './SelectInput';
 
 describe('selectInput', () => {
-  test('changes and shows error', () => {
+  test('changes and shows error', async () => {
     const onChange = jest.fn();
     render(
       <SelectInput defaultValue="" error="bad" onChange={onChange}>
@@ -12,7 +13,7 @@ describe('selectInput', () => {
         <option value="a">A</option>
       </SelectInput>,
     );
-    fireEvent.change(screen.getByDisplayValue('-'), {target: {value: 'a'}});
+    await userEvent.selectOptions(screen.getByRole('combobox'), 'a');
     expect(onChange).toHaveBeenCalledWith('a', expect.any(Object));
     expect(screen.getByText('bad')).toBeInTheDocument();
     const select = screen.getByRole('combobox');
