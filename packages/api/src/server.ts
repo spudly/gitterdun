@@ -1,5 +1,4 @@
 import express from 'express';
-import compression from 'compression';
 import cors from 'cors';
 import helmet from 'helmet';
 import path from 'node:path';
@@ -14,6 +13,7 @@ import leaderboardRoutes from './routes/leaderboard';
 import familyRoutes from './routes/families';
 import invitationRoutes from './routes/invitations';
 import {asError} from '@gitterdun/shared';
+import {setupErrorHandling} from './middleware/errorHandler';
 
 // Load environment variables
 dotenv.config();
@@ -49,7 +49,6 @@ const setupSecurityMiddleware = (app: express.Express): void => {
 };
 
 const setupBasicMiddleware = (app: express.Express): void => {
-  app.use(compression());
   if (!isProduction) {
     app.use(cors({origin: [/^http:\/\/localhost:\d+$/], credentials: true}));
   }
@@ -77,40 +76,6 @@ const setupRoutes = (app: express.Express): void => {
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
     });
-  });
-};
-
-const setupErrorHandling = (app: express.Express): void => {
-  app.use(
-    // eslint-disable-next-line max-params -- Express error handlers require 4 parameters
-    (
-      err: unknown,
-      _req: express.Request,
-      res: express.Response,
-      _next: express.NextFunction,
-    ) => {
-      logger.error({error: err}, 'Error');
-
-      if (asError(err).type === 'entity.parse.failed') {
-        return res
-          .status(400)
-          .json({success: false, error: 'Invalid JSON payload'});
-      }
-
-      return res
-        .status(asError(err).status ?? 500)
-        .json({
-          success: false,
-          error:
-            process.env['NODE_ENV'] === 'production'
-              ? 'Internal server error'
-              : asError(err).message,
-        });
-    },
-  );
-
-  app.use('/api/*', (_req: express.Request, res: express.Response) => {
-    res.status(404).json({success: false, error: 'API endpoint not found'});
   });
 };
 

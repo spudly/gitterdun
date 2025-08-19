@@ -1,10 +1,9 @@
 import express from 'express';
-import {z} from 'zod';
+
 import {
   LeaderboardRowSchema,
   LeaderboardQuerySchema,
   LeaderboardEntrySchema,
-  asError,
 } from '@gitterdun/shared';
 import db from '../lib/db';
 import {logger} from '../utils/logger';
@@ -51,50 +50,26 @@ const processLeaderboardResults = (rows: Array<unknown>) => {
   });
 };
 
-const handleLeaderboardError = (
-  res: express.Response,
-  error: unknown,
-): express.Response => {
-  if (error instanceof z.ZodError) {
-    logger.warn({error}, 'Leaderboard query validation error');
-    return res
-      .status(400)
-      .json({
-        success: false,
-        error: 'Invalid query parameters',
-        details: error.stack,
-      });
-  }
-
-  logger.error({error: asError(error)}, 'Get leaderboard error');
-  return res.status(500).json({success: false, error: 'Internal server error'});
-};
-
 // GET /api/leaderboard - Get leaderboard rankings
-// eslint-disable-next-line @typescript-eslint/no-misused-promises -- will upgrade express to v5 to get promise support
 router.get('/', async (req, res) => {
-  try {
-    const {limit, sortBy} = LeaderboardQuerySchema.parse(req.query);
-    const query = buildLeaderboardQuery(sortBy);
-    const leaderboard = db.prepare(query).all(limit);
-    const validatedLeaderboard = processLeaderboardResults(leaderboard);
+  const {limit, sortBy} = LeaderboardQuerySchema.parse(req.query);
+  const query = buildLeaderboardQuery(sortBy);
+  const leaderboard = db.prepare(query).all(limit);
+  const validatedLeaderboard = processLeaderboardResults(leaderboard);
 
-    logger.info(
-      {sortBy, limit, totalUsers: validatedLeaderboard.length},
-      'Leaderboard retrieved',
-    );
+  logger.info(
+    {sortBy, limit, totalUsers: validatedLeaderboard.length},
+    'Leaderboard retrieved',
+  );
 
-    return res.json({
-      success: true,
-      data: {
-        leaderboard: validatedLeaderboard,
-        sortBy,
-        totalUsers: validatedLeaderboard.length,
-      },
-    });
-  } catch (error) {
-    return handleLeaderboardError(res, error);
-  }
+  res.json({
+    success: true,
+    data: {
+      leaderboard: validatedLeaderboard,
+      sortBy,
+      totalUsers: validatedLeaderboard.length,
+    },
+  });
 });
 
 export default router;

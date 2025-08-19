@@ -716,7 +716,7 @@ const eslintConfig = [
       'max-lines': ['warn', 150],
       'max-lines-per-function': 'off', // ['warn', {max: 20, skipBlankLines: true, skipComments: true, IIFEs: true},], // TODO: re-enable
       'max-nested-callbacks': 'warn',
-      'max-params': 'warn',
+      'max-params': ['warn', {max: 5}],
       'max-statements': 'warn',
       'multiline-comment-style': 'off', // use Prettier for styling
       'new-cap': 'warn',

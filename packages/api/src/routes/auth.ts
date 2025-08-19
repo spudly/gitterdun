@@ -6,7 +6,7 @@ import {
   asError,
 } from '@gitterdun/shared';
 import {logger} from '../utils/logger';
-import {handleRouteError} from '../utils/errorHandling';
+
 import {getCookie} from '../utils/cookieUtils';
 import {getUserFromSession, deleteSession} from '../utils/sessionUtils';
 import {
@@ -27,46 +27,29 @@ import {
 // eslint-disable-next-line new-cap -- express.Router() is a factory function
 const router = express.Router();
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises -- properly handled with try-catch
 router.post('/login', async (req, res) => {
-  try {
-    const {email, password} = LoginSchema.parse(req.body);
-    const user = await authenticateUser(email, password);
+  const {email, password} = LoginSchema.parse(req.body);
+  const user = await authenticateUser(email, password);
 
-    createLoginSession(res, user.id);
-    const response = prepareLoginResponse(user, email);
-    return res.json(response);
-  } catch (error) {
-    return handleRouteError(res, error, 'Login');
-  }
+  createLoginSession(res, user.id);
+  const response = prepareLoginResponse(user, email);
+  res.json(response);
 });
 
 // POST /api/auth/register - Parent self-registration and family creation optional later
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises -- properly handled with try-catch
 router.post('/register', async (req, res) => {
-  try {
-    const {username, email, password, role} = validateRegistrationData(
-      req.body,
-    );
-    const validatedUser = await createNewUser({
-      username,
-      email,
-      password,
-      role,
-    });
+  const {username, email, password, role} = validateRegistrationData(req.body);
+  const validatedUser = await createNewUser({username, email, password, role});
 
-    logger.info(`New user registered: ${email}`);
-    return res
-      .status(201)
-      .json({
-        success: true,
-        data: validatedUser,
-        message: 'User registered successfully',
-      });
-  } catch (error) {
-    return handleRouteError(res, error, 'Registration');
-  }
+  logger.info(`New user registered: ${email}`);
+  res
+    .status(201)
+    .json({
+      success: true,
+      data: validatedUser,
+      message: 'User registered successfully',
+    });
 });
 
 // POST /api/auth/logout - Invalidate session
@@ -104,35 +87,27 @@ router.get('/me', (req, res) => {
 
 // POST /api/auth/forgot - request password reset
 router.post('/forgot', (req, res) => {
-  try {
-    const {email} = ForgotPasswordRequestSchema.parse(req.body);
-    const user = findUserForReset(email);
-    const response = getSecuritySafeResponse();
+  const {email} = ForgotPasswordRequestSchema.parse(req.body);
+  const user = findUserForReset(email);
+  const response = getSecuritySafeResponse();
 
-    if (!user) {
-      return res.json(response);
-    }
-
-    const resetResponse = handlePasswordResetRequest(email, user.id);
-    return res.json(resetResponse);
-  } catch (error) {
-    return handleRouteError(res, error, 'Forgot password');
+  if (!user) {
+    res.json(response);
+    return;
   }
+
+  const resetResponse = handlePasswordResetRequest(email, user.id);
+  res.json(resetResponse);
 });
 
 // POST /api/auth/reset - reset password
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises -- properly handled with try-catch
 router.post('/reset', async (req, res) => {
-  try {
-    const {token, password} = ResetPasswordSchema.parse(req.body);
-    const resetData = validateResetToken(token);
+  const {token, password} = ResetPasswordSchema.parse(req.body);
+  const resetData = validateResetToken(token);
 
-    await resetUserPassword(resetData.user_id, password, token);
-    return res.json({success: true, message: 'Password has been reset'});
-  } catch (error) {
-    return handleRouteError(res, error, 'Reset password');
-  }
+  await resetUserPassword(resetData.user_id, password, token);
+  res.json({success: true, message: 'Password has been reset'});
 });
 
 export default router;

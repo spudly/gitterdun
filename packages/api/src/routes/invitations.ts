@@ -5,7 +5,7 @@ import {
   FamilyIdParamSchema,
 } from '@gitterdun/shared';
 import {requireUserId} from '../utils/auth';
-import {handleRouteError} from '../utils/errorHandling';
+
 import {
   validateParentMembership,
   generateInvitationToken,
@@ -26,43 +26,34 @@ const router = express.Router();
 
 // POST /api/invitations/:familyId - invite by email as parent or child
 router.post('/:familyId', (req, res) => {
-  try {
-    const inviterId = requireUserId(req);
-    const {familyId} = FamilyIdParamSchema.parse(req.params);
-    const {email, role} = CreateInvitationSchema.parse(req.body);
+  const inviterId = requireUserId(req);
+  const {familyId} = FamilyIdParamSchema.parse(req.params);
+  const {email, role} = CreateInvitationSchema.parse(req.body);
 
-    validateParentMembership(inviterId, familyId);
+  validateParentMembership(inviterId, familyId);
 
-    const {token, expiresAt} = generateInvitationToken();
-    createInvitation({token, familyId, email, role, inviterId, expiresAt});
+  const {token, expiresAt} = generateInvitationToken();
+  createInvitation({token, familyId, email, role, inviterId, expiresAt});
 
-    // Email sending would go here; return token for dev
-    return res.json({success: true, message: 'Invitation created', token});
-  } catch (error) {
-    return handleRouteError(res, error, 'Create invitation');
-  }
+  // Email sending would go here; return token for dev
+  res.json({success: true, message: 'Invitation created', token});
 });
 
 // POST /api/invitations/accept - accept an invitation and create/link account
-// eslint-disable-next-line @typescript-eslint/no-misused-promises -- properly handled with try-catch
 router.post('/accept', async (req, res) => {
-  try {
-    const {token, username, password} = AcceptInvitationSchema.parse(req.body);
-    const invitation = validateInvitationToken(token);
-    validateInvitationExpiry(invitation);
+  const {token, username, password} = AcceptInvitationSchema.parse(req.body);
+  const invitation = validateInvitationToken(token);
+  validateInvitationExpiry(invitation);
 
-    const userId = await authenticateOrCreateUser(
-      invitation.email,
-      username,
-      password,
-    );
-    ensureFamilyMembership(invitation.family_id, userId, invitation.role);
-    markInvitationAccepted(token);
+  const userId = await authenticateOrCreateUser(
+    invitation.email,
+    username,
+    password,
+  );
+  ensureFamilyMembership(invitation.family_id, userId, invitation.role);
+  markInvitationAccepted(token);
 
-    return res.json({success: true, message: 'Invitation accepted'});
-  } catch (error) {
-    return handleRouteError(res, error, 'Accept invitation');
-  }
+  res.json({success: true, message: 'Invitation accepted'});
 });
 
 export default router;

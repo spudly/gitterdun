@@ -1,11 +1,4 @@
-import express from 'express';
-import {z} from 'zod';
-import {
-  FamilySchema,
-  FamilyMemberSchema,
-  IdRowSchema,
-  asError,
-} from '@gitterdun/shared';
+import {FamilySchema, FamilyMemberSchema, IdRowSchema} from '@gitterdun/shared';
 import bcrypt from 'bcryptjs';
 import db from '../lib/db';
 import {sql} from './sql';
@@ -114,16 +107,4 @@ export const addChildToFamily = (familyId: number, childId: number): void => {
     VALUES
       (?, ?, ?)
   `).run(familyId, childId, 'child');
-};
-
-export const handleRouteError = (
-  res: express.Response,
-  error: unknown,
-): express.Response => {
-  if (error instanceof z.ZodError) {
-    return res.status(400).json({success: false, error: 'Invalid request'});
-  }
-  return res
-    .status(asError(error).status ?? 500)
-    .json({success: false, error: asError(error).message || 'Server error'});
 };

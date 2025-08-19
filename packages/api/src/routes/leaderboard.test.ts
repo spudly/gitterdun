@@ -18,6 +18,7 @@ import {
 } from '@gitterdun/shared';
 import leaderboardRouter from './leaderboard';
 import db from '../lib/db';
+import {setupErrorHandling} from '../middleware/errorHandler';
 import {logger} from '../utils/logger';
 import {ZodError} from 'zod';
 
@@ -52,6 +53,7 @@ describe('leaderboard routes', () => {
     app = express();
     app.use(express.json());
     app.use('/api/leaderboard', leaderboardRouter);
+    setupErrorHandling(app);
 
     // Start server on a random port
     server = app.listen(0);
@@ -220,9 +222,9 @@ describe('leaderboard routes', () => {
 
       expect(response.status).toBe(400);
       expect(body.success).toBe(false);
-      expect(body.error).toBe('Invalid query parameters');
+      expect(body.error).toBe('Invalid request data');
 
-      expect(mockLogger.warn).toHaveBeenCalledWith(
+      expect(mockLogger.error).toHaveBeenCalledWith(
         {
           error: new ZodError([
             {
@@ -233,7 +235,7 @@ describe('leaderboard routes', () => {
             },
           ]),
         },
-        'Leaderboard query validation error',
+        'Error',
       );
     });
 
@@ -257,12 +259,12 @@ describe('leaderboard routes', () => {
       const body = await response.json();
 
       expect(response.status).toBe(500);
-      expect(body).toEqual({success: false, error: 'Internal server error'});
+      expect(body).toEqual({
+        success: false,
+        error: 'Database connection failed',
+      });
 
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        {error: dbError},
-        'Get leaderboard error',
-      );
+      expect(mockLogger.error).toHaveBeenCalledWith({error: dbError}, 'Error');
     });
 
     test('should handle schema parsing errors', async () => {
@@ -297,7 +299,7 @@ describe('leaderboard routes', () => {
       const body = await response.json();
 
       expect(response.status).toBe(500);
-      expect(body).toEqual({success: false, error: 'Internal server error'});
+      expect(body).toEqual({success: false, error: 'Schema parsing failed'});
     });
   });
 });
