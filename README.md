@@ -240,3 +240,5 @@ For support and questions:
 ---
 
 **Gitterdun** - Making chores fun and rewarding for kids! 🎉
+
+# Testing sequenced precommit tasks

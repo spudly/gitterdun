@@ -1,1 +1,4 @@
-npx turbo run precommit:check
+npm run knip
+npm run build
+npm run test:changed
+npm run lint-staged

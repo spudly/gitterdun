@@ -25,7 +25,6 @@
     "lint:changed": "git diff --name-only HEAD | grep -E '\\.(ts|tsx|js|jsx)$' | xargs -r eslint --max-warnings 0",
     "ci:check": "turbo run ci:check",
     "turbo:reset": "find . -name '.turbo' -type d -exec rm -rf {}",
-    "precommit:check": "turbo run precommit:check",
     "ai:check": "turbo run ai:check"
   },
   "devDependencies": {

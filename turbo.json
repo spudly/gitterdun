@@ -60,9 +60,6 @@
         "$TURBO_ROOT$/packages/*/package.json"
       ]
     },
-    "precommit:check": {
-      "dependsOn": ["//#knip", "build", "//#test:changed", "//#lint-staged"]
-    },
     "ci:check": {
       "dependsOn": ["//#knip", "build", "test", "lint", "//#prettier:check"]
     },
