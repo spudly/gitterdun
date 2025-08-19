@@ -81,10 +81,15 @@ describe('family page', () => {
     // Since members section depends on selection, skip the child creation inputs if not present
     const usernameInput = await screen.findByPlaceholderText('Username');
     await userEvent.type(usernameInput, 'kid');
-    await userEvent.type(screen.getAllByPlaceholderText('Email')[0]!, 'kid@ex.com');
+    await userEvent.type(
+      screen.getAllByPlaceholderText('Email')[0]!,
+      'kid@ex.com',
+    );
     await userEvent.type(screen.getAllByPlaceholderText('Password')[0]!, 'pw');
     await act(async () => {
-      await userEvent.click(screen.getAllByRole('button', {name: 'Create'})[1]!);
+      await userEvent.click(
+        screen.getAllByRole('button', {name: 'Create'})[1]!,
+      );
     });
     // Invite
     const inviteEmailInput = screen.getAllByPlaceholderText('Email')[1]!;

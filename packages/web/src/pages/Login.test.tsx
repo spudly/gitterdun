@@ -80,7 +80,6 @@ describe('login page', () => {
     await userEvent.type(screen.getByLabelText(/email/iu), 'user@example.com');
     await userEvent.type(screen.getByLabelText(/password/iu), 'validpassword');
     await act(async () => {
-      const form = screen.getByRole('button', {name: 'Login'}).closest('form')!;
       await userEvent.click(screen.getByRole('button', {name: 'Login'}));
     });
     // Test successful submission by verifying no error messages appear
@@ -97,7 +96,6 @@ describe('login page', () => {
     await userEvent.type(screen.getByLabelText(/email/iu), 'user@example.com');
     await userEvent.type(screen.getByLabelText(/password/iu), 'validpassword');
     await act(async () => {
-      const form = screen.getByRole('button', {name: 'Login'}).closest('form')!;
       await userEvent.click(screen.getByRole('button', {name: 'Login'}));
     });
     // For this test, we just verify the form submission completes without throwing

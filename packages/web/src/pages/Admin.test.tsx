@@ -45,7 +45,9 @@ describe('admin page', () => {
     await userEvent.clear(screen.getByPlaceholderText('Family name'));
     await userEvent.type(screen.getByPlaceholderText('Family name'), 'Smiths');
     await act(async () => {
-      await userEvent.click(screen.getByRole('button', {name: 'Create Family'}));
+      await userEvent.click(
+        screen.getByRole('button', {name: 'Create Family'}),
+      );
     });
     await expect(
       screen.findByText(/Family created/u),
@@ -55,7 +57,10 @@ describe('admin page', () => {
     await userEvent.clear(screen.getByPlaceholderText('Family ID'));
     await userEvent.type(screen.getByPlaceholderText('Family ID'), '1');
     await userEvent.clear(screen.getByPlaceholderText('Invite email'));
-    await userEvent.type(screen.getByPlaceholderText('Invite email'), 'a@b.com');
+    await userEvent.type(
+      screen.getByPlaceholderText('Invite email'),
+      'a@b.com',
+    );
     await act(async () => {
       await userEvent.click(screen.getByRole('button', {name: 'Invite'}));
     });
@@ -175,7 +180,9 @@ describe('admin page', () => {
     render(wrap(<Admin />));
     await screen.findByText('Admin Panel');
     await act(async () => {
-      await userEvent.click(screen.getByRole('button', {name: 'Create Family'}));
+      await userEvent.click(
+        screen.getByRole('button', {name: 'Create Family'}),
+      );
     });
 
     // Create Family: API returns success=false
@@ -183,7 +190,9 @@ describe('admin page', () => {
     await userEvent.clear(screen.getByPlaceholderText('Family name'));
     await userEvent.type(screen.getByPlaceholderText('Family name'), 'A');
     await act(async () => {
-      await userEvent.click(screen.getByRole('button', {name: 'Create Family'}));
+      await userEvent.click(
+        screen.getByRole('button', {name: 'Create Family'}),
+      );
     });
     await expect(
       screen.findByText(/Failed to create family|Bad/u),
@@ -205,7 +214,10 @@ describe('admin page', () => {
     await userEvent.clear(screen.getByPlaceholderText('Family ID'));
     await userEvent.type(screen.getByPlaceholderText('Family ID'), '123');
     await userEvent.clear(screen.getByPlaceholderText('Invite email'));
-    await userEvent.type(screen.getByPlaceholderText('Invite email'), 'x@y.com');
+    await userEvent.type(
+      screen.getByPlaceholderText('Invite email'),
+      'x@y.com',
+    );
     invitationsApi.create.mockRejectedValueOnce(new Error('nope'));
     await act(async () => {
       await userEvent.click(screen.getByRole('button', {name: 'Invite'}));
@@ -249,7 +261,9 @@ describe('admin page', () => {
     await userEvent.clear(screen.getByPlaceholderText('Family name'));
     await userEvent.type(screen.getByPlaceholderText('Family name'), 'Err');
     await act(async () => {
-      await userEvent.click(screen.getByRole('button', {name: 'Create Family'}));
+      await userEvent.click(
+        screen.getByRole('button', {name: 'Create Family'}),
+      );
     });
     await expect(
       screen.findByText('Failed to create family'),
@@ -264,7 +278,9 @@ describe('admin page', () => {
     await userEvent.clear(screen.getByPlaceholderText('Family name'));
     await userEvent.type(screen.getByPlaceholderText('Family name'), 'X');
     await act(async () => {
-      await userEvent.click(screen.getByRole('button', {name: 'Create Family'}));
+      await userEvent.click(
+        screen.getByRole('button', {name: 'Create Family'}),
+      );
     });
     await expect(
       screen.findByText('Failed to create family'),
@@ -293,9 +309,14 @@ describe('admin page', () => {
 
     await screen.findByText('Admin Panel');
     await userEvent.clear(screen.getByPlaceholderText('Family name'));
-    await userEvent.type(screen.getByPlaceholderText('Family name'), 'TimerFam');
+    await userEvent.type(
+      screen.getByPlaceholderText('Family name'),
+      'TimerFam',
+    );
     await act(async () => {
-      await userEvent.click(screen.getByRole('button', {name: 'Create Family'}));
+      await userEvent.click(
+        screen.getByRole('button', {name: 'Create Family'}),
+      );
     });
 
     await act(async () => {

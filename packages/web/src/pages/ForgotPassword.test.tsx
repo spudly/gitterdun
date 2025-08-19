@@ -19,7 +19,9 @@ describe('forgotPassword page', () => {
     const input = screen.getByLabelText(/email/iu);
     await userEvent.type(input, 'e');
     await act(async () => {
-      await userEvent.click(screen.getByRole('button', {name: 'Send reset link'}));
+      await userEvent.click(
+        screen.getByRole('button', {name: 'Send reset link'}),
+      );
     });
     const msgs = await screen.findAllByText(/reset link/);
     expect(msgs.length).toBeGreaterThan(0);
@@ -56,7 +58,9 @@ describe('forgotPassword page', () => {
     render(wrap(<ForgotPassword />));
     await userEvent.type(screen.getByLabelText(/email/iu), 'x@example.com');
     await act(async () => {
-      await userEvent.click(screen.getByRole('button', {name: 'Send reset link'}));
+      await userEvent.click(
+        screen.getByRole('button', {name: 'Send reset link'}),
+      );
     });
     await expect(
       screen.findByText('Request failed'),
