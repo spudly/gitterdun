@@ -14,11 +14,11 @@ type InvitationSubmitParams = {
   username: string;
   password: string;
   setMessage: (msg: string | null) => void;
-  navigate: (path: string) => void;
+  onAccepted: () => void;
 };
 
 const useInvitationSubmit = (params: InvitationSubmitParams) => {
-  const {token, username, password, setMessage, navigate} = params;
+  const {token, username, password, setMessage, onAccepted} = params;
   const submitHandler: FormEventHandler<HTMLFormElement> = event => {
     event.preventDefault();
     setMessage(null);
@@ -28,7 +28,7 @@ const useInvitationSubmit = (params: InvitationSubmitParams) => {
         if (res.success) {
           setMessage('Invitation accepted. You can now log in.');
           setTimeout(() => {
-            navigate('/login');
+            onAccepted();
           }, 1200);
         } else {
           setMessage('Failed to accept');
@@ -53,7 +53,10 @@ const useAcceptInvitationSetup = () => {
     username,
     password,
     setMessage,
-    navigate,
+    onAccepted: () => {
+      // Ensure any promise returned by navigate is handled
+      Promise.resolve(navigate('/login')).catch(() => undefined);
+    },
   });
   return {
     token,
@@ -84,8 +87,9 @@ const AcceptInvitation: FC = () => {
   return (
     <FormCard title="Accept Invitation">
       <form
-        onSubmit={e => {
-          handleSubmit(e);
+        onSubmit={event => {
+          // Ensure a synchronous void-returning handler
+          handleSubmit(event);
         }}
       >
         <Stack gap="md">
