@@ -33,20 +33,17 @@ const ResetPassword: FC = () => {
     }
     // Wrap in a void-returning IIFE to avoid returning a Promise from the handler
     // and to satisfy no-floating-promises without using the void operator on a void.
-    ((): void => {
-      const run = safeAsync(
-        async () => {
-          await resetPassword(token, password);
-          setMessage('Password reset successful. Redirecting...');
-          setTimeout(() => {
-            navigate('/login');
-          }, 1200);
-        },
-        'Could not reset password. Please try again.',
-        setMessage,
-      );
-      run();
-    })();
+    (async () => {
+      try {
+        await resetPassword(token, password);
+        setMessage('Password reset successful. Redirecting...');
+        setTimeout(() => {
+          navigate('/login');
+        }, 1200);
+      } catch {
+        setMessage('Could not reset password. Please try again.');
+      }
+    })().catch(() => undefined);
   };
 
   return (

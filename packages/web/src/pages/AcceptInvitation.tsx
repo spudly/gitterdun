@@ -84,8 +84,8 @@ const AcceptInvitation: FC = () => {
   return (
     <FormCard title="Accept Invitation">
       <form
-        onSubmit={event => {
-          handleSubmit(event);
+        onSubmit={e => {
+          handleSubmit(e);
         }}
       >
         <Stack gap="md">
