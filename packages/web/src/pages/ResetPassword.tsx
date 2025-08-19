@@ -42,7 +42,7 @@ const ResetPassword: FC = () => {
       'Could not reset password. Please try again.',
       setMessage,
     );
-    run();
+    void run();
   };
 
   return (
