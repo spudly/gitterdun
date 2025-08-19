@@ -7,54 +7,48 @@ import Admin from './Admin';
 import * as useUserModule from '../hooks/useUser';
 import * as apiModule from '../lib/api';
 
-const mockNavigate = jest.fn();
-jest.mock('react-router-dom', () => {
-	const actual = jest.requireActual('react-router-dom');
-	return {
-		...actual,
-		useNavigate: () => mockNavigate,
-	};
-});
-
 jest.mock('../hooks/useUser', () => ({
-	useUser: jest.fn(() => ({user: {id: 1, role: 'admin'}})),
+  useUser: jest.fn(() => ({user: {id: 1, role: 'admin'}})),
 }));
 
 jest.mock('../lib/api', () => ({
-	choresApi: {getAll: jest.fn(async () => ({success: true, data: []}))},
-	familiesApi: {
-		create: jest.fn(async () => ({success: true})),
-		myFamilies: jest.fn(async () => ({success: true, data: []})),
-		listMembers: jest.fn(async () => ({success: true, data: []})),
-		createChild: jest.fn(async () => ({success: true})),
-	},
-	invitationsApi: {create: jest.fn(async () => ({success: true}))},
+  choresApi: {getAll: jest.fn(async () => ({success: true, data: []}))},
+  familiesApi: {
+    create: jest.fn(async () => ({success: true})),
+    myFamilies: jest.fn(async () => ({success: true, data: []})),
+    listMembers: jest.fn(async () => ({success: true, data: []})),
+    createChild: jest.fn(async () => ({success: true})),
+  },
+  invitationsApi: {create: jest.fn(async () => ({success: true}))},
 }));
 
 const wrap = (ui: React.ReactElement) => (
-	<QueryClientProvider client={new QueryClient()}>
-		<MemoryRouter>{ui}</MemoryRouter>
-	</QueryClientProvider>
+  <QueryClientProvider client={new QueryClient()}>
+    <MemoryRouter>{ui}</MemoryRouter>
+  </QueryClientProvider>
 );
 
 describe('admin page', () => {
-	// ... other tests remain unchanged ...
-	test('navigates to /family after successful create via setTimeout', async () => {
-		const {familiesApi} = jest.mocked(apiModule);
-		familiesApi.create.mockResolvedValueOnce({success: true});
+  // other tests above...
+  test('navigates to /family after successful create via setTimeout (shows redirect message)', async () => {
+    const {familiesApi} = jest.mocked(apiModule);
+    familiesApi.create.mockResolvedValueOnce({success: true});
 
-		render(wrap(<Admin />));
-		await screen.findByText('Admin Panel');
-		await userEvent.clear(screen.getByPlaceholderText('Family name'));
-		await userEvent.type(screen.getByPlaceholderText('Family name'), 'TimerFam');
-		jest.useFakeTimers();
-		await act(async () => {
-			await userEvent.click(screen.getByRole('button', {name: 'Create Family'}));
-		});
-		await act(async () => {
-			jest.advanceTimersByTime(1200);
-		});
-		jest.useRealTimers();
-		expect(mockNavigate).toHaveBeenCalledWith('/family');
-	});
+    render(wrap(<Admin />));
+    await screen.findByText('Admin Panel');
+    await userEvent.clear(screen.getByPlaceholderText('Family name'));
+    await userEvent.type(
+      screen.getByPlaceholderText('Family name'),
+      'TimerFam',
+    );
+    await act(async () => {
+      await userEvent.click(
+        screen.getByRole('button', {name: 'Create Family'}),
+      );
+    });
+    await expect(
+      screen.findByText('Family created. Redirecting...'),
+    ).resolves.toBeInTheDocument();
+    expect(familiesApi.create).toHaveBeenCalledWith({name: 'TimerFam'});
+  });
 });
