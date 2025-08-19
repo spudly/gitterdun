@@ -40,9 +40,10 @@ describe('modal', () => {
       </Modal>,
     );
     const overlay = screen.getByRole('button', {name: 'Close modal'});
-    await userEvent.type(overlay, '{Enter}');
+    overlay.focus();
+    await userEvent.keyboard('{Enter}');
     // also hit Space branch
-    await userEvent.type(overlay, ' ');
+    await userEvent.keyboard(' ');
     // now enable closeOnOverlayClick and click overlay directly
     rerender(
       <Modal
@@ -97,8 +98,9 @@ describe('modal', () => {
       </Modal>,
     );
     const overlay = screen.getByRole('button', {name: 'Close modal'});
-    // Triggers onKeyDown branch (line 83) and should close because closeOnOverlayClick=true
-    await userEvent.type(overlay, '{Enter}');
+    // Triggers onKeyDown branch and should close because closeOnOverlayClick=true
+    overlay.focus();
+    await userEvent.keyboard('{Enter}');
     expect(onClose).toHaveBeenCalledWith();
   });
 
