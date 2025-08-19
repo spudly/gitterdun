@@ -1,4 +1,4 @@
-import type {FC} from 'react';
+import type {FC, FormEventHandler} from 'react';
 import {useState} from 'react';
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import {invitationsApi} from '../lib/api.js';
@@ -8,7 +8,6 @@ import {TextInput} from '../widgets/TextInput.js';
 import {Button} from '../widgets/Button.js';
 import {Alert} from '../widgets/Alert.js';
 import {Stack} from '../widgets/Stack.js';
-import {useToast} from '../widgets/ToastProvider.js';
 
 type InvitationSubmitParams = {
   token: string;
@@ -16,21 +15,16 @@ type InvitationSubmitParams = {
   password: string;
   setMessage: (msg: string | null) => void;
   navigate: (path: string) => void;
-  safeAsync: (
-    fn: () => Promise<void>,
-    errorMsg: string,
-    onError: (msg: string | null) => void,
-  ) => () => void;
 };
 
 const useInvitationSubmit = (params: InvitationSubmitParams) => {
-  const {token, username, password, setMessage, navigate, safeAsync} = params;
-  return (event: React.FormEvent<HTMLFormElement>) => {
+  const {token, username, password, setMessage, navigate} = params;
+  const submitHandler: FormEventHandler<HTMLFormElement> = event => {
     event.preventDefault();
     setMessage(null);
-    const run = safeAsync(
-      async () => {
-        const res = await invitationsApi.accept({token, username, password});
+    invitationsApi
+      .accept({token, username, password})
+      .then(res => {
         if (res.success) {
           setMessage('Invitation accepted. You can now log in.');
           setTimeout(() => {
@@ -39,12 +33,12 @@ const useInvitationSubmit = (params: InvitationSubmitParams) => {
         } else {
           setMessage('Failed to accept');
         }
-      },
-      'Failed to accept',
-      setMessage,
-    );
-    run();
+      })
+      .catch(() => {
+        setMessage('Failed to accept');
+      });
   };
+  return submitHandler;
 };
 
 const useAcceptInvitationSetup = () => {
@@ -54,14 +48,12 @@ const useAcceptInvitationSetup = () => {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const navigate = useNavigate();
-  const {safeAsync} = useToast();
   const handleSubmit = useInvitationSubmit({
     token,
     username,
     password,
     setMessage,
     navigate,
-    safeAsync,
   });
   return {
     token,
@@ -91,7 +83,11 @@ const AcceptInvitation: FC = () => {
 
   return (
     <FormCard title="Accept Invitation">
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={event => {
+          handleSubmit(event);
+        }}
+      >
         <Stack gap="md">
           <FormField htmlFor="username" label="Username" required>
             <TextInput
