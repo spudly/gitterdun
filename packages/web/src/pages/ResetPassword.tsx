@@ -31,18 +31,22 @@ const ResetPassword: FC = () => {
       setMessage('Passwords do not match');
       return;
     }
-    const run = safeAsync(
-      async () => {
-        await resetPassword(token, password);
-        setMessage('Password reset successful. Redirecting...');
-        setTimeout(() => {
-          navigate('/login');
-        }, 1200);
-      },
-      'Could not reset password. Please try again.',
-      setMessage,
-    );
-    void run();
+    // Wrap in a void-returning IIFE to avoid returning a Promise from the handler
+    // and to satisfy no-floating-promises without using the void operator on a void.
+    ((): void => {
+      const run = safeAsync(
+        async () => {
+          await resetPassword(token, password);
+          setMessage('Password reset successful. Redirecting...');
+          setTimeout(() => {
+            navigate('/login');
+          }, 1200);
+        },
+        'Could not reset password. Please try again.',
+        setMessage,
+      );
+      run();
+    })();
   };
 
   return (
