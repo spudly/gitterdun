@@ -1,5 +1,6 @@
 import {beforeEach, describe, expect, jest, test} from '@jest/globals';
-import {render, screen, fireEvent, act, waitFor} from '@testing-library/react';
+import {render, screen, act, waitFor} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {MemoryRouter, useLocation} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Login from './Login';
@@ -76,15 +77,10 @@ describe('login page', () => {
     // Use default working mock that allows successful login
     render(wrap(<Login />));
     expect(screen.getAllByText('Login')[0]).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText(/email/iu), {
-      target: {value: 'user@example.com'},
-    });
-    fireEvent.change(screen.getByLabelText(/password/iu), {
-      target: {value: 'validpassword'},
-    });
+    await userEvent.type(screen.getByLabelText(/email/iu), 'user@example.com');
+    await userEvent.type(screen.getByLabelText(/password/iu), 'validpassword');
     await act(async () => {
-      const form = screen.getByRole('button', {name: 'Login'}).closest('form')!;
-      fireEvent.submit(form);
+      await userEvent.click(screen.getByRole('button', {name: 'Login'}));
     });
     // Test successful submission by verifying no error messages appear
     expect(screen.queryByText(/Login failed/i)).not.toBeInTheDocument();
@@ -97,15 +93,10 @@ describe('login page', () => {
     // This test verifies error handling behavior through UI state
     // The actual error throwing is covered by integration tests
     render(wrap(<Login />));
-    fireEvent.change(screen.getByLabelText(/email/iu), {
-      target: {value: 'user@example.com'},
-    });
-    fireEvent.change(screen.getByLabelText(/password/iu), {
-      target: {value: 'validpassword'},
-    });
+    await userEvent.type(screen.getByLabelText(/email/iu), 'user@example.com');
+    await userEvent.type(screen.getByLabelText(/password/iu), 'validpassword');
     await act(async () => {
-      const form = screen.getByRole('button', {name: 'Login'}).closest('form')!;
-      fireEvent.submit(form);
+      await userEvent.click(screen.getByRole('button', {name: 'Login'}));
     });
     // For this test, we just verify the form submission completes without throwing
     expect(screen.getByRole('button', {name: 'Login'})).toBeInTheDocument();
@@ -146,14 +137,10 @@ describe('login page', () => {
         </MemoryRouter>
       </QueryClientProvider>,
     );
-    fireEvent.change(screen.getByLabelText(/email/iu), {
-      target: {value: 'user@example.com'},
-    });
-    fireEvent.change(screen.getByLabelText(/password/iu), {
-      target: {value: 'pw'},
-    });
+    await userEvent.type(screen.getByLabelText(/email/iu), 'user@example.com');
+    await userEvent.type(screen.getByLabelText(/password/iu), 'pw');
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', {name: 'Login'}));
+      await userEvent.click(screen.getByRole('button', {name: 'Login'}));
     });
     await waitFor(() => {
       expect(screen.getByTestId('loc').textContent).toBe('/');

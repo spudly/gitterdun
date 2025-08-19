@@ -1,9 +1,10 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {Alert} from './Alert';
 
 describe('alert', () => {
-  test('shows types, title and dismiss', () => {
+  test('shows types, title and dismiss', async () => {
     const onDismiss = jest.fn();
     const {rerender} = render(
       <Alert onDismiss={onDismiss} title="T" type="info">
@@ -12,7 +13,7 @@ describe('alert', () => {
     );
     expect(screen.getByText('T')).toBeInTheDocument();
     expect(screen.getByText('Body')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', {name: /dismiss/i}));
+    await userEvent.click(screen.getByRole('button', {name: /dismiss/i}));
     expect(onDismiss).toHaveBeenCalledWith();
     rerender(<Alert type="success">S</Alert>);
     expect(screen.getByText('S')).toBeInTheDocument();

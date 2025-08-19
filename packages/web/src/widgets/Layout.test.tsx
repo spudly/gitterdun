@@ -1,5 +1,6 @@
 import {beforeAll, describe, expect, jest, test} from '@jest/globals';
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {MemoryRouter} from 'react-router-dom';
 
 import Layout from './Layout';
@@ -50,7 +51,7 @@ describe('layout', () => {
     expect(screen.getByText('Login')).toBeInTheDocument();
   });
 
-  test('calls logout when clicking Logout button', () => {
+  test('calls logout when clicking Logout button', async () => {
     user = mockUser;
     mockLogout.mockClear();
     render(
@@ -60,7 +61,7 @@ describe('layout', () => {
         </Layout>
       </MemoryRouter>,
     );
-    fireEvent.click(screen.getByRole('button', {name: /logout/i}));
+    await userEvent.click(screen.getByRole('button', {name: /logout/i}));
     expect(mockLogout).toHaveBeenCalledWith();
   });
 });
