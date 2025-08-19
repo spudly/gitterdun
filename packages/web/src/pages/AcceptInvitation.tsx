@@ -10,16 +10,22 @@ import {Alert} from '../widgets/Alert.js';
 import {Stack} from '../widgets/Stack.js';
 import {useToast} from '../widgets/ToastProvider.js';
 
-const AcceptInvitation: FC = () => {
-  const [params] = useSearchParams();
-  const token = params.get('token') ?? '';
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState<string | null>(null);
-  const navigate = useNavigate();
-  const {safeAsync} = useToast();
+type InvitationSubmitParams = {
+  token: string;
+  username: string;
+  password: string;
+  setMessage: (msg: string | null) => void;
+  navigate: (path: string) => void;
+  safeAsync: (
+    fn: () => Promise<void>,
+    errorMsg: string,
+    onError: (msg: string | null) => void,
+  ) => () => void;
+};
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+const useInvitationSubmit = (params: InvitationSubmitParams) => {
+  const {token, username, password, setMessage, navigate, safeAsync} = params;
+  return (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setMessage(null);
     safeAsync(
@@ -38,6 +44,45 @@ const AcceptInvitation: FC = () => {
       setMessage,
     )();
   };
+};
+
+const useAcceptInvitationSetup = () => {
+  const [params] = useSearchParams();
+  const token = params.get('token') ?? '';
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const {safeAsync} = useToast();
+  const handleSubmit = useInvitationSubmit({
+    token,
+    username,
+    password,
+    setMessage,
+    navigate,
+    safeAsync,
+  });
+  return {
+    token,
+    username,
+    setUsername,
+    password,
+    setPassword,
+    message,
+    handleSubmit,
+  };
+};
+
+const AcceptInvitation: FC = () => {
+  const {
+    token,
+    username,
+    setUsername,
+    password,
+    setPassword,
+    message,
+    handleSubmit,
+  } = useAcceptInvitationSetup();
 
   if (!token) {
     return <div>Missing token.</div>;

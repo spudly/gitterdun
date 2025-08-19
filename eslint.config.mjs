@@ -10,8 +10,6 @@ import commentsPlugin from 'eslint-plugin-eslint-comments';
 import jestPlugin from 'eslint-plugin-jest';
 import tailwindcssPlugin from 'eslint-plugin-tailwindcss';
 
-// TODO: get rid of these
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -677,7 +675,7 @@ const eslintConfig = [
       'react/no-will-update-set-state': 'warn',
       'react/prefer-es6-class': 'warn',
       'react/prefer-exact-props': 'warn',
-      'react/prefer-read-only-props': 'warn',
+      'react/prefer-read-only-props': 'off', // noisy
       'react/prefer-stateless-function': 'warn',
       'react/prop-types': 'off', // propTypes are so last decade
       'react/require-optimization': 'warn',
@@ -715,11 +713,11 @@ const eslintConfig = [
       'logical-assignment-operators': 'warn',
       'max-classes-per-file': 'warn',
       'max-depth': 'warn',
-      'max-lines': 'off', //['warn', 150],// TODO: re-enable & refactor to fix
+      'max-lines': ['warn', 150],
       'max-lines-per-function': 'off', // ['warn', {max: 20, skipBlankLines: true, skipComments: true, IIFEs: true},], // TODO: re-enable
       'max-nested-callbacks': 'warn',
-      'max-params': 'warn',
-      'max-statements': 'off', // 'warn', // TODO: re-enable
+      'max-params': ['warn', {max: 5}],
+      'max-statements': 'warn',
       'multiline-comment-style': 'off', // use Prettier for styling
       'new-cap': 'warn',
       'no-alert': 'warn',
@@ -927,7 +925,6 @@ const eslintConfig = [
     files: ['**/*.tsx'],
     rules: {
       'max-lines-per-function': 'off', // TODO: re-enable this after fixing other issues
-      'max-statements': 'off', // TODO: re-enable this after fixing other issues
     },
   },
   {

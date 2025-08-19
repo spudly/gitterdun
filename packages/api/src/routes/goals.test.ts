@@ -20,6 +20,7 @@ import {
 } from '@gitterdun/shared';
 import goalsRouter from './goals';
 import db from '../lib/db';
+import {setupErrorHandling} from '../middleware/errorHandler';
 
 // Mock dependencies
 jest.mock('../lib/db', () => ({
@@ -49,6 +50,7 @@ describe('goals routes', () => {
     app = express();
     app.use(express.json());
     app.use('/api/goals', goalsRouter);
+    setupErrorHandling(app);
 
     // Start server on a random port
     server = app.listen(0);
@@ -192,7 +194,7 @@ describe('goals routes', () => {
 
       expect(response.status).toBe(400);
       expect(body.success).toBe(false);
-      expect(body.error).toBe('Invalid query parameters');
+      expect(body.error).toBe('Invalid request data');
     });
   });
 

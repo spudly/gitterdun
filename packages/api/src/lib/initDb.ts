@@ -5,50 +5,60 @@ import {asError, CountRowSchema} from '@gitterdun/shared';
 import {logger} from '../utils/logger';
 import {sql} from '../utils/sql';
 
+const readSchemaFile = (): string => {
+  const schemaPath = path.join(process.cwd(), 'src/lib/schema.sqlite.sql');
+  return fs.readFileSync(schemaPath, 'utf8');
+};
+
+const executeSchema = (schema: string): void => {
+  db.exec(schema);
+  logger.info('Database initialized successfully');
+};
+
+const checkAdminExists = (): boolean => {
+  const adminExists = CountRowSchema.parse(
+    db
+      .prepare(sql`
+        SELECT
+          COUNT(*) AS count
+        FROM
+          users
+        WHERE
+          role = ?
+      `)
+      .get('admin'),
+  );
+  return adminExists.count > 0;
+};
+
+const createDefaultAdmin = async (): Promise<void> => {
+  const bcrypt = await import('bcryptjs');
+  const hashedPassword = bcrypt.default.hashSync('admin123', 10);
+
+  db.prepare(sql`
+    INSERT INTO
+      users (
+        username,
+        email,
+        password_hash,
+        role,
+        points,
+        streak_count
+      )
+    VALUES
+      (?, ?, ?, ?, ?, ?)
+  `).run('admin', 'admin@gitterdun.com', hashedPassword, 'admin', 0, 0);
+
+  logger.info('Default admin user created: admin@gitterdun.com / admin123');
+};
+
 export const initializeDatabase = async (): Promise<void> => {
   try {
-    // Read the schema file
-    const schemaPath = path.join(process.cwd(), 'src/lib/schema.sqlite.sql');
-    const schema = fs.readFileSync(schemaPath, 'utf8');
+    const schema = readSchemaFile();
+    executeSchema(schema);
 
-    // Execute the schema
-    db.exec(schema);
-
-    logger.info('Database initialized successfully');
-
-    // Insert a default admin user if none exists
-    const adminExists = CountRowSchema.parse(
-      db
-        .prepare(sql`
-          SELECT
-            COUNT(*) AS count
-          FROM
-            users
-          WHERE
-            role = ?
-        `)
-        .get('admin'),
-    );
-
-    if (adminExists.count === 0) {
-      const bcrypt = await import('bcryptjs');
-      const hashedPassword = bcrypt.default.hashSync('admin123', 10);
-
-      db.prepare(sql`
-        INSERT INTO
-          users (
-            username,
-            email,
-            password_hash,
-            role,
-            points,
-            streak_count
-          )
-        VALUES
-          (?, ?, ?, ?, ?, ?)
-      `).run('admin', 'admin@gitterdun.com', hashedPassword, 'admin', 0, 0);
-
-      logger.info('Default admin user created: admin@gitterdun.com / admin123');
+    if (!checkAdminExists()) {
+      await createDefaultAdmin();
     }
   } catch (error) {
     logger.error({error: asError(error)}, 'Failed to initialize database');
