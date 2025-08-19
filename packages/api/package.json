@@ -16,25 +16,24 @@
   },
   "dependencies": {
     "@gitterdun/shared": "file:../shared",
-    "bcryptjs": "^2.4.3",
-    "better-sqlite3": "^10.1.0",
+    "bcryptjs": "^3.0.2",
+    "better-sqlite3": "^12.2.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "helmet": "^8.0.0",
-    "pino": "^9.0.0",
+    "pino": "^9.9.0",
     "zod": "^4.0.17"
   },
   "devDependencies": {
     "@jest/globals": "^30.0.5",
-    "@types/bcryptjs": "^2.4.6",
     "@types/better-sqlite3": "^7.6.13",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.0",
-    "@types/node": "^22.10.2",
+    "@types/node": "^24.3.0",
     "nock": "^14.0.10",
-    "nodemon": "^3.1.0",
-    "pino-pretty": "^11.3.0",
+    "nodemon": "^3.1.9",
+    "pino-pretty": "^13.1.1",
     "tsx": "^4.20.4",
     "typescript": "^5.6.3"
   }
