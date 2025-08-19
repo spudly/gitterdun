@@ -1,6 +1,7 @@
 import type {FC, FormEventHandler} from 'react';
 import {useState} from 'react';
 import {useSearchParams, useNavigate} from 'react-router-dom';
+import {useToast} from '../widgets/ToastProvider.js';
 import {useUser} from '../hooks/useUser.js';
 import {FormCard} from '../widgets/FormCard.js';
 import {FormField} from '../widgets/FormField.js';
@@ -11,6 +12,7 @@ import {Stack} from '../widgets/Stack.js';
 
 const ResetPassword: FC = () => {
   const {resetPassword} = useUser();
+  const {safeAsync} = useToast();
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [message, setMessage] = useState<string | null>(null);
@@ -29,16 +31,18 @@ const ResetPassword: FC = () => {
       setMessage('Passwords do not match');
       return;
     }
-    resetPassword(token, password)
-      .then(() => {
+    const run = safeAsync(
+      async () => {
+        await resetPassword(token, password);
         setMessage('Password reset successful. Redirecting...');
         setTimeout(() => {
           navigate('/login');
         }, 1200);
-      })
-      .catch(() => {
-        setMessage('Could not reset password. Please try again.');
-      });
+      },
+      'Could not reset password. Please try again.',
+      setMessage,
+    );
+    run();
   };
 
   return (
