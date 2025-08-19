@@ -1,17 +1,18 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {TextInput} from './TextInput';
 import {FormField} from './FormField';
 import type {ChangeEvent} from 'react';
 
 describe('textInput', () => {
-  test('handles change, icons and error', () => {
+  test('handles change, icons and error', async () => {
     const onChange =
       jest.fn<(value: string, event: ChangeEvent<HTMLInputElement>) => void>();
     const {rerender} = render(
       <TextInput onChange={onChange} placeholder="p" value="" />,
     );
-    fireEvent.change(screen.getByPlaceholderText('p'), {target: {value: 'x'}});
+    await userEvent.type(screen.getByPlaceholderText('p'), 'x');
     expect(onChange).toHaveBeenCalledWith('x', expect.any(Object));
     rerender(
       <TextInput

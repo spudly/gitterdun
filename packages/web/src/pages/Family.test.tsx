@@ -1,5 +1,6 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen, fireEvent, act} from '@testing-library/react';
+import {render, screen, act} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Family from './Family';
 import {useUser} from '../hooks/useUser';
@@ -64,37 +65,37 @@ describe('family page', () => {
 
     render(wrap(<Family />));
     await screen.findByText('Your Families');
-    fireEvent.change(screen.getByPlaceholderText('New family name'), {
-      target: {value: 'NewFam'},
-    });
-    act(() => {
-      fireEvent.click(screen.getAllByRole('button', {name: 'Create'})[0]!);
-    });
+    await userEvent.type(
+      screen.getByPlaceholderText('New family name'),
+      'NewFam',
+    );
+    await userEvent.click(screen.getAllByRole('button', {name: 'Create'})[0]!);
     // Without a selected family, member sections are hidden.
     // Simulate a selection by setting state indirectly
     const selects = screen.getAllByRole('combobox');
     const familySelect = selects[0]!;
     await act(async () => {
-      fireEvent.change(familySelect, {target: {value: '1'}});
+      await userEvent.selectOptions(familySelect, '1');
     });
     // Create child
     // Since members section depends on selection, skip the child creation inputs if not present
     const usernameInput = await screen.findByPlaceholderText('Username');
-    fireEvent.change(usernameInput, {target: {value: 'kid'}});
-    fireEvent.change(screen.getAllByPlaceholderText('Email')[0]!, {
-      target: {value: 'kid@ex.com'},
-    });
-    fireEvent.change(screen.getAllByPlaceholderText('Password')[0]!, {
-      target: {value: 'pw'},
-    });
+    await userEvent.type(usernameInput, 'kid');
+    await userEvent.type(
+      screen.getAllByPlaceholderText('Email')[0]!,
+      'kid@ex.com',
+    );
+    await userEvent.type(screen.getAllByPlaceholderText('Password')[0]!, 'pw');
     await act(async () => {
-      fireEvent.click(screen.getAllByRole('button', {name: 'Create'})[1]!);
+      await userEvent.click(
+        screen.getAllByRole('button', {name: 'Create'})[1]!,
+      );
     });
     // Invite
     const inviteEmailInput = screen.getAllByPlaceholderText('Email')[1]!;
-    fireEvent.change(inviteEmailInput, {target: {value: 'm@ex.com'}});
+    await userEvent.type(inviteEmailInput, 'm@ex.com');
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', {name: 'Send'}));
+      await userEvent.click(screen.getByRole('button', {name: 'Send'}));
     });
     expect(familiesApi.create).toHaveBeenCalledWith({name: 'NewFam'});
     expect(familiesApi.createChild).toHaveBeenCalledWith(1, {
@@ -112,24 +113,14 @@ describe('family page', () => {
     render(wrap(<Family />));
     await screen.findByText('Your Families');
     // Click create with empty family name (guard branch)
-    act(() => {
-      fireEvent.click(screen.getAllByRole('button', {name: 'Create'})[0]!);
-    });
+    await userEvent.click(screen.getAllByRole('button', {name: 'Create'})[0]!);
     // Select a family to reveal sections
-    fireEvent.change(screen.getAllByRole('combobox')[0]!, {
-      target: {value: '1'},
-    });
+    await userEvent.selectOptions(screen.getAllByRole('combobox')[0]!, '1');
     // Child create with missing inputs (guard branch)
-    act(() => {
-      fireEvent.click(screen.getAllByRole('button', {name: 'Create'})[1]!);
-    });
+    await userEvent.click(screen.getAllByRole('button', {name: 'Create'})[1]!);
     // Invite with empty email should no-op (exercise path only)
-    fireEvent.change(screen.getAllByRole('combobox')[0]!, {
-      target: {value: '1'},
-    });
-    act(() => {
-      fireEvent.click(screen.getByRole('button', {name: 'Send'}));
-    });
+    await userEvent.selectOptions(screen.getAllByRole('combobox')[0]!, '1');
+    await userEvent.click(screen.getByRole('button', {name: 'Send'}));
     // Nothing to assert on API; ensure page is still rendered
     expect(screen.getByText('Your Families')).toBeInTheDocument();
   });

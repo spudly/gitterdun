@@ -1,10 +1,11 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import type {Column} from './DataTable';
 import {DataTable} from './DataTable';
 
 describe('dataTable', () => {
-  test('renders, handles click and loading/empty', () => {
+  test('renders, handles click and loading/empty', async () => {
     type Row = {id: number; name: string};
     const data: Array<Row> = [{id: 1, name: 'N'}];
     const columns: Array<Column<Row>> = [
@@ -14,7 +15,7 @@ describe('dataTable', () => {
     const {rerender} = render(
       <DataTable columns={columns} data={data} onRowClick={onRowClick} />,
     );
-    fireEvent.click(screen.getByText('N'));
+    await userEvent.click(screen.getByText('N'));
     expect(onRowClick).toHaveBeenCalledWith(
       expect.objectContaining({id: 1, name: 'N'}),
       0, // index parameter
