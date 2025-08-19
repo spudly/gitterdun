@@ -18,9 +18,7 @@ const Leaderboard: FC = () => {
     queryFn: async () => leaderboardApi.get({limit: 10, sortBy: 'points'}),
   });
   if (error) {
-    const err = error instanceof Error ? error : new Error(String(error));
-    // eslint-disable-next-line no-console -- dev logging only
-    console.error(err);
+    console.error(error instanceof Error ? error : new Error(String(error))); // eslint-disable-line no-console -- dev logging only
   }
 
   const leaderboard = leaderboardResponse?.data?.leaderboard ?? [];

@@ -22,7 +22,11 @@
     "type-check": "turbo run type-check",
     "find-unused-eslint-rules": "eslint-find-rules --unused eslint.config.mjs --flatConfig",
     "knip": "knip",
-    "ci:check": "turbo run ci:check"
+    "lint:changed": "git diff --name-only HEAD | grep -E '\\.(ts|tsx|js|jsx)$' | xargs -r eslint --max-warnings 0",
+    "ci:check": "turbo run ci:check",
+    "turbo:reset": "find . -name '.turbo' -type d -exec rm -rf {}",
+    "precommit:check": "turbo run precommit:check",
+    "ai:check": "turbo run ai:check"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",

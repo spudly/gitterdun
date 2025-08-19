@@ -1,6 +1,16 @@
 import type {FC, ReactNode} from 'react';
-import {useEffect} from 'react';
 import clsx from 'clsx';
+import {useModalKeyboard} from './modal-utils/ModalKeyboardHandler.js';
+import {
+  createOverlayClickHandler,
+  createOverlayKeyHandler,
+  isOverlayKey,
+  shouldCloseOnOverlayClick,
+} from './modal-utils/ModalOverlayHandler.js';
+import {ModalCloseButton} from './modal-utils/ModalCloseButton.js';
+
+// Re-export for tests
+export {isOverlayKey, shouldCloseOnOverlayClick};
 
 type ModalProps = {
   readonly isOpen: boolean;
@@ -30,16 +40,6 @@ const SIZE_STYLES = {
   full: 'max-w-full mx-4',
 };
 
-export const isOverlayKey = (key: string): boolean =>
-  key === 'Enter' || key === ' ';
-
-export const shouldCloseOnOverlayClick = (
-  closeOnOverlayClick: boolean,
-  isSelfTarget: boolean,
-): boolean => {
-  return closeOnOverlayClick && isSelfTarget;
-};
-
 export const Modal: FC<ModalProps> = ({
   isOpen,
   onClose,
@@ -51,40 +51,20 @@ export const Modal: FC<ModalProps> = ({
   closeOnOverlayClick = true,
   showCloseButton = true,
 }) => {
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, onClose]);
+  useModalKeyboard({isOpen, onClose});
 
   if (!isOpen) {
     return null;
   }
 
-  const handleOverlayClick = (
-    event: React.MouseEvent | React.KeyboardEvent,
-  ) => {
-    if (
-      shouldCloseOnOverlayClick(
-        closeOnOverlayClick,
-        event.target === event.currentTarget,
-      )
-    ) {
-      onClose();
-    }
-  };
+  const handleOverlayClick = createOverlayClickHandler(
+    closeOnOverlayClick,
+    onClose,
+  );
+  const handleOverlayKey = createOverlayKeyHandler(
+    closeOnOverlayClick,
+    onClose,
+  );
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -93,11 +73,7 @@ export const Modal: FC<ModalProps> = ({
           aria-label="Close modal"
           className="fixed inset-0 bg-gray-500/75 transition-opacity"
           onClick={handleOverlayClick}
-          onKeyDown={event => {
-            if (isOverlayKey(event.key)) {
-              handleOverlayClick(event);
-            }
-          }}
+          onKeyDown={handleOverlayKey}
           tabIndex={0}
           type="button"
         />
@@ -127,32 +103,12 @@ export const Modal: FC<ModalProps> = ({
                 <h3 className="text-lg font-medium text-gray-900">{title}</h3>
               ) : null}
 
-              {showCloseButton ? (
-                <button
-                  className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                  onClick={onClose}
-                  type="button"
-                >
-                  <span className="sr-only">Close</span>
-
-                  <svg
-                    className="size-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      d="M6 18L18 6M6 6l12 12"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                    />
-                  </svg>
-                </button>
-              ) : null}
+              <ModalCloseButton
+                onClose={onClose}
+                showCloseButton={showCloseButton}
+              />
             </div>
           ) : null}
-
           <div className="px-6 py-4">{children}</div>
         </div>
       </div>

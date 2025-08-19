@@ -1,7 +1,6 @@
 import type {FC} from 'react';
 import type {RankingItem} from './RankingList.js';
 import {RankingList} from './RankingList.js';
-
 const RankingListDemo: FC = () => {
   const sampleRankings: Array<RankingItem> = [
     {
@@ -129,19 +128,15 @@ const RankingListDemo: FC = () => {
           title="Top Performers"
         />
       </div>
-
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Usage Example</h3>
-
         <div className="rounded-lg bg-gray-50 p-6">
           <h3 className="mb-4 text-xl font-semibold">Monthly Leaderboard</h3>
-
           <RankingList
             items={sampleRankings}
             subtitle="Sorted by total points"
             title="Full Rankings"
           />
-
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Keep up the great work! Rankings update daily.
@@ -152,5 +147,4 @@ const RankingListDemo: FC = () => {
     </div>
   );
 };
-
 export default RankingListDemo;

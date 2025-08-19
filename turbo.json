@@ -11,11 +11,19 @@
     },
     "lint": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**/*.{ts,tsx,js,jsx,json,css}", "eslint.config.mjs"]
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx,json,css}",
+        "$TURBO_ROOT$/eslint.config.mjs"
+      ]
     },
     "test": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**/*.{ts,tsx,js,jsx,json,css}", "jest.config.js"],
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx,json,css}",
+        "jest.config.js",
+        "$TURBO_ROOT$/jest.config.base.cjs",
+        "$TURBO_ROOT$/packages/*/package.json"
+      ],
       "outputs": ["coverage/**"]
     },
     "dev": {"dependsOn": ["^build"], "cache": false, "persistent": true},
@@ -24,23 +32,48 @@
     "//#knip": {
       "inputs": [
         "src/**/*.{ts,tsx,js,jsx,json,css}",
-        "knip.config.ts",
-        "package.json"
+        "$TURBO_ROOT$/knip.config.ts",
+        "$TURBO_ROOT$/package.json",
+        "$TURBO_ROOT$/packages/*/package.json"
       ]
     },
     "//#lint-staged": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**/*.{ts,tsx,js,jsx,json,css}", "eslint.config.mjs"]
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx,json,css}",
+        "$TURBO_ROOT$/eslint.config.mjs"
+      ]
+    },
+    "//#lint:changed": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx,json,css}",
+        "$TURBO_ROOT$/eslint.config.mjs"
+      ]
     },
     "//#test:changed": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**/*.{ts,tsx,js,jsx,json,css}", "jest.config.js"]
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx,json,css}",
+        "jest.config.js",
+        "$TURBO_ROOT$/jest.config.base.cjs",
+        "$TURBO_ROOT$/packages/*/package.json"
+      ]
     },
     "precommit:check": {
       "dependsOn": ["//#knip", "build", "//#test:changed", "//#lint-staged"]
     },
     "ci:check": {
       "dependsOn": ["//#knip", "build", "test", "lint", "//#prettier:check"]
+    },
+    "ai:check": {
+      "dependsOn": [
+        "//#knip",
+        "build",
+        "//#test:changed",
+        "//#lint:changed",
+        "//#prettier:check"
+      ]
     }
   }
 }

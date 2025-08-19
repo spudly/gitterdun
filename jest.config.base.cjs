@@ -16,7 +16,7 @@ module.exports = {
     '!**/*.config.*',
     '!**/coverage/**',
   ],
-  collectCoverage: true, // jest cli says this is a mistake but it is not. jest has a bug causing this warning to be shown
+  // Moved collectCoverage to CLI level to avoid configuration warnings
   coverageThreshold: {
     // global: {branches: 100, functions: 100, lines: 100, statements: 100},
   },
@@ -25,5 +25,6 @@ module.exports = {
     '<rootDir>/src/**/__tests__/**/*.(spec|test).(ts|tsx|js|jsx)',
     '<rootDir>/src/**/*.(spec|test).(ts|tsx|js|jsx)',
   ],
-  forceExit: true,
+  // Replaced forceExit with detectOpenHandles for better debugging
+  detectOpenHandles: true,
 };
