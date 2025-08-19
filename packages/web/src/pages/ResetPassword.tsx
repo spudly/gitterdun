@@ -1,4 +1,4 @@
-import type {FC} from 'react';
+import type {FC, FormEventHandler} from 'react';
 import {useState} from 'react';
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import {useUser} from '../hooks/useUser.js';
@@ -8,18 +8,16 @@ import {TextInput} from '../widgets/TextInput.js';
 import {Button} from '../widgets/Button.js';
 import {Alert} from '../widgets/Alert.js';
 import {Stack} from '../widgets/Stack.js';
-import {useToast} from '../widgets/ToastProvider.js';
 
 const ResetPassword: FC = () => {
   const {resetPassword} = useUser();
-  const {safeAsync} = useToast();
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [params] = useSearchParams();
   const navigate = useNavigate();
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = event => {
     event.preventDefault();
     setMessage(null);
     const token = params.get('token') ?? '';
@@ -31,13 +29,18 @@ const ResetPassword: FC = () => {
       setMessage('Passwords do not match');
       return;
     }
-    safeAsync(async () => {
-      await resetPassword(token, password);
-      setMessage('Password reset successful. Redirecting...');
-      setTimeout(() => {
-        navigate('/login');
-      }, 1200);
-    }, 'Could not reset password. Please try again.')();
+    // Wrap in an IIFE and attach a catch handler instead of using the void operator
+    (async () => {
+      try {
+        await resetPassword(token, password);
+        setMessage('Password reset successful. Redirecting...');
+        setTimeout(() => {
+          Promise.resolve(navigate('/login')).catch(() => undefined);
+        }, 1200);
+      } catch {
+        setMessage('Could not reset password. Please try again.');
+      }
+    })().catch(() => undefined);
   };
 
   return (

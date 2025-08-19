@@ -29,3 +29,13 @@ if (typeof (globalThis as any).Response === 'undefined') {
     configurable: true,
   });
 }
+
+// Polyfill TextEncoder/TextDecoder for jsdom environment (needed by react-router v7)
+import {TextEncoder, TextDecoder} from 'node:util';
+if (typeof (globalThis as any).TextEncoder === 'undefined') {
+  (globalThis as any).TextEncoder = TextEncoder;
+}
+if (typeof (globalThis as any).TextDecoder === 'undefined') {
+  (globalThis as any).TextDecoder =
+    TextDecoder as unknown as typeof globalThis.TextDecoder;
+}

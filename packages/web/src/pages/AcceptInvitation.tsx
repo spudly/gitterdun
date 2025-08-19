@@ -1,4 +1,4 @@
-import type {FC} from 'react';
+import type {FC, FormEventHandler} from 'react';
 import {useState} from 'react';
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import {invitationsApi} from '../lib/api.js';
@@ -8,42 +8,37 @@ import {TextInput} from '../widgets/TextInput.js';
 import {Button} from '../widgets/Button.js';
 import {Alert} from '../widgets/Alert.js';
 import {Stack} from '../widgets/Stack.js';
-import {useToast} from '../widgets/ToastProvider.js';
 
 type InvitationSubmitParams = {
   token: string;
   username: string;
   password: string;
   setMessage: (msg: string | null) => void;
-  navigate: (path: string) => void;
-  safeAsync: (
-    fn: () => Promise<void>,
-    errorMsg: string,
-    onError: (msg: string | null) => void,
-  ) => () => void;
+  onAccepted: () => void;
 };
 
 const useInvitationSubmit = (params: InvitationSubmitParams) => {
-  const {token, username, password, setMessage, navigate, safeAsync} = params;
-  return (event: React.FormEvent<HTMLFormElement>) => {
+  const {token, username, password, setMessage, onAccepted} = params;
+  const submitHandler: FormEventHandler<HTMLFormElement> = event => {
     event.preventDefault();
     setMessage(null);
-    safeAsync(
-      async () => {
-        const res = await invitationsApi.accept({token, username, password});
+    invitationsApi
+      .accept({token, username, password})
+      .then(res => {
         if (res.success) {
           setMessage('Invitation accepted. You can now log in.');
           setTimeout(() => {
-            navigate('/login');
+            onAccepted();
           }, 1200);
         } else {
           setMessage('Failed to accept');
         }
-      },
-      'Failed to accept',
-      setMessage,
-    )();
+      })
+      .catch(() => {
+        setMessage('Failed to accept');
+      });
   };
+  return submitHandler;
 };
 
 const useAcceptInvitationSetup = () => {
@@ -53,14 +48,15 @@ const useAcceptInvitationSetup = () => {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const navigate = useNavigate();
-  const {safeAsync} = useToast();
   const handleSubmit = useInvitationSubmit({
     token,
     username,
     password,
     setMessage,
-    navigate,
-    safeAsync,
+    onAccepted: () => {
+      // Ensure any promise returned by navigate is handled
+      Promise.resolve(navigate('/login')).catch(() => undefined);
+    },
   });
   return {
     token,
