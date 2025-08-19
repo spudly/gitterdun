@@ -1,5 +1,5 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen, act, waitFor} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {MemoryRouter} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
@@ -33,9 +33,7 @@ describe('resetPassword page', () => {
     await userEvent.type(screen.getByLabelText(/New Password/iu), 'abcdef');
     await userEvent.type(screen.getByLabelText(/Confirm Password/iu), 'abcdef');
     const submit = screen.getByRole('button', {name: 'Reset Password'});
-    await act(async () => {
-      submit.click();
-    });
+    await userEvent.click(submit);
     await expect(
       screen.findByText(/Missing token/i),
     ).resolves.toBeInTheDocument();
@@ -45,11 +43,7 @@ describe('resetPassword page', () => {
     render(wrap(<ResetPassword />));
     await userEvent.type(screen.getByLabelText(/New Password/iu), 'a');
     await userEvent.type(screen.getByLabelText(/Confirm Password/iu), 'a');
-    await act(async () => {
-      await userEvent.click(
-        screen.getByRole('button', {name: 'Reset Password'}),
-      );
-    });
+    await userEvent.click(screen.getByRole('button', {name: 'Reset Password'}));
     await expect(
       screen.findByText(/Password reset successful/i),
     ).resolves.toBeInTheDocument();
@@ -68,11 +62,7 @@ describe('resetPassword page', () => {
     // Fill in valid passwords to pass HTML validation
     await userEvent.type(screen.getByLabelText(/New Password/iu), 'abcdef');
     await userEvent.type(screen.getByLabelText(/Confirm Password/iu), 'abcdef');
-    await act(async () => {
-      await userEvent.click(
-        screen.getByRole('button', {name: 'Reset Password'}),
-      );
-    });
+    await userEvent.click(screen.getByRole('button', {name: 'Reset Password'}));
     await expect(
       screen.findByText(/Missing token/i),
     ).resolves.toBeInTheDocument();
@@ -98,11 +88,7 @@ describe('resetPassword page', () => {
     );
     await userEvent.type(screen.getByLabelText(/New Password/iu), 'abcdef');
     await userEvent.type(screen.getByLabelText(/Confirm Password/iu), 'abcdef');
-    await act(async () => {
-      await userEvent.click(
-        screen.getByRole('button', {name: 'Reset Password'}),
-      );
-    });
+    await userEvent.click(screen.getByRole('button', {name: 'Reset Password'}));
     await expect(
       screen.findByText(/Password reset successful/i),
     ).resolves.toBeInTheDocument();
@@ -118,37 +104,33 @@ describe('resetPassword page', () => {
     const consoleErrorSpy = jest
       .spyOn(console, 'error')
       .mockImplementation(() => {});
-    const mockResetPassword = (jest.fn() as any).mockRejectedValue(
-      new Error('API Error'),
-    );
+    const mockResetPassword = jest.fn(async () => {
+      throw new Error('API Error');
+    });
 
-    jest
-      .mocked(useUser)
-      .mockReturnValue({
-        user: null,
-        isLoading: false,
-        error: null,
-        login: jest.fn(),
-        register: jest.fn(),
-        logout: jest.fn(),
-        forgotPassword: jest.fn(),
-        resetPassword: mockResetPassword,
-        isLoggingIn: false,
-        isRegistering: false,
-        isLoggingOut: false,
-        loginError: null,
-        registerError: null,
-      } as any);
+    type UseUserReturn = ReturnType<typeof useUser>;
+    const mockUseUserReturn: UseUserReturn = {
+      user: null,
+      isLoading: false,
+      error: null,
+      login: jest.fn() as UseUserReturn['login'],
+      register: jest.fn() as UseUserReturn['register'],
+      logout: jest.fn() as UseUserReturn['logout'],
+      forgotPassword: jest.fn() as UseUserReturn['forgotPassword'],
+      resetPassword: mockResetPassword as UseUserReturn['resetPassword'],
+      isLoggingIn: false,
+      isRegistering: false,
+      isLoggingOut: false,
+      loginError: null,
+      registerError: null,
+    };
+    jest.mocked(useUser).mockReturnValue(mockUseUserReturn);
 
     render(wrap(<ResetPassword />));
     await userEvent.type(screen.getByLabelText(/New Password/iu), 'abcdef');
     await userEvent.type(screen.getByLabelText(/Confirm Password/iu), 'abcdef');
 
-    await act(async () => {
-      await userEvent.click(
-        screen.getByRole('button', {name: 'Reset Password'}),
-      );
-    });
+    await userEvent.click(screen.getByRole('button', {name: 'Reset Password'}));
 
     // Verify the resetPassword function was called
     expect(mockResetPassword).toHaveBeenCalledWith('t', 'abcdef');
@@ -162,11 +144,7 @@ describe('resetPassword page', () => {
     // Fill valid passwords to satisfy required/minLength so submit handler runs
     await userEvent.type(screen.getByLabelText(/New Password/iu), 'abcdef');
     await userEvent.type(screen.getByLabelText(/Confirm Password/iu), 'abcdef');
-    await act(async () => {
-      await userEvent.click(
-        screen.getByRole('button', {name: 'Reset Password'}),
-      );
-    });
+    await userEvent.click(screen.getByRole('button', {name: 'Reset Password'}));
     expect(screen.getByText(/Missing token/u)).toBeInTheDocument();
   });
 });
