@@ -1,5 +1,8 @@
 import '@testing-library/jest-dom';
 
+// Polyfill TextEncoder/TextDecoder for jsdom environment (needed by react-router v7)
+import {TextEncoder, TextDecoder} from 'node:util';
+
 // Provide a minimal WHATWG Response polyfill for tests that construct `new Response(...)`
 if (typeof (globalThis as any).Response === 'undefined') {
   class SimpleResponse {
@@ -29,9 +32,6 @@ if (typeof (globalThis as any).Response === 'undefined') {
     configurable: true,
   });
 }
-
-// Polyfill TextEncoder/TextDecoder for jsdom environment (needed by react-router v7)
-import {TextEncoder, TextDecoder} from 'node:util';
 if (typeof (globalThis as any).TextEncoder === 'undefined') {
   (globalThis as any).TextEncoder = TextEncoder;
 }

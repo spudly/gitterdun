@@ -1,5 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "noUpdateNotifier": true,
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -13,7 +14,7 @@
       "dependsOn": ["^build"],
       "inputs": [
         "src/**/*.{ts,tsx,js,jsx,json,css}",
-        "$TURBO_ROOT$/eslint.config.mjs"
+        "$TURBO_ROOT$/eslint.config.ts"
       ]
     },
     "test": {
@@ -41,14 +42,14 @@
       "dependsOn": ["^build"],
       "inputs": [
         "src/**/*.{ts,tsx,js,jsx,json,css}",
-        "$TURBO_ROOT$/eslint.config.mjs"
+        "$TURBO_ROOT$/eslint.config.ts"
       ]
     },
     "//#lint:changed": {
       "dependsOn": ["^build"],
       "inputs": [
         "src/**/*.{ts,tsx,js,jsx,json,css}",
-        "$TURBO_ROOT$/eslint.config.mjs"
+        "$TURBO_ROOT$/eslint.config.ts"
       ]
     },
     "//#test:changed": {

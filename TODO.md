@@ -16,15 +16,19 @@
 - [x] use types, not interfaces
 - [x] prettier-plugin-tailwindcss
 - [x] eslint-plugin-tailwindcss
-- [ ] re-enable react/jsx-max-depth, import/max-dependencies
+- [x] re-enable import/max-dependencies
+- [x] re-enable react/jsx-max-depth
 - [x] add eslint-plugin-jest
 - [x] format SQL using prettier-plugin-embed + prettier-plugin-sql
-- [ ] upgrade to express 5
-- [ ] update all dependencies
+- [x] upgrade to express 5
+- [x] update all dependencies
 - [x] instruct cursor to always make sure that any new code it writes passes
       checks: eslint, jest, typescript, prettier
 - [ ] audit all the eslint-disable rules that AI added; make sure they're not
       for stupid reasons
 - [ ] where possible, use user-event instead of fireEvent
 - [ ] jest - configure clearAllMocks (or better?) in the jest config so it
-      doesn't have to be se everwhere
+      doesn't have to be set everwhere
+- [ ] setup react-i18n; include pig-latin & pirate-speak
+- [ ] refine landing => sign-up/login flow
+- [ ] add eslint-plugin-turbo

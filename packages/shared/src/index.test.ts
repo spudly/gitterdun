@@ -8,7 +8,7 @@ import {
   UserSchema,
   CreateUserSchema,
   FamilySchema,
-  ApiResponseSchema,
+  apiResponseSchema,
 } from './schemas';
 import {asError} from './utils/asError';
 
@@ -66,16 +66,16 @@ describe('index.ts barrel exports', () => {
       expect(result.success).toBe(true);
     });
 
-    test('should export ApiResponseSchema function correctly', () => {
-      expect(indexExports.ApiResponseSchema).toBeDefined();
-      expect(indexExports.ApiResponseSchema).toBe(ApiResponseSchema);
-      expect(typeof indexExports.ApiResponseSchema).toBe('function');
+    test('should export apiResponseSchema function correctly', () => {
+      expect(indexExports.apiResponseSchema).toBeDefined();
+      expect(indexExports.apiResponseSchema).toBe(apiResponseSchema);
+      expect(typeof indexExports.apiResponseSchema).toBe('function');
     });
 
-    test('should create working schemas with ApiResponseSchema', () => {
+    test('should create working schemas with apiResponseSchema', () => {
       // Test that the exported function works as expected
-      // eslint-disable-next-line new-cap -- ApiResponseSchema is a factory function, not a constructor
-      const userResponseSchema = indexExports.ApiResponseSchema(
+
+      const userResponseSchema = indexExports.apiResponseSchema(
         indexExports.UserSchema,
       );
       const validResponse = {
@@ -179,11 +179,11 @@ describe('index.ts barrel exports', () => {
       expect(indexExports.ChoreSchema).toBeDefined();
     });
 
-    test('should have GoalSchema and ApiResponseSchema available', () => {
+    test('should have GoalSchema and apiResponseSchema available', () => {
       expect(indexExports).toHaveProperty('GoalSchema');
       expect(indexExports.GoalSchema).toBeDefined();
-      expect(indexExports).toHaveProperty('ApiResponseSchema');
-      expect(indexExports.ApiResponseSchema).toBeDefined();
+      expect(indexExports).toHaveProperty('apiResponseSchema');
+      expect(indexExports.apiResponseSchema).toBeDefined();
     });
 
     test('should have schemas for corresponding TypeScript types', () => {
@@ -208,9 +208,9 @@ describe('index.ts barrel exports', () => {
       expect(indexExports.CreateUserSchema).toBe(CreateUserSchema);
     });
 
-    test('should re-export FamilySchema and ApiResponseSchema identically', () => {
+    test('should re-export FamilySchema and apiResponseSchema identically', () => {
       expect(indexExports.FamilySchema).toBe(FamilySchema);
-      expect(indexExports.ApiResponseSchema).toBe(ApiResponseSchema);
+      expect(indexExports.apiResponseSchema).toBe(apiResponseSchema);
     });
 
     test('should re-export utilities identically to direct imports', () => {

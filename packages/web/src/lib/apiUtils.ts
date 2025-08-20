@@ -1,6 +1,6 @@
 // Core API utilities and types
 import {z} from 'zod';
-import {ApiResponseSchema as createApiResponseSchema} from '@gitterdun/shared';
+import {apiResponseSchema as createApiResponseSchema} from '@gitterdun/shared';
 
 const API_ORIGIN = 'http://localhost:3000';
 export const API_BASE_URL = `${API_ORIGIN}/api`;

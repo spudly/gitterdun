@@ -268,7 +268,7 @@ export const GoalQuerySchema = PaginationSchema.extend({
 });
 
 // Response schemas
-export const ApiResponseSchema = <T extends z.ZodType>(dataSchema: T) =>
+export const apiResponseSchema = <T extends z.ZodType>(dataSchema: T) =>
   z.object({
     success: z.boolean(),
     data: dataSchema.optional(),
@@ -300,6 +300,8 @@ export const IdParamSchema = z.object({id: z.coerce.number().int().min(1)});
 export const FamilyIdParamSchema = z.object({
   familyId: z.coerce.number().int().min(1),
 });
+
+// Search parameter schemas
 
 // Database row schemas (runtime-validated parsing for raw DB results)
 export const SessionRowSchema = z.object({
@@ -415,3 +417,6 @@ export type Pagination = z.infer<typeof PaginationSchema>;
 export type ChoreQuery = z.infer<typeof ChoreQuerySchema>;
 export type GoalQuery = z.infer<typeof GoalQuerySchema>;
 export type LeaderboardResponse = z.infer<typeof LeaderboardResponseSchema>;
+
+// Search parameter types
+// export type TokenSearchParams moved to web package

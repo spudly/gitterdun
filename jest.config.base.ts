@@ -1,5 +1,11 @@
-/** @type {import('jest').Config} */
-module.exports = {
+import type {Config} from 'jest';
+import {fileURLToPath} from 'url';
+import {dirname} from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const config: Config = {
   testEnvironment: 'node',
   transform: {
     '^.+\\.(t|j)sx?$': [
@@ -16,15 +22,14 @@ module.exports = {
     '!**/*.config.*',
     '!**/coverage/**',
   ],
-  // Moved collectCoverage to CLI level to avoid configuration warnings
-  coverageThreshold: {
-    // global: {branches: 100, functions: 100, lines: 100, statements: 100},
-  },
+  coverageThreshold: {},
   moduleNameMapper: {'^(\\.{1,2}/.*)\\.js$': '$1'},
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.(spec|test).(ts|tsx|js|jsx)',
     '<rootDir>/src/**/*.(spec|test).(ts|tsx|js|jsx)',
   ],
-  // Replaced forceExit with detectOpenHandles for better debugging
   detectOpenHandles: true,
+  setupFilesAfterEnv: [`${__dirname}/jest.setup.ts`],
 };
+
+export default config;

@@ -1,4 +1,6 @@
-module.exports = {
+import type {Config} from 'prettier';
+
+const config: Config = {
   plugins: [
     'prettier-plugin-embed',
     'prettier-plugin-sql',
@@ -34,3 +36,5 @@ module.exports = {
   denseOperators: false,
   newlineBeforeSemicolon: false,
 };
+
+export default config;

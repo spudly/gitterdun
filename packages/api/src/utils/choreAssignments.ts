@@ -48,10 +48,12 @@ export type ChoreCompletionParams = {
   notes?: string | undefined;
 };
 
-export const updateChoreAssignmentCompletion = (
-  params: ChoreCompletionParams,
-) => {
-  const {choreId, userId, points, notes} = params;
+export const updateChoreAssignmentCompletion = ({
+  choreId,
+  userId,
+  points,
+  notes,
+}: ChoreCompletionParams) => {
   db.prepare(sql`
     UPDATE chore_assignments
     SET

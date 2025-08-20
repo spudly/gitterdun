@@ -10,8 +10,14 @@ type CreateInvitationParams = {
   expiresAt: Date;
 };
 
-export const createInvitation = (params: CreateInvitationParams): void => {
-  const {token, familyId, email, role, inviterId, expiresAt} = params;
+export const createInvitation = ({
+  token,
+  familyId,
+  email,
+  role,
+  inviterId,
+  expiresAt,
+}: CreateInvitationParams): void => {
   db.prepare(sql`
     INSERT INTO
       family_invitations (

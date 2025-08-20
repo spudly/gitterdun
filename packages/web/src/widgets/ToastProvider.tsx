@@ -96,7 +96,6 @@ export const ToastProvider: FC<{readonly children: ReactNode}> = ({
   return (
     <ToastContext.Provider value={value}>
       {children}
-      {/* Toast viewport */}
       <div className="fixed right-4 top-4 z-50 w-full max-w-sm space-y-2 md:max-w-md">
         {toasts.map(toast => (
           <Alert
@@ -131,13 +130,16 @@ export const useToast = (): ToastContextValue => {
         onError,
       ) => {
         return (...args) => {
-          fn(...args)
-            .then(() => undefined)
-            .catch(() => {
+          fn(...args).then(
+            () => undefined,
+            (error: unknown) => {
+              // eslint-disable-next-line no-console -- log errors for debugging purposes
+              console.error(error);
               if (onError) {
                 onError(userMessage);
               }
-            });
+            },
+          );
         };
       };
       return {addToast, safeAsync};

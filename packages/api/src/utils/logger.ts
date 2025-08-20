@@ -1,7 +1,11 @@
 import type {LoggerOptions} from 'pino';
 import pinoLogger from 'pino';
 
-const baseOptions: LoggerOptions = {level: process.env['LOG_LEVEL'] ?? 'info'};
+const isTest = process.env['NODE_ENV'] === 'test';
+
+const baseOptions: LoggerOptions = {
+  level: process.env['LOG_LEVEL'] ?? (isTest ? 'silent' : 'info'),
+};
 
 const devTransport =
   process.env['NODE_ENV'] === 'development'
