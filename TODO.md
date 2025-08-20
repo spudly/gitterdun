@@ -17,7 +17,7 @@
 - [x] prettier-plugin-tailwindcss
 - [x] eslint-plugin-tailwindcss
 - [x] re-enable import/max-dependencies
-- [ ] re-enable react/jsx-max-depth
+- [x] re-enable react/jsx-max-depth
 - [x] add eslint-plugin-jest
 - [x] format SQL using prettier-plugin-embed + prettier-plugin-sql
 - [x] upgrade to express 5
@@ -28,6 +28,7 @@
       for stupid reasons
 - [ ] where possible, use user-event instead of fireEvent
 - [ ] jest - configure clearAllMocks (or better?) in the jest config so it
-      doesn't have to be se everwhere
+      doesn't have to be set everwhere
 - [ ] setup react-i18n; include pig-latin & pirate-speak
 - [ ] refine landing => sign-up/login flow
+- [ ] add eslint-plugin-turbo

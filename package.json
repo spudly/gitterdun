@@ -16,18 +16,20 @@
     "lint": "turbo run lint --output-logs=errors-only",
     "test": "jest",
     "test:changed": "jest --onlyChanged",
-    "prettier:fix": "prettier --write .",
-    "prettier:check": "prettier --check .",
+    "prettier:fix": "node --experimental-strip-types node_modules/prettier/bin/prettier.cjs --write .",
+    "prettier:check": "node --experimental-strip-types node_modules/prettier/bin/prettier.cjs --check .",
     "lint-staged": "lint-staged",
     "type-check": "turbo run type-check --output-logs=errors-only",
-    "find-unused-eslint-rules": "eslint-find-rules --unused eslint.config.mjs --flatConfig",
+    "find-unused-eslint-rules": "eslint-find-rules --unused eslint.config.ts --flatConfig",
     "knip": "knip",
-    "lint:changed": "(git diff --name-only HEAD --diff-filter=AM && git ls-files --others --exclude-standard) | grep -E '\\.(ts|tsx|js|jsx)$' | sort -u | xargs -r eslint --max-warnings 0",
+    "lint:changed": "(git diff --name-only HEAD --diff-filter=AM && git ls-files --others --exclude-standard) | grep -E \"\\.(ts|tsx|js|jsx)$\" | sort -u | xargs -r eslint --max-warnings 0",
     "ci:check": "turbo run ci:check --output-logs=errors-only",
     "turbo:reset": "find . -name '.turbo' -type d -exec rm -rf {}",
     "ai:check": "turbo run ai:check --output-logs=errors-only"
   },
   "devDependencies": {
+    "@types/eslint-plugin-jsx-a11y": "^6.10.0",
+    "@types/eslint-plugin-tailwindcss": "^3.17.0",
     "@types/jest": "^30.0.0",
     "@typescript-eslint/eslint-plugin": "^8.40.0",
     "@typescript-eslint/parser": "^8.40.0",
@@ -43,9 +45,10 @@
     "eslint-plugin-tailwindcss": "^3.18.2",
     "husky": "^9.1.7",
     "jest": "^30.0.5",
+    "jiti": "^2.0.0",
     "knip": "^5.62.0",
     "lint-staged": "^16.1.5",
-    "prettier": "^3.4.2",
+    "prettier": "^3.5.0",
     "prettier-plugin-embed": "^0.5.0",
     "prettier-plugin-sql": "^0.19.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
@@ -60,7 +63,7 @@
     ]
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22.18.0"
   },
   "packageManager": "npm@10.2.4"
 }
