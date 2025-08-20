@@ -29,8 +29,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
-          key:
-            ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-node_modules-${{ github.sha }}-${{ hashFiles('package-lock.json') }}
 
   build:
     name: Build
@@ -46,13 +45,17 @@ jobs:
           node-version: 22.18.0
 
       - name: Restore node_modules cache
+        id: cache-node-modules-build
         uses: actions/cache@v4
         with:
           path: |
             node_modules
             packages/*/node_modules
-          key:
-            ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-node_modules-${{ github.sha }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies (cache miss)
+        if: steps.cache-node-modules-build.outputs.cache-hit != 'true'
+        run: npm ci
 
       - name: Build packages
         run: npm run build
@@ -79,13 +82,17 @@ jobs:
           node-version: 22.18.0
 
       - name: Restore node_modules cache
+        id: cache-node-modules-test
         uses: actions/cache@v4
         with:
           path: |
             node_modules
             packages/*/node_modules
-          key:
-            ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-node_modules-${{ github.sha }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies (cache miss)
+        if: steps.cache-node-modules-test.outputs.cache-hit != 'true'
+        run: npm ci
 
       - name: Restore build artifacts cache
         uses: actions/cache@v4
@@ -114,13 +121,17 @@ jobs:
           node-version: 22.18.0
 
       - name: Restore node_modules cache
+        id: cache-node-modules-lint
         uses: actions/cache@v4
         with:
           path: |
             node_modules
             packages/*/node_modules
-          key:
-            ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-node_modules-${{ github.sha }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies (cache miss)
+        if: steps.cache-node-modules-lint.outputs.cache-hit != 'true'
+        run: npm ci
 
       - name: Restore build artifacts cache
         uses: actions/cache@v4
@@ -147,13 +158,17 @@ jobs:
           node-version: 22.18.0
 
       - name: Restore node_modules cache
+        id: cache-node-modules-prettier
         uses: actions/cache@v4
         with:
           path: |
             node_modules
             packages/*/node_modules
-          key:
-            ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-node_modules-${{ github.sha }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies (cache miss)
+        if: steps.cache-node-modules-prettier.outputs.cache-hit != 'true'
+        run: npm ci
 
       - name: Prettier Check
         run: npm run prettier:check
@@ -172,13 +187,17 @@ jobs:
           node-version: 22.18.0
 
       - name: Restore node_modules cache
+        id: cache-node-modules-knip
         uses: actions/cache@v4
         with:
           path: |
             node_modules
             packages/*/node_modules
-          key:
-            ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-node_modules-${{ github.sha }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies (cache miss)
+        if: steps.cache-node-modules-knip.outputs.cache-hit != 'true'
+        run: npm ci
 
       - name: Check dependencies
         run: npm run knip
