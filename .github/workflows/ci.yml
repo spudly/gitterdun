@@ -29,7 +29,8 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          key:
+            ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
 
   build:
     name: Build
@@ -50,7 +51,8 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          key:
+            ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
 
       - name: Build packages
         run: npm run build
@@ -82,7 +84,8 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          key:
+            ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
 
       - name: Restore build artifacts cache
         uses: actions/cache@v4
@@ -116,7 +119,8 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          key:
+            ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
 
       - name: Restore build artifacts cache
         uses: actions/cache@v4
@@ -148,7 +152,8 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          key:
+            ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
 
       - name: Prettier Check
         run: npm run prettier:check
@@ -172,7 +177,8 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          key:
+            ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
 
       - name: Check dependencies
         run: npm run knip
