@@ -40,10 +40,10 @@ describe('i18nProvider', () => {
     screen.getByRole('button', {name: /pirate/i}).click();
 
     // Tagline should update to pirate speak
-    await waitFor(() =>
-      { expect(screen.getByRole('heading', {level: 2}).textContent).toMatch(
+    await waitFor(() => {
+      expect(screen.getByRole('heading', {level: 2}).textContent).toMatch(
         /Chore Plunderin'/i,
-      ); },
-    );
+      );
+    });
   });
 });

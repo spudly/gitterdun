@@ -33,3 +33,5 @@
 - [ ] refine landing => sign-up/login flow
 - [ ] add eslint-plugin-turbo
 - [ ] scan repo for strings that haven't been internationalized
+- [ ] add secret detection to precommit hook:
+      https://docs.gitguardian.com/ggshield-docs/integrations/git-hooks/pre-commit
