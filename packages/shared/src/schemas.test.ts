@@ -16,10 +16,11 @@ import {
   CompleteChoreBodySchema,
   LeaderboardQuerySchema,
   RoleRowSchema,
+  TokenSearchParamsSchema,
 } from './schemas';
 
 describe('user schemas', () => {
-  test('UserSchema should validate valid data', () => {
+  test('userSchema should validate valid data', () => {
     const validUser = {
       id: 1,
       username: 'testuser',
@@ -35,7 +36,7 @@ describe('user schemas', () => {
     expect(result.success).toBe(true);
   });
 
-  test('UserSchema should reject invalid email', () => {
+  test('userSchema should reject invalid email', () => {
     const invalidUser = {
       id: 1,
       username: 'testuser',
@@ -51,7 +52,7 @@ describe('user schemas', () => {
     expect(result.success).toBe(false);
   });
 
-  test('CreateUserSchema should apply default role', () => {
+  test('createUserSchema should apply default role', () => {
     const validCreateUser = {
       username: 'newuser',
       email: 'new@example.com',
@@ -62,7 +63,7 @@ describe('user schemas', () => {
     expect(result.success).toBe(true);
   });
 
-  test('CreateUserSchema should reject short password', () => {
+  test('createUserSchema should reject short password', () => {
     const invalidCreateUser = {
       username: 'newuser',
       email: 'new@example.com',
@@ -73,7 +74,7 @@ describe('user schemas', () => {
     expect(result.success).toBe(false);
   });
 
-  test('LoginSchema should validate login data', () => {
+  test('loginSchema should validate login data', () => {
     const validLogin = {email: 'user@example.com', password: 'password123'};
 
     const result = LoginSchema.safeParse(validLogin);
@@ -82,7 +83,7 @@ describe('user schemas', () => {
 });
 
 describe('chore schemas', () => {
-  test('ChoreSchema should validate valid chore', () => {
+  test('choreSchema should validate valid chore', () => {
     const validChore = {
       id: 1,
       title: 'Take out trash',
@@ -100,7 +101,7 @@ describe('chore schemas', () => {
     expect(result.success).toBe(true);
   });
 
-  test('ChoreSchema should reject invalid chore_type', () => {
+  test('choreSchema should reject invalid chore_type', () => {
     const invalidChore = {
       id: 1,
       title: 'Take out trash',
@@ -118,7 +119,7 @@ describe('chore schemas', () => {
     expect(result.success).toBe(false);
   });
 
-  test('ChoreSchema should reject invalid status', () => {
+  test('choreSchema should reject invalid status', () => {
     const invalidChore = {
       id: 1,
       title: 'Take out trash',
@@ -136,14 +137,14 @@ describe('chore schemas', () => {
     expect(result.success).toBe(false);
   });
 
-  test('CreateChoreSchema should apply defaults', () => {
+  test('createChoreSchema should apply defaults', () => {
     const validCreateChore = {title: 'New chore', point_reward: 10};
 
     const result = CreateChoreSchema.safeParse(validCreateChore);
     expect(result.success).toBe(true);
   });
 
-  test('CreateChoreSchema should reject invalid chore_type', () => {
+  test('createChoreSchema should reject invalid chore_type', () => {
     const invalidCreateChore = {
       title: 'Invalid chore',
       point_reward: 10,
@@ -154,21 +155,21 @@ describe('chore schemas', () => {
     expect(result.success).toBe(false);
   });
 
-  test('UpdateChoreSchema should validate partial updates', () => {
+  test('updateChoreSchema should validate partial updates', () => {
     const validUpdate = {title: 'Updated title', point_reward: 15};
 
     const result = UpdateChoreSchema.safeParse(validUpdate);
     expect(result.success).toBe(true);
   });
 
-  test('UpdateChoreSchema should reject invalid status', () => {
+  test('updateChoreSchema should reject invalid status', () => {
     const invalidUpdate = {status: 'invalid-status'};
 
     const result = UpdateChoreSchema.safeParse(invalidUpdate);
     expect(result.success).toBe(false);
   });
 
-  test('UpdateChoreSchema should reject invalid chore_type', () => {
+  test('updateChoreSchema should reject invalid chore_type', () => {
     const invalidUpdate = {chore_type: 'invalid-type'};
 
     const result = UpdateChoreSchema.safeParse(invalidUpdate);
@@ -177,7 +178,7 @@ describe('chore schemas', () => {
 });
 
 describe('goal schemas', () => {
-  test('GoalSchema should validate valid goal', () => {
+  test('goalSchema should validate valid goal', () => {
     const validGoal = {
       id: 1,
       user_id: 1,
@@ -193,7 +194,7 @@ describe('goal schemas', () => {
     expect(result.success).toBe(true);
   });
 
-  test('GoalSchema should reject invalid status', () => {
+  test('goalSchema should reject invalid status', () => {
     const invalidGoal = {
       id: 1,
       user_id: 1,
@@ -210,46 +211,46 @@ describe('goal schemas', () => {
 });
 
 describe('utility schemas', () => {
-  test('PaginationSchema should apply defaults', () => {
+  test('paginationSchema should apply defaults', () => {
     const result = PaginationSchema.safeParse({});
     expect(result.success).toBe(true);
   });
 
-  test('PaginationSchema should coerce string numbers', () => {
+  test('paginationSchema should coerce string numbers', () => {
     const result = PaginationSchema.safeParse({page: '2', limit: '10'});
     expect(result.success).toBe(true);
   });
 
-  test('IdParamSchema should coerce string id', () => {
+  test('idParamSchema should coerce string id', () => {
     const result = IdParamSchema.safeParse({id: '123'});
     expect(result.success).toBe(true);
   });
 
-  test('CompleteChoreBodySchema should validate completion data', () => {
+  test('completeChoreBodySchema should validate completion data', () => {
     const validData = {userId: 1, notes: 'Completed successfully'};
 
     const result = CompleteChoreBodySchema.safeParse(validData);
     expect(result.success).toBe(true);
   });
 
-  test('LeaderboardQuerySchema should apply defaults', () => {
+  test('leaderboardQuerySchema should apply defaults', () => {
     const result = LeaderboardQuerySchema.safeParse({});
     expect(result.success).toBe(true);
   });
 
-  test('RoleRowSchema should validate parent role', () => {
+  test('roleRowSchema should validate parent role', () => {
     const result = RoleRowSchema.safeParse({role: 'parent'});
     expect(result.success).toBe(true);
   });
 
-  test('RoleRowSchema should reject invalid role', () => {
+  test('roleRowSchema should reject invalid role', () => {
     const result = RoleRowSchema.safeParse({role: 'invalid'});
     expect(result.success).toBe(false);
   });
 });
 
 describe('response schemas', () => {
-  test('ApiResponseSchema should create success response schema', () => {
+  test('apiResponseSchema should create success response schema', () => {
     // eslint-disable-next-line new-cap -- ApiResponseSchema is a factory function
     const userResponseSchema = ApiResponseSchema(UserSchema);
     const validResponse = {
@@ -270,7 +271,7 @@ describe('response schemas', () => {
     expect(result.success).toBe(true);
   });
 
-  test('ApiResponseSchema should create error response schema', () => {
+  test('apiResponseSchema should create error response schema', () => {
     // eslint-disable-next-line new-cap -- ApiResponseSchema is a factory function
     const userResponseSchema = ApiResponseSchema(UserSchema);
     const errorResponse = {success: false, error: 'User not found'};
@@ -279,7 +280,7 @@ describe('response schemas', () => {
     expect(result.success).toBe(true);
   });
 
-  test('PaginatedResponseSchema should create paginated schema', () => {
+  test('paginatedResponseSchema should create paginated schema', () => {
     // eslint-disable-next-line new-cap -- PaginatedResponseSchema is a factory function
     const paginatedUsersSchema = PaginatedResponseSchema(UserSchema);
     const validResponse = {
@@ -305,7 +306,7 @@ describe('response schemas', () => {
 });
 
 describe('notification schema', () => {
-  test('NotificationSchema should validate notification', () => {
+  test('notificationSchema should validate notification', () => {
     const validNotification = {
       id: 1,
       user_id: 1,
@@ -319,7 +320,7 @@ describe('notification schema', () => {
     expect(result.success).toBe(true);
   });
 
-  test('NotificationSchema should validate all notification types', () => {
+  test('notificationSchema should validate all notification types', () => {
     const types = [
       'chore_due',
       'chore_completed',
@@ -347,7 +348,7 @@ describe('notification schema', () => {
 });
 
 describe('family schema', () => {
-  test('FamilySchema should validate family data', () => {
+  test('familySchema should validate family data', () => {
     const validFamily = {
       id: 1,
       name: 'Test Family',
@@ -359,7 +360,7 @@ describe('family schema', () => {
     expect(result.success).toBe(true);
   });
 
-  test('FamilySchema should reject empty name', () => {
+  test('familySchema should reject empty name', () => {
     const invalidFamily = {
       id: 1,
       name: '',
@@ -369,5 +370,27 @@ describe('family schema', () => {
 
     const result = FamilySchema.safeParse(invalidFamily);
     expect(result.success).toBe(false);
+  });
+});
+
+describe('search parameter schemas', () => {
+  describe('tokenSearchParamsSchema', () => {
+    test('should validate valid token', () => {
+      const validParams = {token: 'abc123token'};
+      const result = TokenSearchParamsSchema.safeParse(validParams);
+      expect(result.success).toBe(true);
+    });
+
+    test('should reject empty token', () => {
+      const invalidParams = {token: ''};
+      const result = TokenSearchParamsSchema.safeParse(invalidParams);
+      expect(result.success).toBe(false);
+    });
+
+    test('should reject missing token', () => {
+      const invalidParams = {};
+      const result = TokenSearchParamsSchema.safeParse(invalidParams);
+      expect(result.success).toBe(false);
+    });
   });
 });

@@ -5,5 +5,6 @@ module.exports = {
   ...base,
   rootDir: '.',
   testEnvironment: 'node',
+  // Uses base.setupFilesAfterEnv (includes global console silencing)
   displayName: 'api',
 };

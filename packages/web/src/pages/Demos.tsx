@@ -1,83 +1,64 @@
+/* eslint-disable import/max-dependencies -- Demo registry requires many imports for all widget demos */
 import type {FC} from 'react';
+import {Suspense, lazy} from 'react';
 import {useParams} from 'react-router-dom';
+import {z} from 'zod';
 import {TextLink} from '../widgets/TextLink.js';
 import {Text} from '../widgets/Text.js';
 import {PageContainer} from '../widgets/PageContainer.js';
 import {Stack} from '../widgets/Stack.js';
 import {BulletList} from '../widgets/BulletList.js';
-import AlertDemo from '../widgets/Alert.demo.js';
-import AvatarCircleDemo from '../widgets/AvatarCircle.demo.js';
-import BadgeDemo from '../widgets/Badge.demo.js';
-import BulletListDemo from '../widgets/BulletList.demo.js';
-import ButtonDemo from '../widgets/Button.demo.js';
-import CardDemo from '../widgets/Card.demo.js';
-import DataTableDemo from '../widgets/DataTable.demo.js';
-import EmptyStateDemo from '../widgets/EmptyState.demo.js';
-import FormCardDemo from '../widgets/FormCard.demo.js';
-import FormFieldDemo from '../widgets/FormField.demo.js';
-import FormSectionDemo from '../widgets/FormSection.demo.js';
-import GridContainerDemo from '../widgets/GridContainer.demo.js';
-import IconButtonDemo from '../widgets/IconButton.demo.js';
-import InputGroupDemo from '../widgets/InputGroup.demo.js';
-import LayoutDemo from '../widgets/Layout.demo.js';
-import ListRowDemo from '../widgets/ListRow.demo.js';
-import ModalDemo from '../widgets/Modal.demo.js';
-import PageContainerDemo from '../widgets/PageContainer.demo.js';
-import PageHeaderDemo from '../widgets/PageHeader.demo.js';
-import PodiumDemo from '../widgets/Podium.demo.js';
-import ProgressBarDemo from '../widgets/ProgressBar.demo.js';
-import RankingListDemo from '../widgets/RankingList.demo.js';
-import SectionHeaderDemo from '../widgets/SectionHeader.demo.js';
-import SelectInputDemo from '../widgets/SelectInput.demo.js';
-import SpinnerDemo from '../widgets/Spinner.demo.js';
-import StatCardDemo from '../widgets/StatCard.demo.js';
-import StatusBadgeDemo from '../widgets/StatusBadge.demo.js';
-import StatusDotDemo from '../widgets/StatusDot.demo.js';
-import TextInputDemo from '../widgets/TextInput.demo.js';
 
 const registry: Record<string, FC> = {
-  Alert: AlertDemo,
-  AvatarCircle: AvatarCircleDemo,
-  Badge: BadgeDemo,
-  BulletList: BulletListDemo,
-  Button: ButtonDemo,
-  Card: CardDemo,
-  DataTable: DataTableDemo,
-  EmptyState: EmptyStateDemo,
-  FormCard: FormCardDemo,
-  FormField: FormFieldDemo,
-  FormSection: FormSectionDemo,
-  GridContainer: GridContainerDemo,
-  IconButton: IconButtonDemo,
-  InputGroup: InputGroupDemo,
-  Layout: LayoutDemo,
-  ListRow: ListRowDemo,
-  Modal: ModalDemo,
-  PageContainer: PageContainerDemo,
-  PageHeader: PageHeaderDemo,
-  Podium: PodiumDemo,
-  ProgressBar: ProgressBarDemo,
-  RankingList: RankingListDemo,
-  SectionHeader: SectionHeaderDemo,
-  SelectInput: SelectInputDemo,
-  Spinner: SpinnerDemo,
-  StatCard: StatCardDemo,
-  StatusBadge: StatusBadgeDemo,
-  StatusDot: StatusDotDemo,
-  TextInput: TextInputDemo,
+  Alert: lazy(async () => import('../widgets/Alert.demo.js')),
+  AvatarCircle: lazy(async () => import('../widgets/AvatarCircle.demo.js')),
+  Badge: lazy(async () => import('../widgets/Badge.demo.js')),
+  BulletList: lazy(async () => import('../widgets/BulletList.demo.js')),
+  Button: lazy(async () => import('../widgets/Button.demo.js')),
+  Card: lazy(async () => import('../widgets/Card.demo.js')),
+  DataTable: lazy(async () => import('../widgets/DataTable.demo.js')),
+  EmptyState: lazy(async () => import('../widgets/EmptyState.demo.js')),
+  FormCard: lazy(async () => import('../widgets/FormCard.demo.js')),
+  FormField: lazy(async () => import('../widgets/FormField.demo.js')),
+  FormSection: lazy(async () => import('../widgets/FormSection.demo.js')),
+  GridContainer: lazy(async () => import('../widgets/GridContainer.demo.js')),
+  Heading: lazy(async () => import('../widgets/Heading.demo.js')),
+  IconButton: lazy(async () => import('../widgets/IconButton.demo.js')),
+  InputGroup: lazy(async () => import('../widgets/InputGroup.demo.js')),
+  Layout: lazy(async () => import('../widgets/Layout.demo.js')),
+  ListRow: lazy(async () => import('../widgets/ListRow.demo.js')),
+  Modal: lazy(async () => import('../widgets/Modal.demo.js')),
+  PageContainer: lazy(async () => import('../widgets/PageContainer.demo.js')),
+  PageHeader: lazy(async () => import('../widgets/PageHeader.demo.js')),
+  Podium: lazy(async () => import('../widgets/Podium.demo.js')),
+  ProgressBar: lazy(async () => import('../widgets/ProgressBar.demo.js')),
+  RankingList: lazy(async () => import('../widgets/RankingList.demo.js')),
+  Section: lazy(async () => import('../widgets/Section.demo.js')),
+  SectionHeader: lazy(async () => import('../widgets/SectionHeader.demo.js')),
+  SelectInput: lazy(async () => import('../widgets/SelectInput.demo.js')),
+  Spinner: lazy(async () => import('../widgets/Spinner.demo.js')),
+  StatCard: lazy(async () => import('../widgets/StatCard.demo.js')),
+  StatusBadge: lazy(async () => import('../widgets/StatusBadge.demo.js')),
+  StatusDot: lazy(async () => import('../widgets/StatusDot.demo.js')),
+  TextInput: lazy(async () => import('../widgets/TextInput.demo.js')),
 };
 
+/* eslint-enable import/max-dependencies */
+
+const DemoParamsSchema = z.object({name: z.string().min(1).optional()});
+
 const Demos: FC = () => {
-  const params = useParams();
-  const {name} = params;
-  if (name !== undefined && name !== '' && registry[name]) {
+  const {name} = DemoParamsSchema.parse(useParams());
+  if (name !== undefined && registry[name]) {
     const Demo = registry[name];
     return (
       <PageContainer variant="wide">
         <Stack gap="md">
           <TextLink to="/__demos">← All demos</TextLink>
 
-          <Demo />
+          <Suspense fallback={<div>Loading demo...</div>}>
+            <Demo />
+          </Suspense>
         </Stack>
       </PageContainer>
     );

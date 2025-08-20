@@ -111,8 +111,12 @@ const checkUserExists = (email: string, username: string) => {
   return existingUser !== null;
 };
 
-export const createNewUser = async (params: CreateUserParams) => {
-  const {username, email, password, role} = params;
+export const createNewUser = async ({
+  username,
+  email,
+  password,
+  role,
+}: CreateUserParams) => {
   const saltRounds = 12;
   const passwordHash = await bcrypt.hash(password, saltRounds);
 

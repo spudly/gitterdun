@@ -301,6 +301,9 @@ export const FamilyIdParamSchema = z.object({
   familyId: z.coerce.number().int().min(1),
 });
 
+// Search parameter schemas
+export const TokenSearchParamsSchema = z.object({token: z.string().min(1)});
+
 // Database row schemas (runtime-validated parsing for raw DB results)
 export const SessionRowSchema = z.object({
   user_id: z.number(),
@@ -415,3 +418,6 @@ export type Pagination = z.infer<typeof PaginationSchema>;
 export type ChoreQuery = z.infer<typeof ChoreQuerySchema>;
 export type GoalQuery = z.infer<typeof GoalQuerySchema>;
 export type LeaderboardResponse = z.infer<typeof LeaderboardResponseSchema>;
+
+// Search parameter types
+export type TokenSearchParams = z.infer<typeof TokenSearchParamsSchema>;

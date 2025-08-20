@@ -567,7 +567,7 @@ const eslintConfig = [
       '@typescript-eslint/use-unknown-in-catch-callback-variable': 'warn',
       'import/consistent-type-specifier-style': 'warn',
       'import/enforce-node-protocol-usage': ['warn', 'always'],
-      'import/max-dependencies': 'off', // TODO: re-enable this after fixing other issues
+      'import/max-dependencies': ['warn', {max: 20}],
       'import/no-anonymous-default-export': 'warn',
       'import/no-deprecated': 'warn',
       'import/no-empty-named-blocks': 'warn',
@@ -622,7 +622,7 @@ const eslintConfig = [
       'react/jsx-fragments': 'warn',
       'react/jsx-handler-names': 'warn',
       'react/jsx-key': 'warn',
-      'react/jsx-max-depth': ['off', {max: 5}], // TODO: re-enable this after fixing other issues
+      'react/jsx-max-depth': ['warn', {max: 10}],
       'react/jsx-max-props-per-line': 'off', // use Prettier for styling
       'react/jsx-newline': 'off', // use Prettier for styling
       'react/jsx-no-bind': 'off', // react-compiler handles these types of issues
@@ -713,11 +713,11 @@ const eslintConfig = [
       'logical-assignment-operators': 'warn',
       'max-classes-per-file': 'warn',
       'max-depth': 'warn',
-      'max-lines': ['warn', 150],
+      'max-lines': ['warn', 200],
       'max-lines-per-function': 'off', // ['warn', {max: 20, skipBlankLines: true, skipComments: true, IIFEs: true},], // TODO: re-enable
       'max-nested-callbacks': 'warn',
       'max-params': ['warn', {max: 5}],
-      'max-statements': 'warn',
+      'max-statements': ['warn', {max: 20}],
       'multiline-comment-style': 'off', // use Prettier for styling
       'new-cap': 'warn',
       'no-alert': 'warn',

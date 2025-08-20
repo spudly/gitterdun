@@ -1,6 +1,7 @@
 import type {FC, FormEventHandler} from 'react';
 import {useState} from 'react';
 import {useSearchParams, useNavigate} from 'react-router-dom';
+import {TokenSearchParamsSchema} from '@gitterdun/shared';
 import {useUser} from '../hooks/useUser.js';
 import {FormCard} from '../widgets/FormCard.js';
 import {FormField} from '../widgets/FormField.js';
@@ -8,6 +9,7 @@ import {TextInput} from '../widgets/TextInput.js';
 import {Button} from '../widgets/Button.js';
 import {Alert} from '../widgets/Alert.js';
 import {Stack} from '../widgets/Stack.js';
+import {useToast} from '../widgets/ToastProvider.js';
 
 const ResetPassword: FC = () => {
   const {resetPassword} = useUser();
@@ -16,31 +18,37 @@ const ResetPassword: FC = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [params] = useSearchParams();
   const navigate = useNavigate();
+  const {safeAsync} = useToast();
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = event => {
     event.preventDefault();
     setMessage(null);
-    const token = params.get('token') ?? '';
-    if (!token) {
+
+    // Validate search parameters using Zod - use safeParse for URL params
+    const searchParamsObject = Object.fromEntries(params.entries());
+    const parseResult = TokenSearchParamsSchema.safeParse(searchParamsObject);
+    if (!parseResult.success) {
       setMessage('Missing token');
       return;
     }
+    const {token} = parseResult.data;
     if (password !== confirm) {
       setMessage('Passwords do not match');
       return;
     }
-    // Wrap in an IIFE and attach a catch handler instead of using the void operator
-    (async () => {
+    safeAsync(async () => {
       try {
         await resetPassword(token, password);
         setMessage('Password reset successful. Redirecting...');
         setTimeout(() => {
-          Promise.resolve(navigate('/login')).catch(() => undefined);
+          safeAsync(async () => {
+            await navigate('/login');
+          }, 'Failed to redirect to login');
         }, 1200);
       } catch {
         setMessage('Could not reset password. Please try again.');
       }
-    })().catch(() => undefined);
+    }, 'Failed to submit form. Please try again.');
   };
 
   return (

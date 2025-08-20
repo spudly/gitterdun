@@ -25,7 +25,7 @@ const Login: FC = () => {
     const run = safeAsync(
       async () => {
         await login(email, password);
-        return navigate('/');
+        await navigate('/');
       },
       'Login failed',
       setMessage,

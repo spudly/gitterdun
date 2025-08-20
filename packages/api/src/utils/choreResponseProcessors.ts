@@ -37,8 +37,12 @@ const getChoresCount = (query: string, params: Array<string | number>) => {
   return total;
 };
 
-const buildPaginatedChoresQuery = (params: PaginatedQueryParams) => {
-  const {baseQuery, params: queryParams, page, limit} = params;
+const buildPaginatedChoresQuery = ({
+  baseQuery,
+  params: queryParams,
+  page,
+  limit,
+}: PaginatedQueryParams) => {
   const finalQuery = `${baseQuery} ORDER BY c.created_at DESC LIMIT ? OFFSET ?`;
   const offset = (page - 1) * limit;
   const finalParams = [...queryParams, limit, offset];
@@ -53,8 +57,12 @@ const executeChoresQuery = (
   return chores.map(chore => ChoreWithUsernameSchema.parse(chore));
 };
 
-const formatChoresResponse = (params: ChoresResponseParams) => {
-  const {chores, page, limit, total} = params;
+const formatChoresResponse = ({
+  chores,
+  page,
+  limit,
+  total,
+}: ChoresResponseParams) => {
   return {
     success: true as const,
     data: chores,
@@ -62,8 +70,13 @@ const formatChoresResponse = (params: ChoresResponseParams) => {
   };
 };
 
-export const processChoresRequest = (params: ProcessChoresParams) => {
-  const {status, choreType, userId, page, limit} = params;
+export const processChoresRequest = ({
+  status,
+  choreType,
+  userId,
+  page,
+  limit,
+}: ProcessChoresParams) => {
   const {query, params: queryParams} = buildChoresQuery(
     status,
     choreType,

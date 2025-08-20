@@ -5,6 +5,10 @@ module.exports = {
   ...base,
   rootDir: '.',
   testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  setupFilesAfterEnv: [
+    // Extend base setup with package-specific setup
+    ...base.setupFilesAfterEnv,
+    '<rootDir>/jest.setup.ts',
+  ],
   displayName: 'web',
 };

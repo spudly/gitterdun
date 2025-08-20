@@ -27,4 +27,5 @@ module.exports = {
   ],
   // Replaced forceExit with detectOpenHandles for better debugging
   detectOpenHandles: true,
+  setupFilesAfterEnv: [`${__dirname}/jest.setup.ts`],
 };
