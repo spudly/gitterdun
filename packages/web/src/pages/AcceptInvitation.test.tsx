@@ -3,6 +3,7 @@ import {render, screen} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
 import AcceptInvitation from './AcceptInvitation';
 import {ToastProvider} from '../widgets/ToastProvider';
+import {TestProviders} from '../test/TestProviders';
 
 jest.mock('../lib/api', () => ({
   invitationsApi: {accept: jest.fn(async () => ({success: true}))},
@@ -35,6 +36,7 @@ describe('acceptInvitation page', () => {
           <AcceptInvitation />
         </ToastProvider>
       </MemoryRouter>,
+      {wrapper: TestProviders},
     );
     expect(screen.getByText('Missing token.')).toBeInTheDocument();
   });
@@ -46,6 +48,7 @@ describe('acceptInvitation page', () => {
           <AcceptInvitation />
         </ToastProvider>
       </MemoryRouter>,
+      {wrapper: TestProviders},
     );
     expect(
       screen.getByRole('heading', {name: 'Accept Invitation'}),

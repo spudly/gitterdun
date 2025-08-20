@@ -1,7 +1,7 @@
 import type {NavigationItem} from './widgets/Layout';
 import {defineMessages} from 'react-intl';
 
-export const navMessages = defineMessages({
+const navMessages = defineMessages({
   dashboard: {id: 'nav.dashboard', defaultMessage: 'Dashboard'},
   chores: {id: 'nav.chores', defaultMessage: 'Chores'},
   goals: {id: 'nav.goals', defaultMessage: 'Goals'},

@@ -4,6 +4,7 @@ import {MemoryRouter} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import ResetPassword from './ResetPassword';
 import {ToastProvider} from '../widgets/ToastProvider';
+import {TestProviders} from '../test/TestProviders';
 
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => {
@@ -26,7 +27,9 @@ const wrap = (ui: React.ReactElement, path = '/reset-password?token=t') => (
 
 describe('resetPassword page', () => {
   test('validates token and passwords', async () => {
-    render(wrap(<ResetPassword />, '/reset-password?token='));
+    render(wrap(<ResetPassword />, '/reset-password?token='), {
+      wrapper: TestProviders,
+    });
     // Fill in valid passwords to pass HTML validation
     fireEvent.change(screen.getByLabelText(/New Password/iu), {
       target: {value: 'abcdef'},
@@ -42,7 +45,7 @@ describe('resetPassword page', () => {
   });
 
   test('shows message when passwords do not match', async () => {
-    render(wrap(<ResetPassword />));
+    render(wrap(<ResetPassword />), {wrapper: TestProviders});
     fireEvent.change(screen.getByLabelText(/New Password/iu), {
       target: {value: 'a'},
     });
@@ -54,7 +57,9 @@ describe('resetPassword page', () => {
   });
 
   test('executes missing-token branch', async () => {
-    render(wrap(<ResetPassword />, '/reset-password?token='));
+    render(wrap(<ResetPassword />, '/reset-password?token='), {
+      wrapper: TestProviders,
+    });
     // Fill in valid passwords to pass HTML validation
     fireEvent.change(screen.getByLabelText(/New Password/iu), {
       target: {value: 'abcdef'},
@@ -76,7 +81,9 @@ describe('resetPassword page', () => {
   });
 
   test('uses default empty token when query param is absent and shows error', async () => {
-    render(wrap(<ResetPassword />, '/reset-password'));
+    render(wrap(<ResetPassword />, '/reset-password'), {
+      wrapper: TestProviders,
+    });
     // Fill valid passwords to satisfy required/minLength so submit handler runs
     fireEvent.change(screen.getByLabelText(/New Password/iu), {
       target: {value: 'abcdef'},

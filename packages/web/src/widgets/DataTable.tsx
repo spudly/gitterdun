@@ -1,4 +1,5 @@
 import type {ReactNode} from 'react';
+import {FormattedMessage} from 'react-intl';
 import clsx from 'clsx';
 import {isReactNode} from '../utils/isReactNode';
 
@@ -54,7 +55,12 @@ export const DataTable = <T extends object>({
         <div className="px-4 py-8 text-center">
           <div className="mx-auto size-8 animate-spin rounded-full border-b-2 border-indigo-600" />
 
-          <p className="mt-2 text-gray-600">Loading...</p>
+          <p className="mt-2 text-gray-600">
+            <FormattedMessage
+              defaultMessage="Loading..."
+              id="datatable.loading"
+            />
+          </p>
         </div>
       </div>
     );

@@ -6,3 +6,6 @@ export * from './SparklesIcon';
 export * from './TrophyIcon';
 export * from './InfoCircleIcon';
 export * from './GlobeIcon';
+export * from './UserIcon';
+export * from './FlameIcon';
+export * from './GearIcon';

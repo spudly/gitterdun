@@ -51,17 +51,37 @@ const Chores: FC = () => {
 
   const renderStatusBadge = (status: ChoreWithUsername['status']) => {
     if (status === 'completed') {
-      return <Badge variant="success">completed</Badge>;
+      return (
+        <Badge variant="success">
+          <FormattedMessage
+            defaultMessage="Completed"
+            id="chores.status.completed"
+          />
+        </Badge>
+      );
     }
     if (status === 'approved') {
-      return <Badge variant="info">approved</Badge>;
+      return (
+        <Badge variant="info">
+          <FormattedMessage
+            defaultMessage="Approved"
+            id="chores.status.approved"
+          />
+        </Badge>
+      );
     }
-    return <Badge variant="warning">pending</Badge>;
+    return (
+      <Badge variant="warning">
+        <FormattedMessage defaultMessage="Pending" id="chores.status.pending" />
+      </Badge>
+    );
   };
 
   return (
     <PageContainer>
-      <PageHeader title={intl.formatMessage({id: 'nav.chores', defaultMessage: 'Chores'})} />
+      <PageHeader
+        title={intl.formatMessage({id: 'nav.chores', defaultMessage: 'Chores'})}
+      />
 
       <List>
         {chores.map((chore: ChoreWithUsername) => (
@@ -72,25 +92,46 @@ const Chores: FC = () => {
             meta={
               <InlineMeta>
                 <span>
-                  {intl.formatMessage({id: 'chores.points', defaultMessage: 'Points'})}: {chore.point_reward}
+                  {intl.formatMessage(
+                    {
+                      id: 'chores.pointsWithValue',
+                      defaultMessage: 'Points: {points}',
+                    },
+                    {points: chore.point_reward},
+                  )}
                 </span>
 
                 {chore.bonus_points > 0 && (
                   <span>
-                    {intl.formatMessage({id: 'chores.bonus', defaultMessage: 'Bonus'})}: +{chore.bonus_points}
+                    {intl.formatMessage(
+                      {
+                        id: 'chores.bonusWithPoints',
+                        defaultMessage: 'Bonus: +{points}',
+                      },
+                      {points: chore.bonus_points},
+                    )}
                   </span>
                 )}
 
                 {chore.penalty_points > 0 && (
                   <span>
-                    {intl.formatMessage({id: 'chores.penalty', defaultMessage: 'Penalty'})}: -{chore.penalty_points}
+                    {intl.formatMessage(
+                      {
+                        id: 'chores.penaltyWithPoints',
+                        defaultMessage: 'Penalty: -{points}',
+                      },
+                      {points: chore.penalty_points},
+                    )}
                   </span>
                 )}
 
                 {typeof chore.due_date === 'string'
                 && chore.due_date.length > 0 ? (
                   <span>
-                    {intl.formatMessage({id: 'chores.due', defaultMessage: 'Due'})}: {new Date(chore.due_date).toLocaleDateString()}
+                    {intl.formatMessage(
+                      {id: 'chores.dueWithDate', defaultMessage: 'Due: {date}'},
+                      {date: new Date(chore.due_date).toLocaleDateString()},
+                    )}
                   </span>
                 ) : null}
               </InlineMeta>
@@ -98,7 +139,10 @@ const Chores: FC = () => {
             right={
               chore.status === 'pending' ? (
                 <Button size="sm" variant="primary">
-                  <FormattedMessage id="chores.complete" defaultMessage="Complete" />
+                  <FormattedMessage
+                    defaultMessage="Complete"
+                    id="chores.complete"
+                  />
                 </Button>
               ) : undefined
             }
@@ -108,7 +152,12 @@ const Chores: FC = () => {
                 {renderStatusBadge(chore.status)}
 
                 {chore.chore_type === 'bonus' && (
-                  <Badge variant="purple">Bonus</Badge>
+                  <Badge variant="purple">
+                    <FormattedMessage
+                      defaultMessage="Bonus"
+                      id="chores.type.bonus"
+                    />
+                  </Badge>
                 )}
               </>
             }

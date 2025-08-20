@@ -29,7 +29,11 @@ export const FormField: FC<FormFieldProps> = ({
       >
         {label}
 
-        {required ? <span className="ml-1 text-red-500">*</span> : null}
+        {required ? (
+          <span aria-hidden className="ml-1 text-red-500">
+            *
+          </span>
+        ) : null}
       </label>
 
       {children}

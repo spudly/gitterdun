@@ -31,21 +31,30 @@ const ForgotPassword: FC = () => {
           }),
         );
       },
-      intl.formatMessage({id: 'forgotPassword.error', defaultMessage: 'Request failed'}),
+      intl.formatMessage({
+        id: 'forgotPassword.error',
+        defaultMessage: 'Request failed',
+      }),
       setMessage,
     )();
   };
 
   return (
     <FormCard
-      title={intl.formatMessage({id: 'forgotPassword.title', defaultMessage: 'Forgot Password'})}
+      title={intl.formatMessage({
+        id: 'forgotPassword.title',
+        defaultMessage: 'Forgot Password',
+      })}
     >
       <Stack gap="md">
         <form onSubmit={handleSubmit}>
           <Stack gap="md">
             <FormField
               htmlFor="email"
-              label={intl.formatMessage({id: 'login.email', defaultMessage: 'Email'})}
+              label={intl.formatMessage({
+                id: 'login.email',
+                defaultMessage: 'Email',
+              })}
               required
             >
               <TextInput
@@ -60,7 +69,10 @@ const ForgotPassword: FC = () => {
             </FormField>
 
             <Button fullWidth type="submit">
-              <FormattedMessage id="forgotPassword.submit" defaultMessage="Send reset link" />
+              <FormattedMessage
+                defaultMessage="Send reset link"
+                id="forgotPassword.submit"
+              />
             </Button>
           </Stack>
         </form>

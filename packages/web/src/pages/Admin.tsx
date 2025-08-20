@@ -56,8 +56,8 @@ const Admin: FC = () => {
           />
           <Text muted>
             <FormattedMessage
-              id="admin.accessDeniedText"
               defaultMessage="You need admin privileges to view this page."
+              id="admin.accessDeniedText"
             />
           </Text>
         </Card>
@@ -81,7 +81,10 @@ const Admin: FC = () => {
   return (
     <PageContainer>
       <PageHeader
-        title={intl.formatMessage({id: 'admin.title', defaultMessage: 'Admin Panel'})}
+        title={intl.formatMessage({
+          id: 'admin.title',
+          defaultMessage: 'Admin Panel',
+        })}
       />
 
       <Stack gap="lg">

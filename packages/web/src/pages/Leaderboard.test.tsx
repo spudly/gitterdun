@@ -3,6 +3,7 @@ import {render, screen} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Leaderboard from './Leaderboard';
 import * as apiModule from '../lib/api';
+import {TestProviders} from '../test/TestProviders';
 
 jest.mock('../lib/api', () => ({
   leaderboardApi: {
@@ -42,12 +43,12 @@ const wrap = (ui: React.ReactElement) => (
 
 describe('leaderboard page', () => {
   test('renders header', async () => {
-    render(wrap(<Leaderboard />));
+    render(wrap(<Leaderboard />), {wrapper: TestProviders});
     await expect(screen.findByText('Leaderboard')).resolves.toBeInTheDocument();
   });
 
   test('renders podium and ranking list content', async () => {
-    render(wrap(<Leaderboard />));
+    render(wrap(<Leaderboard />), {wrapper: TestProviders});
     const headings = await screen.findAllByText('U1');
     expect(headings.length).toBeGreaterThan(0);
     expect(screen.getAllByText('U2').length).toBeGreaterThan(0);
@@ -73,7 +74,7 @@ describe('leaderboard page', () => {
         totalUsers: 1,
       },
     });
-    render(wrap(<Leaderboard />));
+    render(wrap(<Leaderboard />), {wrapper: TestProviders});
     await expect(
       screen.findByText(/Sorted by streak count/u),
     ).resolves.toBeInTheDocument();

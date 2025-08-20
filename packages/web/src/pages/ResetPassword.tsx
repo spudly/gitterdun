@@ -30,48 +30,70 @@ const ResetPassword: FC = () => {
     const searchParamsObject = Object.fromEntries(params.entries());
     const parseResult = TokenSearchParamsSchema.safeParse(searchParamsObject);
     if (!parseResult.success) {
-      setMessage(intl.formatMessage({id: 'resetPassword.missingToken', defaultMessage: 'Missing token'}));
+      setMessage(
+        intl.formatMessage({
+          id: 'resetPassword.missingToken',
+          defaultMessage: 'Missing token',
+        }),
+      );
       return;
     }
     const {token} = parseResult.data;
     if (password !== confirm) {
       setMessage(
-        intl.formatMessage({id: 'resetPassword.noMatch', defaultMessage: 'Passwords do not match'}),
+        intl.formatMessage({
+          id: 'resetPassword.noMatch',
+          defaultMessage: 'Passwords do not match',
+        }),
       );
       return;
     }
-    safeAsync(async () => {
-      try {
-        await resetPassword(token, password);
-        setMessage(
-          intl.formatMessage({
-            id: 'resetPassword.success',
-            defaultMessage: 'Password reset successful. Redirecting...',
-          }),
-        );
-        setTimeout(() => {
-          safeAsync(async () => {
-            await navigate('/login');
-          }, 'Failed to redirect to login');
-        }, 1200);
-      } catch {
-        setMessage(
-          intl.formatMessage({
-            id: 'resetPassword.error',
-            defaultMessage: 'Could not reset password. Please try again.',
-          }),
-        );
-      }
-    }, intl.formatMessage({id: 'resetPassword.submitError', defaultMessage: 'Failed to submit form. Please try again.'}));
+    safeAsync(
+      async () => {
+        try {
+          await resetPassword(token, password);
+          setMessage(
+            intl.formatMessage({
+              id: 'resetPassword.success',
+              defaultMessage: 'Password reset successful. Redirecting...',
+            }),
+          );
+          setTimeout(() => {
+            safeAsync(async () => {
+              await navigate('/login');
+            }, 'Failed to redirect to login');
+          }, 1200);
+        } catch {
+          setMessage(
+            intl.formatMessage({
+              id: 'resetPassword.error',
+              defaultMessage: 'Could not reset password. Please try again.',
+            }),
+          );
+        }
+      },
+      intl.formatMessage({
+        id: 'resetPassword.submitError',
+        defaultMessage: 'Failed to submit form. Please try again.',
+      }),
+    );
   };
 
   return (
-    <FormCard title={intl.formatMessage({id: 'resetPassword.title', defaultMessage: 'Reset Password'})}>
+    <FormCard
+      title={intl.formatMessage({
+        id: 'resetPassword.title',
+        defaultMessage: 'Reset Password',
+      })}
+    >
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
           <FormField
             htmlFor="new-password"
-            label={intl.formatMessage({id: 'resetPassword.newPassword', defaultMessage: 'New Password'})}
+            label={intl.formatMessage({
+              id: 'resetPassword.newPassword',
+              defaultMessage: 'New Password',
+            })}
             required
           >
             <TextInput
@@ -88,7 +110,10 @@ const ResetPassword: FC = () => {
 
           <FormField
             htmlFor="confirm-password"
-            label={intl.formatMessage({id: 'resetPassword.confirmPassword', defaultMessage: 'Confirm Password'})}
+            label={intl.formatMessage({
+              id: 'resetPassword.confirmPassword',
+              defaultMessage: 'Confirm Password',
+            })}
             required
           >
             <TextInput
@@ -108,7 +133,10 @@ const ResetPassword: FC = () => {
           ) : null}
 
           <Button fullWidth type="submit">
-            <FormattedMessage id="resetPassword.submit" defaultMessage="Reset Password" />
+            <FormattedMessage
+              defaultMessage="Reset Password"
+              id="resetPassword.submit"
+            />
           </Button>
         </Stack>
       </form>

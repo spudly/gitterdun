@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {z} from 'zod';
 import Demos from './Demos';
+import {TestProviders} from '../test/TestProviders';
 
 // Test the local DemoParamsSchema
 const DemoParamsSchema = z.object({name: z.string().min(1).optional()});
@@ -38,6 +39,7 @@ describe('demos page', () => {
             <Route element={<Demos />} path="/__demos" />
           </Routes>
         </MemoryRouter>,
+        {wrapper: TestProviders},
       );
     });
     expect(screen.getByText('Widget Demos')).toBeInTheDocument();
@@ -51,6 +53,7 @@ describe('demos page', () => {
             <Route element={<Demos />} path="/__demos/:name" />
           </Routes>
         </MemoryRouter>,
+        {wrapper: TestProviders},
       );
     });
     expect(screen.getByTestId('ButtonDemo')).toBeInTheDocument();
@@ -71,6 +74,7 @@ describe('demos page', () => {
           <Route element={<Demos />} path="/__demos" />
         </Routes>
       </MemoryRouter>,
+      {wrapper: TestProviders},
     );
 
     // Check that each demo file has a corresponding link in the rendered component

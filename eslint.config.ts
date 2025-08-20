@@ -176,7 +176,10 @@ const eslintConfig = [
       'react/jsx-props-no-spreading': 'off',
       'react/jsx-wrap-multilines': 'off',
       // Enable to force all UI copy through i18n
-      'react/jsx-no-literals': ['error', {noStrings: true, allowedStrings: []}],
+      'react/jsx-no-literals': [
+        'error',
+        {noStrings: true, ignoreProps: true, allowedStrings: ['*', '%']},
+      ],
       '@typescript-eslint/keyword-spacing': 'off', // using Prettier for styling
       'keyword-spacing': 'off', // using Prettier for styling
       'jsx-a11y/label-has-associated-control': [
@@ -636,7 +639,6 @@ const eslintConfig = [
       'react/jsx-no-constructed-context-values': 'warn',
       'react/jsx-no-duplicate-props': 'warn',
       'react/jsx-no-leaked-render': 'warn',
-      'react/jsx-no-literals': 'off', // legacy; overridden above for project
       'react/jsx-no-script-url': 'warn',
       'react/jsx-no-target-blank': 'warn',
       'react/jsx-no-undef': 'warn',
@@ -934,8 +936,17 @@ const eslintConfig = [
     },
   },
   {
+    files: ['**/*.demo.tsx'],
+    rules: {
+      // Allow literal strings in widget demo files
+      'react/jsx-no-literals': 'off',
+    },
+  },
+  {
     files: ['**/*.test.ts', '**/*.test.tsx'],
     rules: {
+      // Allow literal strings in test files
+      'react/jsx-no-literals': 'off',
       'import/no-namespace': 'off', // useful for mocking in jest
       '@typescript-eslint/no-non-null-assertion': 'off', // we can be more loose in unit tests
       '@typescript-eslint/no-unsafe-call': 'off', // we can be more loose in unit tests

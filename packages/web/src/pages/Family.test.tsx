@@ -5,6 +5,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Family from './Family';
 import {useUser} from '../hooks/useUser';
 import * as apiModule from '../lib/api';
+import {TestProviders} from '../test/TestProviders';
 
 jest.mock('../hooks/useUser', () => ({
   useUser: jest.fn(() => ({user: {id: 1}})),
@@ -45,14 +46,14 @@ describe('family page', () => {
       loginError: null,
       registerError: null,
     } as ReturnType<typeof useUser>);
-    render(wrap(<Family />));
+    render(wrap(<Family />), {wrapper: TestProviders});
     expect(
       screen.getByText('Please log in to manage your family.'),
     ).toBeInTheDocument();
   });
   test('renders section title', async () => {
     await act(async () => {
-      render(wrap(<Family />));
+      render(wrap(<Family />), {wrapper: TestProviders});
     });
     expect(screen.getByText('Your Families')).toBeInTheDocument();
   });
@@ -63,7 +64,7 @@ describe('family page', () => {
     familiesApi.createChild.mockResolvedValueOnce({success: true});
     invitationsApi.create.mockResolvedValueOnce({success: true});
 
-    render(wrap(<Family />));
+    render(wrap(<Family />), {wrapper: TestProviders});
     await screen.findByText('Your Families');
     await userEvent.type(
       screen.getByPlaceholderText('New family name'),
@@ -110,7 +111,7 @@ describe('family page', () => {
   });
 
   test('skips actions when inputs are empty (validation branches)', async () => {
-    render(wrap(<Family />));
+    render(wrap(<Family />), {wrapper: TestProviders});
     await screen.findByText('Your Families');
     // Click create with empty family name (guard branch)
     await userEvent.click(screen.getAllByRole('button', {name: 'Create'})[0]!);

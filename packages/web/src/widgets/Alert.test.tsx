@@ -2,6 +2,7 @@ import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {Alert} from './Alert';
+import {TestProviders} from '../test/TestProviders';
 
 describe('alert', () => {
   test('shows types, title and dismiss', async () => {
@@ -10,6 +11,7 @@ describe('alert', () => {
       <Alert onDismiss={onDismiss} title="T" type="info">
         Body
       </Alert>,
+      {wrapper: TestProviders},
     );
     expect(screen.getByText('T')).toBeInTheDocument();
     expect(screen.getByText('Body')).toBeInTheDocument();
@@ -26,7 +28,7 @@ describe('alert', () => {
   });
 
   test('defaults type to info when omitted', () => {
-    render(<Alert>Default</Alert>);
+    render(<Alert>Default</Alert>, {wrapper: TestProviders});
     const alert = screen.getByRole('alert');
     expect(alert).toHaveClass('bg-blue-50', 'border-blue-200', 'text-blue-800');
   });

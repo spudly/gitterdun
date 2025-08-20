@@ -7,8 +7,10 @@ import {Podium} from '../widgets/Podium.js';
 import {RankingList} from '../widgets/RankingList.js';
 import {PageLoading} from '../widgets/PageLoading.js';
 import {Text} from '../widgets/Text.js';
+import {useIntl} from 'react-intl';
 
 const Leaderboard: FC = () => {
+  const intl = useIntl();
   const {
     data: leaderboardResponse,
     isLoading,
@@ -27,7 +29,12 @@ const Leaderboard: FC = () => {
   if (isLoading) {
     return (
       <PageContainer variant="centered">
-        <PageLoading message="Loading leaderboard..." />
+        <PageLoading
+          message={intl.formatMessage({
+            id: 'leaderboard.loading',
+            defaultMessage: 'Loading leaderboard...',
+          })}
+        />
       </PageContainer>
     );
   }
@@ -42,10 +49,18 @@ const Leaderboard: FC = () => {
           {entry.username}
         </Text>
 
-        <Text muted>{entry.points} points</Text>
+        <Text muted>
+          {intl.formatMessage(
+            {id: 'leaderboard.pointsLong', defaultMessage: '{count} points'},
+            {count: entry.points},
+          )}
+        </Text>
 
         <Text muted size="sm">
-          {entry.chores_completed} chores
+          {intl.formatMessage(
+            {id: 'leaderboard.choresCount', defaultMessage: '{count} chores'},
+            {count: entry.chores_completed},
+          )}
         </Text>
       </>
     ),
@@ -59,27 +74,73 @@ const Leaderboard: FC = () => {
         {entry.username}
       </Text>
     ),
-    score: `${entry.points} pts`,
+    score: intl.formatMessage(
+      {id: 'leaderboard.scoreAbbrev', defaultMessage: '{points} pts'},
+      {points: entry.points},
+    ),
     subtitle: (
       <>
-        <span>{entry.chores_completed} chores completed</span>
+        <span>
+          {intl.formatMessage(
+            {
+              id: 'leaderboard.choresCompleted',
+              defaultMessage: '{count} chores completed',
+            },
+            {count: entry.chores_completed},
+          )}
+        </span>
 
-        <span>{entry.badges_earned} badges earned</span>
+        <span>
+          {intl.formatMessage(
+            {
+              id: 'leaderboard.badgesEarned',
+              defaultMessage: '{count} badges earned',
+            },
+            {count: entry.badges_earned},
+          )}
+        </span>
       </>
     ),
-    metadata: <span>{entry.streak_count} day streak</span>,
+    metadata: (
+      <span>
+        {intl.formatMessage(
+          {id: 'leaderboard.dayStreak', defaultMessage: '{count} day streak'},
+          {count: entry.streak_count},
+        )}
+      </span>
+    ),
   }));
 
   return (
     <PageContainer>
-      <PageHeader title="Leaderboard" />
+      <PageHeader
+        title={intl.formatMessage({
+          id: 'nav.leaderboard',
+          defaultMessage: 'Leaderboard',
+        })}
+      />
 
       <Podium items={podiumItems} />
 
       <RankingList
         items={rankingItems}
-        subtitle={`Sorted by ${sortBy === 'points' ? 'total points' : 'streak count'}`}
-        title="Full Rankings"
+        subtitle={intl.formatMessage(
+          {id: 'leaderboard.sortedBy', defaultMessage: 'Sorted by {criterion}'},
+          {
+            criterion: intl.formatMessage({
+              id:
+                sortBy === 'points'
+                  ? 'leaderboard.sortedBy.totalPoints'
+                  : 'leaderboard.sortedBy.streakCount',
+              defaultMessage:
+                sortBy === 'points' ? 'total points' : 'streak count',
+            }),
+          },
+        )}
+        title={intl.formatMessage({
+          id: 'leaderboard.fullRankings',
+          defaultMessage: 'Full Rankings',
+        })}
       />
     </PageContainer>
   );

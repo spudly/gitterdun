@@ -1,5 +1,6 @@
 import type {FC, FormEventHandler} from 'react';
 import {useState} from 'react';
+import {FormattedMessage, useIntl} from 'react-intl';
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import {TokenSearchParamsSchema} from '../schemas.js';
 import {invitationsApi} from '../lib/api.js';
@@ -26,26 +27,48 @@ const useInvitationSubmit = ({
   setMessage,
   onAccepted,
 }: InvitationSubmitParams) => {
+  const intl = useIntl();
   const {safeAsync} = useToast();
   const submitHandler: FormEventHandler<HTMLFormElement> = event => {
     event.preventDefault();
     setMessage(null);
 
-    safeAsync(async () => {
-      try {
-        const res = await invitationsApi.accept({token, username, password});
-        if (res.success) {
-          setMessage('Invitation accepted. You can now log in.');
-          setTimeout(() => {
-            onAccepted();
-          }, 1200);
-        } else {
-          setMessage('Failed to accept');
+    safeAsync(
+      async () => {
+        try {
+          const res = await invitationsApi.accept({token, username, password});
+          if (res.success) {
+            setMessage(
+              intl.formatMessage({
+                id: 'acceptInvitation.accepted',
+                defaultMessage: 'Invitation accepted. You can now log in.',
+              }),
+            );
+            setTimeout(() => {
+              onAccepted();
+            }, 1200);
+          } else {
+            setMessage(
+              intl.formatMessage({
+                id: 'acceptInvitation.failed',
+                defaultMessage: 'Failed to accept',
+              }),
+            );
+          }
+        } catch {
+          setMessage(
+            intl.formatMessage({
+              id: 'acceptInvitation.failed',
+              defaultMessage: 'Failed to accept',
+            }),
+          );
         }
-      } catch {
-        setMessage('Failed to accept');
-      }
-    }, 'Failed to accept invitation');
+      },
+      intl.formatMessage({
+        id: 'acceptInvitation.submitError',
+        defaultMessage: 'Failed to accept invitation',
+      }),
+    );
   };
   return submitHandler;
 };
@@ -87,6 +110,7 @@ const useAcceptInvitationSetup = () => {
 };
 
 const AcceptInvitation: FC = () => {
+  const intl = useIntl();
   const {
     token,
     username,
@@ -98,14 +122,33 @@ const AcceptInvitation: FC = () => {
   } = useAcceptInvitationSetup();
 
   if (token == null || token === '') {
-    return <div>Missing token.</div>;
+    return (
+      <div>
+        <FormattedMessage
+          defaultMessage="Missing token."
+          id="acceptInvitation.missingToken"
+        />
+      </div>
+    );
   }
 
   return (
-    <FormCard title="Accept Invitation">
+    <FormCard
+      title={intl.formatMessage({
+        defaultMessage: 'Accept Invitation',
+        id: 'acceptInvitation.title',
+      })}
+    >
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
-          <FormField htmlFor="username" label="Username" required>
+          <FormField
+            htmlFor="username"
+            label={intl.formatMessage({
+              defaultMessage: 'Username',
+              id: 'acceptInvitation.username',
+            })}
+            required
+          >
             <TextInput
               id="username"
               onChange={value => {
@@ -116,7 +159,14 @@ const AcceptInvitation: FC = () => {
             />
           </FormField>
 
-          <FormField htmlFor="password" label="Password" required>
+          <FormField
+            htmlFor="password"
+            label={intl.formatMessage({
+              defaultMessage: 'Password',
+              id: 'acceptInvitation.password',
+            })}
+            required
+          >
             <TextInput
               id="password"
               minLength={6}
@@ -134,7 +184,10 @@ const AcceptInvitation: FC = () => {
           ) : null}
 
           <Button fullWidth type="submit">
-            Accept Invitation
+            <FormattedMessage
+              defaultMessage="Accept Invitation"
+              id="acceptInvitation.accept"
+            />
           </Button>
         </Stack>
       </form>

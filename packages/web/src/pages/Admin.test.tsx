@@ -5,6 +5,7 @@ import {MemoryRouter} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Admin from './Admin';
 import * as apiModule from '../lib/api';
+import {TestProviders} from '../test/TestProviders';
 
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => {
@@ -40,7 +41,7 @@ describe('admin page', () => {
     familiesApi.create.mockResolvedValueOnce({success: true});
     mockNavigate.mockClear();
 
-    render(wrap(<Admin />));
+    render(wrap(<Admin />), {wrapper: TestProviders});
     await screen.findByText('Admin Panel');
     await userEvent.clear(screen.getByPlaceholderText('Family name'));
     await userEvent.type(

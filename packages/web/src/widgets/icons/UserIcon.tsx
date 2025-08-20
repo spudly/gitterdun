@@ -1,7 +1,7 @@
 import type {IconComponent} from './common.js';
 import {SIZE} from './common.js';
 
-export const GlobeIcon: IconComponent = ({size = 'md'}) => (
+export const UserIcon: IconComponent = ({size = 'md'}) => (
   <svg
     fill="none"
     height={SIZE[size]}
@@ -10,25 +10,13 @@ export const GlobeIcon: IconComponent = ({size = 'md'}) => (
     width={SIZE[size]}
   >
     <path
-      d="M12 2a10 10 0 100 20 10 10 0 000-20z"
+      d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5z"
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}
     />
     <path
-      d="M2 12h20"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-    />
-    <path
-      d="M12 2c3 3 3 17 0 20"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-    />
-    <path
-      d="M12 2c-3 3-3 17 0 20"
+      d="M4 20c0-4.418 3.582-8 8-8s8 3.582 8 8"
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}

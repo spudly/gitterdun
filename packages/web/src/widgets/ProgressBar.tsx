@@ -1,4 +1,5 @@
 import type {FC} from 'react';
+import {FormattedMessage} from 'react-intl';
 import clsx from 'clsx';
 
 type ProgressBarProps = {
@@ -35,7 +36,11 @@ export const ProgressBar: FC<ProgressBarProps> = ({
     <div className={clsx('space-y-2', padded ? 'p-4' : null)}>
       {showLabel || showPercentage ? (
         <div className="flex justify-between text-sm">
-          {showLabel ? <span className="text-gray-500">Progress</span> : null}
+          {showLabel ? (
+            <span className="text-gray-500">
+              <FormattedMessage defaultMessage="Progress" id="progress.label" />
+            </span>
+          ) : null}
 
           {showPercentage ? (
             <span className="font-medium">{Math.round(percentage)}%</span>

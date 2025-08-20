@@ -3,6 +3,7 @@ import {render, screen} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Chores from './Chores';
 import * as apiModule from '../lib/api';
+import {TestProviders} from '../test/TestProviders';
 
 jest.mock('../hooks/useUser', () => ({useUser: () => ({user: {id: 1}})}));
 
@@ -35,7 +36,7 @@ const wrap = (ui: React.ReactElement) => (
 
 describe('chores page', () => {
   test('renders header', async () => {
-    render(wrap(<Chores />));
+    render(wrap(<Chores />), {wrapper: TestProviders});
     await expect(screen.findByText('Chores')).resolves.toBeInTheDocument();
   });
 
@@ -72,9 +73,9 @@ describe('chores page', () => {
         },
       ],
     });
-    render(wrap(<Chores />));
+    render(wrap(<Chores />), {wrapper: TestProviders});
     await expect(screen.findByText('B')).resolves.toBeInTheDocument();
-    expect(screen.getByText('approved')).toBeInTheDocument();
+    expect(screen.getByText(/approved/i)).toBeInTheDocument();
     await expect(screen.findByText('C')).resolves.toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Complete'})).toBeInTheDocument();
   });
@@ -100,9 +101,9 @@ describe('chores page', () => {
         },
       ],
     });
-    render(wrap(<Chores />));
+    render(wrap(<Chores />), {wrapper: TestProviders});
     await expect(screen.findByText('D')).resolves.toBeInTheDocument();
-    expect(screen.getByText(/Penalty:/u)).toBeInTheDocument();
+    expect(screen.getByText('Penalty: -2')).toBeInTheDocument();
     expect(screen.getByText(/Due:/u)).toBeInTheDocument();
   });
 });

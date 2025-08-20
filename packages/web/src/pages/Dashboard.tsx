@@ -69,7 +69,12 @@ const Dashboard: FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader title={intl.formatMessage({id: 'nav.dashboard', defaultMessage: 'Dashboard'})} />
+      <PageHeader
+        title={intl.formatMessage({
+          id: 'nav.dashboard',
+          defaultMessage: 'Dashboard',
+        })}
+      />
 
       <GridContainer cols={4} gap="lg">
         <StatCard
@@ -117,8 +122,8 @@ const Dashboard: FC = () => {
         header={
           <Text as="h2" size="xl" weight="medium">
             <FormattedMessage
-              id="dashboard.recentChores"
               defaultMessage="Recent Chores"
+              id="dashboard.recentChores"
             />
           </Text>
         }
@@ -127,15 +132,25 @@ const Dashboard: FC = () => {
           <ListRow
             description={
               <Text as="span" muted size="sm">
-                {chore.description ??
-                  intl.formatMessage({
+                {chore.description
+                  ?? intl.formatMessage({
                     id: 'dashboard.noDescription',
                     defaultMessage: 'No description',
                   })}
               </Text>
             }
             key={chore.id}
-            right={<Text>{chore.point_reward} pts</Text>}
+            right={
+              <Text>
+                {intl.formatMessage(
+                  {
+                    id: 'dashboard.pointsAbbrev',
+                    defaultMessage: '{points} pts',
+                  },
+                  {points: chore.point_reward},
+                )}
+              </Text>
+            }
             title={chore.title}
           />
         ))}

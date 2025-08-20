@@ -2,10 +2,15 @@ import en from './en.js';
 import pirate from './pirate.js';
 import piglatin from './piglatin.js';
 
-export const supportedLocales = ['en', 'pirate', 'piglatin'] as const;
-export type SupportedLocale = (typeof supportedLocales)[number];
+const supportedLocales = ['en', 'pirate', 'piglatin'] as const;
 
-export const getMessagesForLocale = (locale: string) => {
+type SupportedLocales = typeof supportedLocales;
+export type SupportedLocale = SupportedLocales[number];
+
+export const isSupportedLocale = (locale: string): locale is SupportedLocale =>
+  supportedLocales.some(supportedLocale => supportedLocale === locale);
+
+export const getMessagesForLocale = (locale: SupportedLocale) => {
   switch (locale) {
     case 'pirate':
       return pirate;
@@ -16,4 +21,3 @@ export const getMessagesForLocale = (locale: string) => {
       return en;
   }
 };
-

@@ -5,6 +5,7 @@ import {MemoryRouter} from 'react-router-dom';
 
 import Layout from './Layout';
 import type {User} from '@gitterdun/shared';
+import {TestProviders} from '../test/TestProviders';
 
 const mockUser: User = {
   id: 1,
@@ -34,6 +35,7 @@ describe('layout', () => {
           <div>Child</div>
         </Layout>
       </MemoryRouter>,
+      {wrapper: TestProviders},
     );
     expect(screen.getByText('Child')).toBeInTheDocument();
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
@@ -41,11 +43,12 @@ describe('layout', () => {
 
   test('shows a language selector control in the header', () => {
     render(
-      <MemoryRouter initialEntries={['/']}> 
-        <Layout navigation={[]}> 
+      <MemoryRouter initialEntries={['/']}>
+        <Layout navigation={[]}>
           <div>Child</div>
         </Layout>
       </MemoryRouter>,
+      {wrapper: TestProviders},
     );
     expect(screen.getByRole('button', {name: /language/i})).toBeInTheDocument();
   });
@@ -58,6 +61,7 @@ describe('layout', () => {
           <div>Child</div>
         </Layout>
       </MemoryRouter>,
+      {wrapper: TestProviders},
     );
     expect(screen.getByText('Login')).toBeInTheDocument();
   });
@@ -71,6 +75,7 @@ describe('layout', () => {
           <div>Child</div>
         </Layout>
       </MemoryRouter>,
+      {wrapper: TestProviders},
     );
     await userEvent.click(screen.getByRole('button', {name: /logout/i}));
     expect(mockLogout).toHaveBeenCalledWith();

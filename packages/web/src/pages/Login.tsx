@@ -36,12 +36,17 @@ const Login: FC = () => {
   };
 
   return (
-    <FormCard title={intl.formatMessage({id: 'login.title', defaultMessage: 'Login'})}>
+    <FormCard
+      title={intl.formatMessage({id: 'login.title', defaultMessage: 'Login'})}
+    >
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
           <FormField
             htmlFor="email"
-            label={intl.formatMessage({id: 'login.email', defaultMessage: 'Email'})}
+            label={intl.formatMessage({
+              id: 'login.email',
+              defaultMessage: 'Email',
+            })}
             required
           >
             <TextInput
@@ -57,7 +62,10 @@ const Login: FC = () => {
 
           <FormField
             htmlFor="password"
-            label={intl.formatMessage({id: 'login.password', defaultMessage: 'Password'})}
+            label={intl.formatMessage({
+              id: 'login.password',
+              defaultMessage: 'Password',
+            })}
             required
           >
             <TextInput
@@ -93,13 +101,16 @@ const Login: FC = () => {
 
       <Stack gap="sm">
         <TextLink to="/forgot-password">
-          <FormattedMessage id="login.forgot" defaultMessage="Forgot password?" />
+          <FormattedMessage
+            defaultMessage="Forgot password?"
+            id="login.forgot"
+          />
         </TextLink>
 
         <TextLink to="/admin">
           <FormattedMessage
-            id="login.registerAdmin"
             defaultMessage="Register (Admin)"
+            id="login.registerAdmin"
           />
         </TextLink>
       </Stack>

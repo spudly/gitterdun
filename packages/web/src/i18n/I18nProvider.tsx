@@ -1,7 +1,11 @@
 import type {FC, ReactNode} from 'react';
 import {createContext, useContext, useMemo, useState} from 'react';
 import {IntlProvider} from 'react-intl';
-import {getMessagesForLocale, supportedLocales} from './messages/index.js';
+import {
+  getMessagesForLocale,
+  isSupportedLocale,
+  SupportedLocale,
+} from './messages/index.js';
 
 type I18nContextValue = {
   readonly locale: string;
@@ -21,15 +25,20 @@ export const useI18n = (): I18nContextValue => {
 type I18nProviderProps = {readonly children: ReactNode};
 
 export const I18nProvider: FC<I18nProviderProps> = ({children}) => {
-  const initial = (typeof window !== 'undefined'
-    ? window.localStorage.getItem('locale')
-    : null) as string | null;
-  const [locale, setLocaleState] = useState<string>(
-    initial && supportedLocales.includes(initial) ? initial : 'en',
-  );
+  // eslint-disable-next-line react/hook-use-state -- false positive
+  const [locale, setLocaleState] = useState<SupportedLocale>(() => {
+    const initial =
+      typeof window !== 'undefined'
+        ? window.localStorage.getItem('locale')
+        : null;
+    if (initial !== null && isSupportedLocale(initial)) {
+      return initial;
+    }
+    return 'en';
+  });
 
   const setLocale = (next: string) => {
-    const resolved = supportedLocales.includes(next) ? next : 'en';
+    const resolved = isSupportedLocale(next) ? next : 'en';
     setLocaleState(resolved);
     if (typeof window !== 'undefined') {
       window.localStorage.setItem('locale', resolved);
@@ -37,10 +46,7 @@ export const I18nProvider: FC<I18nProviderProps> = ({children}) => {
   };
 
   const messages = useMemo(() => getMessagesForLocale(locale), [locale]);
-  const ctx: I18nContextValue = useMemo(
-    () => ({locale, setLocale}),
-    [locale],
-  );
+  const ctx: I18nContextValue = useMemo(() => ({locale, setLocale}), [locale]);
 
   return (
     <I18nContext.Provider value={ctx}>
@@ -50,6 +56,3 @@ export const I18nProvider: FC<I18nProviderProps> = ({children}) => {
     </I18nContext.Provider>
   );
 };
-
-export default I18nProvider;
-

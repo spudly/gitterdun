@@ -1,4 +1,5 @@
 import type {FC, ReactNode} from 'react';
+import {FormattedMessage} from 'react-intl';
 import clsx from 'clsx';
 
 export type PodiumItem = {
@@ -51,7 +52,13 @@ export const Podium: FC<PodiumProps> = ({items, showMedals = true}) => {
 
             {typeof item.score === 'number'
             || (typeof item.score === 'string' && item.score.length > 0) ? (
-              <p className="text-gray-600">{item.score} points</p>
+              <p className="text-gray-600">
+                <FormattedMessage
+                  defaultMessage="{score} points"
+                  id="podium.points"
+                  values={{score: item.score}}
+                />
+              </p>
             ) : null}
 
             {typeof item.subtitle === 'string' && item.subtitle.length > 0 ? (

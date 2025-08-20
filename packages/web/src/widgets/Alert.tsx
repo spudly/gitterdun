@@ -1,4 +1,5 @@
 import type {FC, ReactNode} from 'react';
+import {FormattedMessage} from 'react-intl';
 import clsx from 'clsx';
 
 type AlertType = 'success' | 'error' | 'warning' | 'info';
@@ -126,7 +127,9 @@ export const Alert: FC<AlertProps> = ({
               }}
               type="button"
             >
-              <span className="sr-only">Dismiss</span>
+              <span className="sr-only">
+                <FormattedMessage defaultMessage="Dismiss" id="alert.dismiss" />
+              </span>
 
               <svg className="size-5" fill="currentColor" viewBox="0 0 20 20">
                 <path

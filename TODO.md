@@ -32,3 +32,4 @@
 - [ ] setup react-i18n; include pig-latin & pirate-speak
 - [ ] refine landing => sign-up/login flow
 - [ ] add eslint-plugin-turbo
+- [ ] scan repo for strings that haven't been internationalized

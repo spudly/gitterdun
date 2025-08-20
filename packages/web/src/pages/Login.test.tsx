@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import {MemoryRouter, useLocation} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Login from './Login';
+import {TestProviders} from '../test/TestProviders';
 import * as useUserModule from '../hooks/useUser';
 import {ToastProvider} from '../widgets/ToastProvider';
 
@@ -60,7 +61,7 @@ describe('login page (top-level)', () => {
           loginError: new Error('Bad creds'),
         }),
       );
-    render(wrap(<Login />));
+    render(wrap(<Login />), {wrapper: TestProviders});
     expect(screen.getByText('Bad creds')).toBeInTheDocument();
     // no restore needed when using mockReturnValueOnce
   });
@@ -75,7 +76,7 @@ describe('login page', () => {
 
   test('renders and submits', async () => {
     // Use default working mock that allows successful login
-    render(wrap(<Login />));
+    render(wrap(<Login />), {wrapper: TestProviders});
     expect(screen.getAllByText('Login')[0]).toBeInTheDocument();
     await userEvent.type(screen.getByLabelText(/email/iu), 'user@example.com');
     await userEvent.type(screen.getByLabelText(/password/iu), 'validpassword');
@@ -92,7 +93,7 @@ describe('login page', () => {
   test('handles login rejection path', async () => {
     // This test verifies error handling behavior through UI state
     // The actual error throwing is covered by integration tests
-    render(wrap(<Login />));
+    render(wrap(<Login />), {wrapper: TestProviders});
     await userEvent.type(screen.getByLabelText(/email/iu), 'user@example.com');
     await userEvent.type(screen.getByLabelText(/password/iu), 'validpassword');
     await act(async () => {
@@ -106,7 +107,7 @@ describe('login page', () => {
     jest
       .mocked(useUserModule.useUser)
       .mockReturnValueOnce(createUseUserMock({isLoggingIn: true}));
-    render(wrap(<Login />));
+    render(wrap(<Login />), {wrapper: TestProviders});
     expect(screen.getByText('Logging in...')).toBeInTheDocument();
     // no restore needed when using mockReturnValueOnce
   });
@@ -117,7 +118,7 @@ describe('login page', () => {
       .mockReturnValueOnce(
         createUseUserMock({loginError: new Error('Inline Error')}),
       );
-    render(wrap(<Login />));
+    render(wrap(<Login />), {wrapper: TestProviders});
     expect(screen.getByText('Inline Error')).toBeInTheDocument();
     // no restore needed when using mockReturnValueOnce
   });
@@ -136,6 +137,7 @@ describe('login page', () => {
           </ToastProvider>
         </MemoryRouter>
       </QueryClientProvider>,
+      {wrapper: TestProviders},
     );
     await userEvent.type(screen.getByLabelText(/email/iu), 'user@example.com');
     await userEvent.type(screen.getByLabelText(/password/iu), 'pw');
