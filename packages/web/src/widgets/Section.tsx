@@ -8,6 +8,9 @@ const SectionContext = createContext<{level: number}>({level: 1});
 
 type GapSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
+const isHeadingLevel = (level: number): level is HeadingLevel =>
+  Number.isInteger(level) && level >= 1 && level <= 6;
+
 export const Section: FC<
   PropsWithChildren<{
     header: string;
@@ -17,9 +20,11 @@ export const Section: FC<
 > = ({header, headingLevel, gap, children}) => {
   const {level: contextLevel} = useContext(SectionContext);
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- fixing this would make the code worse
-  const currentLevel = (headingLevel
-    ?? Math.min(contextLevel + 1, 6)) as HeadingLevel;
+  const currentLevel = headingLevel ?? Math.min(contextLevel + 1, 6);
+
+  if (!isHeadingLevel(currentLevel)) {
+    throw new Error('Invalid heading level');
+  }
 
   const newContextValue = useMemo(
     () => ({level: currentLevel}),
