@@ -302,7 +302,6 @@ export const FamilyIdParamSchema = z.object({
 });
 
 // Search parameter schemas
-export const TokenSearchParamsSchema = z.object({token: z.string().min(1)});
 
 // Database row schemas (runtime-validated parsing for raw DB results)
 export const SessionRowSchema = z.object({
@@ -420,4 +419,4 @@ export type GoalQuery = z.infer<typeof GoalQuerySchema>;
 export type LeaderboardResponse = z.infer<typeof LeaderboardResponseSchema>;
 
 // Search parameter types
-export type TokenSearchParams = z.infer<typeof TokenSearchParamsSchema>;
+// export type TokenSearchParams moved to web package

@@ -1,7 +1,7 @@
 import type {FC, FormEventHandler} from 'react';
 import {useState} from 'react';
 import {useSearchParams, useNavigate} from 'react-router-dom';
-import {TokenSearchParamsSchema} from '@gitterdun/shared';
+import {TokenSearchParamsSchema} from '../schemas.js';
 import {invitationsApi} from '../lib/api.js';
 import {FormCard} from '../widgets/FormCard.js';
 import {FormField} from '../widgets/FormField.js';

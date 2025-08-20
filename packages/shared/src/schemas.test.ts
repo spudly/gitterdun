@@ -16,7 +16,6 @@ import {
   CompleteChoreBodySchema,
   LeaderboardQuerySchema,
   RoleRowSchema,
-  TokenSearchParamsSchema,
 } from './schemas';
 
 describe('user schemas', () => {
@@ -251,7 +250,7 @@ describe('utility schemas', () => {
 
 describe('response schemas', () => {
   test('apiResponseSchema should create success response schema', () => {
-    // eslint-disable-next-line new-cap -- ApiResponseSchema is a factory function
+     
     const userResponseSchema = ApiResponseSchema(UserSchema);
     const validResponse = {
       success: true,
@@ -272,7 +271,7 @@ describe('response schemas', () => {
   });
 
   test('apiResponseSchema should create error response schema', () => {
-    // eslint-disable-next-line new-cap -- ApiResponseSchema is a factory function
+     
     const userResponseSchema = ApiResponseSchema(UserSchema);
     const errorResponse = {success: false, error: 'User not found'};
 
@@ -281,7 +280,7 @@ describe('response schemas', () => {
   });
 
   test('paginatedResponseSchema should create paginated schema', () => {
-    // eslint-disable-next-line new-cap -- PaginatedResponseSchema is a factory function
+     
     const paginatedUsersSchema = PaginatedResponseSchema(UserSchema);
     const validResponse = {
       success: true,
@@ -373,24 +372,4 @@ describe('family schema', () => {
   });
 });
 
-describe('search parameter schemas', () => {
-  describe('tokenSearchParamsSchema', () => {
-    test('should validate valid token', () => {
-      const validParams = {token: 'abc123token'};
-      const result = TokenSearchParamsSchema.safeParse(validParams);
-      expect(result.success).toBe(true);
-    });
-
-    test('should reject empty token', () => {
-      const invalidParams = {token: ''};
-      const result = TokenSearchParamsSchema.safeParse(invalidParams);
-      expect(result.success).toBe(false);
-    });
-
-    test('should reject missing token', () => {
-      const invalidParams = {};
-      const result = TokenSearchParamsSchema.safeParse(invalidParams);
-      expect(result.success).toBe(false);
-    });
-  });
-});
+// token search params schema moved to web package
