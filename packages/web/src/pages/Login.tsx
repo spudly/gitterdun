@@ -10,9 +10,11 @@ import {Alert} from '../widgets/Alert.js';
 import {Stack} from '../widgets/Stack.js';
 import {useToast} from '../widgets/ToastProvider.js';
 import {TextLink} from '../widgets/TextLink.js';
+import {FormattedMessage, useIntl} from 'react-intl';
 
 const Login: FC = () => {
   const {login, isLoggingIn, loginError} = useUser();
+  const intl = useIntl();
   const {safeAsync} = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,17 +29,21 @@ const Login: FC = () => {
         await login(email, password);
         await navigate('/');
       },
-      'Login failed',
+      intl.formatMessage({id: 'login.failed', defaultMessage: 'Login failed'}),
       setMessage,
     );
     run();
   };
 
   return (
-    <FormCard title="Login">
+    <FormCard title={intl.formatMessage({id: 'login.title', defaultMessage: 'Login'})}>
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
-          <FormField htmlFor="email" label="Email" required>
+          <FormField
+            htmlFor="email"
+            label={intl.formatMessage({id: 'login.email', defaultMessage: 'Email'})}
+            required
+          >
             <TextInput
               id="email"
               onChange={value => {
@@ -49,7 +55,11 @@ const Login: FC = () => {
             />
           </FormField>
 
-          <FormField htmlFor="password" label="Password" required>
+          <FormField
+            htmlFor="password"
+            label={intl.formatMessage({id: 'login.password', defaultMessage: 'Password'})}
+            required
+          >
             <TextInput
               id="password"
               onChange={value => {
@@ -68,15 +78,30 @@ const Login: FC = () => {
           {loginError ? <Alert type="error">{loginError.message}</Alert> : null}
 
           <Button disabled={isLoggingIn} fullWidth type="submit">
-            {isLoggingIn ? 'Logging in...' : 'Login'}
+            {isLoggingIn
+              ? intl.formatMessage({
+                  id: 'login.submitting',
+                  defaultMessage: 'Logging in...',
+                })
+              : intl.formatMessage({
+                  id: 'login.submit',
+                  defaultMessage: 'Login',
+                })}
           </Button>
         </Stack>
       </form>
 
       <Stack gap="sm">
-        <TextLink to="/forgot-password">Forgot password?</TextLink>
+        <TextLink to="/forgot-password">
+          <FormattedMessage id="login.forgot" defaultMessage="Forgot password?" />
+        </TextLink>
 
-        <TextLink to="/admin">Register (Admin)</TextLink>
+        <TextLink to="/admin">
+          <FormattedMessage
+            id="login.registerAdmin"
+            defaultMessage="Register (Admin)"
+          />
+        </TextLink>
       </Stack>
     </FormCard>
   );

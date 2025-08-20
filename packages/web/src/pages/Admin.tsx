@@ -12,6 +12,7 @@ import {Stack} from '../widgets/Stack.js';
 import {Card} from '../widgets/Card.js';
 import {Alert} from '../widgets/Alert.js';
 import {AdminFamilyCreation} from './admin/AdminFamilyCreation.js';
+import {FormattedMessage, useIntl} from 'react-intl';
 import {AdminInvitations} from './admin/AdminInvitations.js';
 import {AdminStats} from './admin/AdminStats.js';
 import {AdminChoresManagement} from './admin/AdminChoresManagement.js';
@@ -42,12 +43,23 @@ const Admin: FC = () => {
   const {user, message, messageType, handleMessageChange, chores, isLoading} =
     useAdminSetup();
 
+  const intl = useIntl();
   if (!user || user.role !== 'admin') {
     return (
       <PageContainer variant="centered">
         <Card padded>
-          <PageHeader title="Access Denied" />
-          <Text muted>You need admin privileges to view this page.</Text>
+          <PageHeader
+            title={intl.formatMessage({
+              id: 'admin.accessDenied',
+              defaultMessage: 'Access Denied',
+            })}
+          />
+          <Text muted>
+            <FormattedMessage
+              id="admin.accessDeniedText"
+              defaultMessage="You need admin privileges to view this page."
+            />
+          </Text>
         </Card>
       </PageContainer>
     );
@@ -56,14 +68,21 @@ const Admin: FC = () => {
   if (isLoading) {
     return (
       <PageContainer variant="centered">
-        <PageLoading message="Loading admin panel..." />
+        <PageLoading
+          message={intl.formatMessage({
+            id: 'admin.loading',
+            defaultMessage: 'Loading admin panel...',
+          })}
+        />
       </PageContainer>
     );
   }
 
   return (
     <PageContainer>
-      <PageHeader title="Admin Panel" />
+      <PageHeader
+        title={intl.formatMessage({id: 'admin.title', defaultMessage: 'Admin Panel'})}
+      />
 
       <Stack gap="lg">
         <FormSection title="Family Management">

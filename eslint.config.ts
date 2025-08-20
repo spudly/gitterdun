@@ -175,6 +175,8 @@ const eslintConfig = [
       'react/jsx-one-expression-per-line': 'off',
       'react/jsx-props-no-spreading': 'off',
       'react/jsx-wrap-multilines': 'off',
+      // Enable to force all UI copy through i18n
+      'react/jsx-no-literals': ['error', {noStrings: true, allowedStrings: []}],
       '@typescript-eslint/keyword-spacing': 'off', // using Prettier for styling
       'keyword-spacing': 'off', // using Prettier for styling
       'jsx-a11y/label-has-associated-control': [
@@ -634,7 +636,7 @@ const eslintConfig = [
       'react/jsx-no-constructed-context-values': 'warn',
       'react/jsx-no-duplicate-props': 'warn',
       'react/jsx-no-leaked-render': 'warn',
-      'react/jsx-no-literals': 'off', // only needed if we're doing i18n and we want to avoid putting strings in english
+      'react/jsx-no-literals': 'off', // legacy; overridden above for project
       'react/jsx-no-script-url': 'warn',
       'react/jsx-no-target-blank': 'warn',
       'react/jsx-no-undef': 'warn',

@@ -5,6 +5,7 @@ import Layout from './widgets/Layout.js';
 import {ToastProvider} from './widgets/ToastProvider.js';
 import {Routes} from './Routes.js';
 import {NAVIGATION_ITEMS} from './constants.js';
+import {I18nProvider} from './i18n/I18nProvider.js';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -24,12 +25,14 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <QueryClientProvider client={queryClient}>
-    <ToastProvider>
-      <BrowserRouter>
-        <Layout navigation={NAVIGATION_ITEMS}>
-          <Routes />
-        </Layout>
-      </BrowserRouter>
-    </ToastProvider>
+    <I18nProvider>
+      <ToastProvider>
+        <BrowserRouter>
+          <Layout navigation={NAVIGATION_ITEMS}>
+            <Routes />
+          </Layout>
+        </BrowserRouter>
+      </ToastProvider>
+    </I18nProvider>
   </QueryClientProvider>,
 );

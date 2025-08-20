@@ -39,6 +39,17 @@ describe('layout', () => {
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
   });
 
+  test('shows a language selector control in the header', () => {
+    render(
+      <MemoryRouter initialEntries={['/']}> 
+        <Layout navigation={[]}> 
+          <div>Child</div>
+        </Layout>
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole('button', {name: /language/i})).toBeInTheDocument();
+  });
+
   test('shows login when no user and hides admin link', () => {
     user = null;
     render(

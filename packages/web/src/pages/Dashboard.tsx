@@ -12,9 +12,11 @@ import {ListRow} from '../widgets/ListRow.js';
 import {Text} from '../widgets/Text.js';
 import {PageLoading} from '../widgets/PageLoading.js';
 import {CheckCircleIcon, ClockIcon, DocIcon} from '../widgets/icons';
+import {FormattedMessage, useIntl} from 'react-intl';
 
 const Dashboard: FC = () => {
   const {user} = useUser();
+  const intl = useIntl();
 
   const {data: choresResponse, isLoading: choresLoading} = useQuery({
     queryKey: ['chores', 'dashboard'],
@@ -55,41 +57,58 @@ const Dashboard: FC = () => {
   if (choresLoading) {
     return (
       <PageContainer variant="centered">
-        <PageLoading message="Loading dashboard..." />
+        <PageLoading
+          message={intl.formatMessage({
+            id: 'dashboard.loading',
+            defaultMessage: 'Loading dashboard...',
+          })}
+        />
       </PageContainer>
     );
   }
 
   return (
     <PageContainer>
-      <PageHeader title="Dashboard" />
+      <PageHeader title={intl.formatMessage({id: 'nav.dashboard', defaultMessage: 'Dashboard'})} />
 
       <GridContainer cols={4} gap="lg">
         <StatCard
           color="blue"
           icon={<CheckCircleIcon />}
-          label="Completed Chores"
+          label={intl.formatMessage({
+            id: 'dashboard.completed',
+            defaultMessage: 'Completed Chores',
+          })}
           value={getCompletedChoresCount()}
         />
 
         <StatCard
           color="yellow"
           icon={<ClockIcon />}
-          label="Pending Chores"
+          label={intl.formatMessage({
+            id: 'dashboard.pending',
+            defaultMessage: 'Pending Chores',
+          })}
           value={getPendingChoresCount()}
         />
 
         <StatCard
           color="green"
           icon={<DocIcon />}
-          label="Total Points"
+          label={intl.formatMessage({
+            id: 'dashboard.totalPoints',
+            defaultMessage: 'Total Points',
+          })}
           value={getTotalPoints()}
         />
 
         <StatCard
           color="red"
           icon={<ClockIcon />}
-          label="Due Soon"
+          label={intl.formatMessage({
+            id: 'dashboard.dueSoon',
+            defaultMessage: 'Due Soon',
+          })}
           value={getDueSoonChoresCount()}
         />
       </GridContainer>
@@ -97,7 +116,10 @@ const Dashboard: FC = () => {
       <Card
         header={
           <Text as="h2" size="xl" weight="medium">
-            Recent Chores
+            <FormattedMessage
+              id="dashboard.recentChores"
+              defaultMessage="Recent Chores"
+            />
           </Text>
         }
       >
@@ -105,7 +127,11 @@ const Dashboard: FC = () => {
           <ListRow
             description={
               <Text as="span" muted size="sm">
-                {chore.description ?? 'No description'}
+                {chore.description ??
+                  intl.formatMessage({
+                    id: 'dashboard.noDescription',
+                    defaultMessage: 'No description',
+                  })}
               </Text>
             }
             key={chore.id}

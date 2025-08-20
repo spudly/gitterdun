@@ -12,9 +12,11 @@ import {Badge} from '../widgets/Badge.js';
 import {InlineMeta} from '../widgets/InlineMeta.js';
 import {Button} from '../widgets/Button.js';
 import {PageLoading} from '../widgets/PageLoading.js';
+import {FormattedMessage, useIntl} from 'react-intl';
 
 const Chores: FC = () => {
   const {user} = useUser();
+  const intl = useIntl();
 
   const {data: choresResponse, isLoading} = useQuery({
     queryKey: ['chores'],
@@ -27,7 +29,12 @@ const Chores: FC = () => {
   if (isLoading) {
     return (
       <PageContainer variant="centered">
-        <PageLoading message="Loading chores..." />
+        <PageLoading
+          message={intl.formatMessage({
+            id: 'chores.loading',
+            defaultMessage: 'Loading chores...',
+          })}
+        />
       </PageContainer>
     );
   }
@@ -54,7 +61,7 @@ const Chores: FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader title="Chores" />
+      <PageHeader title={intl.formatMessage({id: 'nav.chores', defaultMessage: 'Chores'})} />
 
       <List>
         {chores.map((chore: ChoreWithUsername) => (
@@ -64,20 +71,26 @@ const Chores: FC = () => {
             left={renderStatusDot(chore.status)}
             meta={
               <InlineMeta>
-                <span>Points: {chore.point_reward}</span>
+                <span>
+                  {intl.formatMessage({id: 'chores.points', defaultMessage: 'Points'})}: {chore.point_reward}
+                </span>
 
                 {chore.bonus_points > 0 && (
-                  <span>Bonus: +{chore.bonus_points}</span>
+                  <span>
+                    {intl.formatMessage({id: 'chores.bonus', defaultMessage: 'Bonus'})}: +{chore.bonus_points}
+                  </span>
                 )}
 
                 {chore.penalty_points > 0 && (
-                  <span>Penalty: -{chore.penalty_points}</span>
+                  <span>
+                    {intl.formatMessage({id: 'chores.penalty', defaultMessage: 'Penalty'})}: -{chore.penalty_points}
+                  </span>
                 )}
 
                 {typeof chore.due_date === 'string'
                 && chore.due_date.length > 0 ? (
                   <span>
-                    Due: {new Date(chore.due_date).toLocaleDateString()}
+                    {intl.formatMessage({id: 'chores.due', defaultMessage: 'Due'})}: {new Date(chore.due_date).toLocaleDateString()}
                   </span>
                 ) : null}
               </InlineMeta>
@@ -85,7 +98,7 @@ const Chores: FC = () => {
             right={
               chore.status === 'pending' ? (
                 <Button size="sm" variant="primary">
-                  Complete
+                  <FormattedMessage id="chores.complete" defaultMessage="Complete" />
                 </Button>
               ) : undefined
             }
