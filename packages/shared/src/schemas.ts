@@ -268,7 +268,7 @@ export const GoalQuerySchema = PaginationSchema.extend({
 });
 
 // Response schemas
-export const ApiResponseSchema = <T extends z.ZodType>(dataSchema: T) =>
+export const apiResponseSchema = <T extends z.ZodType>(dataSchema: T) =>
   z.object({
     success: z.boolean(),
     data: dataSchema.optional(),

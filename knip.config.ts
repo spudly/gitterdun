@@ -45,7 +45,6 @@ const config: KnipConfig = {
     '**/dist/**', // Build output
     '**/.turbo/**', // Turbo cache
     'types/eslint-plugin-eslint-comments.ts', // Ambient type shim used by ESLint config
-    'jiti', // used for running eslint with a .ts config file
   ],
 };
 

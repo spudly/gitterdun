@@ -10,7 +10,7 @@ import {
   GoalSchema,
   NotificationSchema,
   PaginationSchema,
-  ApiResponseSchema,
+  apiResponseSchema,
   PaginatedResponseSchema,
   IdParamSchema,
   CompleteChoreBodySchema,
@@ -250,8 +250,7 @@ describe('utility schemas', () => {
 
 describe('response schemas', () => {
   test('apiResponseSchema should create success response schema', () => {
-     
-    const userResponseSchema = ApiResponseSchema(UserSchema);
+    const userResponseSchema = apiResponseSchema(UserSchema);
     const validResponse = {
       success: true,
       data: {
@@ -271,8 +270,7 @@ describe('response schemas', () => {
   });
 
   test('apiResponseSchema should create error response schema', () => {
-     
-    const userResponseSchema = ApiResponseSchema(UserSchema);
+    const userResponseSchema = apiResponseSchema(UserSchema);
     const errorResponse = {success: false, error: 'User not found'};
 
     const result = userResponseSchema.safeParse(errorResponse);
@@ -280,7 +278,6 @@ describe('response schemas', () => {
   });
 
   test('paginatedResponseSchema should create paginated schema', () => {
-     
     const paginatedUsersSchema = PaginatedResponseSchema(UserSchema);
     const validResponse = {
       success: true,

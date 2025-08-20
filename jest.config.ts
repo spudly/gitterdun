@@ -1,4 +1,5 @@
-import type { Config } from 'jest';
+import type {Config} from 'jest';
+// eslint-disable-next-line import/extensions -- jest needs the extension
 import base from './jest.config.base.ts';
 import {execSync} from 'node:child_process';
 
