@@ -21,13 +21,13 @@ const eslintConfig = [
       '@typescript-eslint': typescriptEslint,
       import: importPlugin,
       react: reactPlugin,
-       
+
       'jsx-a11y': jsxA11yPlugin,
       'react-hooks': reactHooks,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- not my types
       comments: commentsPlugin,
       jest: jestPlugin,
-       
+
       tailwindcss: tailwindcssPlugin,
     },
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
