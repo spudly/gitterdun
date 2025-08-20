@@ -29,7 +29,9 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-node_modules-${{ github.sha }}-${{ hashFiles('package-lock.json') }}
+          key:
+            ${{ runner.os }}-node_modules-${{ github.sha }}-${{
+            hashFiles('package-lock.json') }}
 
   build:
     name: Build
@@ -51,7 +53,9 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-node_modules-${{ github.sha }}-${{ hashFiles('package-lock.json') }}
+          key:
+            ${{ runner.os }}-node_modules-${{ github.sha }}-${{
+            hashFiles('package-lock.json') }}
 
       - name: Install dependencies (cache miss)
         if: steps.cache-node-modules-build.outputs.cache-hit != 'true'
@@ -88,7 +92,9 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-node_modules-${{ github.sha }}-${{ hashFiles('package-lock.json') }}
+          key:
+            ${{ runner.os }}-node_modules-${{ github.sha }}-${{
+            hashFiles('package-lock.json') }}
 
       - name: Install dependencies (cache miss)
         if: steps.cache-node-modules-test.outputs.cache-hit != 'true'
@@ -127,7 +133,9 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-node_modules-${{ github.sha }}-${{ hashFiles('package-lock.json') }}
+          key:
+            ${{ runner.os }}-node_modules-${{ github.sha }}-${{
+            hashFiles('package-lock.json') }}
 
       - name: Install dependencies (cache miss)
         if: steps.cache-node-modules-lint.outputs.cache-hit != 'true'
@@ -164,7 +172,9 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-node_modules-${{ github.sha }}-${{ hashFiles('package-lock.json') }}
+          key:
+            ${{ runner.os }}-node_modules-${{ github.sha }}-${{
+            hashFiles('package-lock.json') }}
 
       - name: Install dependencies (cache miss)
         if: steps.cache-node-modules-prettier.outputs.cache-hit != 'true'
@@ -193,7 +203,9 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-node_modules-${{ github.sha }}-${{ hashFiles('package-lock.json') }}
+          key:
+            ${{ runner.os }}-node_modules-${{ github.sha }}-${{
+            hashFiles('package-lock.json') }}
 
       - name: Install dependencies (cache miss)
         if: steps.cache-node-modules-knip.outputs.cache-hit != 'true'
