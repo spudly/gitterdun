@@ -69,6 +69,7 @@ jobs:
         with:
           path: |
             packages/*/dist
+            packages/*/src/i18n/extracted
             packages/*/tsconfig.build.tsbuildinfo
           key: ${{ runner.os }}-build-${{ github.sha }}
 
@@ -105,6 +106,7 @@ jobs:
         with:
           path: |
             packages/*/dist
+            packages/*/src/i18n/extracted
             packages/*/tsconfig.build.tsbuildinfo
           key: ${{ runner.os }}-build-${{ github.sha }}
 
@@ -146,6 +148,7 @@ jobs:
         with:
           path: |
             packages/*/dist
+            packages/*/src/i18n/extracted
             packages/*/tsconfig.build.tsbuildinfo
           key: ${{ runner.os }}-build-${{ github.sha }}
 
@@ -216,6 +219,7 @@ jobs:
         with:
           path: |
             packages/*/dist
+            packages/*/src/i18n/extracted
             packages/*/tsconfig.build.tsbuildinfo
           key: ${{ runner.os }}-build-${{ github.sha }}
 
