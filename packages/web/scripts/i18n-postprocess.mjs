@@ -34,15 +34,30 @@ const main = async () => {
   const raw = await fs.readFile(inFile, 'utf8');
   const data = JSON.parse(raw);
 
-  // data shape from formatjs extract default: { id: { defaultMessage, description?, file?, start?, end? }, ... }
+  // Normalize to iterable of { id, defaultMessage, file, origin }
+  const iterable = Array.isArray(data)
+    ? data.map(entry => ({...entry}))
+    : Object.entries(data).map(([id, entry]) => ({id, ...(entry ?? {})}));
+
   const result = {};
-  for (const msg of Object.values(data)) {
-    const {defaultMessage, file} = msg ?? {};
-    if (typeof defaultMessage !== 'string' || !defaultMessage) {
+  for (const msg of iterable) {
+    const {defaultMessage, file, origin, id: extractedId} = msg ?? {};
+    if (typeof defaultMessage !== 'string' || defaultMessage === '') {
       continue;
     }
-    const filePath = typeof file === 'string' ? file : '';
-    const id = computeHumanReadableId(filePath, defaultMessage);
+    // Prefer explicit id when provided
+    let id =
+      typeof extractedId === 'string' && extractedId !== '' ? extractedId : '';
+    if (id === '') {
+      // Fallback to compute from file path when id is missing
+      const originFile =
+        Array.isArray(origin) && Array.isArray(origin[0]) ? origin[0][0] : '';
+      const filePath =
+        typeof file === 'string' && file !== '' ? file : originFile;
+      id = filePath
+        ? computeHumanReadableId(filePath, defaultMessage)
+        : defaultMessage;
+    }
     result[id] = defaultMessage;
   }
 

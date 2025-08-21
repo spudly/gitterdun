@@ -27,22 +27,34 @@ const ForgotPassword: FC = () => {
           intl.formatMessage({
             defaultMessage:
               'If the email exists, a reset link has been sent. Check server logs for token in dev.',
+            id: 'pages.ForgotPassword.if-the-email-exists-a-reset-li',
           }),
         );
       },
-      intl.formatMessage({defaultMessage: 'Request failed'}),
+      intl.formatMessage({
+        defaultMessage: 'Request failed',
+        id: 'pages.ForgotPassword.request-failed',
+      }),
       setMessage,
     )();
   };
 
   return (
-    <FormCard title={intl.formatMessage({defaultMessage: 'Forgot Password'})}>
+    <FormCard
+      title={intl.formatMessage({
+        defaultMessage: 'Forgot Password',
+        id: 'pages.ForgotPassword.forgot-password',
+      })}
+    >
       <Stack gap="md">
         <form onSubmit={handleSubmit}>
           <Stack gap="md">
             <FormField
               htmlFor="email"
-              label={intl.formatMessage({defaultMessage: 'Email'})}
+              label={intl.formatMessage({
+                defaultMessage: 'Email',
+                id: 'pages.family.InviteMemberForm.email',
+              })}
               required
             >
               <TextInput

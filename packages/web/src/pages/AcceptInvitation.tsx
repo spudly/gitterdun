@@ -21,9 +21,18 @@ type InvitationSubmitParams = {
 };
 
 const submitMessages = defineMessages({
-  accepted: {defaultMessage: 'Invitation accepted. You can now log in.'},
-  failedAccept: {defaultMessage: 'Failed to accept'},
-  failedAcceptInvitation: {defaultMessage: 'Failed to accept invitation'},
+  accepted: {
+    defaultMessage: 'Invitation accepted. You can now log in.',
+    id: 'pages.AcceptInvitation.invitation-accepted-you-can-no',
+  },
+  failedAccept: {
+    defaultMessage: 'Failed to accept',
+    id: 'pages.AcceptInvitation.failed-to-accept',
+  },
+  failedAcceptInvitation: {
+    defaultMessage: 'Failed to accept invitation',
+    id: 'pages.AcceptInvitation.failed-to-accept-invitation',
+  },
 });
 
 const useInvitationSubmit = ({
@@ -95,11 +104,26 @@ const useAcceptInvitationSetup = () => {
 };
 
 const pageMessages = defineMessages({
-  missingToken: {defaultMessage: 'Missing token.'},
-  header: {defaultMessage: 'Accept Invitation'},
-  username: {defaultMessage: 'Username'},
-  password: {defaultMessage: 'Password'},
-  accept: {defaultMessage: 'Accept Invitation'},
+  missingToken: {
+    defaultMessage: 'Missing token.',
+    id: 'pages.AcceptInvitation.missing-token',
+  },
+  header: {
+    defaultMessage: 'Accept Invitation',
+    id: 'pages.AcceptInvitation.accept-invitation',
+  },
+  username: {
+    defaultMessage: 'Username',
+    id: 'pages.family.CreateChildForm.username',
+  },
+  password: {
+    defaultMessage: 'Password',
+    id: 'pages.family.CreateChildForm.password',
+  },
+  accept: {
+    defaultMessage: 'Accept Invitation',
+    id: 'pages.AcceptInvitation.accept-invitation',
+  },
 });
 
 const AcceptInvitation: FC = () => {

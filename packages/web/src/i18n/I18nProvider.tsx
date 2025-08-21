@@ -8,8 +8,8 @@ import {
 } from './messages/index.js';
 
 type I18nContextValue = {
-  readonly locale: string;
-  readonly setLocale: (next: string) => void;
+  readonly locale: SupportedLocale;
+  readonly setLocale: (next: SupportedLocale) => void;
 };
 
 const I18nContext = createContext<I18nContextValue | null>(null);

@@ -4,7 +4,8 @@ import {Link, useLocation} from 'react-router-dom';
 import {FormattedMessage, useIntl} from 'react-intl';
 import type {MessageDescriptor} from 'react-intl';
 import {useI18n} from '../i18n/I18nProvider.js';
-import {FlameIcon, GearIcon, GlobeIcon, UserIcon} from './icons/index.js';
+import {FlameIcon, GearIcon, UserIcon} from './icons/index.js';
+import {LocaleSelector} from './LocaleSelector.js';
 import {useUser} from '../hooks/useUser.js';
 import {useToast} from './ToastProvider.js';
 
@@ -48,14 +49,14 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
               <h1 className="text-2xl font-bold text-indigo-600">
                 <FormattedMessage
                   defaultMessage="Gitterdun"
-                  id="layout.brand"
+                  id="widgets.Layout.gitterdun"
                 />
               </h1>
 
               <span className="ml-2 text-sm text-gray-500">
                 <FormattedMessage
                   defaultMessage="Chore Wrangler"
-                  id="layout.tagline"
+                  id="widgets.Layout.chore-wrangler"
                 />
               </span>
             </div>
@@ -63,7 +64,10 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">
-                  {intl.formatMessage({defaultMessage: 'Points'})}
+                  {intl.formatMessage({
+                    defaultMessage: 'Points',
+                    id: 'widgets.Layout.points',
+                  })}
                 </span>
 
                 <span className="font-semibold text-indigo-600">
@@ -73,7 +77,10 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
 
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">
-                  {intl.formatMessage({defaultMessage: 'Streak'})}
+                  {intl.formatMessage({
+                    defaultMessage: 'Streak',
+                    id: 'widgets.Layout.streak',
+                  })}
                 </span>
 
                 <span className="font-semibold text-orange-500">
@@ -88,33 +95,20 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
 
                 <span className="text-sm font-medium text-gray-700">
                   {user?.username
-                    ?? intl.formatMessage({defaultMessage: 'User'})}
+                    ?? intl.formatMessage({
+                      defaultMessage: 'User',
+                      id: 'widgets.Layout.user',
+                    })}
                 </span>
               </div>
 
               <div className="flex items-center">
-                <button
-                  aria-label={intl.formatMessage({defaultMessage: 'Language'})}
-                  className="rounded px-2 py-1 text-sm"
-                  onClick={() => {
-                    const next =
-                      locale === 'en'
-                        ? 'pirate'
-                        : locale === 'pirate'
-                          ? 'piglatin'
-                          : 'en';
-                    setLocale(next);
+                <LocaleSelector
+                  onChange={value => {
+                    setLocale(value);
                   }}
-                  title={intl.formatMessage({
-                    defaultMessage: 'Language',
-                    id: 'layout.language',
-                  })}
-                  type="button"
-                >
-                  <span aria-hidden>
-                    <GlobeIcon size="sm" />
-                  </span>
-                </button>
+                  value={locale}
+                />
               </div>
 
               {user ? (
@@ -128,12 +122,15 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
                 >
                   <FormattedMessage
                     defaultMessage="Logout"
-                    id="layout.logout"
+                    id="widgets.Layout.logout"
                   />
                 </button>
               ) : (
                 <Link className="text-sm text-indigo-600" to="/login">
-                  <FormattedMessage defaultMessage="Login" id="layout.login" />
+                  <FormattedMessage
+                    defaultMessage="Login"
+                    id="widgets.Layout.login"
+                  />
                 </Link>
               )}
             </div>

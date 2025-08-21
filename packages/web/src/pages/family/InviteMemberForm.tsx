@@ -26,11 +26,23 @@ export const InviteMemberForm: FC<InviteMemberFormProps> = ({
   const intl = useIntl();
 
   const messages = defineMessages({
-    header: {defaultMessage: 'Invite Member'},
-    placeholderEmail: {defaultMessage: 'Email'},
-    optionParent: {defaultMessage: 'Parent'},
-    optionChild: {defaultMessage: 'Child'},
-    send: {defaultMessage: 'Send'},
+    header: {
+      defaultMessage: 'Invite Member',
+      id: 'pages.family.InviteMemberForm.invite-member',
+    },
+    placeholderEmail: {
+      defaultMessage: 'Email',
+      id: 'pages.family.InviteMemberForm.email',
+    },
+    optionParent: {
+      defaultMessage: 'Parent',
+      id: 'pages.family.InviteMemberForm.parent',
+    },
+    optionChild: {
+      defaultMessage: 'Child',
+      id: 'pages.family.InviteMemberForm.child',
+    },
+    send: {defaultMessage: 'Send', id: 'pages.family.InviteMemberForm.send'},
   });
 
   return (

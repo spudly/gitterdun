@@ -58,7 +58,10 @@ const Dashboard: FC = () => {
     return (
       <PageContainer variant="centered">
         <PageLoading
-          message={intl.formatMessage({defaultMessage: 'Loading dashboard...'})}
+          message={intl.formatMessage({
+            defaultMessage: 'Loading dashboard...',
+            id: 'pages.Dashboard.loading-dashboard',
+          })}
         />
       </PageContainer>
     );
@@ -66,34 +69,51 @@ const Dashboard: FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader title={intl.formatMessage({defaultMessage: 'Dashboard'})} />
+      <PageHeader
+        title={intl.formatMessage({
+          defaultMessage: 'Dashboard',
+          id: 'pages.Dashboard.dashboard',
+        })}
+      />
 
       <GridContainer cols={4} gap="lg">
         <StatCard
           color="blue"
           icon={<CheckCircleIcon />}
-          label={intl.formatMessage({defaultMessage: 'Completed Chores'})}
+          label={intl.formatMessage({
+            defaultMessage: 'Completed Chores',
+            id: 'pages.Dashboard.completed-chores',
+          })}
           value={getCompletedChoresCount()}
         />
 
         <StatCard
           color="yellow"
           icon={<ClockIcon />}
-          label={intl.formatMessage({defaultMessage: 'Pending Chores'})}
+          label={intl.formatMessage({
+            defaultMessage: 'Pending Chores',
+            id: 'pages.Dashboard.pending-chores',
+          })}
           value={getPendingChoresCount()}
         />
 
         <StatCard
           color="green"
           icon={<DocIcon />}
-          label={intl.formatMessage({defaultMessage: 'Total Points'})}
+          label={intl.formatMessage({
+            defaultMessage: 'Total Points',
+            id: 'pages.Dashboard.total-points',
+          })}
           value={getTotalPoints()}
         />
 
         <StatCard
           color="red"
           icon={<ClockIcon />}
-          label={intl.formatMessage({defaultMessage: 'Due Soon'})}
+          label={intl.formatMessage({
+            defaultMessage: 'Due Soon',
+            id: 'pages.Dashboard.due-soon',
+          })}
           value={getDueSoonChoresCount()}
         />
       </GridContainer>
@@ -113,14 +133,20 @@ const Dashboard: FC = () => {
             description={
               <Text as="span" muted size="sm">
                 {chore.description
-                  ?? intl.formatMessage({defaultMessage: 'No description'})}
+                  ?? intl.formatMessage({
+                    defaultMessage: 'No description',
+                    id: 'pages.Dashboard.no-description',
+                  })}
               </Text>
             }
             key={chore.id}
             right={
               <Text>
                 {intl.formatMessage(
-                  {defaultMessage: '{points} pts'},
+                  {
+                    defaultMessage: '{points} pts',
+                    id: 'pages.Leaderboard.points-pts',
+                  },
                   {points: chore.point_reward},
                 )}
               </Text>

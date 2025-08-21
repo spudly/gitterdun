@@ -27,9 +27,18 @@ export const FamilySelector: FC<FamilySelectorProps> = ({
 }) => {
   const intl = useIntl();
   const messages = defineMessages({
-    chooseFamily: {defaultMessage: 'Choose a family'},
-    newFamilyPlaceholder: {defaultMessage: 'New family name'},
-    create: {defaultMessage: 'Create'},
+    chooseFamily: {
+      defaultMessage: 'Choose a family',
+      id: 'pages.family.FamilySelector.choose-a-family',
+    },
+    newFamilyPlaceholder: {
+      defaultMessage: 'New family name',
+      id: 'pages.family.FamilySelector.new-family-name',
+    },
+    create: {
+      defaultMessage: 'Create',
+      id: 'pages.family.FamilySelector.create',
+    },
   });
   return (
     <Stack gap="md">

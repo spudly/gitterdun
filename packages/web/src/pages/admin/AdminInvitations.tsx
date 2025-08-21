@@ -28,18 +28,41 @@ export const AdminInvitations: FC<AdminInvitationsProps> = ({
   const intl = useIntl();
 
   const messages = defineMessages({
-    placeholderFamilyId: {defaultMessage: 'Family ID'},
-    placeholderInviteEmail: {defaultMessage: 'Invite email'},
-    optionParent: {defaultMessage: 'Parent'},
-    optionChild: {defaultMessage: 'Child'},
-    invite: {defaultMessage: 'Invite'},
-    validation: {defaultMessage: 'Enter family ID and email'},
+    placeholderFamilyId: {
+      defaultMessage: 'Family ID',
+      id: 'pages.admin.AdminInvitations.family-id',
+    },
+    placeholderInviteEmail: {
+      defaultMessage: 'Invite email',
+      id: 'pages.admin.AdminInvitations.invite-email',
+    },
+    optionParent: {
+      defaultMessage: 'Parent',
+      id: 'pages.family.InviteMemberForm.parent',
+    },
+    optionChild: {
+      defaultMessage: 'Child',
+      id: 'pages.family.InviteMemberForm.child',
+    },
+    invite: {
+      defaultMessage: 'Invite',
+      id: 'pages.admin.AdminInvitations.invite',
+    },
+    validation: {
+      defaultMessage: 'Enter family ID and email',
+      id: 'pages.admin.AdminInvitations.enter-family-id-and-email',
+    },
     success: {
       defaultMessage: 'Invitation created (see server logs for token in dev)',
+      id: 'pages.admin.AdminInvitations.invitation-created-see-server-',
     },
-    failure: {defaultMessage: 'Failed to invite'},
+    failure: {
+      defaultMessage: 'Failed to invite',
+      id: 'pages.admin.AdminInvitations.failed-to-invite',
+    },
     toastError: {
       defaultMessage: 'Could not create invitation. Please try again.',
+      id: 'pages.admin.AdminInvitations.could-not-create-invitation-pl',
     },
   });
 

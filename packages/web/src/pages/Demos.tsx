@@ -37,6 +37,7 @@ const registry: Record<string, FC> = {
   Section: lazy(async () => import('../widgets/Section.demo.js')),
   SectionHeader: lazy(async () => import('../widgets/SectionHeader.demo.js')),
   SelectInput: lazy(async () => import('../widgets/SelectInput.demo.js')),
+  LocaleSelector: lazy(async () => import('../widgets/LocaleSelector.demo.js')),
   Spinner: lazy(async () => import('../widgets/Spinner.demo.js')),
   StatCard: lazy(async () => import('../widgets/StatCard.demo.js')),
   StatusBadge: lazy(async () => import('../widgets/StatusBadge.demo.js')),

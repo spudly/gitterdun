@@ -949,6 +949,7 @@ const eslintConfig = [
     files: ['**/*.tsx'],
     rules: {
       'max-lines-per-function': 'off', // TODO: re-enable this after fixing other issues
+      'gitterdun/require-i18n-formatting': 'error',
     },
   },
   {

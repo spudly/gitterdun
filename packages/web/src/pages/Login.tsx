@@ -13,14 +13,20 @@ import {TextLink} from '../widgets/TextLink.js';
 import {FormattedMessage, defineMessages, useIntl} from 'react-intl';
 
 const messages = defineMessages({
-  title: {defaultMessage: 'Login'},
-  failed: {defaultMessage: 'Login failed'},
-  email: {defaultMessage: 'Email'},
-  password: {defaultMessage: 'Password'},
-  submitting: {defaultMessage: 'Logging in...'},
-  submit: {defaultMessage: 'Login'},
-  forgot: {defaultMessage: 'Forgot password?'},
-  registerAdmin: {defaultMessage: 'Register (Admin)'},
+  title: {defaultMessage: 'Login', id: 'pages.Login.login'},
+  failed: {defaultMessage: 'Login failed', id: 'pages.Login.login-failed'},
+  email: {defaultMessage: 'Email', id: 'pages.Login.email'},
+  password: {defaultMessage: 'Password', id: 'pages.Login.password'},
+  submitting: {defaultMessage: 'Logging in...', id: 'pages.Login.logging-in'},
+  submit: {defaultMessage: 'Login', id: 'pages.Login.login'},
+  forgot: {
+    defaultMessage: 'Forgot password?',
+    id: 'pages.Login.forgot-password',
+  },
+  registerAdmin: {
+    defaultMessage: 'Register (Admin)',
+    id: 'pages.Login.register-admin',
+  },
 });
 
 const Login: FC = () => {

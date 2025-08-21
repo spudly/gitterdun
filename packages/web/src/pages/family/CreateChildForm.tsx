@@ -26,11 +26,26 @@ export const CreateChildForm: FC<CreateChildFormProps> = ({
   const intl = useIntl();
 
   const messages = defineMessages({
-    header: {defaultMessage: 'Create Child Account'},
-    placeholderUsername: {defaultMessage: 'Username'},
-    placeholderEmail: {defaultMessage: 'Email'},
-    placeholderPassword: {defaultMessage: 'Password'},
-    create: {defaultMessage: 'Create'},
+    header: {
+      defaultMessage: 'Create Child Account',
+      id: 'pages.family.CreateChildForm.create-child-account',
+    },
+    placeholderUsername: {
+      defaultMessage: 'Username',
+      id: 'pages.family.CreateChildForm.username',
+    },
+    placeholderEmail: {
+      defaultMessage: 'Email',
+      id: 'pages.family.InviteMemberForm.email',
+    },
+    placeholderPassword: {
+      defaultMessage: 'Password',
+      id: 'pages.family.CreateChildForm.password',
+    },
+    create: {
+      defaultMessage: 'Create',
+      id: 'pages.family.FamilySelector.create',
+    },
   });
 
   return (

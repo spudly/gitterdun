@@ -32,6 +32,7 @@ const Leaderboard: FC = () => {
         <PageLoading
           message={intl.formatMessage({
             defaultMessage: 'Loading leaderboard...',
+            id: 'pages.Leaderboard.loading-leaderboard',
           })}
         />
       </PageContainer>
@@ -50,14 +51,20 @@ const Leaderboard: FC = () => {
 
         <Text muted>
           {intl.formatMessage(
-            {defaultMessage: '{count} points'},
+            {
+              defaultMessage: '{count} points',
+              id: 'pages.Leaderboard.count-points',
+            },
             {count: entry.points},
           )}
         </Text>
 
         <Text muted size="sm">
           {intl.formatMessage(
-            {defaultMessage: '{count} chores'},
+            {
+              defaultMessage: '{count} chores',
+              id: 'pages.Leaderboard.count-chores',
+            },
             {count: entry.chores_completed},
           )}
         </Text>
@@ -74,21 +81,27 @@ const Leaderboard: FC = () => {
       </Text>
     ),
     score: intl.formatMessage(
-      {defaultMessage: '{points} pts'},
+      {defaultMessage: '{points} pts', id: 'pages.Leaderboard.points-pts'},
       {points: entry.points},
     ),
     subtitle: (
       <>
         <span>
           {intl.formatMessage(
-            {defaultMessage: '{count} chores completed'},
+            {
+              defaultMessage: '{count} chores completed',
+              id: 'pages.Leaderboard.count-chores-completed',
+            },
             {count: entry.chores_completed},
           )}
         </span>
 
         <span>
           {intl.formatMessage(
-            {defaultMessage: '{count} badges earned'},
+            {
+              defaultMessage: '{count} badges earned',
+              id: 'pages.Leaderboard.count-badges-earned',
+            },
             {count: entry.badges_earned},
           )}
         </span>
@@ -97,7 +110,10 @@ const Leaderboard: FC = () => {
     metadata: (
       <span>
         {intl.formatMessage(
-          {defaultMessage: '{count} day streak'},
+          {
+            defaultMessage: '{count} day streak',
+            id: 'pages.Leaderboard.count-day-streak',
+          },
           {count: entry.streak_count},
         )}
       </span>
@@ -106,22 +122,39 @@ const Leaderboard: FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader title={intl.formatMessage({defaultMessage: 'Leaderboard'})} />
+      <PageHeader
+        title={intl.formatMessage({
+          defaultMessage: 'Leaderboard',
+          id: 'pages.Leaderboard.leaderboard',
+        })}
+      />
 
       <Podium items={podiumItems} />
 
       <RankingList
         items={rankingItems}
         subtitle={intl.formatMessage(
-          {defaultMessage: 'Sorted by {criterion}'},
+          {
+            defaultMessage: 'Sorted by {criterion}',
+            id: 'pages.Leaderboard.sorted-by-criterion',
+          },
           {
             criterion:
               sortBy === 'points'
-                ? intl.formatMessage({defaultMessage: 'total points'})
-                : intl.formatMessage({defaultMessage: 'streak count'}),
+                ? intl.formatMessage({
+                    defaultMessage: 'total points',
+                    id: 'pages.Leaderboard.total-points',
+                  })
+                : intl.formatMessage({
+                    defaultMessage: 'streak count',
+                    id: 'pages.Leaderboard.streak-count',
+                  }),
           },
         )}
-        title={intl.formatMessage({defaultMessage: 'Full Rankings'})}
+        title={intl.formatMessage({
+          defaultMessage: 'Full Rankings',
+          id: 'pages.Leaderboard.full-rankings',
+        })}
       />
     </PageContainer>
   );

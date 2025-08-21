@@ -24,11 +24,26 @@ export const AdminFamilyCreation: FC<AdminFamilyCreationProps> = ({
   const intl = useIntl();
 
   const messages = defineMessages({
-    placeholder: {defaultMessage: 'Family name'},
-    createFamily: {defaultMessage: 'Create Family'},
-    success: {defaultMessage: 'Family created. Redirecting...'},
-    error: {defaultMessage: 'Failed to create family'},
-    toastError: {defaultMessage: 'Could not create family. Please try again.'},
+    placeholder: {
+      defaultMessage: 'Family name',
+      id: 'pages.admin.AdminFamilyCreation.family-name',
+    },
+    createFamily: {
+      defaultMessage: 'Create Family',
+      id: 'pages.admin.AdminFamilyCreation.create-family',
+    },
+    success: {
+      defaultMessage: 'Family created. Redirecting...',
+      id: 'pages.admin.AdminFamilyCreation.family-created-redirecting',
+    },
+    error: {
+      defaultMessage: 'Failed to create family',
+      id: 'pages.admin.AdminFamilyCreation.failed-to-create-family',
+    },
+    toastError: {
+      defaultMessage: 'Could not create family. Please try again.',
+      id: 'pages.admin.AdminFamilyCreation.could-not-create-family-please',
+    },
   });
 
   const handleSuccess = () => {
