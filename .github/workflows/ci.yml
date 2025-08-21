@@ -211,5 +211,13 @@ jobs:
         if: steps.cache-node-modules-knip.outputs.cache-hit != 'true'
         run: npm ci
 
+      - name: Restore build artifacts cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            packages/*/dist
+            packages/*/tsconfig.build.tsbuildinfo
+          key: ${{ runner.os }}-build-${{ github.sha }}
+
       - name: Check dependencies
         run: npm run knip
