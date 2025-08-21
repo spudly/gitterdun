@@ -7,6 +7,7 @@ import {SelectInput} from '../../widgets/SelectInput.js';
 
 import {Toolbar} from '../../widgets/Toolbar.js';
 import {useToast} from '../../widgets/ToastProvider.js';
+import {defineMessages, useIntl} from 'react-intl';
 
 type AdminInvitationsProps = {
   readonly onMessageChange: (
@@ -24,6 +25,23 @@ export const AdminInvitations: FC<AdminInvitationsProps> = ({
     'parent',
   );
   const {safeAsync} = useToast();
+  const intl = useIntl();
+
+  const messages = defineMessages({
+    placeholderFamilyId: {defaultMessage: 'Family ID'},
+    placeholderInviteEmail: {defaultMessage: 'Invite email'},
+    optionParent: {defaultMessage: 'Parent'},
+    optionChild: {defaultMessage: 'Child'},
+    invite: {defaultMessage: 'Invite'},
+    validation: {defaultMessage: 'Enter family ID and email'},
+    success: {
+      defaultMessage: 'Invitation created (see server logs for token in dev)',
+    },
+    failure: {defaultMessage: 'Failed to invite'},
+    toastError: {
+      defaultMessage: 'Could not create invitation. Please try again.',
+    },
+  });
 
   return (
     <Toolbar>
@@ -31,7 +49,7 @@ export const AdminInvitations: FC<AdminInvitationsProps> = ({
         onChange={value => {
           setInviteFamIdAdmin(value);
         }}
-        placeholder="Family ID"
+        placeholder={intl.formatMessage(messages.placeholderFamilyId)}
         value={inviteFamIdAdmin}
       />
 
@@ -39,7 +57,7 @@ export const AdminInvitations: FC<AdminInvitationsProps> = ({
         onChange={value => {
           setInviteEmailAdmin(value);
         }}
-        placeholder="Invite email"
+        placeholder={intl.formatMessage(messages.placeholderInviteEmail)}
         value={inviteEmailAdmin}
       />
 
@@ -51,8 +69,12 @@ export const AdminInvitations: FC<AdminInvitationsProps> = ({
         }}
         value={inviteRoleAdmin}
       >
-        <option value="parent">Parent</option>
-        <option value="child">Child</option>
+        <option value="parent">
+          {intl.formatMessage(messages.optionParent)}
+        </option>
+        <option value="child">
+          {intl.formatMessage(messages.optionChild)}
+        </option>
       </SelectInput>
 
       <Button
@@ -63,7 +85,7 @@ export const AdminInvitations: FC<AdminInvitationsProps> = ({
             || famId <= 0
             || inviteEmailAdmin === ''
           ) {
-            onMessageChange('Enter family ID and email', 'error');
+            onMessageChange(intl.formatMessage(messages.validation), 'error');
             return;
           }
           try {
@@ -72,18 +94,15 @@ export const AdminInvitations: FC<AdminInvitationsProps> = ({
               email: inviteEmailAdmin,
               role: inviteRoleAdmin,
             });
-            onMessageChange(
-              'Invitation created (see server logs for token in dev)',
-              'success',
-            );
+            onMessageChange(intl.formatMessage(messages.success), 'success');
             setInviteEmailAdmin('');
           } catch (_err) {
-            onMessageChange('Failed to invite', 'error');
+            onMessageChange(intl.formatMessage(messages.failure), 'error');
           }
-        }, 'Could not create invitation. Please try again.')}
+        }, intl.formatMessage(messages.toastError))}
         type="button"
       >
-        Invite
+        {intl.formatMessage(messages.invite)}
       </Button>
     </Toolbar>
   );

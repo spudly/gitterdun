@@ -12,7 +12,21 @@ import {Badge} from '../widgets/Badge.js';
 import {InlineMeta} from '../widgets/InlineMeta.js';
 import {Button} from '../widgets/Button.js';
 import {PageLoading} from '../widgets/PageLoading.js';
-import {FormattedMessage, useIntl} from 'react-intl';
+import {defineMessages, FormattedMessage, useIntl} from 'react-intl';
+
+const messages = defineMessages({
+  loading: {defaultMessage: 'Loading chores...'},
+  header: {defaultMessage: 'Chores'},
+  statusCompleted: {defaultMessage: 'Completed'},
+  statusApproved: {defaultMessage: 'Approved'},
+  statusPending: {defaultMessage: 'Pending'},
+  pointsWithValue: {defaultMessage: 'Points: {points}'},
+  bonusWithPoints: {defaultMessage: 'Bonus: +{points}'},
+  penaltyWithPoints: {defaultMessage: 'Penalty: -{points}'},
+  dueWithDate: {defaultMessage: 'Due: {date}'},
+  complete: {defaultMessage: 'Complete'},
+  typeBonus: {defaultMessage: 'Bonus'},
+});
 
 const Chores: FC = () => {
   const {user} = useUser();
@@ -29,12 +43,7 @@ const Chores: FC = () => {
   if (isLoading) {
     return (
       <PageContainer variant="centered">
-        <PageLoading
-          message={intl.formatMessage({
-            id: 'chores.loading',
-            defaultMessage: 'Loading chores...',
-          })}
-        />
+        <PageLoading message={intl.formatMessage(messages.loading)} />
       </PageContainer>
     );
   }
@@ -49,39 +58,19 @@ const Chores: FC = () => {
     return <StatusDot color="yellow" />;
   };
 
-  const renderStatusBadge = (status: ChoreWithUsername['status']) => {
+  const renderStatusText = (status: ChoreWithUsername['status']): string => {
     if (status === 'completed') {
-      return (
-        <Badge variant="success">
-          <FormattedMessage
-            defaultMessage="Completed"
-            id="chores.status.completed"
-          />
-        </Badge>
-      );
+      return intl.formatMessage(messages.statusCompleted);
     }
     if (status === 'approved') {
-      return (
-        <Badge variant="info">
-          <FormattedMessage
-            defaultMessage="Approved"
-            id="chores.status.approved"
-          />
-        </Badge>
-      );
+      return intl.formatMessage(messages.statusApproved);
     }
-    return (
-      <Badge variant="warning">
-        <FormattedMessage defaultMessage="Pending" id="chores.status.pending" />
-      </Badge>
-    );
+    return intl.formatMessage(messages.statusPending);
   };
 
   return (
     <PageContainer>
-      <PageHeader
-        title={intl.formatMessage({id: 'nav.chores', defaultMessage: 'Chores'})}
-      />
+      <PageHeader title={intl.formatMessage(messages.header)} />
 
       <List>
         {chores.map((chore: ChoreWithUsername) => (
@@ -92,46 +81,33 @@ const Chores: FC = () => {
             meta={
               <InlineMeta>
                 <span>
-                  {intl.formatMessage(
-                    {
-                      id: 'chores.pointsWithValue',
-                      defaultMessage: 'Points: {points}',
-                    },
-                    {points: chore.point_reward},
-                  )}
+                  {intl.formatMessage(messages.pointsWithValue, {
+                    points: chore.point_reward,
+                  })}
                 </span>
 
                 {chore.bonus_points > 0 && (
                   <span>
-                    {intl.formatMessage(
-                      {
-                        id: 'chores.bonusWithPoints',
-                        defaultMessage: 'Bonus: +{points}',
-                      },
-                      {points: chore.bonus_points},
-                    )}
+                    {intl.formatMessage(messages.bonusWithPoints, {
+                      points: chore.bonus_points,
+                    })}
                   </span>
                 )}
 
                 {chore.penalty_points > 0 && (
                   <span>
-                    {intl.formatMessage(
-                      {
-                        id: 'chores.penaltyWithPoints',
-                        defaultMessage: 'Penalty: -{points}',
-                      },
-                      {points: chore.penalty_points},
-                    )}
+                    {intl.formatMessage(messages.penaltyWithPoints, {
+                      points: chore.penalty_points,
+                    })}
                   </span>
                 )}
 
                 {typeof chore.due_date === 'string'
                 && chore.due_date.length > 0 ? (
                   <span>
-                    {intl.formatMessage(
-                      {id: 'chores.dueWithDate', defaultMessage: 'Due: {date}'},
-                      {date: new Date(chore.due_date).toLocaleDateString()},
-                    )}
+                    {intl.formatMessage(messages.dueWithDate, {
+                      date: new Date(chore.due_date).toLocaleDateString(),
+                    })}
                   </span>
                 ) : null}
               </InlineMeta>
@@ -139,24 +115,18 @@ const Chores: FC = () => {
             right={
               chore.status === 'pending' ? (
                 <Button size="sm" variant="primary">
-                  <FormattedMessage
-                    defaultMessage="Complete"
-                    id="chores.complete"
-                  />
+                  <FormattedMessage {...messages.complete} />
                 </Button>
               ) : undefined
             }
             title={chore.title}
             titleRight={
               <>
-                {renderStatusBadge(chore.status)}
+                {renderStatusText(chore.status)}
 
                 {chore.chore_type === 'bonus' && (
                   <Badge variant="purple">
-                    <FormattedMessage
-                      defaultMessage="Bonus"
-                      id="chores.type.bonus"
-                    />
+                    <FormattedMessage {...messages.typeBonus} />
                   </Badge>
                 )}
               </>

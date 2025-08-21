@@ -1,4 +1,5 @@
 import type {FC} from 'react';
+import {FormattedMessage, defineMessages, useIntl} from 'react-intl';
 import type {ChoreWithUsername} from '@gitterdun/shared';
 import {Card} from '../../widgets/Card.js';
 import {List} from '../../widgets/List.js';
@@ -16,11 +17,28 @@ type AdminChoresManagementProps = {readonly chores: Array<ChoreWithUsername>};
 export const AdminChoresManagement: FC<AdminChoresManagementProps> = ({
   chores,
 }) => {
+  const intl = useIntl();
+
+  const messages = defineMessages({
+    header: {defaultMessage: 'Chores Management'},
+    pointsWithValue: {defaultMessage: 'Points: {points}'},
+    bonusWithPoints: {defaultMessage: 'Bonus: +{points}'},
+    penaltyWithPoints: {defaultMessage: 'Penalty: -{points}'},
+    dueWithDate: {defaultMessage: 'Due: {date}'},
+    approve: {defaultMessage: 'Approve'},
+    reject: {defaultMessage: 'Reject'},
+    edit: {defaultMessage: 'Edit'},
+    statusCompleted: {defaultMessage: 'Completed'},
+    statusApproved: {defaultMessage: 'Approved'},
+    statusPending: {defaultMessage: 'Pending'},
+    typeBonus: {defaultMessage: 'Bonus'},
+  });
+
   return (
     <Card
       header={
         <Text as="h2" size="lg" weight="medium">
-          Chores Management
+          {intl.formatMessage(messages.header)}
         </Text>
       }
     >
@@ -43,20 +61,34 @@ export const AdminChoresManagement: FC<AdminChoresManagementProps> = ({
             }
             meta={
               <InlineMeta>
-                <span>Points: {chore.point_reward}</span>
+                <span>
+                  {intl.formatMessage(messages.pointsWithValue, {
+                    points: chore.point_reward,
+                  })}
+                </span>
 
                 {chore.bonus_points > 0 && (
-                  <span>Bonus: +{chore.bonus_points}</span>
+                  <span>
+                    {intl.formatMessage(messages.bonusWithPoints, {
+                      points: chore.bonus_points,
+                    })}
+                  </span>
                 )}
 
                 {chore.penalty_points > 0 && (
-                  <span>Penalty: -{chore.penalty_points}</span>
+                  <span>
+                    {intl.formatMessage(messages.penaltyWithPoints, {
+                      points: chore.penalty_points,
+                    })}
+                  </span>
                 )}
 
                 {typeof chore.due_date === 'string'
                 && chore.due_date.length > 0 ? (
                   <span>
-                    Due: {new Date(chore.due_date).toLocaleDateString()}
+                    {intl.formatMessage(messages.dueWithDate, {
+                      date: new Date(chore.due_date).toLocaleDateString(),
+                    })}
                   </span>
                 ) : null}
               </InlineMeta>
@@ -66,17 +98,17 @@ export const AdminChoresManagement: FC<AdminChoresManagementProps> = ({
                 {chore.status === 'completed' && (
                   <>
                     <Button size="sm" variant="primary">
-                      Approve
+                      <FormattedMessage {...messages.approve} />
                     </Button>
 
                     <Button size="sm" variant="danger">
-                      Reject
+                      <FormattedMessage {...messages.reject} />
                     </Button>
                   </>
                 )}
 
                 <Button size="sm" variant="secondary">
-                  Edit
+                  <FormattedMessage {...messages.edit} />
                 </Button>
               </Toolbar>
             }
@@ -92,11 +124,19 @@ export const AdminChoresManagement: FC<AdminChoresManagementProps> = ({
                         : 'pending'
                   }
                 >
-                  {chore.status}
+                  {chore.status === 'completed' ? (
+                    <FormattedMessage {...messages.statusCompleted} />
+                  ) : chore.status === 'approved' ? (
+                    <FormattedMessage {...messages.statusApproved} />
+                  ) : (
+                    <FormattedMessage {...messages.statusPending} />
+                  )}
                 </StatusBadge>
 
                 {chore.chore_type === 'bonus' && (
-                  <Badge variant="purple">Bonus</Badge>
+                  <Badge variant="purple">
+                    <FormattedMessage {...messages.typeBonus} />
+                  </Badge>
                 )}
               </>
             }

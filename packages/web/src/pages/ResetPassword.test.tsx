@@ -1,10 +1,8 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen, fireEvent} from '@testing-library/react';
-import {MemoryRouter} from 'react-router-dom';
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {createWrapper} from '../test/createWrapper';
 import ResetPassword from './ResetPassword';
 import {ToastProvider} from '../widgets/ToastProvider';
-import {TestProviders} from '../test/TestProviders';
 
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => {
@@ -17,19 +15,15 @@ jest.mock('../hooks/useUser', () => ({
   useUser: jest.fn(() => ({resetPassword: jest.fn(async () => ({}))})),
 }));
 
-const wrap = (ui: React.ReactElement, path = '/reset-password?token=t') => (
-  <QueryClientProvider client={new QueryClient()}>
-    <MemoryRouter initialEntries={[path]}>
-      <ToastProvider>{ui}</ToastProvider>
-    </MemoryRouter>
-  </QueryClientProvider>
-);
+const wrap = (ui: React.ReactElement) => <ToastProvider>{ui}</ToastProvider>;
 
 describe('resetPassword page', () => {
   test('validates token and passwords', async () => {
-    render(wrap(<ResetPassword />, '/reset-password?token='), {
-      wrapper: TestProviders,
+    const Wrapper = createWrapper({
+      i18n: true,
+      router: {initialEntries: ['/reset-password?token=']},
     });
+    render(wrap(<ResetPassword />), {wrapper: Wrapper});
     // Fill in valid passwords to pass HTML validation
     fireEvent.change(screen.getByLabelText(/New Password/iu), {
       target: {value: 'abcdef'},
@@ -45,7 +39,11 @@ describe('resetPassword page', () => {
   });
 
   test('shows message when passwords do not match', async () => {
-    render(wrap(<ResetPassword />), {wrapper: TestProviders});
+    const Wrapper = createWrapper({
+      i18n: true,
+      router: {initialEntries: ['/reset-password?token=t']},
+    });
+    render(wrap(<ResetPassword />), {wrapper: Wrapper});
     fireEvent.change(screen.getByLabelText(/New Password/iu), {
       target: {value: 'a'},
     });
@@ -53,13 +51,17 @@ describe('resetPassword page', () => {
       target: {value: 'b'},
     });
     fireEvent.click(screen.getByRole('button', {name: 'Reset Password'}));
-    expect(screen.getByText(/Passwords do not match/u)).toBeInTheDocument();
+    await expect(
+      screen.findByText(/Passwords do not match/u),
+    ).resolves.toBeInTheDocument();
   });
 
   test('executes missing-token branch', async () => {
-    render(wrap(<ResetPassword />, '/reset-password?token='), {
-      wrapper: TestProviders,
+    const MissingTokenWrapper = createWrapper({
+      i18n: true,
+      router: {initialEntries: ['/reset-password?token=']},
     });
+    render(wrap(<ResetPassword />), {wrapper: MissingTokenWrapper});
     // Fill in valid passwords to pass HTML validation
     fireEvent.change(screen.getByLabelText(/New Password/iu), {
       target: {value: 'abcdef'},
@@ -81,9 +83,11 @@ describe('resetPassword page', () => {
   });
 
   test('uses default empty token when query param is absent and shows error', async () => {
-    render(wrap(<ResetPassword />, '/reset-password'), {
-      wrapper: TestProviders,
+    const NoTokenWrapper = createWrapper({
+      i18n: true,
+      router: {initialEntries: ['/reset-password']},
     });
+    render(wrap(<ResetPassword />), {wrapper: NoTokenWrapper});
     // Fill valid passwords to satisfy required/minLength so submit handler runs
     fireEvent.change(screen.getByLabelText(/New Password/iu), {
       target: {value: 'abcdef'},

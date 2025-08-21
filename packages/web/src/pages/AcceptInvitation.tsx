@@ -1,6 +1,6 @@
 import type {FC, FormEventHandler} from 'react';
 import {useState} from 'react';
-import {FormattedMessage, useIntl} from 'react-intl';
+import {FormattedMessage, defineMessages, useIntl} from 'react-intl';
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import {TokenSearchParamsSchema} from '../schemas.js';
 import {invitationsApi} from '../lib/api.js';
@@ -20,6 +20,12 @@ type InvitationSubmitParams = {
   onAccepted: () => void;
 };
 
+const submitMessages = defineMessages({
+  accepted: {defaultMessage: 'Invitation accepted. You can now log in.'},
+  failedAccept: {defaultMessage: 'Failed to accept'},
+  failedAcceptInvitation: {defaultMessage: 'Failed to accept invitation'},
+});
+
 const useInvitationSubmit = ({
   token,
   username,
@@ -33,42 +39,21 @@ const useInvitationSubmit = ({
     event.preventDefault();
     setMessage(null);
 
-    safeAsync(
-      async () => {
-        try {
-          const res = await invitationsApi.accept({token, username, password});
-          if (res.success) {
-            setMessage(
-              intl.formatMessage({
-                id: 'acceptInvitation.accepted',
-                defaultMessage: 'Invitation accepted. You can now log in.',
-              }),
-            );
-            setTimeout(() => {
-              onAccepted();
-            }, 1200);
-          } else {
-            setMessage(
-              intl.formatMessage({
-                id: 'acceptInvitation.failed',
-                defaultMessage: 'Failed to accept',
-              }),
-            );
-          }
-        } catch {
-          setMessage(
-            intl.formatMessage({
-              id: 'acceptInvitation.failed',
-              defaultMessage: 'Failed to accept',
-            }),
-          );
+    safeAsync(async () => {
+      try {
+        const res = await invitationsApi.accept({token, username, password});
+        if (res.success) {
+          setMessage(intl.formatMessage(submitMessages.accepted));
+          setTimeout(() => {
+            onAccepted();
+          }, 1200);
+        } else {
+          setMessage(intl.formatMessage(submitMessages.failedAccept));
         }
-      },
-      intl.formatMessage({
-        id: 'acceptInvitation.submitError',
-        defaultMessage: 'Failed to accept invitation',
-      }),
-    );
+      } catch {
+        setMessage(intl.formatMessage(submitMessages.failedAccept));
+      }
+    }, intl.formatMessage(submitMessages.failedAcceptInvitation));
   };
   return submitHandler;
 };
@@ -109,6 +94,14 @@ const useAcceptInvitationSetup = () => {
   };
 };
 
+const pageMessages = defineMessages({
+  missingToken: {defaultMessage: 'Missing token.'},
+  header: {defaultMessage: 'Accept Invitation'},
+  username: {defaultMessage: 'Username'},
+  password: {defaultMessage: 'Password'},
+  accept: {defaultMessage: 'Accept Invitation'},
+});
+
 const AcceptInvitation: FC = () => {
   const intl = useIntl();
   const {
@@ -124,29 +117,18 @@ const AcceptInvitation: FC = () => {
   if (token == null || token === '') {
     return (
       <div>
-        <FormattedMessage
-          defaultMessage="Missing token."
-          id="acceptInvitation.missingToken"
-        />
+        <FormattedMessage {...pageMessages.missingToken} />
       </div>
     );
   }
 
   return (
-    <FormCard
-      title={intl.formatMessage({
-        defaultMessage: 'Accept Invitation',
-        id: 'acceptInvitation.title',
-      })}
-    >
+    <FormCard title={intl.formatMessage(pageMessages.header)}>
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
           <FormField
             htmlFor="username"
-            label={intl.formatMessage({
-              defaultMessage: 'Username',
-              id: 'acceptInvitation.username',
-            })}
+            label={intl.formatMessage(pageMessages.username)}
             required
           >
             <TextInput
@@ -161,10 +143,7 @@ const AcceptInvitation: FC = () => {
 
           <FormField
             htmlFor="password"
-            label={intl.formatMessage({
-              defaultMessage: 'Password',
-              id: 'acceptInvitation.password',
-            })}
+            label={intl.formatMessage(pageMessages.password)}
             required
           >
             <TextInput
@@ -184,10 +163,7 @@ const AcceptInvitation: FC = () => {
           ) : null}
 
           <Button fullWidth type="submit">
-            <FormattedMessage
-              defaultMessage="Accept Invitation"
-              id="acceptInvitation.accept"
-            />
+            <FormattedMessage {...pageMessages.accept} />
           </Button>
         </Stack>
       </form>

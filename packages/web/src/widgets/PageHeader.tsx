@@ -3,8 +3,8 @@ import clsx from 'clsx';
 
 type PageHeaderProps = {
   readonly title: ReactNode;
-  readonly subtitle?: ReactNode;
-  readonly actions?: ReactNode;
+  readonly subtitle?: ReactNode | ReadonlyArray<ReactNode>;
+  readonly actions?: ReactNode | ReadonlyArray<ReactNode>;
   readonly className?: string;
 };
 
@@ -14,8 +14,14 @@ export const PageHeader: FC<PageHeaderProps> = ({
   actions,
   className = '',
 }) => {
-  const hasSubtitle = subtitle !== null && subtitle !== undefined;
-  const hasActions = actions !== null && actions !== undefined;
+  const hasSubtitle =
+    subtitle !== null
+    && subtitle !== undefined
+    && (!Array.isArray(subtitle) || subtitle.length > 0);
+  const hasActions =
+    actions !== null
+    && actions !== undefined
+    && (!Array.isArray(actions) || actions.length > 0);
 
   return (
     <div className={clsx('mb-8', className)}>
@@ -24,12 +30,18 @@ export const PageHeader: FC<PageHeaderProps> = ({
           <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
 
           {hasSubtitle ? (
-            <p className="mt-1 text-gray-600">{subtitle}</p>
+            Array.isArray(subtitle) ? (
+              <div className="mt-1 flex gap-2 text-gray-600">{subtitle}</div>
+            ) : (
+              <p className="mt-1 text-gray-600">{subtitle}</p>
+            )
           ) : null}
         </div>
 
         {hasActions ? (
-          <div className="flex items-center gap-2">{actions}</div>
+          <div className="flex items-center gap-2">
+            {Array.isArray(actions) ? actions : actions}
+          </div>
         ) : null}
       </div>
     </div>

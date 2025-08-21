@@ -1,9 +1,8 @@
 import {beforeEach, describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {MemoryRouter} from 'react-router-dom';
+import {createWrapper} from '../test/createWrapper';
 import AcceptInvitation from './AcceptInvitation';
 import {ToastProvider} from '../widgets/ToastProvider';
-import {TestProviders} from '../test/TestProviders';
 
 jest.mock('../lib/api', () => ({
   invitationsApi: {accept: jest.fn(async () => ({success: true}))},
@@ -30,25 +29,29 @@ describe('acceptInvitation page', () => {
   });
 
   test('shows missing token when none provided', () => {
+    const Wrapper = createWrapper({
+      i18n: true,
+      router: {initialEntries: ['/accept-invitation']},
+    });
     render(
-      <MemoryRouter initialEntries={['/accept-invitation']}>
-        <ToastProvider>
-          <AcceptInvitation />
-        </ToastProvider>
-      </MemoryRouter>,
-      {wrapper: TestProviders},
+      <ToastProvider>
+        <AcceptInvitation />
+      </ToastProvider>,
+      {wrapper: Wrapper},
     );
     expect(screen.getByText('Missing token.')).toBeInTheDocument();
   });
 
   test('renders form with valid token', () => {
+    const Wrapper = createWrapper({
+      i18n: true,
+      router: {initialEntries: ['/accept-invitation?token=abc']},
+    });
     render(
-      <MemoryRouter initialEntries={['/accept-invitation?token=abc']}>
-        <ToastProvider>
-          <AcceptInvitation />
-        </ToastProvider>
-      </MemoryRouter>,
-      {wrapper: TestProviders},
+      <ToastProvider>
+        <AcceptInvitation />
+      </ToastProvider>,
+      {wrapper: Wrapper},
     );
     expect(
       screen.getByRole('heading', {name: 'Accept Invitation'}),

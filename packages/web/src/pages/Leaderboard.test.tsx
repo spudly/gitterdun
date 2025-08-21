@@ -3,7 +3,7 @@ import {render, screen} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Leaderboard from './Leaderboard';
 import * as apiModule from '../lib/api';
-import {TestProviders} from '../test/TestProviders';
+import {createWrapper} from '../test/createWrapper';
 
 jest.mock('../lib/api', () => ({
   leaderboardApi: {
@@ -43,12 +43,14 @@ const wrap = (ui: React.ReactElement) => (
 
 describe('leaderboard page', () => {
   test('renders header', async () => {
-    render(wrap(<Leaderboard />), {wrapper: TestProviders});
+    const Wrapper = createWrapper({i18n: true, queryClient: true});
+    render(wrap(<Leaderboard />), {wrapper: Wrapper});
     await expect(screen.findByText('Leaderboard')).resolves.toBeInTheDocument();
   });
 
   test('renders podium and ranking list content', async () => {
-    render(wrap(<Leaderboard />), {wrapper: TestProviders});
+    const Wrapper2 = createWrapper({i18n: true, queryClient: true});
+    render(wrap(<Leaderboard />), {wrapper: Wrapper2});
     const headings = await screen.findAllByText('U1');
     expect(headings.length).toBeGreaterThan(0);
     expect(screen.getAllByText('U2').length).toBeGreaterThan(0);
@@ -74,7 +76,8 @@ describe('leaderboard page', () => {
         totalUsers: 1,
       },
     });
-    render(wrap(<Leaderboard />), {wrapper: TestProviders});
+    const Wrapper3 = createWrapper({i18n: true, queryClient: true});
+    render(wrap(<Leaderboard />), {wrapper: Wrapper3});
     await expect(
       screen.findByText(/Sorted by streak count/u),
     ).resolves.toBeInTheDocument();

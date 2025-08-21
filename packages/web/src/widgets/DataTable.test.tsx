@@ -3,7 +3,7 @@ import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {Column} from './DataTable';
 import {DataTable} from './DataTable';
-import {TestProviders} from '../test/TestProviders';
+import {createWrapper} from '../test/createWrapper';
 
 describe('dataTable', () => {
   test('renders, handles click and loading/empty', async () => {
@@ -13,9 +13,10 @@ describe('dataTable', () => {
       {key: 'name', header: 'Name', align: 'right'},
     ];
     const onRowClick = jest.fn();
+    const Wrapper = createWrapper({i18n: true});
     const {rerender} = render(
       <DataTable columns={columns} data={data} onRowClick={onRowClick} />,
-      {wrapper: TestProviders},
+      {wrapper: Wrapper},
     );
     await userEvent.click(screen.getByText('N'));
     expect(onRowClick).toHaveBeenCalledWith(
@@ -32,9 +33,8 @@ describe('dataTable', () => {
     type Row = {name: string};
     const data: Array<Row> = [{name: 'X'}]; // no id triggers `row-${index}` branch
     const columns: Array<Column<Row>> = [{key: 'name', header: 'Name'}];
-    render(<DataTable columns={columns} data={data} />, {
-      wrapper: TestProviders,
-    });
+    const Wrapper = createWrapper({i18n: true});
+    render(<DataTable columns={columns} data={data} />, {wrapper: Wrapper});
     expect(screen.getByText('X')).toBeInTheDocument();
   });
 
@@ -48,9 +48,8 @@ describe('dataTable', () => {
         render: (item, index) => `R-${item.name}-${index}`,
       },
     ];
-    render(<DataTable columns={columns} data={data} />, {
-      wrapper: TestProviders,
-    });
+    const Wrapper = createWrapper({i18n: true});
+    render(<DataTable columns={columns} data={data} />, {wrapper: Wrapper});
     expect(screen.getByText('R-X-0')).toBeInTheDocument();
     expect(screen.getByText('R-Y-1')).toBeInTheDocument();
   });

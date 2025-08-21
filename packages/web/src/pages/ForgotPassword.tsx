@@ -25,36 +25,24 @@ const ForgotPassword: FC = () => {
         await forgotPassword(email);
         setMessage(
           intl.formatMessage({
-            id: 'forgotPassword.success',
             defaultMessage:
               'If the email exists, a reset link has been sent. Check server logs for token in dev.',
           }),
         );
       },
-      intl.formatMessage({
-        id: 'forgotPassword.error',
-        defaultMessage: 'Request failed',
-      }),
+      intl.formatMessage({defaultMessage: 'Request failed'}),
       setMessage,
     )();
   };
 
   return (
-    <FormCard
-      title={intl.formatMessage({
-        id: 'forgotPassword.title',
-        defaultMessage: 'Forgot Password',
-      })}
-    >
+    <FormCard title={intl.formatMessage({defaultMessage: 'Forgot Password'})}>
       <Stack gap="md">
         <form onSubmit={handleSubmit}>
           <Stack gap="md">
             <FormField
               htmlFor="email"
-              label={intl.formatMessage({
-                id: 'login.email',
-                defaultMessage: 'Email',
-              })}
+              label={intl.formatMessage({defaultMessage: 'Email'})}
               required
             >
               <TextInput

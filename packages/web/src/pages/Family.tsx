@@ -77,10 +77,7 @@ const Family: FC = () => {
   if (!user) {
     return (
       <div>
-        <FormattedMessage
-          defaultMessage="Please log in to manage your family."
-          id="family.loginRequired"
-        />
+        <FormattedMessage defaultMessage="Please log in to manage your family." />
       </div>
     );
   }
@@ -88,10 +85,7 @@ const Family: FC = () => {
   return (
     <PageContainer>
       <FormSection
-        title={intl.formatMessage({
-          id: 'family.yourFamilies',
-          defaultMessage: 'Your Families',
-        })}
+        title={intl.formatMessage({defaultMessage: 'Your Families'})}
       >
         <FamilySelector
           families={familyOptions}
@@ -108,12 +102,7 @@ const Family: FC = () => {
 
       {selectedFamilyId !== null ? (
         <GridContainer cols={2} gap="lg">
-          <FormSection
-            title={intl.formatMessage({
-              id: 'family.members',
-              defaultMessage: 'Members',
-            })}
-          >
+          <FormSection title={intl.formatMessage({defaultMessage: 'Members'})}>
             <FamilyMembers membersData={membersQuery.data?.data} />
           </FormSection>
 

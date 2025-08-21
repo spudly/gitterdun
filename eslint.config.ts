@@ -11,14 +11,22 @@ import * as reactHooks from 'eslint-plugin-react-hooks';
 import commentsPlugin from 'eslint-plugin-eslint-comments';
 import jestPlugin from 'eslint-plugin-jest';
 import tailwindcssPlugin from 'eslint-plugin-tailwindcss';
+import gitterdunPlugin from 'eslint-plugin-gitterdun';
 
 const WORKSPACE_ROOT_DIR = dirname(fileURLToPath(import.meta.url));
 
 const eslintConfig = [
-  {ignores: ['**/dist/**', '**/build/**', '**/coverage/**', 'node_modules/**']},
+  {
+    ignores: [
+      '**/dist/**',
+      '**/build/**',
+      '**/coverage/**',
+      'node_modules/**',
+      'packages/eslint-plugin-i18n/**',
+    ],
+  },
   {
     plugins: {
-      '@typescript-eslint': typescriptEslint,
       import: importPlugin,
       react: reactPlugin,
 
@@ -29,16 +37,9 @@ const eslintConfig = [
       jest: jestPlugin,
 
       tailwindcss: tailwindcssPlugin,
+      gitterdun: gitterdunPlugin,
     },
-    files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
-    languageOptions: {
-      parser: typescriptEslintParser,
-      parserOptions: {
-        project: ['./tsconfig.base.json'],
-        tsconfigRootDir: WORKSPACE_ROOT_DIR,
-        warnOnUnsupportedTypeScriptVersion: false,
-      },
-    },
+    files: ['**/*.{ts,tsx,js,jsx,cjs,mjs,mts,cts}'],
     settings: {
       react: {version: 'detect', pragma: 'React'},
       'import/resolver': {
@@ -59,6 +60,7 @@ const eslintConfig = [
       propWrapperFunctions: ['forbidExtraProps', 'exact', 'Object.freeze'],
     },
     rules: {
+      // i18n rules are enabled via per-file overrides below
       'jsx-a11y/accessible-emoji': 'off',
       'jsx-a11y/alt-text': [
         'error',
@@ -87,13 +89,10 @@ const eslintConfig = [
       'arrow-body-style': 'off', // using Prettier for styling
       'arrow-parens': 'off', // using Prettier for styling
       'jsx-a11y/autocomplete-valid': ['off', {inputComponents: []}],
-      '@typescript-eslint/brace-style': 'off', // using Prettier for styling
       'brace-style': 'off', // using Prettier for styling
       camelcase: 'off',
       'jsx-a11y/click-events-have-key-events': 'error',
-      '@typescript-eslint/comma-dangle': 'off', // using Prettier for styling
       'comma-dangle': 'off', // using Prettier for styling
-      '@typescript-eslint/comma-spacing': 'off', // using Prettier for styling
       'comma-spacing': 'off', // using Prettier for styling
       'constructor-super': 'off',
       'jsx-a11y/control-has-associated-label': [
@@ -127,9 +126,7 @@ const eslintConfig = [
       ],
       curly: ['warn', 'all'],
       'import/default': 'off',
-      '@typescript-eslint/default-param-last': 'error',
       'default-param-last': 'off', //  use @typescript-eslint version instead
-      '@typescript-eslint/dot-notation': ['error', {allowKeywords: true}],
       'dot-notation': 'off', //  use @typescript-eslint version instead
       'import/dynamic-import-chunkname': [
         'off',
@@ -144,7 +141,6 @@ const eslintConfig = [
         {js: 'never', mjs: 'never', jsx: 'never', ts: 'never', tsx: 'never'},
       ],
       'import/first': 'error',
-      '@typescript-eslint/func-call-spacing': 'off', // using Prettier for styling
       'func-call-spacing': 'off', // using Prettier for styling
       'react/function-component-definition': [
         'error',
@@ -161,7 +157,6 @@ const eslintConfig = [
       'jsx-a11y/iframe-has-title': 'error',
       'jsx-a11y/img-redundant-alt': 'error',
       'implicit-arrow-linebreak': 'off', // using Prettier for styling
-      '@typescript-eslint/indent': 'off', // using Prettier for styling
       indent: 'off', // using Prettier for styling
       'jsx-a11y/interactive-supports-focus': 'error',
       'react/jsx-curly-newline': 'off', // using Prettier for styling
@@ -180,7 +175,6 @@ const eslintConfig = [
         'error',
         {noStrings: true, ignoreProps: true, allowedStrings: ['*', '%']},
       ],
-      '@typescript-eslint/keyword-spacing': 'off', // using Prettier for styling
       'keyword-spacing': 'off', // using Prettier for styling
       'jsx-a11y/label-has-associated-control': [
         'error',
@@ -201,7 +195,6 @@ const eslintConfig = [
         },
       ],
       'jsx-a11y/lang': 'error',
-      '@typescript-eslint/lines-between-class-members': 'off', // using Prettier for styling
       'lines-between-class-members': 'off', // using Prettier for styling
       'max-len': 'off', // using Prettier for styling
       'jsx-a11y/media-has-caption': [
@@ -211,21 +204,11 @@ const eslintConfig = [
       'jsx-a11y/mouse-events-have-key-events': 'error',
       'import/named': 'off',
       'import/namespace': 'off',
-      '@typescript-eslint/naming-convention': [
-        'error',
-        {
-          selector: 'variable',
-          format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
-        },
-        {selector: 'function', format: ['camelCase', 'PascalCase']},
-        {selector: 'typeLike', format: ['PascalCase']},
-      ],
       'import/newline-after-import': 'off', // using Prettier for styling
       'newline-per-chained-call': 'off', // using Prettier for styling
       'import/no-absolute-path': 'error',
       'jsx-a11y/no-access-key': 'error',
       'import/no-amd': 'error',
-      '@typescript-eslint/no-array-constructor': 'error',
       'no-array-constructor': 'off', //  use @typescript-eslint version instead
       'jsx-a11y/no-autofocus': ['error', {ignoreNonDOM: true}],
       'import/no-commonjs': 'off',
@@ -238,29 +221,12 @@ const eslintConfig = [
         {elements: ['marquee', 'blink']},
       ],
       'no-dupe-args': 'off',
-      '@typescript-eslint/no-dupe-class-members': 'error',
       'no-dupe-class-members': 'off', //  use @typescript-eslint version instead
       'no-dupe-keys': 'off',
       'import/no-duplicates': 'error',
       'import/no-dynamic-require': 'error',
-      '@typescript-eslint/no-empty-function': [
-        'error',
-        {allow: ['arrowFunctions', 'functions', 'methods']},
-      ],
       'no-empty-function': 'off', //  use @typescript-eslint version instead
-      '@typescript-eslint/no-extra-parens': [
-        'off',
-        'all',
-        {
-          conditionalAssign: true,
-          nestedBinaryExpressions: false,
-          returnAssign: false,
-          ignoreJSX: 'all',
-          enforceForArrowConditionals: false,
-        },
-      ],
       'no-extra-parens': 'off',
-      '@typescript-eslint/no-extra-semi': 'off',
       'no-extra-semi': 'off',
       'import/no-extraneous-dependencies': [
         'error',
@@ -296,7 +262,6 @@ const eslintConfig = [
         },
       ],
       'no-func-assign': 'off',
-      '@typescript-eslint/no-implied-eval': 'error',
       'no-implied-eval': 'off', //  use @typescript-eslint version instead
       'no-import-assign': 'off',
       'import/no-import-module-exports': ['error', {exceptions: []}],
@@ -304,19 +269,8 @@ const eslintConfig = [
         'error',
         {tr: ['none', 'presentation']},
       ],
-      '@typescript-eslint/no-loop-func': ['error'],
       'no-loop-func': 'off', //  use @typescript-eslint version instead
-      '@typescript-eslint/no-loss-of-precision': 'error',
       'no-loss-of-precision': 'off', //  use @typescript-eslint version instead
-      '@typescript-eslint/no-magic-numbers': [
-        'off',
-        {
-          ignore: [],
-          ignoreArrayIndexes: false,
-          enforceConst: true,
-          detectObjects: true,
-        },
-      ],
       'no-magic-numbers': 'off',
       'no-multiple-empty-lines': 'off', // using Prettier for styling
       'import/no-named-as-default-member': 'off',
@@ -370,7 +324,6 @@ const eslintConfig = [
       ],
       'no-obj-calls': 'off',
       'jsx-a11y/no-onchange': 'off',
-      '@typescript-eslint/no-redeclare': 'error',
       'no-redeclare': 'off', //  use @typescript-eslint version instead
       'jsx-a11y/no-redundant-roles': 'error',
       'import/no-relative-packages': 'error',
@@ -378,7 +331,6 @@ const eslintConfig = [
       'no-return-await': 'off',
       'import/no-self-import': 'error',
       'no-setter-return': 'off',
-      '@typescript-eslint/no-shadow': 'error',
       'no-shadow': 'off', //  use @typescript-eslint version instead
       'jsx-a11y/no-static-element-interactions': [
         'error',
@@ -402,178 +354,35 @@ const eslintConfig = [
       'no-unreachable': 'off',
       'import/no-unresolved': 'off',
       'no-unsafe-negation': 'off',
-      '@typescript-eslint/no-unused-expressions': [
-        'error',
-        {
-          allowShortCircuit: false,
-          allowTernary: false,
-          allowTaggedTemplates: false,
-        },
-      ],
       'no-unused-expressions': 'off', //  use @typescript-eslint version instead
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        {
-          vars: 'all',
-          varsIgnorePattern: '^_',
-          args: 'after-used',
-          argsIgnorePattern: '^_',
-          caughtErrors: 'all',
-          caughtErrorsIgnorePattern: '^_',
-          ignoreRestSiblings: true,
-        },
-      ],
       'no-unused-vars': 'off', //  use @typescript-eslint version instead
-      '@typescript-eslint/no-use-before-define': [
-        'error',
-        {functions: true, classes: true, variables: true},
-      ],
       'no-use-before-define': 'off', //  use @typescript-eslint version instead
-      '@typescript-eslint/no-useless-constructor': 'error',
       'no-useless-constructor': 'off', //  use @typescript-eslint version instead
       'import/no-useless-path-segments': ['error', {commonjs: true}],
       'import/no-webpack-loader-syntax': 'error',
       'nonblock-statement-body-position': 'off', // using Prettier for styling
       'object-curly-newline': 'off', // using Prettier for styling
-      '@typescript-eslint/object-curly-spacing': 'off', // using Prettier for styling
       'object-curly-spacing': 'off', // using Prettier for styling
       'operator-linebreak': 'off', // using Prettier for styling
       'import/order': 'off', // using Prettier for styling
       'import/prefer-default-export': 'off',
-      '@typescript-eslint/quotes': 'off', // using Prettier for styling
       quotes: 'off', // using Prettier for styling
       'react-hooks/react-compiler': 'error',
       'react/react-in-jsx-scope': 'off',
-      '@typescript-eslint/require-await': 'off',
       'require-await': 'off',
       'react/require-default-props': 'off',
-      '@typescript-eslint/return-await': 'off',
       'jsx-a11y/role-has-required-aria-props': 'error',
       'jsx-a11y/role-supports-aria-props': 'error',
       'react-hooks/rules-of-hooks': 'error',
       'jsx-a11y/scope': 'error',
-      '@typescript-eslint/semi': 'off', // using Prettier for styling
       semi: 'off', // using Prettier for styling
       'space-before-blocks': 'off', // using Prettier for styling
-      '@typescript-eslint/space-before-function-paren': 'off', // using Prettier for styling
       'space-before-function-paren': 'off', // using Prettier for styling
-      '@typescript-eslint/space-infix-ops': 'off', // using Prettier for styling
       'space-infix-ops': 'off', // using Prettier for styling
       strict: ['error', 'never'],
       'jsx-a11y/tabindex-no-positive': 'error',
       'import/unambiguous': 'off',
       'valid-typeof': 'off',
-      // Auto-added: unconfigured plugin rules set to warn
-      '@typescript-eslint/adjacent-overload-signatures': 'warn',
-      '@typescript-eslint/array-type': [
-        'warn',
-        {default: 'generic', readonly: 'generic'},
-      ],
-      '@typescript-eslint/await-thenable': 'warn',
-      '@typescript-eslint/ban-ts-comment': 'warn',
-      '@typescript-eslint/ban-tslint-comment': 'warn',
-      '@typescript-eslint/class-literal-property-style': 'warn',
-      '@typescript-eslint/class-methods-use-this': 'warn',
-      '@typescript-eslint/consistent-generic-constructors': 'warn',
-      '@typescript-eslint/consistent-indexed-object-style': 'warn',
-      '@typescript-eslint/consistent-return': 'warn',
-      '@typescript-eslint/consistent-type-assertions': 'warn',
-      '@typescript-eslint/consistent-type-definitions': ['warn', 'type'],
-      '@typescript-eslint/consistent-type-exports': 'warn',
-      '@typescript-eslint/consistent-type-imports': 'off', // sometimes tyepof import() is the best way
-      '@typescript-eslint/explicit-function-return-type': 'off', // too verbose
-      '@typescript-eslint/explicit-member-accessibility': 'warn',
-      '@typescript-eslint/explicit-module-boundary-types': 'off', // too verbose
-      '@typescript-eslint/init-declarations': 'off', // typescript makes sure variables are initialized before use
-      '@typescript-eslint/max-params': ['warn', {max: 5}],
-      '@typescript-eslint/member-ordering': 'warn',
-      '@typescript-eslint/method-signature-style': 'warn',
-      '@typescript-eslint/no-array-delete': 'warn',
-      '@typescript-eslint/no-base-to-string': 'warn',
-      '@typescript-eslint/no-confusing-non-null-assertion': 'warn',
-      '@typescript-eslint/no-confusing-void-expression': 'warn',
-      '@typescript-eslint/no-deprecated': 'warn',
-      '@typescript-eslint/no-duplicate-enum-values': 'warn',
-      '@typescript-eslint/no-duplicate-type-constituents': 'warn',
-      '@typescript-eslint/no-dynamic-delete': 'warn',
-      '@typescript-eslint/no-empty-object-type': 'warn',
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-extra-non-null-assertion': 'warn',
-      '@typescript-eslint/no-extraneous-class': 'warn',
-      '@typescript-eslint/no-floating-promises': 'error',
-      '@typescript-eslint/no-for-in-array': 'warn',
-      '@typescript-eslint/no-import-type-side-effects': 'warn',
-      '@typescript-eslint/no-inferrable-types': 'warn',
-      '@typescript-eslint/no-invalid-this': 'warn',
-      '@typescript-eslint/no-invalid-void-type': 'warn',
-      '@typescript-eslint/no-meaningless-void-operator': 'warn',
-      '@typescript-eslint/no-misused-new': 'warn',
-      '@typescript-eslint/no-misused-promises': 'warn',
-      '@typescript-eslint/no-misused-spread': 'warn',
-      '@typescript-eslint/no-mixed-enums': 'warn',
-      '@typescript-eslint/no-namespace': 'warn',
-      '@typescript-eslint/no-non-null-asserted-nullish-coalescing': 'warn',
-      '@typescript-eslint/no-non-null-asserted-optional-chain': 'warn',
-      '@typescript-eslint/no-non-null-assertion': 'warn',
-      '@typescript-eslint/no-redundant-type-constituents': 'warn',
-      '@typescript-eslint/no-require-imports': 'warn',
-      '@typescript-eslint/no-restricted-imports': 'warn',
-      '@typescript-eslint/no-restricted-types': 'warn',
-      '@typescript-eslint/no-this-alias': 'warn',
-      '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'warn',
-      '@typescript-eslint/no-unnecessary-condition': 'warn',
-      '@typescript-eslint/no-unnecessary-parameter-property-assignment': 'warn',
-      '@typescript-eslint/no-unnecessary-qualifier': 'warn',
-      '@typescript-eslint/no-unnecessary-template-expression': 'warn',
-      '@typescript-eslint/no-unnecessary-type-arguments': 'warn',
-      '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
-      '@typescript-eslint/no-unnecessary-type-constraint': 'warn',
-      '@typescript-eslint/no-unnecessary-type-conversion': 'warn',
-      '@typescript-eslint/no-unnecessary-type-parameters': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn',
-      '@typescript-eslint/no-unsafe-assignment': 'warn',
-      '@typescript-eslint/no-unsafe-call': 'warn',
-      '@typescript-eslint/no-unsafe-declaration-merging': 'warn',
-      '@typescript-eslint/no-unsafe-enum-comparison': 'warn',
-      '@typescript-eslint/no-unsafe-function-type': 'warn',
-      '@typescript-eslint/no-unsafe-member-access': 'warn',
-      '@typescript-eslint/no-unsafe-return': 'warn',
-      '@typescript-eslint/no-unsafe-type-assertion': 'warn',
-      '@typescript-eslint/no-unsafe-unary-minus': 'warn',
-      '@typescript-eslint/no-useless-empty-export': 'warn',
-      '@typescript-eslint/no-wrapper-object-types': 'warn',
-      '@typescript-eslint/non-nullable-type-assertion-style': 'warn',
-      '@typescript-eslint/only-throw-error': 'warn',
-      '@typescript-eslint/parameter-properties': 'warn',
-      '@typescript-eslint/prefer-as-const': 'warn',
-      '@typescript-eslint/prefer-destructuring': 'warn',
-      '@typescript-eslint/prefer-enum-initializers': 'warn',
-      '@typescript-eslint/prefer-find': 'warn',
-      '@typescript-eslint/prefer-for-of': 'warn',
-      '@typescript-eslint/prefer-function-type': 'warn',
-      '@typescript-eslint/prefer-includes': 'warn',
-      '@typescript-eslint/prefer-literal-enum-member': 'warn',
-      '@typescript-eslint/prefer-namespace-keyword': 'warn',
-      '@typescript-eslint/prefer-nullish-coalescing': 'warn',
-      '@typescript-eslint/prefer-optional-chain': 'warn',
-      '@typescript-eslint/prefer-promise-reject-errors': 'warn',
-      '@typescript-eslint/prefer-readonly': 'warn',
-      '@typescript-eslint/prefer-readonly-parameter-types': 'off', // makes code too noisy
-      '@typescript-eslint/prefer-reduce-type-parameter': 'warn',
-      '@typescript-eslint/prefer-regexp-exec': 'warn',
-      '@typescript-eslint/prefer-return-this-type': 'warn',
-      '@typescript-eslint/prefer-string-starts-ends-with': 'warn',
-      '@typescript-eslint/promise-function-async': 'warn',
-      '@typescript-eslint/related-getter-setter-pairs': 'warn',
-      '@typescript-eslint/require-array-sort-compare': 'warn',
-      '@typescript-eslint/restrict-plus-operands': 'warn',
-      '@typescript-eslint/restrict-template-expressions': 'warn',
-      '@typescript-eslint/strict-boolean-expressions': 'warn',
-      '@typescript-eslint/switch-exhaustiveness-check': 'warn',
-      '@typescript-eslint/triple-slash-reference': 'warn',
-      '@typescript-eslint/unbound-method': 'warn',
-      '@typescript-eslint/unified-signatures': 'warn',
-      '@typescript-eslint/use-unknown-in-catch-callback-variable': 'warn',
       'import/consistent-type-specifier-style': 'warn',
       'import/enforce-node-protocol-usage': ['warn', 'always'],
       'import/max-dependencies': ['warn', {max: 20}],
@@ -741,7 +550,7 @@ const eslintConfig = [
       'no-constant-binary-expression': 'warn',
       'no-constant-condition': 'warn',
       'no-constructor-return': 'warn',
-      'no-continue': 'warn',
+      'no-continue': 'off', // comes in handy
       'no-control-regex': 'warn',
       'no-debugger': 'warn',
       'no-delete-var': 'warn',
@@ -930,20 +739,242 @@ const eslintConfig = [
     },
   },
   {
+    files: ['**/*.{ts,tsx,mts,cts}'],
+    plugins: {'@typescript-eslint': typescriptEslint},
+    languageOptions: {
+      parser: typescriptEslintParser,
+      parserOptions: {
+        project: ['./tsconfig.base.json'],
+        tsconfigRootDir: WORKSPACE_ROOT_DIR,
+        warnOnUnsupportedTypeScriptVersion: false,
+      },
+    },
+    rules: {
+      '@typescript-eslint/brace-style': 'off',
+      '@typescript-eslint/comma-dangle': 'off',
+      '@typescript-eslint/comma-spacing': 'off',
+      '@typescript-eslint/default-param-last': 'error',
+      '@typescript-eslint/dot-notation': ['error', {allowKeywords: true}],
+      '@typescript-eslint/func-call-spacing': 'off',
+      '@typescript-eslint/indent': 'off',
+      '@typescript-eslint/keyword-spacing': 'off',
+      '@typescript-eslint/lines-between-class-members': 'off',
+      '@typescript-eslint/naming-convention': [
+        'error',
+        {
+          selector: 'variable',
+          format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
+        },
+        {selector: 'function', format: ['camelCase', 'PascalCase']},
+        {selector: 'typeLike', format: ['PascalCase']},
+      ],
+      '@typescript-eslint/no-array-constructor': 'error',
+      '@typescript-eslint/no-dupe-class-members': 'error',
+      '@typescript-eslint/no-empty-function': [
+        'error',
+        {allow: ['arrowFunctions', 'functions', 'methods']},
+      ],
+      '@typescript-eslint/no-extra-parens': [
+        'off',
+        'all',
+        {
+          conditionalAssign: true,
+          nestedBinaryExpressions: false,
+          returnAssign: false,
+          ignoreJSX: 'all',
+          enforceForArrowConditionals: false,
+        },
+      ],
+      '@typescript-eslint/no-extra-semi': 'off',
+      '@typescript-eslint/no-implied-eval': 'error',
+      '@typescript-eslint/no-loop-func': ['error'],
+      '@typescript-eslint/no-loss-of-precision': 'error',
+      '@typescript-eslint/no-magic-numbers': [
+        'off',
+        {
+          ignore: [],
+          ignoreArrayIndexes: false,
+          enforceConst: true,
+          detectObjects: true,
+        },
+      ],
+      '@typescript-eslint/no-redeclare': 'error',
+      '@typescript-eslint/no-shadow': 'error',
+      '@typescript-eslint/no-unused-expressions': [
+        'error',
+        {
+          allowShortCircuit: false,
+          allowTernary: false,
+          allowTaggedTemplates: false,
+        },
+      ],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          vars: 'all',
+          varsIgnorePattern: '^_',
+          args: 'after-used',
+          argsIgnorePattern: '^_',
+          caughtErrors: 'all',
+          caughtErrorsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
+      '@typescript-eslint/no-use-before-define': [
+        'error',
+        {functions: true, classes: true, variables: true},
+      ],
+      '@typescript-eslint/no-useless-constructor': 'error',
+      '@typescript-eslint/object-curly-spacing': 'off',
+      '@typescript-eslint/quotes': 'off',
+      '@typescript-eslint/require-await': 'off',
+      '@typescript-eslint/return-await': 'off',
+      '@typescript-eslint/semi': 'off',
+      '@typescript-eslint/space-before-function-paren': 'off',
+      '@typescript-eslint/space-infix-ops': 'off',
+      // Auto-added: unconfigured plugin rules set to warn
+      '@typescript-eslint/adjacent-overload-signatures': 'warn',
+      '@typescript-eslint/array-type': [
+        'warn',
+        {default: 'generic', readonly: 'generic'},
+      ],
+      '@typescript-eslint/await-thenable': 'warn',
+      '@typescript-eslint/ban-ts-comment': 'warn',
+      '@typescript-eslint/ban-tslint-comment': 'warn',
+      '@typescript-eslint/class-literal-property-style': 'warn',
+      '@typescript-eslint/class-methods-use-this': 'warn',
+      '@typescript-eslint/consistent-generic-constructors': 'warn',
+      '@typescript-eslint/consistent-indexed-object-style': 'warn',
+      '@typescript-eslint/consistent-return': 'warn',
+      '@typescript-eslint/consistent-type-assertions': 'warn',
+      '@typescript-eslint/consistent-type-definitions': ['warn', 'type'],
+      '@typescript-eslint/consistent-type-exports': 'warn',
+      '@typescript-eslint/consistent-type-imports': 'off',
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/explicit-member-accessibility': 'off',
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
+      '@typescript-eslint/init-declarations': 'off',
+      '@typescript-eslint/max-params': ['warn', {max: 5}],
+      '@typescript-eslint/member-ordering': 'warn',
+      '@typescript-eslint/method-signature-style': 'warn',
+      '@typescript-eslint/no-array-delete': 'warn',
+      '@typescript-eslint/no-base-to-string': 'warn',
+      '@typescript-eslint/no-confusing-non-null-assertion': 'warn',
+      '@typescript-eslint/no-confusing-void-expression': 'warn',
+      '@typescript-eslint/no-deprecated': 'warn',
+      '@typescript-eslint/no-duplicate-enum-values': 'warn',
+      '@typescript-eslint/no-duplicate-type-constituents': 'warn',
+      '@typescript-eslint/no-dynamic-delete': 'warn',
+      '@typescript-eslint/no-empty-object-type': 'warn',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-extra-non-null-assertion': 'warn',
+      '@typescript-eslint/no-extraneous-class': 'warn',
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-for-in-array': 'warn',
+      '@typescript-eslint/no-import-type-side-effects': 'warn',
+      '@typescript-eslint/no-inferrable-types': 'warn',
+      '@typescript-eslint/no-invalid-this': 'warn',
+      '@typescript-eslint/no-invalid-void-type': 'warn',
+      '@typescript-eslint/no-meaningless-void-operator': 'warn',
+      '@typescript-eslint/no-misused-new': 'warn',
+      '@typescript-eslint/no-misused-promises': 'warn',
+      '@typescript-eslint/no-misused-spread': 'warn',
+      '@typescript-eslint/no-mixed-enums': 'warn',
+      '@typescript-eslint/no-namespace': 'warn',
+      '@typescript-eslint/no-non-null-asserted-nullish-coalescing': 'warn',
+      '@typescript-eslint/no-non-null-asserted-optional-chain': 'warn',
+      '@typescript-eslint/no-non-null-assertion': 'warn',
+      '@typescript-eslint/no-redundant-type-constituents': 'warn',
+      '@typescript-eslint/no-require-imports': 'warn',
+      '@typescript-eslint/no-restricted-imports': 'warn',
+      '@typescript-eslint/no-restricted-types': 'warn',
+      '@typescript-eslint/no-this-alias': 'warn',
+      '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'warn',
+      '@typescript-eslint/no-unnecessary-condition': 'warn',
+      '@typescript-eslint/no-unnecessary-parameter-property-assignment': 'warn',
+      '@typescript-eslint/no-unnecessary-qualifier': 'warn',
+      '@typescript-eslint/no-unnecessary-template-expression': 'warn',
+      '@typescript-eslint/no-unnecessary-type-arguments': 'warn',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
+      '@typescript-eslint/no-unnecessary-type-constraint': 'warn',
+      '@typescript-eslint/no-unnecessary-type-conversion': 'warn',
+      '@typescript-eslint/no-unnecessary-type-parameters': 'warn',
+      '@typescript-eslint/no-unsafe-argument': 'warn',
+      '@typescript-eslint/no-unsafe-assignment': 'warn',
+      '@typescript-eslint/no-unsafe-call': 'warn',
+      '@typescript-eslint/no-unsafe-declaration-merging': 'warn',
+      '@typescript-eslint/no-unsafe-enum-comparison': 'warn',
+      '@typescript-eslint/no-unsafe-function-type': 'warn',
+      '@typescript-eslint/no-unsafe-member-access': 'warn',
+      '@typescript-eslint/no-unsafe-return': 'warn',
+      '@typescript-eslint/no-unsafe-type-assertion': 'warn',
+      '@typescript-eslint/no-unsafe-unary-minus': 'warn',
+      '@typescript-eslint/no-useless-empty-export': 'warn',
+      '@typescript-eslint/no-wrapper-object-types': 'warn',
+      '@typescript-eslint/non-nullable-type-assertion-style': 'warn',
+      '@typescript-eslint/only-throw-error': 'warn',
+      '@typescript-eslint/parameter-properties': 'warn',
+      '@typescript-eslint/prefer-as-const': 'warn',
+      '@typescript-eslint/prefer-destructuring': 'warn',
+      '@typescript-eslint/prefer-enum-initializers': 'warn',
+      '@typescript-eslint/prefer-find': 'warn',
+      '@typescript-eslint/prefer-for-of': 'warn',
+      '@typescript-eslint/prefer-function-type': 'warn',
+      '@typescript-eslint/prefer-includes': 'warn',
+      '@typescript-eslint/prefer-literal-enum-member': 'warn',
+      '@typescript-eslint/prefer-namespace-keyword': 'warn',
+      '@typescript-eslint/prefer-nullish-coalescing': 'warn',
+      '@typescript-eslint/prefer-optional-chain': 'warn',
+      '@typescript-eslint/prefer-promise-reject-errors': 'warn',
+      '@typescript-eslint/prefer-readonly': 'warn',
+      '@typescript-eslint/prefer-readonly-parameter-types': 'off',
+      '@typescript-eslint/prefer-reduce-type-parameter': 'warn',
+      '@typescript-eslint/prefer-regexp-exec': 'warn',
+      '@typescript-eslint/prefer-return-this-type': 'warn',
+      '@typescript-eslint/prefer-string-starts-ends-with': 'warn',
+      '@typescript-eslint/promise-function-async': 'warn',
+      '@typescript-eslint/related-getter-setter-pairs': 'warn',
+      '@typescript-eslint/require-array-sort-compare': 'warn',
+      '@typescript-eslint/restrict-plus-operands': 'warn',
+      '@typescript-eslint/restrict-template-expressions': 'warn',
+      '@typescript-eslint/strict-boolean-expressions': 'warn',
+      '@typescript-eslint/switch-exhaustiveness-check': 'warn',
+      '@typescript-eslint/triple-slash-reference': 'warn',
+      '@typescript-eslint/unbound-method': 'warn',
+      '@typescript-eslint/unified-signatures': 'warn',
+      '@typescript-eslint/use-unknown-in-catch-callback-variable': 'warn',
+    },
+  },
+  {
     files: ['**/*.tsx'],
     rules: {
       'max-lines-per-function': 'off', // TODO: re-enable this after fixing other issues
     },
   },
   {
-    files: ['**/*.demo.tsx'],
+    files: ['**/messages/*.ts'],
+    ignores: ['**/messages/index.ts'],
+    rules: {
+      'gitterdun/no-missing-i18n-messages': [
+        'error',
+        {enPath: 'packages/web/src/i18n/extracted/en.json'},
+      ],
+      'gitterdun/no-extra-i18n-messages': [
+        'warn',
+        {enPath: 'packages/web/src/i18n/extracted/en.json'},
+      ],
+      'import/no-anonymous-default-export': 'off',
+    },
+  },
+  {
+    files: ['**/*.demo.tsx', '**/widgets/demo-utils/**'],
     rules: {
       // Allow literal strings in widget demo files
       'react/jsx-no-literals': 'off',
     },
   },
   {
-    files: ['**/*.test.ts', '**/*.test.tsx'],
+    files: ['**/*.test.ts', '**/*.test.tsx', '**/test/**', '**/jest.setup.ts'],
     rules: {
       // Allow literal strings in test files
       'react/jsx-no-literals': 'off',
@@ -1013,7 +1044,7 @@ const eslintConfig = [
       'jest/prefer-todo': 'warn',
       'jest/require-hook': 'warn',
       'jest/require-to-throw-message': 'warn',
-      'jest/require-top-level-describe': 'warn',
+      'jest/require-top-level-describe': 'off', // why enforce extra boilerplate?
       'jest/unbound-method': 'warn',
       'jest/valid-describe-callback': 'warn',
       'jest/valid-expect': 'warn',
@@ -1024,6 +1055,7 @@ const eslintConfig = [
       '@typescript-eslint/no-explicit-any': 'off', // we can be more loose in unit tests
     },
   },
+  {files: ['**/scripts/**'], rules: {'no-console': 'off'}},
 ];
 
 export default eslintConfig;

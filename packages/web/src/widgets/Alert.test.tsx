@@ -2,16 +2,17 @@ import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {Alert} from './Alert';
-import {TestProviders} from '../test/TestProviders';
+import {createWrapper} from '../test/createWrapper';
 
 describe('alert', () => {
   test('shows types, title and dismiss', async () => {
     const onDismiss = jest.fn();
+    const Wrapper = createWrapper({i18n: true});
     const {rerender} = render(
       <Alert onDismiss={onDismiss} title="T" type="info">
         Body
       </Alert>,
-      {wrapper: TestProviders},
+      {wrapper: Wrapper},
     );
     expect(screen.getByText('T')).toBeInTheDocument();
     expect(screen.getByText('Body')).toBeInTheDocument();
@@ -28,7 +29,8 @@ describe('alert', () => {
   });
 
   test('defaults type to info when omitted', () => {
-    render(<Alert>Default</Alert>, {wrapper: TestProviders});
+    const Wrapper = createWrapper({i18n: true});
+    render(<Alert>Default</Alert>, {wrapper: Wrapper});
     const alert = screen.getByRole('alert');
     expect(alert).toHaveClass('bg-blue-50', 'border-blue-200', 'text-blue-800');
   });

@@ -1,10 +1,9 @@
 import {beforeEach, describe, expect, jest, test} from '@jest/globals';
 import {render, screen, act, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {MemoryRouter, useLocation} from 'react-router-dom';
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {useLocation} from 'react-router-dom';
 import Login from './Login';
-import {TestProviders} from '../test/TestProviders';
+import {createWrapper} from '../test/createWrapper';
 import * as useUserModule from '../hooks/useUser';
 import {ToastProvider} from '../widgets/ToastProvider';
 
@@ -37,13 +36,7 @@ jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
   useUser: jest.fn(() => createUseUserMock()),
 }));
 
-const wrap = (ui: React.ReactElement) => (
-  <QueryClientProvider client={new QueryClient()}>
-    <MemoryRouter>
-      <ToastProvider>{ui}</ToastProvider>
-    </MemoryRouter>
-  </QueryClientProvider>
-);
+const wrap = (ui: React.ReactElement) => <ToastProvider>{ui}</ToastProvider>;
 
 describe('login page (top-level)', () => {
   beforeEach(() => {
@@ -61,7 +54,8 @@ describe('login page (top-level)', () => {
           loginError: new Error('Bad creds'),
         }),
       );
-    render(wrap(<Login />), {wrapper: TestProviders});
+    const Wrapper = createWrapper({i18n: true, router: true});
+    render(wrap(<Login />), {wrapper: Wrapper});
     expect(screen.getByText('Bad creds')).toBeInTheDocument();
     // no restore needed when using mockReturnValueOnce
   });
@@ -76,7 +70,8 @@ describe('login page', () => {
 
   test('renders and submits', async () => {
     // Use default working mock that allows successful login
-    render(wrap(<Login />), {wrapper: TestProviders});
+    const Wrapper2 = createWrapper({i18n: true, router: true});
+    render(wrap(<Login />), {wrapper: Wrapper2});
     expect(screen.getAllByText('Login')[0]).toBeInTheDocument();
     await userEvent.type(screen.getByLabelText(/email/iu), 'user@example.com');
     await userEvent.type(screen.getByLabelText(/password/iu), 'validpassword');
@@ -93,7 +88,8 @@ describe('login page', () => {
   test('handles login rejection path', async () => {
     // This test verifies error handling behavior through UI state
     // The actual error throwing is covered by integration tests
-    render(wrap(<Login />), {wrapper: TestProviders});
+    const Wrapper3 = createWrapper({i18n: true, router: true});
+    render(wrap(<Login />), {wrapper: Wrapper3});
     await userEvent.type(screen.getByLabelText(/email/iu), 'user@example.com');
     await userEvent.type(screen.getByLabelText(/password/iu), 'validpassword');
     await act(async () => {
@@ -107,7 +103,8 @@ describe('login page', () => {
     jest
       .mocked(useUserModule.useUser)
       .mockReturnValueOnce(createUseUserMock({isLoggingIn: true}));
-    render(wrap(<Login />), {wrapper: TestProviders});
+    const Wrapper4 = createWrapper({i18n: true, router: true});
+    render(wrap(<Login />), {wrapper: Wrapper4});
     expect(screen.getByText('Logging in...')).toBeInTheDocument();
     // no restore needed when using mockReturnValueOnce
   });
@@ -118,7 +115,8 @@ describe('login page', () => {
       .mockReturnValueOnce(
         createUseUserMock({loginError: new Error('Inline Error')}),
       );
-    render(wrap(<Login />), {wrapper: TestProviders});
+    const Wrapper5 = createWrapper({i18n: true, router: true});
+    render(wrap(<Login />), {wrapper: Wrapper5});
     expect(screen.getByText('Inline Error')).toBeInTheDocument();
     // no restore needed when using mockReturnValueOnce
   });
@@ -128,16 +126,16 @@ describe('login page', () => {
       const loc = useLocation();
       return <div data-testid="loc">{loc.pathname}</div>;
     };
+    const Wrapper = createWrapper({
+      i18n: true,
+      router: {initialEntries: ['/login']},
+    });
     render(
-      <QueryClientProvider client={new QueryClient()}>
-        <MemoryRouter initialEntries={['/login']}>
-          <ToastProvider>
-            <LocationProbe />
-            <Login />
-          </ToastProvider>
-        </MemoryRouter>
-      </QueryClientProvider>,
-      {wrapper: TestProviders},
+      <ToastProvider>
+        <LocationProbe />
+        <Login />
+      </ToastProvider>,
+      {wrapper: Wrapper},
     );
     await userEvent.type(screen.getByLabelText(/email/iu), 'user@example.com');
     await userEvent.type(screen.getByLabelText(/password/iu), 'pw');

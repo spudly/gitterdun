@@ -1,4 +1,3 @@
-import en from './en.js';
 import pirate from './pirate.js';
 import piglatin from './piglatin.js';
 
@@ -18,6 +17,7 @@ export const getMessagesForLocale = (locale: SupportedLocale) => {
       return piglatin;
     case 'en':
     default:
-      return en;
+      // For English, rely on defaultMessage strings inline in source files
+      return {} as Record<string, string>;
   }
 };

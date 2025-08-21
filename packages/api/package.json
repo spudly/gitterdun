@@ -2,7 +2,6 @@
   "name": "@gitterdun/api",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "main": "dist/server.js",
   "scripts": {
     "dev": "nodemon --exec tsx src/server.tsx",
@@ -10,7 +9,6 @@
     "type-check": "tsc",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/server.js",
-    "lint": "eslint --max-warnings 0 src/**/*.ts",
     "test": "jest",
     "test:dev": "jest --watch"
   },

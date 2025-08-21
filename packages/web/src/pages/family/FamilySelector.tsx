@@ -4,6 +4,7 @@ import {Button} from '../../widgets/Button.js';
 import {TextInput} from '../../widgets/TextInput.js';
 import {Toolbar} from '../../widgets/Toolbar.js';
 import {Stack} from '../../widgets/Stack.js';
+import {defineMessages, useIntl} from 'react-intl';
 
 type Family = {id: number; name: string};
 
@@ -24,6 +25,12 @@ export const FamilySelector: FC<FamilySelectorProps> = ({
   onNewFamilyNameChange,
   onCreateFamily,
 }) => {
+  const intl = useIntl();
+  const messages = defineMessages({
+    chooseFamily: {defaultMessage: 'Choose a family'},
+    newFamilyPlaceholder: {defaultMessage: 'New family name'},
+    create: {defaultMessage: 'Create'},
+  });
   return (
     <Stack gap="md">
       <SelectInput
@@ -37,7 +44,7 @@ export const FamilySelector: FC<FamilySelectorProps> = ({
         }}
         value={selectedFamilyId?.toString() ?? ''}
       >
-        <option value="">Choose a family</option>
+        <option value="">{intl.formatMessage(messages.chooseFamily)}</option>
         {families.map(family => (
           <option key={family.id} value={family.id}>
             {family.name}
@@ -48,7 +55,7 @@ export const FamilySelector: FC<FamilySelectorProps> = ({
       <Toolbar>
         <TextInput
           onChange={onNewFamilyNameChange}
-          placeholder="New family name"
+          placeholder={intl.formatMessage(messages.newFamilyPlaceholder)}
           value={newFamilyName}
         />
         <Button
@@ -60,7 +67,7 @@ export const FamilySelector: FC<FamilySelectorProps> = ({
           }}
           type="button"
         >
-          Create
+          {intl.formatMessage(messages.create)}
         </Button>
       </Toolbar>
     </Stack>

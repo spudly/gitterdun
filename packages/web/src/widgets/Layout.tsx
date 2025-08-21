@@ -2,12 +2,17 @@ import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 import {Link, useLocation} from 'react-router-dom';
 import {FormattedMessage, useIntl} from 'react-intl';
+import type {MessageDescriptor} from 'react-intl';
 import {useI18n} from '../i18n/I18nProvider.js';
 import {FlameIcon, GearIcon, GlobeIcon, UserIcon} from './icons/index.js';
 import {useUser} from '../hooks/useUser.js';
 import {useToast} from './ToastProvider.js';
 
-export type NavigationItem = {name: string; path: string; icon?: ReactNode};
+export type NavigationItem = {
+  message: MessageDescriptor;
+  path: string;
+  icon?: ReactNode;
+};
 
 type LayoutProps = {
   readonly children: ReactNode;
@@ -23,7 +28,13 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
   const computedNavigation: Array<NavigationItem> = [
     ...navigation,
     ...(user?.role === 'admin'
-      ? [{name: 'Admin', path: '/admin', icon: <GearIcon size="sm" />}]
+      ? [
+          {
+            message: {defaultMessage: 'Admin', id: 'layout.nav.admin'},
+            path: '/admin',
+            icon: <GearIcon size="sm" />,
+          },
+        ]
       : []),
   ];
 
@@ -35,13 +46,16 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
               <h1 className="text-2xl font-bold text-indigo-600">
-                <FormattedMessage defaultMessage="Gitterdun" id="app.name" />
+                <FormattedMessage
+                  defaultMessage="Gitterdun"
+                  id="layout.brand"
+                />
               </h1>
 
               <span className="ml-2 text-sm text-gray-500">
                 <FormattedMessage
                   defaultMessage="Chore Wrangler"
-                  id="app.tagline"
+                  id="layout.tagline"
                 />
               </span>
             </div>
@@ -49,10 +63,7 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">
-                  {intl.formatMessage({
-                    id: 'header.points',
-                    defaultMessage: 'Points',
-                  })}
+                  {intl.formatMessage({defaultMessage: 'Points'})}
                 </span>
 
                 <span className="font-semibold text-indigo-600">
@@ -62,10 +73,7 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
 
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">
-                  {intl.formatMessage({
-                    id: 'header.streak',
-                    defaultMessage: 'Streak',
-                  })}
+                  {intl.formatMessage({defaultMessage: 'Streak'})}
                 </span>
 
                 <span className="font-semibold text-orange-500">
@@ -80,19 +88,13 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
 
                 <span className="text-sm font-medium text-gray-700">
                   {user?.username
-                    ?? intl.formatMessage({
-                      id: 'header.user',
-                      defaultMessage: 'User',
-                    })}
+                    ?? intl.formatMessage({defaultMessage: 'User'})}
                 </span>
               </div>
 
               <div className="flex items-center">
                 <button
-                  aria-label={intl.formatMessage({
-                    defaultMessage: 'Language',
-                    id: 'header.language',
-                  })}
+                  aria-label={intl.formatMessage({defaultMessage: 'Language'})}
                   className="rounded px-2 py-1 text-sm"
                   onClick={() => {
                     const next =
@@ -105,7 +107,7 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
                   }}
                   title={intl.formatMessage({
                     defaultMessage: 'Language',
-                    id: 'header.language',
+                    id: 'layout.language',
                   })}
                   type="button"
                 >
@@ -126,12 +128,12 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
                 >
                   <FormattedMessage
                     defaultMessage="Logout"
-                    id="header.logout"
+                    id="layout.logout"
                   />
                 </button>
               ) : (
                 <Link className="text-sm text-indigo-600" to="/login">
-                  <FormattedMessage defaultMessage="Login" id="header.login" />
+                  <FormattedMessage defaultMessage="Login" id="layout.login" />
                 </Link>
               )}
             </div>
@@ -154,16 +156,13 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
                         ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
                         : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900',
                     )}
-                    key={item.name}
+                    key={item.path}
                     to={item.path}
                   >
                     <span className="mr-3 shrink-0 text-lg">{item.icon}</span>
 
                     <span>
-                      {intl.formatMessage({
-                        id: item.name,
-                        defaultMessage: item.name,
-                      })}
+                      <FormattedMessage {...item.message} />
                     </span>
                   </Link>
                 );

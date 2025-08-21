@@ -1,6 +1,5 @@
-import type {Config} from 'prettier';
-
-const config: Config = {
+/** @type {import('prettier').Config} */
+module.exports = {
   plugins: [
     'prettier-plugin-embed',
     'prettier-plugin-sql',
@@ -36,5 +35,3 @@ const config: Config = {
   denseOperators: false,
   newlineBeforeSemicolon: false,
 };
-
-export default config;

@@ -9,7 +9,10 @@ const TestComponent = () => {
   return (
     <div>
       <h2>
-        <FormattedMessage defaultMessage="Chore Tracker" id="app.tagline" />
+        <FormattedMessage
+          defaultMessage="Chore Wrangler"
+          id="widgets.Layout.chore-wrangler"
+        />
       </h2>
       <button
         onClick={() => {
@@ -42,7 +45,7 @@ describe('i18nProvider', () => {
     // Tagline should update to pirate speak
     await waitFor(() => {
       expect(screen.getByRole('heading', {level: 2}).textContent).toMatch(
-        /Chore Plunderin'/i,
+        /Chore Plunderin'|Chore Plunderin’/i,
       );
     });
   });

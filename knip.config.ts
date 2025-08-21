@@ -7,18 +7,22 @@ const config: KnipConfig = {
     '.': {
       ignoreDependencies: [
         'husky', // Used by Git hooks, not imported
+        'ts-jest', // Used in some environments; referenced by tooling but not imported in source
       ],
     },
 
-    // Web package (React SPA)
     'packages/web': {
       entry: ['src/main.tsx'], // Single entry point for Vite React app
 
       // Include all TS/TSX files but exclude demo and test files from analysis
       project: ['src/**/*.{ts,tsx}'],
+      ignoreDependencies: [
+        '@babel/preset-typescript', // Used by jest transform via babelConfig in web/jest.config.ts
+        'babel-plugin-dynamic-import-node', // Used by jest transform via babelConfig in web/jest.config.ts
+        'ts-jest', // Present for Jest TS support; not directly imported in project files
+      ],
     },
 
-    // API package (Express server)
     'packages/api': {
       entry: ['src/server.ts'], // Server entry point
 
@@ -30,7 +34,6 @@ const config: KnipConfig = {
       ],
     },
 
-    // Shared package (utility library)
     'packages/shared': {
       entry: ['src/index.ts'], // Library entry point
 

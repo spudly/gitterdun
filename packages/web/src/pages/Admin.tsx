@@ -49,16 +49,10 @@ const Admin: FC = () => {
       <PageContainer variant="centered">
         <Card padded>
           <PageHeader
-            title={intl.formatMessage({
-              id: 'admin.accessDenied',
-              defaultMessage: 'Access Denied',
-            })}
+            title={intl.formatMessage({defaultMessage: 'Access Denied'})}
           />
           <Text muted>
-            <FormattedMessage
-              defaultMessage="You need admin privileges to view this page."
-              id="admin.accessDeniedText"
-            />
+            <FormattedMessage defaultMessage="You need admin privileges to view this page." />
           </Text>
         </Card>
       </PageContainer>
@@ -70,7 +64,6 @@ const Admin: FC = () => {
       <PageContainer variant="centered">
         <PageLoading
           message={intl.formatMessage({
-            id: 'admin.loading',
             defaultMessage: 'Loading admin panel...',
           })}
         />
@@ -80,12 +73,7 @@ const Admin: FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader
-        title={intl.formatMessage({
-          id: 'admin.title',
-          defaultMessage: 'Admin Panel',
-        })}
-      />
+      <PageHeader title={intl.formatMessage({defaultMessage: 'Admin Panel'})} />
 
       <Stack gap="lg">
         <FormSection title="Family Management">

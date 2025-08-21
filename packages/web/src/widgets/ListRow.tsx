@@ -1,10 +1,11 @@
+import {Children} from 'react';
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 
 type ListRowProps = {
   readonly left?: ReactNode;
   readonly title: ReactNode;
-  readonly titleRight?: ReactNode;
+  readonly titleRight?: ReactNode | ReadonlyArray<ReactNode>;
   readonly description?: ReactNode;
   readonly meta?: ReactNode;
   readonly right?: ReactNode;
@@ -22,7 +23,7 @@ export const ListRow: FC<ListRowProps> = ({
 }) => {
   const hasLeft = left !== null && left !== undefined;
   const hasDescription = description !== null && description !== undefined;
-  const hasMeta = meta !== null && meta !== undefined;
+  const hasMeta = Children.count(meta) > 0;
 
   return (
     <div className={clsx('px-6 py-4', className)}>
@@ -34,7 +35,7 @@ export const ListRow: FC<ListRowProps> = ({
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-medium text-gray-900">{title}</h3>
 
-              {titleRight}
+              {Array.isArray(titleRight) ? titleRight : titleRight}
             </div>
 
             {hasDescription ? (
