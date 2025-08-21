@@ -30,8 +30,8 @@
 - [ ] jest - configure clearAllMocks (or better?) in the jest config so it
       doesn't have to be set everwhere
 - [x] setup react-i18n; include pig-latin & pirate-speak
-- [ ] add french translation
-- [ ] add deseret translation
+- [x] add french translation
+- [x] add deseret translation
 - [ ] refine landing => sign-up/login flow
 - [ ] add eslint-plugin-turbo
 - [ ] scan repo for strings that haven't been internationalized
