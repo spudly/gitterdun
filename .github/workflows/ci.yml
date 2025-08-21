@@ -188,7 +188,7 @@ jobs:
 
   knip:
     name: Knip
-    needs: install
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
