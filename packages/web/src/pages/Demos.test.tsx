@@ -1,10 +1,11 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen, act} from '@testing-library/react';
-import {MemoryRouter, Routes, Route} from 'react-router-dom';
+import {Routes, Route} from 'react-router-dom';
 import fs from 'node:fs';
 import path from 'node:path';
 import {z} from 'zod';
 import Demos from './Demos';
+import {createWrapper} from '../test/createWrapper';
 
 // Test the local DemoParamsSchema
 const DemoParamsSchema = z.object({name: z.string().min(1).optional()});
@@ -32,12 +33,15 @@ describe('demoParamsSchema', () => {
 describe('demos page', () => {
   test('renders list of demos at index route', async () => {
     await act(async () => {
+      const Wrapper = createWrapper({
+        i18n: true,
+        router: {initialEntries: ['/__demos']},
+      });
       render(
-        <MemoryRouter initialEntries={['/__demos']}>
-          <Routes>
-            <Route element={<Demos />} path="/__demos" />
-          </Routes>
-        </MemoryRouter>,
+        <Routes>
+          <Route element={<Demos />} path="/__demos" />
+        </Routes>,
+        {wrapper: Wrapper},
       );
     });
     expect(screen.getByText('Widget Demos')).toBeInTheDocument();
@@ -45,12 +49,15 @@ describe('demos page', () => {
 
   test('renders a specific demo when :name is provided', async () => {
     await act(async () => {
+      const Wrapper = createWrapper({
+        i18n: true,
+        router: {initialEntries: ['/__demos/Button']},
+      });
       render(
-        <MemoryRouter initialEntries={['/__demos/Button']}>
-          <Routes>
-            <Route element={<Demos />} path="/__demos/:name" />
-          </Routes>
-        </MemoryRouter>,
+        <Routes>
+          <Route element={<Demos />} path="/__demos/:name" />
+        </Routes>,
+        {wrapper: Wrapper},
       );
     });
     expect(screen.getByTestId('ButtonDemo')).toBeInTheDocument();
@@ -65,12 +72,15 @@ describe('demos page', () => {
 
     // Import the registry from the Demos module
     // We'll need to test this by rendering the component and checking links exist
+    const Wrapper = createWrapper({
+      i18n: true,
+      router: {initialEntries: ['/__demos']},
+    });
     render(
-      <MemoryRouter initialEntries={['/__demos']}>
-        <Routes>
-          <Route element={<Demos />} path="/__demos" />
-        </Routes>
-      </MemoryRouter>,
+      <Routes>
+        <Route element={<Demos />} path="/__demos" />
+      </Routes>,
+      {wrapper: Wrapper},
     );
 
     // Check that each demo file has a corresponding link in the rendered component

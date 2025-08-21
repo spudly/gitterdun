@@ -1,10 +1,19 @@
 import type {FC, ReactNode} from 'react';
 import clsx from 'clsx';
 import {Link, useLocation} from 'react-router-dom';
+import {FormattedMessage, useIntl} from 'react-intl';
+import type {MessageDescriptor} from 'react-intl';
+import {useI18n} from '../i18n/I18nProvider.js';
+import {FlameIcon, GearIcon, UserIcon} from './icons/index.js';
+import {LocaleSelector} from './LocaleSelector.js';
 import {useUser} from '../hooks/useUser.js';
 import {useToast} from './ToastProvider.js';
 
-export type NavigationItem = {name: string; path: string; icon?: ReactNode};
+export type NavigationItem = {
+  message: MessageDescriptor;
+  path: string;
+  icon?: ReactNode;
+};
 
 type LayoutProps = {
   readonly children: ReactNode;
@@ -13,12 +22,20 @@ type LayoutProps = {
 
 const Layout: FC<LayoutProps> = ({children, navigation}) => {
   const location = useLocation();
+  const intl = useIntl();
+  const {locale, setLocale} = useI18n();
   const {user, logout} = useUser();
   const {safeAsync} = useToast();
   const computedNavigation: Array<NavigationItem> = [
     ...navigation,
     ...(user?.role === 'admin'
-      ? [{name: 'Admin', path: '/admin', icon: '⚙️'}]
+      ? [
+          {
+            message: {defaultMessage: 'Admin', id: 'layout.nav.admin'},
+            path: '/admin',
+            icon: <GearIcon size="sm" />,
+          },
+        ]
       : []),
   ];
 
@@ -29,14 +46,29 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-indigo-600">Gitterdun</h1>
+              <h1 className="text-2xl font-bold text-indigo-600">
+                <FormattedMessage
+                  defaultMessage="Gitterdun"
+                  id="widgets.Layout.gitterdun"
+                />
+              </h1>
 
-              <span className="ml-2 text-sm text-gray-500">Chore Tracker</span>
+              <span className="ml-2 text-sm text-gray-500">
+                <FormattedMessage
+                  defaultMessage="Chore Wrangler"
+                  id="widgets.Layout.chore-wrangler"
+                />
+              </span>
             </div>
 
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">Points:</span>
+                <span className="text-sm text-gray-600">
+                  {intl.formatMessage({
+                    defaultMessage: 'Points',
+                    id: 'widgets.Layout.points',
+                  })}
+                </span>
 
                 <span className="font-semibold text-indigo-600">
                   {user?.points ?? 0}
@@ -44,19 +76,39 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
               </div>
 
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">Streak:</span>
+                <span className="text-sm text-gray-600">
+                  {intl.formatMessage({
+                    defaultMessage: 'Streak',
+                    id: 'widgets.Layout.streak',
+                  })}
+                </span>
 
                 <span className="font-semibold text-orange-500">
-                  {user?.streak_count ?? 0} 🔥
+                  {user?.streak_count ?? 0} <FlameIcon size="sm" />
                 </span>
               </div>
 
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-400">👤</span>
+                <span aria-hidden className="text-sm text-gray-400">
+                  <UserIcon size="sm" />
+                </span>
 
                 <span className="text-sm font-medium text-gray-700">
-                  {user?.username ?? 'User'}
+                  {user?.username
+                    ?? intl.formatMessage({
+                      defaultMessage: 'User',
+                      id: 'widgets.Layout.user',
+                    })}
                 </span>
+              </div>
+
+              <div className="flex items-center">
+                <LocaleSelector
+                  onChange={value => {
+                    setLocale(value);
+                  }}
+                  value={locale}
+                />
               </div>
 
               {user ? (
@@ -68,11 +120,17 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
                   }, 'Unable to log out. Please try again.')}
                   type="button"
                 >
-                  Logout
+                  <FormattedMessage
+                    defaultMessage="Logout"
+                    id="widgets.Layout.logout"
+                  />
                 </button>
               ) : (
                 <Link className="text-sm text-indigo-600" to="/login">
-                  Login
+                  <FormattedMessage
+                    defaultMessage="Login"
+                    id="widgets.Layout.login"
+                  />
                 </Link>
               )}
             </div>
@@ -95,12 +153,14 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
                         ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
                         : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900',
                     )}
-                    key={item.name}
+                    key={item.path}
                     to={item.path}
                   >
                     <span className="mr-3 shrink-0 text-lg">{item.icon}</span>
 
-                    <span>{item.name}</span>
+                    <span>
+                      <FormattedMessage {...item.message} />
+                    </span>
                   </Link>
                 );
               })}

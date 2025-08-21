@@ -12,6 +12,7 @@ import {Stack} from '../widgets/Stack.js';
 import {Card} from '../widgets/Card.js';
 import {Alert} from '../widgets/Alert.js';
 import {AdminFamilyCreation} from './admin/AdminFamilyCreation.js';
+import {FormattedMessage, useIntl} from 'react-intl';
 import {AdminInvitations} from './admin/AdminInvitations.js';
 import {AdminStats} from './admin/AdminStats.js';
 import {AdminChoresManagement} from './admin/AdminChoresManagement.js';
@@ -42,12 +43,23 @@ const Admin: FC = () => {
   const {user, message, messageType, handleMessageChange, chores, isLoading} =
     useAdminSetup();
 
+  const intl = useIntl();
   if (!user || user.role !== 'admin') {
     return (
       <PageContainer variant="centered">
         <Card padded>
-          <PageHeader title="Access Denied" />
-          <Text muted>You need admin privileges to view this page.</Text>
+          <PageHeader
+            title={intl.formatMessage({
+              defaultMessage: 'Access Denied',
+              id: 'pages.Admin.access-denied',
+            })}
+          />
+          <Text muted>
+            <FormattedMessage
+              defaultMessage="You need admin privileges to view this page."
+              id="pages.Admin.you-need-admin-privileges-to-v"
+            />
+          </Text>
         </Card>
       </PageContainer>
     );
@@ -56,14 +68,24 @@ const Admin: FC = () => {
   if (isLoading) {
     return (
       <PageContainer variant="centered">
-        <PageLoading message="Loading admin panel..." />
+        <PageLoading
+          message={intl.formatMessage({
+            defaultMessage: 'Loading admin panel...',
+            id: 'pages.Admin.loading-admin-panel',
+          })}
+        />
       </PageContainer>
     );
   }
 
   return (
     <PageContainer>
-      <PageHeader title="Admin Panel" />
+      <PageHeader
+        title={intl.formatMessage({
+          defaultMessage: 'Admin Panel',
+          id: 'pages.Admin.admin-panel',
+        })}
+      />
 
       <Stack gap="lg">
         <FormSection title="Family Management">

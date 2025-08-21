@@ -10,13 +10,6 @@
       ],
       "outputs": ["dist/**", "build/**", "lib/**"]
     },
-    "lint": {
-      "dependsOn": ["^build"],
-      "inputs": [
-        "src/**/*.{ts,tsx,js,jsx,json,css}",
-        "$TURBO_ROOT$/eslint.config.ts"
-      ]
-    },
     "test": {
       "dependsOn": ["^build"],
       "inputs": [
@@ -41,14 +34,16 @@
     "//#lint-staged": {
       "dependsOn": ["^build"],
       "inputs": [
-        "src/**/*.{ts,tsx,js,jsx,json,css}",
+        "**/*.{ts,tsx,js,jsx,json,css}",
+        "**/dist/**",
         "$TURBO_ROOT$/eslint.config.ts"
       ]
     },
     "//#lint:changed": {
       "dependsOn": ["^build"],
       "inputs": [
-        "src/**/*.{ts,tsx,js,jsx,json,css}",
+        "**/*.{ts,tsx,js,jsx,json,css}",
+        "**/dist/**",
         "$TURBO_ROOT$/eslint.config.ts"
       ]
     },
@@ -56,6 +51,7 @@
       "dependsOn": ["^build"],
       "inputs": [
         "src/**/*.{ts,tsx,js,jsx,json,css}",
+        "**/dist/**",
         "jest.config.js",
         "$TURBO_ROOT$/jest.config.base.cjs",
         "$TURBO_ROOT$/packages/*/package.json"

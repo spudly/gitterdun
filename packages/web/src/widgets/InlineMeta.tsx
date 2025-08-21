@@ -1,8 +1,6 @@
-import type {FC, ReactNode} from 'react';
+import type {FC, PropsWithChildren} from 'react';
 
-type InlineMetaProps = {readonly children: ReactNode};
-
-export const InlineMeta: FC<InlineMetaProps> = ({children}) => {
+export const InlineMeta: FC<PropsWithChildren> = ({children}) => {
   return (
     <div className="mt-2 flex items-center space-x-4 text-sm text-gray-500">
       {children}

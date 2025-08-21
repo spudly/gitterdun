@@ -29,6 +29,13 @@
 - [ ] where possible, use user-event instead of fireEvent
 - [ ] jest - configure clearAllMocks (or better?) in the jest config so it
       doesn't have to be set everwhere
-- [ ] setup react-i18n; include pig-latin & pirate-speak
+- [x] setup react-i18n; include pig-latin & pirate-speak
+- [x] add french translation
+- [x] add deseret translation
 - [ ] refine landing => sign-up/login flow
 - [ ] add eslint-plugin-turbo
+- [ ] scan repo for strings that haven't been internationalized
+- [ ] add secret detection to precommit hook:
+      https://docs.gitguardian.com/ggshield-docs/integrations/git-hooks/pre-commit
+- [ ] write an eslint rule to ensure i18n messages are not used without
+      <FormattedMessage /> or intl.formatMessage()

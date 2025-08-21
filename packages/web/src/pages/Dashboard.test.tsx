@@ -2,6 +2,7 @@ import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Dashboard from './Dashboard';
+import {createWrapper} from '../test/createWrapper';
 
 jest.mock('../hooks/useUser', () => ({useUser: () => ({user: {id: 1}})}));
 
@@ -52,12 +53,14 @@ const wrap = (ui: React.ReactElement) => (
 
 describe('dashboard page', () => {
   test('renders header', async () => {
-    render(wrap(<Dashboard />));
+    const Wrapper = createWrapper({i18n: true, queryClient: true});
+    render(wrap(<Dashboard />), {wrapper: Wrapper});
     await expect(screen.findByText('Dashboard')).resolves.toBeInTheDocument();
   });
 
   test('computes stats and lists recent chores', async () => {
-    render(wrap(<Dashboard />));
+    const Wrapper2 = createWrapper({i18n: true, queryClient: true});
+    render(wrap(<Dashboard />), {wrapper: Wrapper2});
     await expect(screen.findByText('Dashboard')).resolves.toBeInTheDocument();
     // Completed/Pending counts (multiple '1' exist; assert by nearby labels)
     expect(screen.getByText('Completed Chores').nextSibling).toHaveTextContent(

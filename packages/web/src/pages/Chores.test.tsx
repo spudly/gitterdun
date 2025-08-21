@@ -1,8 +1,8 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Chores from './Chores';
 import * as apiModule from '../lib/api';
+import {createWrapper} from '../test/createWrapper';
 
 jest.mock('../hooks/useUser', () => ({useUser: () => ({user: {id: 1}})}));
 
@@ -29,17 +29,15 @@ jest.mock('../lib/api', () => ({
   },
 }));
 
-const wrap = (ui: React.ReactElement) => (
-  <QueryClientProvider client={new QueryClient()}>{ui}</QueryClientProvider>
-);
-
 describe('chores page', () => {
   test('renders header', async () => {
-    render(wrap(<Chores />));
+    render(<Chores />, {
+      wrapper: createWrapper({i18n: true, queryClient: true}),
+    });
     await expect(screen.findByText('Chores')).resolves.toBeInTheDocument();
   });
 
-  test('renders status dot/badge branches including pending', async () => {
+  test('renders approved and pending rows; shows Complete button for pending', async () => {
     const mocked = jest.mocked(apiModule);
     mocked.choresApi.getAll.mockResolvedValueOnce({
       success: true,
@@ -72,11 +70,19 @@ describe('chores page', () => {
         },
       ],
     });
-    render(wrap(<Chores />));
-    await expect(screen.findByText('B')).resolves.toBeInTheDocument();
-    expect(screen.getByText('approved')).toBeInTheDocument();
-    await expect(screen.findByText('C')).resolves.toBeInTheDocument();
-    expect(screen.getByRole('button', {name: 'Complete'})).toBeInTheDocument();
+    render(<Chores />, {
+      wrapper: createWrapper({i18n: true, queryClient: true}),
+    });
+    await expect(screen.findByText('Chores')).resolves.toBeInTheDocument();
+    // Approved row text
+    await expect(screen.findByText('Approved')).resolves.toBeInTheDocument();
+    // Pending row should show Complete button
+    await expect(
+      screen.findByRole('button', {name: 'Complete'}),
+    ).resolves.toBeInTheDocument();
+    // Meta shows points and bonus
+    await expect(screen.findByText('Points: 2')).resolves.toBeInTheDocument();
+    await expect(screen.findByText('Bonus: +1')).resolves.toBeInTheDocument();
   });
 
   test('renders penalty and due date meta when present', async () => {
@@ -100,9 +106,12 @@ describe('chores page', () => {
         },
       ],
     });
-    render(wrap(<Chores />));
-    await expect(screen.findByText('D')).resolves.toBeInTheDocument();
-    expect(screen.getByText(/Penalty:/u)).toBeInTheDocument();
-    expect(screen.getByText(/Due:/u)).toBeInTheDocument();
+    render(<Chores />, {
+      wrapper: createWrapper({i18n: true, queryClient: true}),
+    });
+    await expect(screen.findByText('Chores')).resolves.toBeInTheDocument();
+    await expect(screen.findByText('Penalty: -2')).resolves.toBeInTheDocument();
+    // We don't assert the exact date string; just ensure the label appears
+    await expect(screen.findByText(/Due:/)).resolves.toBeInTheDocument();
   });
 });

@@ -1,8 +1,7 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen, act, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {MemoryRouter} from 'react-router-dom';
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {createWrapper} from '../test/createWrapper';
 import Admin from './Admin';
 import * as apiModule from '../lib/api';
 
@@ -28,11 +27,7 @@ jest.mock('../lib/api', () => ({
   invitationsApi: {create: jest.fn(async () => ({success: true}))},
 }));
 
-const wrap = (ui: React.ReactElement) => (
-  <QueryClientProvider client={new QueryClient()}>
-    <MemoryRouter>{ui}</MemoryRouter>
-  </QueryClientProvider>
-);
+const wrap = (ui: React.ReactElement) => ui;
 
 describe('admin page', () => {
   test('navigates to /family after successful create via setTimeout', async () => {
@@ -40,7 +35,12 @@ describe('admin page', () => {
     familiesApi.create.mockResolvedValueOnce({success: true});
     mockNavigate.mockClear();
 
-    render(wrap(<Admin />));
+    const Wrapper = createWrapper({
+      i18n: true,
+      queryClient: true,
+      router: true,
+    });
+    render(wrap(<Admin />), {wrapper: Wrapper});
     await screen.findByText('Admin Panel');
     await userEvent.clear(screen.getByPlaceholderText('Family name'));
     await userEvent.type(

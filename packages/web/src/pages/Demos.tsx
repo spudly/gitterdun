@@ -1,6 +1,7 @@
 /* eslint-disable import/max-dependencies -- Demo registry requires many imports for all widget demos */
 import type {FC} from 'react';
 import {Suspense, lazy} from 'react';
+import {FormattedMessage} from 'react-intl';
 import {useParams} from 'react-router-dom';
 import {z} from 'zod';
 import {TextLink} from '../widgets/TextLink.js';
@@ -36,6 +37,7 @@ const registry: Record<string, FC> = {
   Section: lazy(async () => import('../widgets/Section.demo.js')),
   SectionHeader: lazy(async () => import('../widgets/SectionHeader.demo.js')),
   SelectInput: lazy(async () => import('../widgets/SelectInput.demo.js')),
+  LocaleSelector: lazy(async () => import('../widgets/LocaleSelector.demo.js')),
   Spinner: lazy(async () => import('../widgets/Spinner.demo.js')),
   StatCard: lazy(async () => import('../widgets/StatCard.demo.js')),
   StatusBadge: lazy(async () => import('../widgets/StatusBadge.demo.js')),
@@ -54,9 +56,20 @@ const Demos: FC = () => {
     return (
       <PageContainer variant="wide">
         <Stack gap="md">
-          <TextLink to="/__demos">← All demos</TextLink>
+          <TextLink to="/__demos">
+            <FormattedMessage defaultMessage="← All demos" id="demos.all" />
+          </TextLink>
 
-          <Suspense fallback={<div>Loading demo...</div>}>
+          <Suspense
+            fallback={
+              <div>
+                <FormattedMessage
+                  defaultMessage="Loading demo..."
+                  id="demos.loading"
+                />
+              </div>
+            }
+          >
             <Demo />
           </Suspense>
         </Stack>
@@ -66,7 +79,7 @@ const Demos: FC = () => {
   return (
     <PageContainer variant="wide">
       <Text as="h1" size="2xl" weight="semibold">
-        Widget Demos
+        <FormattedMessage defaultMessage="Widget Demos" id="demos.title" />
       </Text>
 
       <BulletList density="tight" indent="md">

@@ -2,7 +2,6 @@
   "name": "gitterdun-monorepo",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "workspaces": [
     "packages/*"
   ],
@@ -14,8 +13,8 @@
     "build:api": "npm run build --workspace=packages/api",
     "build:web": "npm run build --workspace=packages/web",
     "start": "npm run start --workspace=packages/api",
-    "lint": "NODE_OPTIONS='--experimental-strip-types' turbo run lint --output-logs=errors-only",
-    "test": "jest",
+    "lint": "turbo run build --output-logs=errors-only && NODE_OPTIONS='--experimental-strip-types' eslint --max-warnings 0 .",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
     "test:changed": "jest --onlyChanged",
     "prettier:fix": "node --experimental-strip-types node_modules/prettier/bin/prettier.cjs --write .",
     "prettier:check": "node --experimental-strip-types node_modules/prettier/bin/prettier.cjs --check .",
@@ -29,6 +28,7 @@
     "ai:check": "turbo run ai:check --output-logs=errors-only"
   },
   "devDependencies": {
+    "@jest/globals": "^30.0.5",
     "@types/eslint-plugin-jsx-a11y": "^6.10.0",
     "@types/eslint-plugin-tailwindcss": "^3.17.0",
     "@types/jest": "^30.0.0",
@@ -65,5 +65,8 @@
   "engines": {
     "node": ">=22.18.0"
   },
-  "packageManager": "npm@10.2.4"
+  "packageManager": "npm@10.2.4",
+  "dependencies": {
+    "eslint-plugin-gitterdun": "^0.1.0"
+  }
 }

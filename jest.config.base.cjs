@@ -1,11 +1,6 @@
-import type {Config} from 'jest';
-import {fileURLToPath} from 'url';
-import {dirname} from 'path';
+const path = require('node:path');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const config: Config = {
+module.exports = {
   testEnvironment: 'node',
   transform: {
     '^.+\\.(t|j)sx?$': [
@@ -22,14 +17,11 @@ const config: Config = {
     '!**/*.config.*',
     '!**/coverage/**',
   ],
-  coverageThreshold: {},
   moduleNameMapper: {'^(\\.{1,2}/.*)\\.js$': '$1'},
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.(spec|test).(ts|tsx|js|jsx)',
     '<rootDir>/src/**/*.(spec|test).(ts|tsx|js|jsx)',
   ],
   detectOpenHandles: true,
-  setupFilesAfterEnv: [`${__dirname}/jest.setup.ts`],
+  setupFilesAfterEnv: [path.join(__dirname, 'jest.setup.ts')],
 };
-
-export default config;

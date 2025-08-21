@@ -6,6 +6,7 @@ export default defineConfig({
     react({
       babel: {
         plugins: [
+          ['babel-plugin-formatjs', {ast: true, removeDefaultMessage: false}],
           ['@babel/plugin-transform-react-jsx', {runtime: 'automatic'}],
         ],
       },

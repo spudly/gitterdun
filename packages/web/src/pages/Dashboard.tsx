@@ -12,9 +12,11 @@ import {ListRow} from '../widgets/ListRow.js';
 import {Text} from '../widgets/Text.js';
 import {PageLoading} from '../widgets/PageLoading.js';
 import {CheckCircleIcon, ClockIcon, DocIcon} from '../widgets/icons';
+import {FormattedMessage, useIntl} from 'react-intl';
 
 const Dashboard: FC = () => {
   const {user} = useUser();
+  const intl = useIntl();
 
   const {data: choresResponse, isLoading: choresLoading} = useQuery({
     queryKey: ['chores', 'dashboard'],
@@ -55,41 +57,63 @@ const Dashboard: FC = () => {
   if (choresLoading) {
     return (
       <PageContainer variant="centered">
-        <PageLoading message="Loading dashboard..." />
+        <PageLoading
+          message={intl.formatMessage({
+            defaultMessage: 'Loading dashboard...',
+            id: 'pages.Dashboard.loading-dashboard',
+          })}
+        />
       </PageContainer>
     );
   }
 
   return (
     <PageContainer>
-      <PageHeader title="Dashboard" />
+      <PageHeader
+        title={intl.formatMessage({
+          defaultMessage: 'Dashboard',
+          id: 'pages.Dashboard.dashboard',
+        })}
+      />
 
       <GridContainer cols={4} gap="lg">
         <StatCard
           color="blue"
           icon={<CheckCircleIcon />}
-          label="Completed Chores"
+          label={intl.formatMessage({
+            defaultMessage: 'Completed Chores',
+            id: 'pages.Dashboard.completed-chores',
+          })}
           value={getCompletedChoresCount()}
         />
 
         <StatCard
           color="yellow"
           icon={<ClockIcon />}
-          label="Pending Chores"
+          label={intl.formatMessage({
+            defaultMessage: 'Pending Chores',
+            id: 'pages.Dashboard.pending-chores',
+          })}
           value={getPendingChoresCount()}
         />
 
         <StatCard
           color="green"
           icon={<DocIcon />}
-          label="Total Points"
+          label={intl.formatMessage({
+            defaultMessage: 'Total Points',
+            id: 'pages.Dashboard.total-points',
+          })}
           value={getTotalPoints()}
         />
 
         <StatCard
           color="red"
           icon={<ClockIcon />}
-          label="Due Soon"
+          label={intl.formatMessage({
+            defaultMessage: 'Due Soon',
+            id: 'pages.Dashboard.due-soon',
+          })}
           value={getDueSoonChoresCount()}
         />
       </GridContainer>
@@ -97,7 +121,10 @@ const Dashboard: FC = () => {
       <Card
         header={
           <Text as="h2" size="xl" weight="medium">
-            Recent Chores
+            <FormattedMessage
+              defaultMessage="Recent Chores"
+              id="pages.Dashboard.recent-chores"
+            />
           </Text>
         }
       >
@@ -105,11 +132,25 @@ const Dashboard: FC = () => {
           <ListRow
             description={
               <Text as="span" muted size="sm">
-                {chore.description ?? 'No description'}
+                {chore.description
+                  ?? intl.formatMessage({
+                    defaultMessage: 'No description',
+                    id: 'pages.Dashboard.no-description',
+                  })}
               </Text>
             }
             key={chore.id}
-            right={<Text>{chore.point_reward} pts</Text>}
+            right={
+              <Text>
+                {intl.formatMessage(
+                  {
+                    defaultMessage: '{points} pts',
+                    id: 'pages.Leaderboard.points-pts',
+                  },
+                  {points: chore.point_reward},
+                )}
+              </Text>
+            }
             title={chore.title}
           />
         ))}

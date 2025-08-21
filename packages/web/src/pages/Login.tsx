@@ -10,9 +10,28 @@ import {Alert} from '../widgets/Alert.js';
 import {Stack} from '../widgets/Stack.js';
 import {useToast} from '../widgets/ToastProvider.js';
 import {TextLink} from '../widgets/TextLink.js';
+import {FormattedMessage, defineMessages, useIntl} from 'react-intl';
+
+const messages = defineMessages({
+  title: {defaultMessage: 'Login', id: 'pages.Login.login'},
+  failed: {defaultMessage: 'Login failed', id: 'pages.Login.login-failed'},
+  email: {defaultMessage: 'Email', id: 'pages.Login.email'},
+  password: {defaultMessage: 'Password', id: 'pages.Login.password'},
+  submitting: {defaultMessage: 'Logging in...', id: 'pages.Login.logging-in'},
+  submit: {defaultMessage: 'Login', id: 'pages.Login.login'},
+  forgot: {
+    defaultMessage: 'Forgot password?',
+    id: 'pages.Login.forgot-password',
+  },
+  registerAdmin: {
+    defaultMessage: 'Register (Admin)',
+    id: 'pages.Login.register-admin',
+  },
+});
 
 const Login: FC = () => {
   const {login, isLoggingIn, loginError} = useUser();
+  const intl = useIntl();
   const {safeAsync} = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,17 +46,21 @@ const Login: FC = () => {
         await login(email, password);
         await navigate('/');
       },
-      'Login failed',
+      intl.formatMessage(messages.failed),
       setMessage,
     );
     run();
   };
 
   return (
-    <FormCard title="Login">
+    <FormCard title={intl.formatMessage(messages.title)}>
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
-          <FormField htmlFor="email" label="Email" required>
+          <FormField
+            htmlFor="email"
+            label={intl.formatMessage(messages.email)}
+            required
+          >
             <TextInput
               id="email"
               onChange={value => {
@@ -49,7 +72,11 @@ const Login: FC = () => {
             />
           </FormField>
 
-          <FormField htmlFor="password" label="Password" required>
+          <FormField
+            htmlFor="password"
+            label={intl.formatMessage(messages.password)}
+            required
+          >
             <TextInput
               id="password"
               onChange={value => {
@@ -68,15 +95,21 @@ const Login: FC = () => {
           {loginError ? <Alert type="error">{loginError.message}</Alert> : null}
 
           <Button disabled={isLoggingIn} fullWidth type="submit">
-            {isLoggingIn ? 'Logging in...' : 'Login'}
+            {isLoggingIn
+              ? intl.formatMessage(messages.submitting)
+              : intl.formatMessage(messages.submit)}
           </Button>
         </Stack>
       </form>
 
       <Stack gap="sm">
-        <TextLink to="/forgot-password">Forgot password?</TextLink>
+        <TextLink to="/forgot-password">
+          <FormattedMessage {...messages.forgot} />
+        </TextLink>
 
-        <TextLink to="/admin">Register (Admin)</TextLink>
+        <TextLink to="/admin">
+          <FormattedMessage {...messages.registerAdmin} />
+        </TextLink>
       </Stack>
     </FormCard>
   );

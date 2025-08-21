@@ -6,6 +6,7 @@ import {SelectInput} from '../../widgets/SelectInput.js';
 import {Toolbar} from '../../widgets/Toolbar.js';
 import {Stack} from '../../widgets/Stack.js';
 import {Text} from '../../widgets/Text.js';
+import {defineMessages, useIntl} from 'react-intl';
 
 type InviteMemberFormProps = {
   readonly handleInviteMember: (data: {
@@ -22,11 +23,32 @@ export const InviteMemberForm: FC<InviteMemberFormProps> = ({
 }) => {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<'parent' | 'child'>('parent');
+  const intl = useIntl();
+
+  const messages = defineMessages({
+    header: {
+      defaultMessage: 'Invite Member',
+      id: 'pages.family.InviteMemberForm.invite-member',
+    },
+    placeholderEmail: {
+      defaultMessage: 'Email',
+      id: 'pages.family.InviteMemberForm.email',
+    },
+    optionParent: {
+      defaultMessage: 'Parent',
+      id: 'pages.family.InviteMemberForm.parent',
+    },
+    optionChild: {
+      defaultMessage: 'Child',
+      id: 'pages.family.InviteMemberForm.child',
+    },
+    send: {defaultMessage: 'Send', id: 'pages.family.InviteMemberForm.send'},
+  });
 
   return (
     <Stack gap="sm">
       <Text as="h3" weight="semibold">
-        Invite Member
+        {intl.formatMessage(messages.header)}
       </Text>
 
       <Toolbar>
@@ -34,7 +56,7 @@ export const InviteMemberForm: FC<InviteMemberFormProps> = ({
           onChange={val => {
             setInviteEmail(val);
           }}
-          placeholder="Email"
+          placeholder={intl.formatMessage(messages.placeholderEmail)}
           type="email"
           value={inviteEmail}
         />
@@ -46,8 +68,12 @@ export const InviteMemberForm: FC<InviteMemberFormProps> = ({
           }}
           value={inviteRole}
         >
-          <option value="parent">Parent</option>
-          <option value="child">Child</option>
+          <option value="parent">
+            {intl.formatMessage(messages.optionParent)}
+          </option>
+          <option value="child">
+            {intl.formatMessage(messages.optionChild)}
+          </option>
         </SelectInput>
 
         <Button
@@ -64,7 +90,7 @@ export const InviteMemberForm: FC<InviteMemberFormProps> = ({
           }}
           type="button"
         >
-          Send
+          {intl.formatMessage(messages.send)}
         </Button>
       </Toolbar>
     </Stack>

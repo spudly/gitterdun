@@ -4,6 +4,7 @@ import type {RankingItem} from './RankingList';
 import {RankingList} from './RankingList';
 import type {PodiumItem} from './Podium';
 import {Podium} from './Podium';
+import {createWrapper} from '../test/createWrapper';
 
 describe('rankingList & Podium', () => {
   test('renders ranking list with/without rank', () => {
@@ -33,7 +34,8 @@ describe('rankingList & Podium', () => {
       {id: 2, rank: 2, content: <span>B</span>},
       {id: 3, rank: 3, content: <span>C</span>},
     ];
-    const {rerender} = render(<Podium items={items} />);
+    const Wrapper = createWrapper({i18n: true});
+    const {rerender} = render(<Podium items={items} />, {wrapper: Wrapper});
     expect(screen.getByText('A')).toBeInTheDocument();
     rerender(<Podium items={items} showMedals={false} />);
     expect(screen.getByText('A')).toBeInTheDocument();

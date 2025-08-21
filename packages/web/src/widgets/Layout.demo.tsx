@@ -3,10 +3,10 @@ import type {NavigationItem} from './Layout.js';
 import Layout from './Layout.js';
 
 const nav: Array<NavigationItem> = [
-  {name: 'Dashboard', path: '/', icon: '🏠'},
-  {name: 'Chores', path: '/chores', icon: '📋'},
-  {name: 'Goals', path: '/goals', icon: '🎯'},
-  {name: 'Leaderboard', path: '/leaderboard', icon: '🏆'},
+  {message: {defaultMessage: 'Dashboard'}, path: '/', icon: '🏠'},
+  {message: {defaultMessage: 'Chores'}, path: '/chores', icon: '📋'},
+  {message: {defaultMessage: 'Goals'}, path: '/goals', icon: '🎯'},
+  {message: {defaultMessage: 'Leaderboard'}, path: '/leaderboard', icon: '🏆'},
 ];
 
 const LayoutDemo: FC = () => {

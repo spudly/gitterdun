@@ -8,12 +8,14 @@ import {Button} from '../widgets/Button.js';
 import {Alert} from '../widgets/Alert.js';
 import {Stack} from '../widgets/Stack.js';
 import {useToast} from '../widgets/ToastProvider.js';
+import {FormattedMessage, useIntl} from 'react-intl';
 
 const ForgotPassword: FC = () => {
   const {forgotPassword} = useUser();
   const {safeAsync} = useToast();
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState<string | null>(null);
+  const intl = useIntl();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -22,20 +24,39 @@ const ForgotPassword: FC = () => {
       async () => {
         await forgotPassword(email);
         setMessage(
-          'If the email exists, a reset link has been sent. Check server logs for token in dev.',
+          intl.formatMessage({
+            defaultMessage:
+              'If the email exists, a reset link has been sent. Check server logs for token in dev.',
+            id: 'pages.ForgotPassword.if-the-email-exists-a-reset-li',
+          }),
         );
       },
-      'Request failed',
+      intl.formatMessage({
+        defaultMessage: 'Request failed',
+        id: 'pages.ForgotPassword.request-failed',
+      }),
       setMessage,
     )();
   };
 
   return (
-    <FormCard title="Forgot Password">
+    <FormCard
+      title={intl.formatMessage({
+        defaultMessage: 'Forgot Password',
+        id: 'pages.ForgotPassword.forgot-password',
+      })}
+    >
       <Stack gap="md">
         <form onSubmit={handleSubmit}>
           <Stack gap="md">
-            <FormField htmlFor="email" label="Email" required>
+            <FormField
+              htmlFor="email"
+              label={intl.formatMessage({
+                defaultMessage: 'Email',
+                id: 'pages.family.InviteMemberForm.email',
+              })}
+              required
+            >
               <TextInput
                 id="email"
                 onChange={value => {
@@ -48,7 +69,10 @@ const ForgotPassword: FC = () => {
             </FormField>
 
             <Button fullWidth type="submit">
-              Send reset link
+              <FormattedMessage
+                defaultMessage="Send reset link"
+                id="forgotPassword.submit"
+              />
             </Button>
           </Stack>
         </form>

@@ -1,4 +1,5 @@
 import type {FC} from 'react';
+import {FormattedMessage, useIntl} from 'react-intl';
 import {useEffect, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {familiesApi} from '../lib/api.js';
@@ -59,6 +60,7 @@ const useFamilySetup = () => {
 };
 
 const Family: FC = () => {
+  const intl = useIntl();
   const {
     user,
     selectedFamilyId,
@@ -73,12 +75,24 @@ const Family: FC = () => {
   } = useFamilySetup();
 
   if (!user) {
-    return <div>Please log in to manage your family.</div>;
+    return (
+      <div>
+        <FormattedMessage
+          defaultMessage="Please log in to manage your family."
+          id="pages.Family.please-log-in-to-manage-your-f"
+        />
+      </div>
+    );
   }
 
   return (
     <PageContainer>
-      <FormSection title="Your Families">
+      <FormSection
+        title={intl.formatMessage({
+          defaultMessage: 'Your Families',
+          id: 'pages.Family.your-families',
+        })}
+      >
         <FamilySelector
           families={familyOptions}
           newFamilyName={newFamilyName}
@@ -94,7 +108,12 @@ const Family: FC = () => {
 
       {selectedFamilyId !== null ? (
         <GridContainer cols={2} gap="lg">
-          <FormSection title="Members">
+          <FormSection
+            title={intl.formatMessage({
+              defaultMessage: 'Members',
+              id: 'pages.Family.members',
+            })}
+          >
             <FamilyMembers membersData={membersQuery.data?.data} />
           </FormSection>
 

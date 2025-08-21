@@ -11,7 +11,7 @@ import {
   NotificationSchema,
   PaginationSchema,
   apiResponseSchema,
-  PaginatedResponseSchema,
+  paginatedResponseSchema,
   IdParamSchema,
   CompleteChoreBodySchema,
   LeaderboardQuerySchema,
@@ -278,7 +278,7 @@ describe('response schemas', () => {
   });
 
   test('paginatedResponseSchema should create paginated schema', () => {
-    const paginatedUsersSchema = PaginatedResponseSchema(UserSchema);
+    const paginatedUsersSchema = paginatedResponseSchema(UserSchema);
     const validResponse = {
       success: true,
       data: [

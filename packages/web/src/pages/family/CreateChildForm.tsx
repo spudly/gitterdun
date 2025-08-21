@@ -4,6 +4,7 @@ import {Button} from '../../widgets/Button.js';
 import {TextInput} from '../../widgets/TextInput.js';
 import {Stack} from '../../widgets/Stack.js';
 import {Text} from '../../widgets/Text.js';
+import {defineMessages, useIntl} from 'react-intl';
 
 type CreateChildFormProps = {
   readonly handleCreateChild: (data: {
@@ -22,11 +23,35 @@ export const CreateChildForm: FC<CreateChildFormProps> = ({
   const [childUsername, setChildUsername] = useState('');
   const [childEmail, setChildEmail] = useState('');
   const [childPassword, setChildPassword] = useState('');
+  const intl = useIntl();
+
+  const messages = defineMessages({
+    header: {
+      defaultMessage: 'Create Child Account',
+      id: 'pages.family.CreateChildForm.create-child-account',
+    },
+    placeholderUsername: {
+      defaultMessage: 'Username',
+      id: 'pages.family.CreateChildForm.username',
+    },
+    placeholderEmail: {
+      defaultMessage: 'Email',
+      id: 'pages.family.InviteMemberForm.email',
+    },
+    placeholderPassword: {
+      defaultMessage: 'Password',
+      id: 'pages.family.CreateChildForm.password',
+    },
+    create: {
+      defaultMessage: 'Create',
+      id: 'pages.family.FamilySelector.create',
+    },
+  });
 
   return (
     <Stack gap="sm">
       <Text as="h3" weight="semibold">
-        Create Child Account
+        {intl.formatMessage(messages.header)}
       </Text>
 
       <Stack gap="sm">
@@ -34,7 +59,7 @@ export const CreateChildForm: FC<CreateChildFormProps> = ({
           onChange={val => {
             setChildUsername(val);
           }}
-          placeholder="Username"
+          placeholder={intl.formatMessage(messages.placeholderUsername)}
           value={childUsername}
         />
 
@@ -42,7 +67,7 @@ export const CreateChildForm: FC<CreateChildFormProps> = ({
           onChange={val => {
             setChildEmail(val);
           }}
-          placeholder="Email"
+          placeholder={intl.formatMessage(messages.placeholderEmail)}
           type="email"
           value={childEmail}
         />
@@ -51,7 +76,7 @@ export const CreateChildForm: FC<CreateChildFormProps> = ({
           onChange={val => {
             setChildPassword(val);
           }}
-          placeholder="Password"
+          placeholder={intl.formatMessage(messages.placeholderPassword)}
           type="password"
           value={childPassword}
         />
@@ -78,7 +103,7 @@ export const CreateChildForm: FC<CreateChildFormProps> = ({
           }}
           type="button"
         >
-          Create
+          {intl.formatMessage(messages.create)}
         </Button>
       </Stack>
     </Stack>

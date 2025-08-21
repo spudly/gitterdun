@@ -1,12 +1,18 @@
 {
   "extends": "./tsconfig.json",
-  "compilerOptions": {"noEmit": false, "outDir": "./dist", "rootDir": "./src"},
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "allowImportingTsExtensions": false
+  },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": [
     "node_modules",
     "**/dist",
     "**/build",
     "**/*.test.ts",
-    "**/*.test.tsx"
+    "**/*.test.tsx",
+    "**/test/**"
   ]
 }
