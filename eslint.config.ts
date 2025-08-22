@@ -12,6 +12,7 @@ import commentsPlugin from 'eslint-plugin-eslint-comments';
 import jestPlugin from 'eslint-plugin-jest';
 import tailwindcssPlugin from 'eslint-plugin-tailwindcss';
 import gitterdunPlugin from 'eslint-plugin-gitterdun';
+import turboPlugin from 'eslint-plugin-turbo';
 
 const WORKSPACE_ROOT_DIR = dirname(fileURLToPath(import.meta.url));
 
@@ -38,6 +39,7 @@ const eslintConfig = [
 
       tailwindcss: tailwindcssPlugin,
       gitterdun: gitterdunPlugin,
+      turbo: turboPlugin,
     },
     files: ['**/*.{ts,tsx,js,jsx,cjs,mjs,mts,cts}'],
     settings: {
@@ -175,6 +177,8 @@ const eslintConfig = [
         'error',
         {noStrings: true, ignoreProps: true, allowedStrings: ['*', '%']},
       ],
+      // turbo plugin rules as warnings
+      'turbo/no-undeclared-env-vars': 'error',
       'keyword-spacing': 'off', // using Prettier for styling
       'jsx-a11y/label-has-associated-control': [
         'error',

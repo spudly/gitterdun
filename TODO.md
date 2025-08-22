@@ -33,9 +33,9 @@
 - [x] add french translation
 - [x] add deseret translation
 - [ ] refine landing => sign-up/login flow
-- [ ] add eslint-plugin-turbo
+- [x] add eslint-plugin-turbo
 - [ ] scan repo for strings that haven't been internationalized
 - [ ] add secret detection to precommit hook:
       https://docs.gitguardian.com/ggshield-docs/integrations/git-hooks/pre-commit
-- [ ] write an eslint rule to ensure i18n messages are not used without
+- [x] write an eslint rule to ensure i18n messages are not used without
       <FormattedMessage /> or intl.formatMessage()
