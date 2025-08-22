@@ -1,7 +1,8 @@
-import type {FC} from 'react';
+import type {FC, ReactNode} from 'react';
 import {Suspense, lazy} from 'react';
-import {Routes as RouterRoutes, Route} from 'react-router-dom';
+import {Routes as RouterRoutes, Route, Navigate} from 'react-router-dom';
 import {Spinner} from './widgets/Spinner';
+import {useUser} from './hooks/useUser.js';
 
 const Dashboard = lazy(async () => import('./pages/Dashboard'));
 const Chores = lazy(async () => import('./pages/Chores'));
@@ -14,20 +15,68 @@ const ResetPassword = lazy(async () => import('./pages/ResetPassword'));
 const Family = lazy(async () => import('./pages/Family'));
 const AcceptInvitation = lazy(async () => import('./pages/AcceptInvitation'));
 const Demos = lazy(async () => import('./pages/Demos'));
+const Landing = lazy(async () => import('./pages/Landing'));
+
+type ProtectedRouteProps = {readonly children: ReactNode};
+const ProtectedRoute: FC<ProtectedRouteProps> = ({children}) => {
+  const {user, isLoading} = useUser();
+  if (isLoading) {
+    return <Spinner />;
+  }
+  if (!user) {
+    return <Navigate replace to="/landing" />;
+  }
+  return <>{children}</>;
+};
 
 export const Routes: FC = () => {
   return (
     <Suspense fallback={<Spinner />}>
       <RouterRoutes>
-        <Route element={<Dashboard />} path="/" />
+        <Route
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+          path="/"
+        />
 
-        <Route element={<Chores />} path="/chores" />
+        <Route
+          element={
+            <ProtectedRoute>
+              <Chores />
+            </ProtectedRoute>
+          }
+          path="/chores"
+        />
 
-        <Route element={<Goals />} path="/goals" />
+        <Route
+          element={
+            <ProtectedRoute>
+              <Goals />
+            </ProtectedRoute>
+          }
+          path="/goals"
+        />
 
-        <Route element={<Leaderboard />} path="/leaderboard" />
+        <Route
+          element={
+            <ProtectedRoute>
+              <Leaderboard />
+            </ProtectedRoute>
+          }
+          path="/leaderboard"
+        />
 
-        <Route element={<Admin />} path="/admin" />
+        <Route
+          element={
+            <ProtectedRoute>
+              <Admin />
+            </ProtectedRoute>
+          }
+          path="/admin"
+        />
 
         <Route element={<Login />} path="/login" />
 
@@ -35,13 +84,22 @@ export const Routes: FC = () => {
 
         <Route element={<ResetPassword />} path="/reset-password" />
 
-        <Route element={<Family />} path="/family" />
+        <Route
+          element={
+            <ProtectedRoute>
+              <Family />
+            </ProtectedRoute>
+          }
+          path="/family"
+        />
 
         <Route element={<AcceptInvitation />} path="/accept-invitation" />
 
         <Route element={<Demos />} path="/__demos" />
 
         <Route element={<Demos />} path="/__demos/:name" />
+
+        <Route element={<Landing />} path="/landing" />
       </RouterRoutes>
     </Suspense>
   );
