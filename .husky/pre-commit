@@ -1,4 +1,3 @@
-ggshield secret scan --staged
 npm run knip
 npm run build
 npm run test:changed

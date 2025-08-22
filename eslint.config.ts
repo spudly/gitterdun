@@ -178,7 +178,7 @@ const eslintConfig = [
         {noStrings: true, ignoreProps: true, allowedStrings: ['*', '%']},
       ],
       // turbo plugin rules as warnings
-      'turbo/no-undeclared-env-vars': 'warn',
+      'turbo/no-undeclared-env-vars': 'error',
       'keyword-spacing': 'off', // using Prettier for styling
       'jsx-a11y/label-has-associated-control': [
         'error',
