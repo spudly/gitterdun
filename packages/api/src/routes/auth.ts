@@ -49,7 +49,7 @@ router.post('/register', async (req, res) => {
       : {username, password, role},
   );
 
-  logger.info(`New user registered: ${email}`);
+  logger.info(`New user registered: ${username}`);
   res
     .status(201)
     .json({
