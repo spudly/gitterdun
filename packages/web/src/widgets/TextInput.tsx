@@ -56,9 +56,7 @@ export const TextInput: FC<TextInputProps> = ({
         ) : null}
       </div>
 
-      {hasError ? (
-        <div className="text-xs text-red-600">{error}</div>
-      ) : null}
+      {hasError ? <div className="text-xs text-red-600">{error}</div> : null}
     </div>
   );
 };

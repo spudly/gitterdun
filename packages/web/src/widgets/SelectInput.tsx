@@ -35,9 +35,7 @@ export const SelectInput: FC<SelectInputProps> = ({
         {children}
       </select>
 
-      {hasError ? (
-        <div className="text-xs text-red-600">{error}</div>
-      ) : null}
+      {hasError ? <div className="text-xs text-red-600">{error}</div> : null}
     </div>
   );
 };

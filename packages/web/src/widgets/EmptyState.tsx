@@ -26,9 +26,7 @@ export const EmptyState: FC<EmptyStateProps> = ({
       <div className="flex flex-col items-center gap-2">
         <h3 className="text-lg font-medium text-gray-900">{title}</h3>
 
-        {hasDescription ? (
-          <p className="text-gray-500">{description}</p>
-        ) : null}
+        {hasDescription ? <p className="text-gray-500">{description}</p> : null}
       </div>
 
       {action}

@@ -1,51 +1,39 @@
-/* eslint-disable gitterdun/no-tailwind-margins -- test file contains margin classes as test data */
+/* eslint-disable gitterdun/no-tailwind-margins, no-template-curly-in-string -- test file contains margin classes and template strings as test data */
 import {RuleTester} from 'eslint';
 import {noTailwindMargins} from '../noTailwindMargins.js';
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports -- ESLint RuleTester requires CommonJS import
+const tsParser = require('@typescript-eslint/parser');
+
 const ruleTester = new RuleTester({
   languageOptions: {
-    parser: require('@typescript-eslint/parser'),
+    parser: tsParser,
     parserOptions: {
       ecmaVersion: 2020,
       sourceType: 'module',
-      ecmaFeatures: {
-        jsx: true,
-      },
+      ecmaFeatures: {jsx: true},
     },
   },
 });
 
+// eslint-disable-next-line jest/require-hook -- ESLint RuleTester runs its own test framework
 ruleTester.run('no-tailwind-margins', noTailwindMargins, {
   valid: [
     // Valid className without margin classes
-    {
-      code: '<div className="flex p-4 bg-blue-500 text-white" />',
-    },
-    {
-      code: '<div className="grid gap-4 space-y-2" />',
-    },
-    {
-      code: '<div className="" />',
-    },
-    {
-      code: '<div className={undefined} />',
-    },
+    {code: '<div className="flex p-4 bg-blue-500 text-white" />'},
+    {code: '<div className="grid gap-4 space-y-2" />'},
+    {code: '<div className="" />'},
+    {code: '<div className={undefined} />'},
     // class attribute (for non-React contexts)
-    {
-      code: '<div class="flex p-4 bg-blue-500" />',
-    },
+    {code: '<div class="flex p-4 bg-blue-500" />'},
     // Template literals without margin classes
     {
       code: '<div className={`flex p-4 ${isActive ? "bg-blue-500" : "bg-gray-500"}`} />',
     },
     // Other attributes should not be checked
-    {
-      code: '<div id="m-4" data-test="mb-2" />',
-    },
+    {code: '<div id="m-4" data-test="mb-2" />'},
     // String literals that don't look like CSS classes
-    {
-      code: 'const message = "margin-top is not allowed";',
-    },
+    {code: 'const message = "margin-top is not allowed";'},
     {
       code: 'const config = "m-4";', // doesn't match Tailwind pattern
     },
@@ -54,21 +42,13 @@ ruleTester.run('no-tailwind-margins', noTailwindMargins, {
     // Single margin class
     {
       code: '<div className="flex m-4 p-2" />',
-      errors: [
-        {
-          messageId: 'noMarginClasses',
-          data: {className: 'm-4'},
-        },
-      ],
+      errors: [{messageId: 'noMarginClasses', data: {className: 'm-4'}}],
     },
     // Multiple margin classes
     {
       code: '<div className="flex m-4 mb-2 p-2" />',
       errors: [
-        {
-          messageId: 'noMarginClassesMultiple',
-          data: {classNames: 'm-4, mb-2'},
-        },
+        {messageId: 'noMarginClassesMultiple', data: {classNames: 'm-4, mb-2'}},
       ],
     },
     // All margin direction classes
@@ -162,7 +142,12 @@ ruleTester.run('no-tailwind-margins', noTailwindMargins, {
     },
     {
       code: '<div className={`flex mt-2 mb-4 ${className}`} />',
-      errors: [{messageId: 'noMarginClassesMultiple', data: {classNames: 'mt-2, mb-4'}}],
+      errors: [
+        {
+          messageId: 'noMarginClassesMultiple',
+          data: {classNames: 'mt-2, mb-4'},
+        },
+      ],
     },
     // class attribute (for non-React contexts)
     {
@@ -192,3 +177,4 @@ ruleTester.run('no-tailwind-margins', noTailwindMargins, {
     },
   ],
 });
+/* eslint-enable gitterdun/no-tailwind-margins, no-template-curly-in-string */
