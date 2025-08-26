@@ -31,7 +31,7 @@ const mockedChoreSchema = jest.mocked(ChoreWithUsernameSchema);
 const mockedCountRowSchema = jest.mocked(CountRowSchema);
 
 describe('chores routes', () => {
-  let app: express.Application | undefined;
+  let app: ReturnType<typeof express> | undefined;
   let server: Server | undefined;
   let baseUrl: string | undefined;
 
@@ -70,8 +70,8 @@ describe('chores routes', () => {
         point_reward: 5,
         bonus_points: 0,
         penalty_points: 0,
-        due_date: null,
-        recurrence_rule: null,
+        due_date: undefined,
+        recurrence_rule: undefined,
         chore_type: 'required',
         status: 'pending',
         created_by: 1,

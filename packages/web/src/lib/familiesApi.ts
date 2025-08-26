@@ -20,7 +20,7 @@ export const leaderboardApi = {
 export const familiesApi = {
   create: async (data: {name: string}) =>
     api.post('/families', FamilySchema, data),
-  myFamilies: async () => api.get('/families/mine', z.array(FamilySchema)),
+  myFamily: async () => api.get('/families/mine', FamilySchema.nullable()),
   listMembers: async (familyId: number) =>
     api.get<Array<unknown>>(
       `/families/${familyId}/members`,
@@ -28,7 +28,7 @@ export const familiesApi = {
     ),
   createChild: async (
     familyId: number,
-    data: {username: string; email: string; password: string},
+    data: {username: string; email: string | undefined; password: string},
   ) =>
     api.post(
       `/families/${familyId}/children`,

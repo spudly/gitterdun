@@ -35,7 +35,10 @@ const fetchSessionFromDb = (sessionId: string) => {
         s.id = ?
     `)
     .get(sessionId);
-  return sessionRow === null ? undefined : SessionRowSchema.parse(sessionRow);
+  if (sessionRow === undefined || sessionRow === null) {
+    return undefined;
+  }
+  return SessionRowSchema.parse(sessionRow);
 };
 
 const removeExpiredSession = (sessionId: string): void => {

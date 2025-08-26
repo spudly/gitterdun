@@ -10,7 +10,7 @@ const extractIdsFromRaw = (rawJson: unknown): Array<string> => {
         typeof item === 'object'
         && item !== null
         && 'id' in (item as Record<string, unknown>)
-          ? String((item as Record<string, unknown>).id)
+          ? String(item as Record<string, unknown>['id'])
           : '',
       )
       .filter(Boolean);

@@ -9,6 +9,7 @@ const navMessages = defineMessages({
     defaultMessage: 'Leaderboard',
     id: 'pages.Leaderboard.leaderboard',
   },
+  family: {defaultMessage: 'Family', id: 'pages.Family.family'},
 });
 
 export const NAVIGATION_ITEMS: Array<NavigationItem> = [
@@ -16,4 +17,5 @@ export const NAVIGATION_ITEMS: Array<NavigationItem> = [
   {message: navMessages.chores, path: '/chores', icon: '📋'},
   {message: navMessages.goals, path: '/goals', icon: '🎯'},
   {message: navMessages.leaderboard, path: '/leaderboard', icon: '🏆'},
+  {message: navMessages.family, path: '/family', icon: '👪'},
 ];

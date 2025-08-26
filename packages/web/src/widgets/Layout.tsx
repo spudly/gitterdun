@@ -83,7 +83,7 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
                   })}
                 </span>
 
-                <span className="font-semibold text-orange-500">
+                <span className="flex flex-nowrap items-center gap-2 font-semibold text-orange-500">
                   {user?.streak_count ?? 0} <FlameIcon size="sm" />
                 </span>
               </div>

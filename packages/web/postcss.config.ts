@@ -1,6 +1,10 @@
-import type {Config} from 'postcss';
+import type {ProcessOptions, Plugin} from 'postcss';
 
-const config: Config = {
+type PostcssConfig = {
+  plugins: Record<string, Plugin | object>;
+} & Partial<ProcessOptions>;
+
+const config: PostcssConfig = {
   plugins: {'@tailwindcss/postcss': {}, autoprefixer: {}},
 };
 

@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS chores (
   point_reward INTEGER NOT NULL DEFAULT 0,
   bonus_points INTEGER DEFAULT 0,
   penalty_points INTEGER DEFAULT 0,
+  start_date timestamp,
   due_date timestamp,
   recurrence_rule TEXT, -- iCalendar RFC 5545 format
   chore_type VARCHAR(20) NOT NULL DEFAULT 'required', -- 'required' or 'bonus'
@@ -115,6 +116,8 @@ CREATE INDEX IF NOT EXISTS idx_chores_status ON chores (status);
 
 CREATE INDEX IF NOT EXISTS idx_chores_due_date ON chores (due_date);
 
+CREATE INDEX IF NOT EXISTS idx_chores_start_date ON chores (start_date);
+
 CREATE INDEX IF NOT EXISTS idx_chore_assignments_user_id ON chore_assignments (user_id);
 
 CREATE INDEX IF NOT EXISTS idx_chore_assignments_chore_id ON chore_assignments (chore_id);
@@ -165,3 +168,22 @@ VALUES
     0
   )
 ON CONFLICT DO NOTHING;
+
+-- Families: group of users managed by a parent (owner)
+CREATE TABLE IF NOT EXISTS families (
+  id serial PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  owner_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+  created_at timestamp DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Membership of users within a family with family-specific roles
+CREATE TABLE IF NOT EXISTS family_members (
+  family_id INTEGER NOT NULL REFERENCES families (id) ON DELETE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+  role VARCHAR(10) NOT NULL CHECK (role IN ('parent', 'child')),
+  PRIMARY KEY (family_id, user_id)
+);
+
+-- Enforce single-family per user (PostgreSQL)
+CREATE UNIQUE INDEX IF NOT EXISTS ux_family_members_user_id ON family_members (user_id);

@@ -1,19 +1,33 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen, act, waitFor} from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import {render, screen} from '@testing-library/react';
 import {createWrapper} from '../test/createWrapper';
 import Admin from './Admin';
-import * as apiModule from '../lib/api';
-
-const mockNavigate = jest.fn();
-jest.mock('react-router-dom', () => {
-  const actual =
-    jest.requireActual<typeof import('react-router-dom')>('react-router-dom');
-  return {...actual, useNavigate: () => mockNavigate};
-});
 
 jest.mock('../hooks/useUser', () => ({
-  useUser: jest.fn(() => ({user: {id: 1, role: 'admin'}})),
+  useUser: jest.fn(() => ({
+    user: {
+      id: 1,
+      username: 'admin',
+      email: 'admin@example.com',
+      role: 'admin',
+      points: 0,
+      streak_count: 0,
+      created_at: '',
+      updated_at: '',
+    },
+    isLoading: false,
+    error: null,
+    login: jest.fn(),
+    register: jest.fn(),
+    logout: jest.fn(),
+    forgotPassword: jest.fn(),
+    resetPassword: jest.fn(),
+    isLoggingIn: false,
+    isRegistering: false,
+    isLoggingOut: false,
+    loginError: null,
+    registerError: null,
+  })),
 }));
 
 jest.mock('../lib/api', () => ({
@@ -27,42 +41,103 @@ jest.mock('../lib/api', () => ({
   invitationsApi: {create: jest.fn(async () => ({success: true}))},
 }));
 
-const wrap = (ui: React.ReactElement) => ui;
-
 describe('admin page', () => {
-  test('navigates to /family after successful create via setTimeout', async () => {
-    const {familiesApi} = jest.mocked(apiModule);
-    familiesApi.create.mockResolvedValueOnce({success: true});
-    mockNavigate.mockClear();
+  test('renders admin panel with appropriate sections but no family management', async () => {
+    const Wrapper = createWrapper({
+      i18n: true,
+      queryClient: true,
+      router: true,
+    });
+    render(<Admin />, {wrapper: Wrapper});
+
+    await expect(screen.findByText('Admin Panel')).resolves.toBeInTheDocument();
+
+    expect(screen.queryByText('Family Management')).not.toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText('Family name'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', {name: 'Create Family'}),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('Family ID')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', {name: 'Invite'}),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Chores Management')).not.toBeInTheDocument();
+  });
+
+  test('denies access for non-admin users', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- wrong
+    const mocked = jest.requireMock('../hooks/useUser') as {useUser: any};
+    const useUserMock: any = mocked.useUser;
+    useUserMock.mockReturnValueOnce({
+      user: {
+        id: 1,
+        username: 'u',
+        email: 'e@x',
+        role: 'user',
+        points: 0,
+        streak_count: 0,
+        created_at: '',
+        updated_at: '',
+      },
+      isLoading: false,
+      error: null,
+      login: jest.fn(),
+      register: jest.fn(),
+      logout: jest.fn(),
+      forgotPassword: jest.fn(),
+      resetPassword: jest.fn(),
+      isLoggingIn: false,
+      isRegistering: false,
+      isLoggingOut: false,
+      loginError: null,
+      registerError: null,
+    });
 
     const Wrapper = createWrapper({
       i18n: true,
       queryClient: true,
       router: true,
     });
-    render(wrap(<Admin />), {wrapper: Wrapper});
-    await screen.findByText('Admin Panel');
-    await userEvent.clear(screen.getByPlaceholderText('Family name'));
-    await userEvent.type(
-      screen.getByPlaceholderText('Family name'),
-      'TimerFam',
-    );
-    await act(async () => {
-      await userEvent.click(
-        screen.getByRole('button', {name: 'Create Family'}),
-      );
+    render(<Admin />, {wrapper: Wrapper});
+
+    expect(screen.getByText('Access Denied')).toBeInTheDocument();
+    expect(
+      screen.getByText('You need admin privileges to view this page.'),
+    ).toBeInTheDocument();
+  });
+
+  test('denies access for unauthenticated users', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- wrong
+    const mocked = jest.requireMock('../hooks/useUser') as {useUser: any};
+    const useUserMock: any = mocked.useUser;
+    useUserMock.mockReturnValueOnce({
+      user: null,
+      isLoading: false,
+      error: null,
+      login: jest.fn(),
+      register: jest.fn(),
+      logout: jest.fn(),
+      forgotPassword: jest.fn(),
+      resetPassword: jest.fn(),
+      isLoggingIn: false,
+      isRegistering: false,
+      isLoggingOut: false,
+      loginError: null,
+      registerError: null,
     });
 
-    await expect(
-      screen.findByText('Family created. Redirecting...'),
-    ).resolves.toBeInTheDocument();
-    expect(familiesApi.create).toHaveBeenCalledWith({name: 'TimerFam'});
+    const Wrapper = createWrapper({
+      i18n: true,
+      queryClient: true,
+      router: true,
+    });
+    render(<Admin />, {wrapper: Wrapper});
 
-    await waitFor(
-      () => {
-        expect(mockNavigate).toHaveBeenCalledWith('/family');
-      },
-      {timeout: 2000},
-    );
+    expect(screen.getByText('Access Denied')).toBeInTheDocument();
+    expect(
+      screen.getByText('You need admin privileges to view this page.'),
+    ).toBeInTheDocument();
   });
 });

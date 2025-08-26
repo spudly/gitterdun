@@ -16,6 +16,7 @@ import {
   CompleteChoreBodySchema,
   LeaderboardQuerySchema,
   RoleRowSchema,
+  CreateChildSchema,
 } from './schemas';
 
 describe('user schemas', () => {
@@ -94,6 +95,7 @@ describe('chore schemas', () => {
       point_reward: 10,
       bonus_points: 0,
       penalty_points: 0,
+      start_date: '2024-01-01T09:00:00.000Z',
       chore_type: 'required',
       status: 'pending',
       created_by: 1,
@@ -142,7 +144,12 @@ describe('chore schemas', () => {
   });
 
   test('createChoreSchema should apply defaults', () => {
-    const validCreateChore = {title: 'New chore', point_reward: 10};
+    const validCreateChore = {
+      title: 'New chore',
+      point_reward: 10,
+      start_date: '2024-01-01T09:00:00.000Z',
+      due_date: '2024-01-01T17:00:00.000Z',
+    };
 
     const result = CreateChoreSchema.safeParse(validCreateChore);
     expect(result.success).toBe(true);
@@ -371,6 +378,32 @@ describe('family schema', () => {
 
     const result = FamilySchema.safeParse(invalidFamily);
     expect(result.success).toBe(false);
+  });
+
+  test('createChildSchema should allow optional email and min password', () => {
+    const validNoEmail = {
+      username: 'child',
+      email: '',
+      password: 'secr',
+    } as const;
+    const resultNoEmail = CreateChildSchema.safeParse(validNoEmail);
+    expect(resultNoEmail.success).toBe(true);
+
+    const validWithEmail = {
+      username: 'child',
+      email: 'kid@example.com',
+      password: 'secr',
+    } as const;
+    const resultWithEmail = CreateChildSchema.safeParse(validWithEmail);
+    expect(resultWithEmail.success).toBe(true);
+
+    const invalidShortPassword = {
+      username: 'child',
+      email: 'kid@example.com',
+      password: '123',
+    } as const;
+    const resultShortPw = CreateChildSchema.safeParse(invalidShortPassword);
+    expect(resultShortPw.success).toBe(false);
   });
 });
 

@@ -118,7 +118,7 @@ describe('api utils', () => {
     await leaderboardApi.get({sortBy: 'points'});
 
     await familiesApi.create({name: 'fam'});
-    await familiesApi.myFamilies();
+    await familiesApi.myFamily();
     await familiesApi.listMembers(1);
     await familiesApi.createChild(1, {
       username: 'c',

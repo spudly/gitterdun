@@ -2,8 +2,12 @@ import {FamilySchema, FamilyMemberSchema, IdRowSchema} from '@gitterdun/shared';
 import bcrypt from 'bcryptjs';
 import db from '../lib/db';
 import {sql} from './sql';
+import {removeAllMembershipsForUser} from './familyMembership';
 
 export const createFamily = (name: string, userId: number) => {
+  // Enforce single-family membership: remove any existing memberships first
+  removeAllMembershipsForUser(userId);
+
   const familyRow = db
     .prepare(sql`
       INSERT INTO
@@ -47,8 +51,8 @@ export const getFamilyMembers = (familyId: number) => {
   return rows.map(row => FamilyMemberSchema.parse(row));
 };
 
-export const getUserFamilies = (userId: number) => {
-  const rows = db
+export const getUserFamily = (userId: number) => {
+  const row = db
     .prepare(sql`
       SELECT
         f.id,
@@ -60,33 +64,51 @@ export const getUserFamilies = (userId: number) => {
         JOIN family_members fm ON fm.family_id = f.id
       WHERE
         fm.user_id = ?
-      ORDER BY
-        f.created_at DESC
+      LIMIT
+        1
     `)
-    .all(userId);
-  return rows.map(row => FamilySchema.parse(row));
+    .get(userId);
+  return row === undefined ? null : FamilySchema.parse(row);
 };
 
-export const checkUserExists = (email: string, username: string): boolean => {
-  const existing = db
-    .prepare(sql`
-      SELECT
-        1
-      FROM
-        users
-      WHERE
-        email = ?
-        OR username = ?
-    `)
-    .get(email, username);
-  return existing !== undefined;
+export const checkUserExists = (
+  email: string | undefined,
+  username: string,
+): boolean => {
+  const trimmedEmail = typeof email === 'string' ? email.trim() : undefined;
+  const existingUserRow =
+    trimmedEmail !== undefined && trimmedEmail !== ''
+      ? db
+          .prepare(sql`
+            SELECT
+              id
+            FROM
+              users
+            WHERE
+              email = ?
+              OR username = ?
+          `)
+          .get(trimmedEmail, username)
+      : db
+          .prepare(sql`
+            SELECT
+              id
+            FROM
+              users
+            WHERE
+              username = ?
+          `)
+          .get(username);
+  return existingUserRow !== null && existingUserRow !== undefined;
 };
 
 export const createChildUser = async (
   username: string,
-  email: string,
+  email: string | undefined,
   password: string,
 ): Promise<number> => {
+  const resolvedEmail: string | null =
+    email != null && email.trim() !== '' ? email : null;
   const passwordHash = await bcrypt.hash(password, 12);
   const userRow = db
     .prepare(sql`
@@ -95,7 +117,7 @@ export const createChildUser = async (
       VALUES
         (?, ?, ?, 'user') RETURNING id
     `)
-    .get(username, email, passwordHash);
+    .get(username, resolvedEmail, passwordHash);
   const user = IdRowSchema.parse(userRow);
   return user.id;
 };

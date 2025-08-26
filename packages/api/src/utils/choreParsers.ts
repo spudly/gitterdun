@@ -14,8 +14,10 @@ export const parseChoresQueryRequest = (req: express.Request) => {
     user_id: userId,
     page,
     limit,
+    sort_by: sortBy,
+    order,
   } = validatedQuery;
-  return {status, choreType, userId, page, limit};
+  return {status, choreType, userId, page, limit, sortBy, order};
 };
 
 export const parseGetChoreRequest = (req: express.Request) => {

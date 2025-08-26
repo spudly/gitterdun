@@ -39,7 +39,7 @@ const mockedCountRowSchema = jest.mocked(CountRowSchema);
 const mockedIdParamSchema = jest.mocked(IdParamSchema);
 
 describe('goals routes', () => {
-  let app: express.Application | undefined;
+  let app: ReturnType<typeof express> | undefined;
   let server: Server | undefined;
   let baseUrl: string | undefined;
 

@@ -12,7 +12,7 @@ import {
 import {
   createFamily,
   getFamilyMembers,
-  getUserFamilies,
+  getUserFamily,
   checkUserExists,
   createChildUser,
   addChildToFamily,
@@ -71,11 +71,11 @@ router.post('/:id/children', async (req, res) => {
   res.status(201).json({success: true, message: 'Child created'});
 });
 
-// GET /api/families/mine - list families where current user is a member
+// GET /api/families/mine - return the single family for the current user
 router.get('/mine', (req, res) => {
   const userId = requireUserId(req);
-  const families = getUserFamilies(userId);
-  res.json({success: true, data: families});
+  const family = getUserFamily(userId);
+  res.json({success: true, data: family});
 });
 
 export default router;

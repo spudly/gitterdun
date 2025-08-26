@@ -4,7 +4,7 @@ import {FormattedMessage} from 'react-intl';
 type MemberItem = {
   user_id: number | string;
   username: string;
-  email: string;
+  email: string | null;
   role: string;
 };
 
@@ -19,7 +19,7 @@ export const MembersList: FC<MembersListProps> = ({members}) => {
             <FormattedMessage
               defaultMessage="{username} ({email})"
               id="membersList.userWithEmail"
-              values={{username: member.username, email: member.email}}
+              values={{username: member.username, email: member.email ?? '—'}}
             />
           </span>
 

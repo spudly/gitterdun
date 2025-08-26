@@ -85,7 +85,8 @@ export default {
 
   'pages.Family.please-log-in-to-manage-your-f':
     'Veuillez vous connecter pour gérer votre famille.',
-  'pages.Family.your-families': 'Vos familles',
+  'pages.Family.family': 'Famille',
+  'pages.Family.your-family': 'Votre famille',
   'pages.Family.members': 'Membres',
 
   'pages.Leaderboard.loading-leaderboard': 'Chargement du classement…',
@@ -107,8 +108,7 @@ export default {
   'datatable.loading': 'Chargement…',
   'admin.users.delete': 'Supprimer',
 
-  'pages.admin.AdminInvitations.could-not-create-invitation-pl':
-    'Impossible de créer l’invitation. Veuillez réessayer.',
+  // AdminInvitations (obsolete - removed)
 
   // AdminChoresManagement
   'pages.admin.AdminChoresManagement.chores-management': 'Gestion des corvées',
@@ -124,25 +124,9 @@ export default {
   'pages.admin.AdminChoresManagement.pending': 'En attente',
   'pages.admin.AdminChoresManagement.bonus': 'Bonus',
 
-  // AdminFamilyCreation
-  'pages.admin.AdminFamilyCreation.family-name': 'Nom de la famille',
-  'pages.admin.AdminFamilyCreation.create-family': 'Créer une famille',
-  'pages.admin.AdminFamilyCreation.family-created-redirecting':
-    'Famille créée. Redirection…',
-  'pages.admin.AdminFamilyCreation.failed-to-create-family':
-    'Échec de la création de la famille',
-  'pages.admin.AdminFamilyCreation.could-not-create-family-please':
-    'Impossible de créer la famille. Veuillez réessayer.',
+  // AdminFamilyCreation (obsolete - removed)
 
-  // AdminInvitations
-  'pages.admin.AdminInvitations.family-id': 'ID de la famille',
-  'pages.admin.AdminInvitations.invite-email': 'E-mail d’invitation',
-  'pages.admin.AdminInvitations.invite': 'Inviter',
-  'pages.admin.AdminInvitations.enter-family-id-and-email':
-    'Saisissez l’ID de la famille et l’e-mail',
-  'pages.admin.AdminInvitations.invitation-created-see-server-':
-    'Invitation créée (voir les journaux du serveur en dev)',
-  'pages.admin.AdminInvitations.failed-to-invite': 'Échec de l’invitation',
+  // AdminInvitations (obsolete - removed)
 
   // FamilySelector
   'pages.family.FamilySelector.choose-a-family': 'Choisir une famille',
@@ -153,6 +137,12 @@ export default {
   'pages.family.CreateChildForm.create-child-account': 'Créer un compte enfant',
   'pages.family.CreateChildForm.username': 'Nom d’utilisateur',
   'pages.family.CreateChildForm.password': 'Mot de passe',
+  'pages.family.CreateChildForm.username-required':
+    'Le nom d’utilisateur est requis',
+  'pages.family.CreateChildForm.email-invalid':
+    'Veuillez saisir une adresse e-mail valide',
+  'pages.family.CreateChildForm.password-too-short':
+    'Le mot de passe doit contenir au moins 4 caractères',
 
   // InviteMemberForm
   'pages.family.InviteMemberForm.invite-member': 'Inviter un membre',

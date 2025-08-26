@@ -38,7 +38,9 @@ export const PageContainer: FC<PageContainerProps> = ({
   };
   return (
     <div className={clsx(VARIANT_STYLES[variant], GRADIENT_STYLES[gradient])}>
-      <div className={CONTAINER_STYLES[variant]}>{children}</div>
+      <div className={clsx(CONTAINER_STYLES[variant], 'flex flex-col gap-2')}>
+        {children}
+      </div>
     </div>
   );
 };

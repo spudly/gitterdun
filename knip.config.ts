@@ -7,7 +7,6 @@ const config: KnipConfig = {
     '.': {
       ignoreDependencies: [
         'husky', // Used by Git hooks, not imported
-        'ts-jest', // Used in some environments; referenced by tooling but not imported in source
       ],
     },
 
@@ -19,7 +18,6 @@ const config: KnipConfig = {
       ignoreDependencies: [
         '@babel/preset-typescript', // Used by jest transform via babelConfig in web/jest.config.ts
         'babel-plugin-dynamic-import-node', // Used by jest transform via babelConfig in web/jest.config.ts
-        'ts-jest', // Present for Jest TS support; not directly imported in project files
       ],
     },
 

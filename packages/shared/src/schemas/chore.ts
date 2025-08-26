@@ -7,6 +7,7 @@ export const ChoreSchema = z.object({
   point_reward: z.number().int().min(0),
   bonus_points: z.number().int().min(0).default(0),
   penalty_points: z.number().int().min(0).default(0),
+  start_date: z.iso.datetime().optional(),
   due_date: z.iso.datetime().optional(),
   recurrence_rule: z.string().optional(),
   chore_type: z
@@ -34,6 +35,7 @@ export const CreateChoreSchema = z.object({
   point_reward: z.number().int().min(0),
   bonus_points: z.number().int().min(0).optional().default(0),
   penalty_points: z.number().int().min(0).optional().default(0),
+  start_date: z.iso.datetime().optional(),
   due_date: z.iso.datetime().optional(),
   recurrence_rule: z.string().optional(),
   chore_type: z
@@ -51,6 +53,7 @@ export const UpdateChoreSchema = z.object({
   point_reward: z.number().int().min(0).optional(),
   bonus_points: z.number().int().min(0).optional(),
   penalty_points: z.number().int().min(0).optional(),
+  start_date: z.iso.datetime().optional(),
   due_date: z.iso.datetime().optional(),
   recurrence_rule: z.string().optional(),
   chore_type: z
