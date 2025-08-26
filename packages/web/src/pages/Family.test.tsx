@@ -52,6 +52,45 @@ describe('family page', () => {
       screen.getByText('Please log in to manage your family.'),
     ).toBeInTheDocument();
   });
+
+  test('serves as the primary family management interface for authenticated users', async () => {
+    const Wrapper = createWrapper({i18n: true, queryClient: true});
+    render(wrap(<Family />), {wrapper: Wrapper});
+
+    // Should provide all core family management features
+    await expect(
+      screen.findByText('Your Families'),
+    ).resolves.toBeInTheDocument();
+
+    // Should allow family creation
+    expect(screen.getByPlaceholderText('New family name')).toBeInTheDocument();
+    expect(
+      screen.getAllByRole('button', {name: 'Create'})[0],
+    ).toBeInTheDocument();
+
+    // Should show family selector
+    expect(screen.getByRole('combobox')).toBeInTheDocument();
+  });
+
+  test('provides complete family management functionality when family is selected', async () => {
+    const Wrapper = createWrapper({i18n: true, queryClient: true});
+    render(wrap(<Family />), {wrapper: Wrapper});
+
+    await screen.findByText('Your Families');
+
+    // Should provide all core family management features even without selecting a family
+    expect(screen.getByPlaceholderText('New family name')).toBeInTheDocument();
+    expect(
+      screen.getAllByRole('button', {name: 'Create'})[0],
+    ).toBeInTheDocument();
+    expect(screen.getByRole('combobox')).toBeInTheDocument();
+
+    // Note: Member management sections are only visible when a family is selected
+    // Since our mock returns a family with id: 1, the Family component should
+    // automatically select it via useEffect, making members section visible
+    await expect(screen.findByText('Members')).resolves.toBeInTheDocument();
+  });
+
   test('renders section title', async () => {
     await act(async () => {
       const Wrapper = createWrapper({i18n: true, queryClient: true});
