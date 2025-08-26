@@ -1,8 +1,8 @@
-import type {FC, ReactNode} from 'react';
+import type {FC} from 'react';
 import {Suspense, lazy} from 'react';
-import {Routes as RouterRoutes, Route, Navigate} from 'react-router-dom';
+import {Routes as RouterRoutes, Route} from 'react-router-dom';
 import {Spinner} from './widgets/Spinner';
-import {useUser} from './hooks/useUser.js';
+import {ProtectedRoute} from './ProtectedRoute.js';
 
 const Dashboard = lazy(async () => import('./pages/Dashboard'));
 const Chores = lazy(async () => import('./pages/Chores'));
@@ -12,22 +12,13 @@ const Admin = lazy(async () => import('./pages/Admin'));
 const Login = lazy(async () => import('./pages/Login'));
 const ForgotPassword = lazy(async () => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(async () => import('./pages/ResetPassword'));
+const Register = lazy(async () => import('./pages/Register'));
 const Family = lazy(async () => import('./pages/Family'));
 const AcceptInvitation = lazy(async () => import('./pages/AcceptInvitation'));
 const Demos = lazy(async () => import('./pages/Demos'));
 const Landing = lazy(async () => import('./pages/Landing'));
 
-type ProtectedRouteProps = {readonly children: ReactNode};
-const ProtectedRoute: FC<ProtectedRouteProps> = ({children}) => {
-  const {user, isLoading} = useUser();
-  if (isLoading) {
-    return <Spinner />;
-  }
-  if (!user) {
-    return <Navigate replace to="/landing" />;
-  }
-  return <>{children}</>;
-};
+// moved to ProtectedRoute.tsx
 
 export const Routes: FC = () => {
   return (
@@ -83,6 +74,8 @@ export const Routes: FC = () => {
         <Route element={<ForgotPassword />} path="/forgot-password" />
 
         <Route element={<ResetPassword />} path="/reset-password" />
+
+        <Route element={<Register />} path="/register" />
 
         <Route
           element={

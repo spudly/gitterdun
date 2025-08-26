@@ -30,7 +30,7 @@ type ProcessChoresParams = {
 const getChoresCount = (query: string, params: Array<string | number>) => {
   const countQuery = query.replace(
     /SELECT[\s\S]*?FROM/u,
-    'SELECT COUNT(*) as total FROM',
+    'SELECT COUNT(*) as count FROM',
   );
   const totalRow = db.prepare(countQuery).get(...params);
   const {count: total} = CountRowSchema.parse(totalRow);

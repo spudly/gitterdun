@@ -39,6 +39,10 @@ jest.mock<typeof import('./pages/Login')>('./pages/Login', () => ({
   __esModule: true,
   default: () => <div>Mock Login</div>,
 }));
+jest.mock<typeof import('./pages/Register')>('./pages/Register', () => ({
+  __esModule: true,
+  default: () => <div>Mock Register</div>,
+}));
 jest.mock<typeof import('./pages/ForgotPassword')>(
   './pages/ForgotPassword',
   () => ({__esModule: true, default: () => <div>Mock Forgot Password</div>}),
@@ -89,6 +93,7 @@ describe('routes', () => {
     ['/leaderboard', 'Mock Leaderboard'],
     ['/admin', 'Mock Admin'],
     ['/login', 'Mock Login'],
+    ['/register', 'Mock Register'],
     ['/forgot-password', 'Mock Forgot Password'],
     ['/reset-password', 'Mock Reset Password'],
     ['/family', 'Mock Family'],
@@ -103,8 +108,10 @@ describe('routes', () => {
 
 describe('access control', () => {
   test('redirects unauthenticated users to landing for protected routes', async () => {
-    const {useUser} = require('./hooks/useUser') as {useUser: jest.Mock};
-    useUser.mockImplementation(() => ({user: null, isLoading: false}));
+    const mod = await import('./hooks/useUser');
+    jest
+      .mocked(mod.useUser)
+      .mockImplementation(() => ({user: null, isLoading: false}));
     await renderAtPath('/goals');
     await expect(
       screen.findByText('Mock Landing'),
@@ -112,8 +119,10 @@ describe('access control', () => {
   });
 
   test('allows authenticated users to access protected routes', async () => {
-    const {useUser} = require('./hooks/useUser') as {useUser: jest.Mock};
-    useUser.mockImplementation(() => ({user: {id: 1}, isLoading: false}));
+    const mod = await import('./hooks/useUser');
+    jest
+      .mocked(mod.useUser)
+      .mockImplementation(() => ({user: {id: 1}, isLoading: false}));
     await renderAtPath('/goals');
     await expect(screen.findByText('Mock Goals')).resolves.toBeInTheDocument();
   });

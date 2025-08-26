@@ -73,9 +73,14 @@ describe('user schemas', () => {
     expect(result.success).toBe(false);
   });
 
-  test('loginSchema should validate login data', () => {
+  test('loginSchema should validate email login', () => {
     const validLogin = {email: 'user@example.com', password: 'password123'};
+    const result = LoginSchema.safeParse(validLogin);
+    expect(result.success).toBe(true);
+  });
 
+  test('loginSchema should validate username login', () => {
+    const validLogin = {username: 'user1', password: 'password123'};
     const result = LoginSchema.safeParse(validLogin);
     expect(result.success).toBe(true);
   });

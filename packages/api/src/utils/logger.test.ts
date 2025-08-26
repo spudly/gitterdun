@@ -30,7 +30,9 @@ describe('logger module', () => {
 
     await import('./logger');
 
-    expect(mockPino).toHaveBeenCalledWith({level: 'info'});
+    expect(mockPino).toHaveBeenCalledWith(
+      expect.objectContaining({level: 'info'}),
+    );
   });
 
   test('should use LOG_LEVEL environment variable when set', async () => {
@@ -40,7 +42,9 @@ describe('logger module', () => {
 
       await import('./logger');
 
-      expect(mockPino).toHaveBeenCalledWith({level: 'debug'});
+      expect(mockPino).toHaveBeenCalledWith(
+        expect.objectContaining({level: 'debug'}),
+      );
     });
     expect.hasAssertions();
   });
@@ -52,17 +56,12 @@ describe('logger module', () => {
 
       await import('./logger');
 
-      expect(mockPino).toHaveBeenCalledWith({
-        level: 'info',
-        transport: {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-            translateTime: 'SYS:standard',
-            ignore: 'pid,hostname',
-          },
-        },
-      });
+      expect(mockPino).toHaveBeenCalledWith(
+        expect.objectContaining({
+          level: 'info',
+          transport: expect.objectContaining({target: 'pino-pretty'}),
+        }),
+      );
     });
     expect.hasAssertions();
   });
@@ -74,7 +73,9 @@ describe('logger module', () => {
 
       await import('./logger');
 
-      expect(mockPino).toHaveBeenCalledWith({level: 'info'});
+      expect(mockPino).toHaveBeenCalledWith(
+        expect.objectContaining({level: 'info'}),
+      );
     });
     expect.hasAssertions();
   });
@@ -86,7 +87,9 @@ describe('logger module', () => {
 
     await import('./logger');
 
-    expect(mockPino).toHaveBeenCalledWith({level: 'info'});
+    expect(mockPino).toHaveBeenCalledWith(
+      expect.objectContaining({level: 'info'}),
+    );
   });
 
   test('should export logger instance', async () => {

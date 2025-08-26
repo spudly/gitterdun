@@ -15,10 +15,26 @@ export default {
   'pages.Login.logging-in': 'Ogging-lay in...',
   'pages.Login.login-failed': 'Ogin-lay ailed-fay',
   'pages.Login.forgot-password': 'Orgot-fay assword-pay?',
-  'pages.Login.register-admin': 'Egister-ray (Admin-way)',
+  'pages.Login.register': 'Egister-ray',
   'pages.Login.login': 'Ogin-lay',
   'pages.Login.email': 'Email-way',
   'pages.Login.password': 'Assword-pay',
+
+  // Landing
+  'pages.Landing.title': 'Elcome-way to Oregitterdun-gay',
+  'pages.Landing.subtitle':
+    'Organize-way ores-chay. Otivate-may our-yay amily-fay. Ave-hay un-fay ogether-tay.',
+  'pages.Landing.login': 'Ogin-lay',
+  'pages.Landing.register': 'Egister-ray',
+
+  // Register
+  'pages.Register.register': 'Egister-ray',
+  'pages.Register.registering': 'Egistering-ray...',
+  'pages.Register.registration-failed': 'Egistration-ray ailed-fay',
+  'pages.Register.username': 'Ername-usay',
+  'pages.Register.email': 'Email-way',
+  'pages.Register.password': 'Assword-pay',
+
   'pages.ForgotPassword.forgot-password': 'Orgot-fay Assword-pay',
   'forgotPassword.submit': 'End-say eset-ray ink-lay',
   'pages.ForgotPassword.if-the-email-exists-a-reset-li':
@@ -81,6 +97,7 @@ export default {
   'progress.label': 'Ogress-pray',
   'membersList.userWithEmail': '{username} ({email})',
   'datatable.loading': 'Oading-lay...',
+  'admin.users.delete': 'Elete-day',
   'pages.Leaderboard.points-pts': '{points} ts-pay',
   'pages.admin.AdminInvitations.could-not-create-invitation-pl':
     'Ould-cay ot-nay eate-cray invitation-way. Ease-play y-tray again-way.',

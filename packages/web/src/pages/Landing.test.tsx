@@ -24,7 +24,7 @@ describe('landing page', () => {
     );
     expect(screen.getByRole('link', {name: /register/i})).toHaveAttribute(
       'href',
-      '/admin',
+      '/register',
     );
   });
 });

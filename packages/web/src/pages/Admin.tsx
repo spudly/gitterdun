@@ -16,6 +16,7 @@ import {FormattedMessage, useIntl} from 'react-intl';
 import {AdminInvitations} from './admin/AdminInvitations.js';
 import {AdminStats} from './admin/AdminStats.js';
 import {AdminChoresManagement} from './admin/AdminChoresManagement.js';
+import {AdminUsers} from './admin/AdminUsers.js';
 
 const useAdminSetup = () => {
   const {user} = useUser();
@@ -100,6 +101,7 @@ const Admin: FC = () => {
 
         <AdminStats chores={chores} />
         <AdminChoresManagement chores={chores} />
+        <AdminUsers />
       </Stack>
     </PageContainer>
   );

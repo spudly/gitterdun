@@ -3,7 +3,7 @@ import {z} from 'zod';
 export const UserSchema = z.object({
   id: z.number(),
   username: z.string().min(1).max(50),
-  email: z.email().max(255),
+  email: z.email().max(255).nullable(),
   role: z.enum(['admin', 'user']),
   points: z.number().int().min(0),
   streak_count: z.number().int().min(0),
@@ -13,8 +13,8 @@ export const UserSchema = z.object({
 
 export const CreateUserSchema = z.object({
   username: z.string().min(1).max(50),
-  email: z.email().max(255),
-  password: z.string().min(6),
+  email: z.email().max(255).optional(),
+  password: z.string().min(4),
   role: z.enum(['admin', 'user']).optional().default('user'),
 });
 

@@ -15,10 +15,25 @@ export default {
   'pages.Login.logging-in': 'Connexion…',
   'pages.Login.login-failed': 'Échec de la connexion',
   'pages.Login.forgot-password': 'Mot de passe oublié ?',
-  'pages.Login.register-admin': 'Inscription (Admin)',
+  'pages.Login.register': 'Inscription',
   'pages.Login.login': 'Connexion',
   'pages.Login.email': 'E-mail',
   'pages.Login.password': 'Mot de passe',
+
+  // Landing
+  'pages.Landing.title': 'Bienvenue sur Gitterdun',
+  'pages.Landing.subtitle':
+    'Organisez les corvées. Motivez votre famille. Amusez-vous ensemble.',
+  'pages.Landing.login': 'Connexion',
+  'pages.Landing.register': 'Inscription',
+
+  // Register
+  'pages.Register.register': 'Inscription',
+  'pages.Register.registering': 'Inscription…',
+  'pages.Register.registration-failed': 'Échec de l’inscription',
+  'pages.Register.username': 'Nom d’utilisateur',
+  'pages.Register.email': 'E-mail',
+  'pages.Register.password': 'Mot de passe',
 
   'pages.ForgotPassword.forgot-password': 'Mot de passe oublié',
   'forgotPassword.submit': 'Envoyer le lien de réinitialisation',
@@ -90,6 +105,7 @@ export default {
   'progress.label': 'Progression',
   'membersList.userWithEmail': '{username} ({email})',
   'datatable.loading': 'Chargement…',
+  'admin.users.delete': 'Supprimer',
 
   'pages.admin.AdminInvitations.could-not-create-invitation-pl':
     'Impossible de créer l’invitation. Veuillez réessayer.',

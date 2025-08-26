@@ -30,7 +30,7 @@ const Landing: FC = () => {
           <TextLink to="/login">
             <FormattedMessage {...messages.loginCta} />
           </TextLink>
-          <TextLink to="/admin">
+          <TextLink to="/register">
             <FormattedMessage {...messages.registerCta} />
           </TextLink>
         </Stack>

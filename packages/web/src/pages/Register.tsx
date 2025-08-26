@@ -1,6 +1,7 @@
 import type {FC} from 'react';
 import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {defineMessages, useIntl} from 'react-intl';
 import {useUser} from '../hooks/useUser.js';
 import {FormCard} from '../widgets/FormCard.js';
 import {FormField} from '../widgets/FormField.js';
@@ -9,38 +10,45 @@ import {Button} from '../widgets/Button.js';
 import {Alert} from '../widgets/Alert.js';
 import {Stack} from '../widgets/Stack.js';
 import {useToast} from '../widgets/ToastProvider.js';
-import {TextLink} from '../widgets/TextLink.js';
-import {FormattedMessage, defineMessages, useIntl} from 'react-intl';
 
 const messages = defineMessages({
-  title: {defaultMessage: 'Login', id: 'pages.Login.login'},
-  failed: {defaultMessage: 'Login failed', id: 'pages.Login.login-failed'},
-  email: {defaultMessage: 'Username or Email', id: 'pages.Login.email'},
-  password: {defaultMessage: 'Password', id: 'pages.Login.password'},
-  submitting: {defaultMessage: 'Logging in...', id: 'pages.Login.logging-in'},
-  submit: {defaultMessage: 'Login', id: 'pages.Login.login'},
-  forgot: {
-    defaultMessage: 'Forgot password?',
-    id: 'pages.Login.forgot-password',
+  title: {defaultMessage: 'Register', id: 'pages.Register.register'},
+  submitting: {
+    defaultMessage: 'Registering...',
+    id: 'pages.Register.registering',
   },
-  registerAdmin: {defaultMessage: 'Register', id: 'pages.Login.register'},
+  submit: {defaultMessage: 'Register', id: 'pages.Register.register'},
+  failed: {
+    defaultMessage: 'Registration failed',
+    id: 'pages.Register.registration-failed',
+  },
+  username: {defaultMessage: 'Username', id: 'pages.Register.username'},
+  email: {defaultMessage: 'Email', id: 'pages.Register.email'},
+  password: {defaultMessage: 'Password', id: 'pages.Register.password'},
 });
 
-const Login: FC = () => {
-  const {login, isLoggingIn, loginError} = useUser();
+const Register: FC = () => {
+  const {register, isRegistering, registerError} = useUser();
   const intl = useIntl();
   const {safeAsync} = useToast();
+  const navigate = useNavigate();
+
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState<string | null>(null);
-  const navigate = useNavigate();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setMessage(null);
     const run = safeAsync(
       async () => {
-        await login(email, password);
+        const trimmedEmail = email.trim();
+        const payload =
+          trimmedEmail !== ''
+            ? {username, email: trimmedEmail, password}
+            : {username, password};
+        await register(payload);
         await navigate('/');
       },
       intl.formatMessage(messages.failed),
@@ -54,17 +62,27 @@ const Login: FC = () => {
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
           <FormField
-            htmlFor="email"
-            label={intl.formatMessage(messages.email)}
+            htmlFor="username"
+            label={intl.formatMessage(messages.username)}
             required
           >
+            <TextInput
+              id="username"
+              onChange={value => {
+                setUsername(value);
+              }}
+              required
+              value={username}
+            />
+          </FormField>
+
+          <FormField htmlFor="email" label={intl.formatMessage(messages.email)}>
             <TextInput
               id="email"
               onChange={value => {
                 setEmail(value);
               }}
-              required
-              type="text"
+              type="email"
               value={email}
             />
           </FormField>
@@ -89,27 +107,19 @@ const Login: FC = () => {
             <Alert type="error">{message}</Alert>
           ) : null}
 
-          {loginError ? <Alert type="error">{loginError.message}</Alert> : null}
+          {registerError ? (
+            <Alert type="error">{registerError.message}</Alert>
+          ) : null}
 
-          <Button disabled={isLoggingIn} fullWidth type="submit">
-            {isLoggingIn
+          <Button disabled={isRegistering} fullWidth type="submit">
+            {isRegistering
               ? intl.formatMessage(messages.submitting)
               : intl.formatMessage(messages.submit)}
           </Button>
         </Stack>
       </form>
-
-      <Stack gap="sm">
-        <TextLink to="/forgot-password">
-          <FormattedMessage {...messages.forgot} />
-        </TextLink>
-
-        <TextLink to="/register">
-          <FormattedMessage {...messages.registerAdmin} />
-        </TextLink>
-      </Stack>
     </FormCard>
   );
 };
 
-export default Login;
+export default Register;

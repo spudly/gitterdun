@@ -81,6 +81,12 @@ describe('login page', () => {
     // Test successful submission by verifying no error messages appear
     expect(screen.queryByText(/Login failed/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+    // has link to register
+    expect(screen.getByRole('link', {name: /register/i})).toHaveAttribute(
+      'href',
+      '/register',
+    );
   });
 
   // Success branch is exercised by the render-and-submit test above

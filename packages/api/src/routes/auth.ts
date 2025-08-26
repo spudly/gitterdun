@@ -28,11 +28,14 @@ import {
 const router = express.Router();
 
 router.post('/login', async (req, res) => {
-  const {email, password} = LoginSchema.parse(req.body);
-  const user = await authenticateUser(email, password);
+  const parsed = LoginSchema.parse(req.body) as
+    | {email: string; password: string}
+    | {username: string; password: string};
+  const user = await authenticateUser(parsed, parsed.password);
 
   createLoginSession(res, user.id);
-  const response = prepareLoginResponse(user, email);
+  const identifier = 'email' in parsed ? parsed.email : parsed.username;
+  const response = prepareLoginResponse(user, identifier);
   res.json(response);
 });
 
@@ -40,7 +43,11 @@ router.post('/login', async (req, res) => {
 
 router.post('/register', async (req, res) => {
   const {username, email, password, role} = validateRegistrationData(req.body);
-  const validatedUser = await createNewUser({username, email, password, role});
+  const validatedUser = await createNewUser(
+    email !== undefined
+      ? {username, email, password, role}
+      : {username, password, role},
+  );
 
   logger.info(`New user registered: ${email}`);
   res

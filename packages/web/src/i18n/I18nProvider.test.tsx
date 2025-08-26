@@ -109,7 +109,7 @@ describe('i18nProvider', () => {
       'pages.Login.password',
       'pages.Login.logging-in',
       'pages.Login.forgot-password',
-      'pages.Login.register-admin',
+      'pages.Login.register',
     ];
     for (const id of expected) {
       expect(keys).toContain(id);

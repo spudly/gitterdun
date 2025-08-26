@@ -14,7 +14,7 @@ const isNoDataSuccess = (value: unknown): value is typeof NO_DATA_SUCCESS => {
     return false;
   }
   // At this point, value has an __noData property of unknown type
-  return value.__noData === true;
+  return (value as {__noData?: unknown}).__noData === true;
 };
 
 type UserQueryData = User | null | typeof NO_DATA_SUCCESS;
@@ -49,6 +49,7 @@ const processRawUserData = (
 };
 
 type RegisterParams =
+  | {username: string; password: string}
   | {username: string; email: string; password: string}
   | {username: string; email: string; password: string; role: string};
 
@@ -99,8 +100,12 @@ export const useUser = () => {
     user,
     isLoading,
     error,
-    login: async (email: string, password: string) =>
-      loginMutation.mutateAsync({email, password}),
+    login: async (identifier: string, password: string) =>
+      loginMutation.mutateAsync(
+        identifier.includes('@')
+          ? {email: identifier, password}
+          : {username: identifier, password},
+      ),
     register: async (params: RegisterParams) =>
       registerMutation.mutateAsync(params),
     logout: async () => logoutMutation.mutateAsync(),

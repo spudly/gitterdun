@@ -7,6 +7,8 @@ alwaysApply: true
 1. Start by creating unit tests to verify the desired behavior.
 2. Run the new unit tests and verify that they are failing (because you haven't implemented the new code yet).
 3. Implement the new code.
+   1. For the web package, any user-facing text or dates should be internationalized.
+   2. Adhere to the configured eslint rules. ESLint errors and warnings should not simply be ignored.
 4. Run the new unit tests again to verify that the tests are now passing. If they are not, make changes to the new code or new tests as needed until the code is fully implemented according to the request and tests are passing with 100% code coverage across all lines, branches, functions, and statements.
 5. Check the new code with `npm run ai:check` to ensure that you didn't introduce any new issues. If any issues are reported, you should continue iterating on the code and it's associated tests until this script reports no errors or warnings.
 6. Use prettier to format the new code.

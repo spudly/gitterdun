@@ -2,8 +2,15 @@ import express from 'express';
 import {logger} from '../utils/logger';
 import {ZodError} from 'zod';
 
-const sendZodErrorResponse = (res: express.Response): void => {
-  res.status(400).json({success: false, error: 'Invalid request data'});
+const sendZodErrorResponse = (res: express.Response, err: ZodError): void => {
+  const isProd = process.env['NODE_ENV'] === 'production';
+  res
+    .status(400)
+    .json(
+      isProd
+        ? {success: false, error: 'Invalid request data'}
+        : {success: false, error: 'Invalid request data', details: err.issues},
+    );
 };
 
 const sendJsonParseErrorResponse = (res: express.Response): void => {
@@ -41,7 +48,7 @@ const handleError = (err: unknown, res: express.Response): void => {
   logger.error({error: err}, 'Error');
 
   if (err instanceof ZodError) {
-    sendZodErrorResponse(res);
+    sendZodErrorResponse(res, err);
     return;
   }
 
@@ -71,5 +78,6 @@ const notFoundHandler = (
 
 export const setupErrorHandling = (app: express.Express): void => {
   app.use(globalErrorHandler);
-  app.use('/api/*path', notFoundHandler);
+  // Catch-all 404 for any /api/* path not already handled
+  app.use('/api', notFoundHandler);
 };
