@@ -1,7 +1,12 @@
 import type {Rule} from 'eslint';
-import type {Literal} from 'estree';
 
-type JSXAttribute = {
+// Using simple interfaces for AST node types to avoid external dependencies
+interface LiteralNode {
+  type: 'Literal';
+  value: string | number | boolean | RegExp | null;
+}
+
+interface JSXAttributeNode {
   type: 'JSXAttribute';
   name?: {
     type: 'JSXIdentifier';
@@ -17,7 +22,7 @@ type JSXAttribute = {
       }>;
     };
   };
-};
+}
 
 /**
  * Detects if a string contains Tailwind CSS margin classes
@@ -48,7 +53,7 @@ const hasTailwindMarginClasses = (classNameValue: string): Array<string> => {
  */
 const reportViolatingClasses = (
   context: Rule.RuleContext,
-  node: JSXAttribute | Literal,
+  node: JSXAttributeNode | LiteralNode,
   violatingClasses: Array<string>
 ): void => {
   if (violatingClasses.length > 0) {
@@ -68,8 +73,8 @@ const reportViolatingClasses = (
  */
 const handleLiteralValue = (
   context: Rule.RuleContext,
-  node: JSXAttribute,
-  literal: Literal
+  node: JSXAttributeNode,
+  literal: LiteralNode
 ): void => {
   if (typeof literal.value === 'string') {
     const violatingClasses = hasTailwindMarginClasses(literal.value);
@@ -82,8 +87,8 @@ const handleLiteralValue = (
  */
 const handleTemplateLiteral = (
   context: Rule.RuleContext,
-  node: JSXAttribute,
-  expression: NonNullable<JSXAttribute['value']>['expression']
+  node: JSXAttributeNode,
+  expression: any
 ): void => {
   if (expression && expression.type === 'TemplateLiteral' && expression.quasis) {
     for (const quasi of expression.quasis) {
@@ -112,7 +117,7 @@ export const noTailwindMargins: Rule.RuleModule = {
 
   create(context) {
     return {
-      JSXAttribute(node: JSXAttribute) {
+      JSXAttribute(node: any) {
         // Only check className and class attributes
         if (!node.name) {
           return;
@@ -125,7 +130,7 @@ export const noTailwindMargins: Rule.RuleModule = {
 
         // Handle string literal values
         if (node.value && node.value.type === 'Literal') {
-          const literal = node.value as Literal;
+          const literal = node.value as LiteralNode;
           handleLiteralValue(context, node, literal);
         }
 
@@ -137,7 +142,7 @@ export const noTailwindMargins: Rule.RuleModule = {
       },
 
       // Also check regular string literals for non-JSX contexts
-      Literal(node: Literal) {
+      Literal(node: any) {
         if (typeof node.value === 'string') {
           // Simple heuristic: if it looks like CSS classes (contains common Tailwind patterns)
           const {value} = node;
