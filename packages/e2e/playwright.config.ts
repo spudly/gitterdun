@@ -18,7 +18,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:8000',
+    baseURL: 'http://localhost:8001',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -54,15 +54,21 @@ export default defineConfig({
   webServer: [
     {
       command: 'npm run dev:api',
-      url: 'http://localhost:8001/api/health',
+      url: 'http://localhost:8000/api/health',
       reuseExistingServer: process.env['CI'] !== 'true',
       cwd: '../..',
+      timeout: 120 * 1000,
+      stderr: 'pipe',
+      stdout: 'pipe',
     },
     {
       command: 'npm run dev:web',
-      url: 'http://localhost:8000',
+      url: 'http://localhost:8001',
       reuseExistingServer: process.env['CI'] !== 'true',
       cwd: '../..',
+      timeout: 120 * 1000,
+      stderr: 'pipe',
+      stdout: 'pipe',
     },
   ],
 });

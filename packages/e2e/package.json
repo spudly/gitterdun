@@ -10,7 +10,7 @@
     "test:report": "playwright show-report",
     "install": "playwright install",
     "install:browsers": "playwright install",
-    "ai:check": "echo 'E2E tests don't need ai:check - they validate integration'"
+    "ai:check": "echo \"E2E tests don't need ai:check - they validate integration\""
   },
   "devDependencies": {
     "@playwright/test": "^1.47.0",

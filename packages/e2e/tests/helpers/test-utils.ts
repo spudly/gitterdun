@@ -3,8 +3,6 @@ import {expect} from '@playwright/test';
 
 export type UserCredentials = {username: string; password: string};
 
-
-
 /**
  * Register and login a user with the given suffix
  */
@@ -79,19 +77,25 @@ export const setupFamily = async (page: Page) => {
 };
 
 /**
+ * Helper to add a child to an existing family
+ */
+const addChildToFamily = async (
+  page: Page,
+  username: string,
+  password: string,
+) => {
+  await page.fill('input#child-username', username);
+  await page.fill('input#child-password', password);
+  await page.click('button:has-text("Create Child")');
+  await expect(page.locator(`text=${username}`)).toBeVisible();
+};
+
+/**
  * Create a family setup with multiple children for leaderboard testing
  */
 export const setupFamilyWithChildren = async (page: Page) => {
   const timestamp = Date.now() + Math.random();
-  const parentUsername = `parent${timestamp}`;
-  const parentPassword = 'parentpassword123';
-
-  // Register parent user
-  await page.goto('/register');
-  await page.fill('#username', parentUsername);
-  await page.fill('#password', parentPassword);
-  await page.click('button[type="submit"]');
-  await expect(page).toHaveURL('/');
+  const parent = await registerAndLogin(page, `_parent_${timestamp}`);
 
   // Create family
   await page.goto('/family');
@@ -100,26 +104,18 @@ export const setupFamilyWithChildren = async (page: Page) => {
   await page.click('button:has-text("Create")');
   await expect(page.locator('text=Members')).toBeVisible();
 
-  // Add first child
+  // Add children
   const child1Username = `child1_${timestamp}`;
-  const child1Password = 'childpassword123';
-  await page.fill('input#child-username', child1Username);
-  await page.fill('input#child-password', child1Password);
-  await page.click('button:has-text("Create Child")');
-  await expect(page.locator(`text=${child1Username}`)).toBeVisible();
-
-  // Add second child
   const child2Username = `child2_${timestamp}`;
-  const child2Password = 'childpassword123';
-  await page.fill('input#child-username', child2Username);
-  await page.fill('input#child-password', child2Password);
-  await page.click('button:has-text("Create Child")');
-  await expect(page.locator(`text=${child2Username}`)).toBeVisible();
+  const childPassword = 'childpassword123';
+
+  await addChildToFamily(page, child1Username, childPassword);
+  await addChildToFamily(page, child2Username, childPassword);
 
   return {
-    parent: {username: parentUsername, password: parentPassword},
-    child1: {username: child1Username, password: child1Password},
-    child2: {username: child2Username, password: child2Password},
+    parent,
+    child1: {username: child1Username, password: childPassword},
+    child2: {username: child2Username, password: childPassword},
     familyName,
   };
 };
