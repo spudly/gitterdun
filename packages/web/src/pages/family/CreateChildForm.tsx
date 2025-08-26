@@ -155,7 +155,7 @@ export const CreateChildForm: FC<CreateChildFormProps> = ({
             handleCreateChild({
               familyId: selectedFamilyId,
               username: parsed.data.username,
-              email: parsed.data.email ?? undefined,
+              email: parsed.data.email,
               password: parsed.data.password,
             });
             setChildUsername('');

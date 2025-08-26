@@ -2,14 +2,11 @@ import {FamilySchema, FamilyMemberSchema, IdRowSchema} from '@gitterdun/shared';
 import bcrypt from 'bcryptjs';
 import db from '../lib/db';
 import {sql} from './sql';
+import {removeAllMembershipsForUser} from './familyMembership';
 
 export const createFamily = (name: string, userId: number) => {
   // Enforce single-family membership: remove any existing memberships first
-  db.prepare(sql`
-    DELETE FROM family_members
-    WHERE
-      user_id = ?
-  `).run(userId);
+  removeAllMembershipsForUser(userId);
 
   const familyRow = db
     .prepare(sql`

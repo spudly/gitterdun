@@ -1,5 +1,6 @@
 import db from '../lib/db';
 import {sql} from './sql';
+import {removeAllMembershipsForUser} from './familyMembership';
 
 type CreateInvitationParams = {
   token: string;
@@ -39,11 +40,7 @@ export const ensureFamilyMembership = (
   role: string,
 ): void => {
   // Enforce single-family membership: remove any existing memberships first
-  db.prepare(sql`
-    DELETE FROM family_members
-    WHERE
-      user_id = ?
-  `).run(userId);
+  removeAllMembershipsForUser(userId);
 
   db.prepare(sql`
     INSERT INTO

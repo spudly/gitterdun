@@ -7,6 +7,8 @@ import {PageContainer} from '../widgets/PageContainer.js';
 import {FormSection} from '../widgets/FormSection.js';
 import {GridContainer} from '../widgets/GridContainer.js';
 import {Stack} from '../widgets/Stack.js';
+import {TextInput} from '../widgets/TextInput.js';
+import {Button} from '../widgets/Button.js';
 import {useUser} from '../hooks/useUser.js';
 import {FamilyMembers} from './family/FamilyMembers.js';
 import {CreateChildForm} from './family/CreateChildForm.js';
@@ -95,10 +97,9 @@ const Family: FC = () => {
         {familyOptions.length === 0 ? (
           <Stack gap="md">
             <div>
-              <input
-                className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                onChange={event => {
-                  setNewFamilyName(event.target.value);
+              <TextInput
+                onChange={val => {
+                  setNewFamilyName(val);
                 }}
                 placeholder={intl.formatMessage({
                   defaultMessage: 'New family name',
@@ -107,8 +108,7 @@ const Family: FC = () => {
                 value={newFamilyName}
               />
             </div>
-            <button
-              className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-60"
+            <Button
               onClick={() => {
                 if (newFamilyName.trim() === '') {
                   return;
@@ -116,15 +116,12 @@ const Family: FC = () => {
                 createFamilyMutation.mutate({name: newFamilyName});
                 setNewFamilyName('');
               }}
-              type="button"
             >
-              <span className="flex items-center gap-2 opacity-100">
-                {intl.formatMessage({
-                  defaultMessage: 'Create',
-                  id: 'pages.family.FamilySelector.create',
-                })}
-              </span>
-            </button>
+              {intl.formatMessage({
+                defaultMessage: 'Create',
+                id: 'pages.family.FamilySelector.create',
+              })}
+            </Button>
           </Stack>
         ) : null}
       </FormSection>
