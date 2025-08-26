@@ -15,7 +15,7 @@ export default {
   'pages.Login.logging-in': '𐐢𐐬𐐘𐐮𐐤 𐐆𐐤…',
   'pages.Login.login-failed': '𐐢𐐬𐐘𐐮𐐤 𐐙𐐩𐐮𐐢𐐯𐐼',
   'pages.Login.forgot-password': '𐐙𐐬𐐡𐐪𐐻 𐐑𐐰𐐝𐐶𐐲𐐡𐐼?',
-  'pages.Login.register-admin': '𐐡𐐯𐐖𐐮𐐝𐐻𐐲𐐡 (𐐈𐐡𐐮𐐤)',
+  'pages.Login.register': '𐐡𐐯𐐖𐐮𐐝𐐻𐐲𐐡',
   'pages.Login.login': '𐐢𐐬𐐘𐐮𐐤',
   'pages.Login.email': '𐐇𐐣𐐰𐐮𐐮𐐢',
   'pages.Login.password': '𐐑𐐰𐐝𐐶𐐲𐐡𐐼',
@@ -89,6 +89,7 @@ export default {
   'progress.label': '𐐑𐐲𐐖𐐯𐐡𐐮𐐝',
   'membersList.userWithEmail': '{username} ({email})',
   'datatable.loading': '𐐢𐐬𐐲𐐼𐐮𐐤…',
+  'admin.users.delete': '𐐗𐐮𐐣𐐣𐐯𐐝',
 
   'pages.admin.AdminInvitations.could-not-create-invitation-pl':
     '𐐗𐐲𐐭𐐮𐐼 𐐤𐐬𐐻 𐐗𐐮𐐯𐐺𐐾 𐐆𐐯𐐮𐐯𐐻𐐨𐐰𐐡𐐮𐐯𐐤. 𐐆𐐶𐐯𐐲 𐐡𐐯𐐼𐐭𐐰𐐡𐐨.',
@@ -143,4 +144,16 @@ export default {
   'pages.family.InviteMemberForm.parent': '𐐑𐐯𐐯𐐻',
   'pages.family.InviteMemberForm.child': '𐐗𐐮𐐤𐐼',
   'pages.family.InviteMemberForm.send': '𐐇𐐣𐐶𐐬𐐌𐐯',
+
+  'pages.Landing.title': '𐐎𐐮𐐻𐐻𐐯𐐡𐐼𐐲𐐡 𐐲 𐐘𐐮𐐻𐐻𐐯𐐡𐐲𐐡',
+  'pages.Landing.subtitle':
+    '𐐬𐑉𐑜𐐲𐑌𐐲𐐟 𐐗𐐬𐑉𐐯𐑊𐑇. 𐑋𐐪𐐻𐐬𐑅𐐨𐑌𐐯 𐑌𐐨𐐲𐑉 𐑁𐐰𐑋𐐨𐑊𐐨. 𐐐𐐲𐑆 𐑁𐐲𐑌 𐑑𐐯𐑒𐐯𐑉.',
+  'pages.Landing.login': '𐐢𐐬𐐘𐐮𐐤',
+  'pages.Landing.register': '𐐡𐐯𐐖𐐮𐐝𐐻𐐲𐐡',
+  'pages.Register.register': '𐐡𐐯𐐖𐐮𐐝𐐻𐐲𐐡',
+  'pages.Register.registering': '𐐡𐐯𐐖𐐮𐐝𐐻𐐮𐑌𐑜...',
+  'pages.Register.registration-failed': '𐐡𐐯𐐖𐐮𐐝𐐻𐐲𐐡 𐐙𐐩𐐮𐐢𐐯𐐼',
+  'pages.Register.username': '𐐏𐐭𐑅𐐯𐑋𐐨𐐲𐑌𐐨',
+  'pages.Register.email': '𐐇𐐣𐐰𐐮𐐮𐐢',
+  'pages.Register.password': '𐐑𐐰𐐝𐐶𐐲𐐡𐐼',
 };

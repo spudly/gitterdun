@@ -2,7 +2,7 @@
 import {z} from 'zod';
 import {apiResponseSchema as createApiResponseSchema} from '@gitterdun/shared';
 
-const API_ORIGIN = 'http://localhost:3000';
+const API_ORIGIN = 'http://localhost:8000';
 export const API_BASE_URL = `${API_ORIGIN}/api`;
 
 export type ApiResponse<T = unknown> = {

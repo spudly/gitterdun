@@ -28,7 +28,6 @@ const processChoreUpdateFields = (validatedBody: UpdateChore) => {
     const value = (validatedBody as Record<string, unknown>)[field];
     if (value !== undefined) {
       updateFields.push(`${column} = ?`);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- safe cast from validated input
       values.push(value as string | number | null);
     }
   }

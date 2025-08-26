@@ -25,7 +25,8 @@
     "lint:changed": "(git diff --name-only HEAD --diff-filter=AM && git ls-files --others --exclude-standard) | grep -E \"\\.(ts|tsx|js|jsx)$\" | sort -u | xargs -r eslint --max-warnings 0",
     "ci:check": "turbo run ci:check --output-logs=errors-only",
     "turbo:reset": "find . -name '.turbo' -type d -exec rm -rf {}",
-    "ai:check": "turbo run ai:check --output-logs=errors-only"
+    "ai:check": "turbo run ai:check --output-logs=errors-only",
+    "db:reset": "rm -f ./packages/api/data/gitterdun.db"
   },
   "devDependencies": {
     "@jest/globals": "^30.0.5",

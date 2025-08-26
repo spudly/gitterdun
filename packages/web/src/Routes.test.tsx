@@ -4,7 +4,17 @@ import {MemoryRouter} from 'react-router-dom';
 
 import {Routes} from './Routes';
 
+// Mock auth hook to allow protected route rendering by default
+jest.mock<typeof import('./hooks/useUser')>('./hooks/useUser', () => ({
+  __esModule: true,
+  useUser: jest.fn(() => ({user: {id: 1}, isLoading: false})),
+}));
+
 // Mock all lazy-loaded pages to simple components so we only test route mapping here
+jest.mock<typeof import('./pages/Landing')>('./pages/Landing', () => ({
+  __esModule: true,
+  default: () => <div>Mock Landing</div>,
+}));
 jest.mock<typeof import('./pages/Dashboard')>('./pages/Dashboard', () => ({
   __esModule: true,
   default: () => <div>Mock Dashboard</div>,
@@ -28,6 +38,10 @@ jest.mock<typeof import('./pages/Admin')>('./pages/Admin', () => ({
 jest.mock<typeof import('./pages/Login')>('./pages/Login', () => ({
   __esModule: true,
   default: () => <div>Mock Login</div>,
+}));
+jest.mock<typeof import('./pages/Register')>('./pages/Register', () => ({
+  __esModule: true,
+  default: () => <div>Mock Register</div>,
 }));
 jest.mock<typeof import('./pages/ForgotPassword')>(
   './pages/ForgotPassword',
@@ -73,11 +87,13 @@ describe('routes', () => {
 
   test.each([
     ['/', 'Mock Dashboard'],
+    ['/landing', 'Mock Landing'],
     ['/chores', 'Mock Chores'],
     ['/goals', 'Mock Goals'],
     ['/leaderboard', 'Mock Leaderboard'],
     ['/admin', 'Mock Admin'],
     ['/login', 'Mock Login'],
+    ['/register', 'Mock Register'],
     ['/forgot-password', 'Mock Forgot Password'],
     ['/reset-password', 'Mock Reset Password'],
     ['/family', 'Mock Family'],
@@ -87,5 +103,27 @@ describe('routes', () => {
   ])('renders %s -> %s', async (path, expectedText) => {
     await renderAtPath(path);
     await expect(screen.findByText(expectedText)).resolves.toBeInTheDocument();
+  });
+});
+
+describe('access control', () => {
+  test('redirects unauthenticated users to landing for protected routes', async () => {
+    const mod = await import('./hooks/useUser');
+    jest
+      .mocked(mod.useUser)
+      .mockImplementation(() => ({user: null, isLoading: false}));
+    await renderAtPath('/goals');
+    await expect(
+      screen.findByText('Mock Landing'),
+    ).resolves.toBeInTheDocument();
+  });
+
+  test('allows authenticated users to access protected routes', async () => {
+    const mod = await import('./hooks/useUser');
+    jest
+      .mocked(mod.useUser)
+      .mockImplementation(() => ({user: {id: 1}, isLoading: false}));
+    await renderAtPath('/goals');
+    await expect(screen.findByText('Mock Goals')).resolves.toBeInTheDocument();
   });
 });

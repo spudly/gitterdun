@@ -34,7 +34,7 @@ export const UserPasswordHashRowSchema = z.object({
 export const UserWithPasswordRowSchema = z.object({
   id: z.number(),
   username: z.string().min(1).max(50),
-  email: z.email().max(255),
+  email: z.email().max(255).nullable(),
   password_hash: z.string(),
   role: z.enum(['admin', 'user']),
   points: z.number().int().min(0),

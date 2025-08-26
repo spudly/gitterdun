@@ -3,19 +3,22 @@ import {z} from 'zod';
 import {api} from './apiCore';
 
 export const authApi = {
-  login: async (credentials: {email: string; password: string}) =>
+  login: async (credentials: {
+    email?: string;
+    username?: string;
+    password: string;
+  }) =>
     api.post<Record<string, unknown>>(
       '/auth/login',
       z.object({}).loose(),
       credentials,
     ),
 
-  register: async (userData: {
-    username: string;
-    email: string;
-    password: string;
-    role?: string;
-  }) =>
+  register: async (
+    userData:
+      | {username: string; password: string}
+      | {username: string; email: string; password: string; role?: string},
+  ) =>
     api.post<Record<string, unknown>>(
       '/auth/register',
       z.object({}).loose(),

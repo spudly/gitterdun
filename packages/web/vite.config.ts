@@ -12,6 +12,6 @@ export default defineConfig({
       },
     }),
   ],
-  server: {port: 3001},
+  server: {port: 8001},
   build: {rollupOptions: {input: {main: 'index.html'}}},
 });

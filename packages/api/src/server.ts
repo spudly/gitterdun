@@ -11,6 +11,7 @@ import choreRoutes from './routes/chores';
 import goalRoutes from './routes/goals';
 import leaderboardRoutes from './routes/leaderboard';
 import familyRoutes from './routes/families';
+import usersRoutes from './routes/users';
 import invitationRoutes from './routes/invitations';
 import {asError} from '@gitterdun/shared';
 import {setupErrorHandling} from './middleware/errorHandler';
@@ -20,7 +21,7 @@ dotenv.config();
 
 const appRootDir = path.resolve();
 const isProduction = process.env['NODE_ENV'] === 'production';
-const PORT = process.env['PORT'] ?? 3000;
+const PORT = process.env['PORT'] ?? 8000;
 
 const initializeApp = async (): Promise<express.Express> => {
   logger.info('Starting server initialization...');
@@ -50,7 +51,21 @@ const setupSecurityMiddleware = (app: express.Express): void => {
 
 const setupBasicMiddleware = (app: express.Express): void => {
   if (!isProduction) {
-    app.use(cors({origin: [/^http:\/\/localhost:\d+$/], credentials: true}));
+    const corsOptions: cors.CorsOptions = {
+      origin: [/^http:\/\/localhost:\d+$/],
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'X-Requested-With',
+        'Accept',
+      ],
+      optionsSuccessStatus: 204,
+    };
+    app.use(cors(corsOptions));
+    // Explicitly handle preflight for any /api/* route using a RegExp (Express 5 friendly)
+    app.options(/^\/api\/.*$/, cors(corsOptions));
   }
   app.use(express.json({limit: '10mb'}));
   app.use(express.urlencoded({extended: true, limit: '10mb'}));
@@ -69,6 +84,7 @@ const setupRoutes = (app: express.Express): void => {
   app.use('/api/leaderboard', leaderboardRoutes);
   app.use('/api/families', familyRoutes);
   app.use('/api/invitations', invitationRoutes);
+  app.use('/api/users', usersRoutes);
 
   app.get('/api/health', (_req: express.Request, res: express.Response) => {
     res.json({
@@ -82,7 +98,7 @@ const setupRoutes = (app: express.Express): void => {
 const startServer = (app: express.Express): void => {
   app.listen(Number(PORT), () => {
     logger.info(`🚀 Gitterdun server running on port ${PORT}`);
-    logger.info(`📱 Frontend: http://localhost:${PORT}`);
+    logger.info(`📱 Frontend: http://localhost:8001`);
     logger.info(`🔌 API: http://localhost:${PORT}/api`);
     logger.info(`🏥 Health: http://localhost:${PORT}/api/health`);
   });

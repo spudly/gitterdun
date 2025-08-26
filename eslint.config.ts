@@ -905,13 +905,13 @@ const eslintConfig = [
       '@typescript-eslint/no-unnecessary-type-parameters': 'warn',
       '@typescript-eslint/no-unsafe-argument': 'warn',
       '@typescript-eslint/no-unsafe-assignment': 'warn',
-      '@typescript-eslint/no-unsafe-call': 'warn',
+      '@typescript-eslint/no-unsafe-call': 'off', // fixing these errors usually makes the code worse
       '@typescript-eslint/no-unsafe-declaration-merging': 'warn',
       '@typescript-eslint/no-unsafe-enum-comparison': 'warn',
       '@typescript-eslint/no-unsafe-function-type': 'warn',
       '@typescript-eslint/no-unsafe-member-access': 'warn',
       '@typescript-eslint/no-unsafe-return': 'warn',
-      '@typescript-eslint/no-unsafe-type-assertion': 'warn',
+      '@typescript-eslint/no-unsafe-type-assertion': 'off', // fixing these errors usually makes the code worse
       '@typescript-eslint/no-unsafe-unary-minus': 'warn',
       '@typescript-eslint/no-useless-empty-export': 'warn',
       '@typescript-eslint/no-wrapper-object-types': 'warn',

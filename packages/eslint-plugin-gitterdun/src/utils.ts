@@ -3,7 +3,6 @@ import path from 'node:path';
 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- not unnecessary
 export const readJson = <TYPE>(file: string) =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- could be anything
   JSON.parse(fs.readFileSync(file, 'utf8')) as TYPE;
 
 // Extract keys from `export default { ... }` literal object

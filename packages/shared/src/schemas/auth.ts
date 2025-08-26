@@ -1,9 +1,13 @@
 import {z} from 'zod';
 
-export const LoginSchema = z.object({
-  email: z.email(),
-  password: z.string().min(1),
-});
+const IdentifierSchema = z
+  .object({email: z.email()})
+  .or(z.object({username: z.string().min(1)}));
+
+export const LoginSchema = z.intersection(
+  IdentifierSchema,
+  z.object({password: z.string().min(1)}),
+);
 
 export const ForgotPasswordRequestSchema = z.object({email: z.email()});
 

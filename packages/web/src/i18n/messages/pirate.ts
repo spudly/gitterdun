@@ -14,10 +14,26 @@ export default {
   'pages.Login.logging-in': 'Hoistin’...',
   'pages.Login.login-failed': 'Boardin’ failed',
   'pages.Login.forgot-password': 'Forgot yer secret?',
-  'pages.Login.register-admin': 'Register (Captain)',
+  'pages.Login.register': 'Register',
   'pages.Login.login': 'Login',
   'pages.Login.email': 'Parrot Mail',
   'pages.Login.password': 'Secret Code',
+
+  // Landing
+  'pages.Landing.title': 'Welcome to Gitterdun',
+  'pages.Landing.subtitle':
+    'Organize chores. Motivate yer crew. Have fun together.',
+  'pages.Landing.login': 'Login',
+  'pages.Landing.register': 'Register',
+
+  // Register
+  'pages.Register.register': 'Register',
+  'pages.Register.registering': 'Registerin’...',
+  'pages.Register.registration-failed': 'Registerin’ failed',
+  'pages.Register.username': 'Deckname',
+  'pages.Register.email': 'Parrot Mail',
+  'pages.Register.password': 'Secret Code',
+
   'pages.ForgotPassword.forgot-password': 'Forgot Yer Secret',
   'forgotPassword.submit': 'Send the rescue parrot',
   'pages.ForgotPassword.if-the-email-exists-a-reset-li':
@@ -78,6 +94,7 @@ export default {
   'progress.label': 'Progress',
   'membersList.userWithEmail': '{username} ({email})',
   'datatable.loading': 'Loadin’...',
+  'admin.users.delete': 'Scuttle',
   'pages.Leaderboard.points-pts': '{points} pts',
   'pages.admin.AdminInvitations.could-not-create-invitation-pl':
     'Couldn’t create invite. Try again.',
