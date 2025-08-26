@@ -26,21 +26,25 @@ npm run install:browsers
 ### Command Line
 
 Run all tests:
+
 ```bash
 npm test --workspace=packages/e2e
 ```
 
 Run tests with UI mode:
+
 ```bash
 npm run test:ui --workspace=packages/e2e
 ```
 
 Run tests in debug mode:
+
 ```bash
 npm run test:debug --workspace=packages/e2e
 ```
 
 Run tests in headed mode (see browser):
+
 ```bash
 npm run test:headed --workspace=packages/e2e
 ```
@@ -59,12 +63,14 @@ npm run test:e2e:debug    # Run in debug mode
 
 - `tests/auth.spec.ts` - Authentication flow tests (login, register)
 - `tests/family.spec.ts` - Family management tests (create family, add children)
-- `tests/chores.spec.ts` - Chore workflow tests (create, assign, complete, approve)
+- `tests/chores.spec.ts` - Chore workflow tests (create, assign, complete,
+  approve)
 - `tests/leaderboard.spec.ts` - Leaderboard and points system tests
 
 ### Test Data
 
-Tests use unique timestamps to avoid conflicts when running multiple times. Each test creates its own users and families to ensure isolation.
+Tests use unique timestamps to avoid conflicts when running multiple times. Each
+test creates its own users and families to ensure isolation.
 
 ## Configuration
 
@@ -72,7 +78,8 @@ The tests are configured to:
 
 - Run against `http://localhost:8000` (web) and `http://localhost:8001` (API)
 - Automatically start the development servers if not already running
-- Support multiple browsers: Chromium, Firefox, WebKit, Mobile Chrome, Mobile Safari
+- Support multiple browsers: Chromium, Firefox, WebKit, Mobile Chrome, Mobile
+  Safari
 - Take screenshots on failure
 - Generate HTML reports
 - Retry failed tests twice in CI
@@ -108,6 +115,7 @@ To debug tests locally:
 ## Browser Support
 
 Tests run on:
+
 - Desktop: Chrome, Firefox, Safari (WebKit)
 - Mobile: Chrome (Pixel 5), Safari (iPhone 12)
 
