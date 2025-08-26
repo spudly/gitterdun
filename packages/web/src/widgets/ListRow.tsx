@@ -28,10 +28,10 @@ export const ListRow: FC<ListRowProps> = ({
   return (
     <div className={clsx('px-6 py-4', className)}>
       <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          {hasLeft ? <div className="mr-3">{left}</div> : null}
+        <div className="flex items-center gap-3">
+          {hasLeft ? <div>{left}</div> : null}
 
-          <div>
+          <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-medium text-gray-900">{title}</h3>
 
@@ -39,11 +39,11 @@ export const ListRow: FC<ListRowProps> = ({
             </div>
 
             {hasDescription ? (
-              <p className="mt-1 text-sm text-gray-500">{description}</p>
+              <p className="text-sm text-gray-500">{description}</p>
             ) : null}
 
             {hasMeta ? (
-              <div className="mt-2 flex items-center space-x-4 text-sm text-gray-500">
+              <div className="flex items-center space-x-4 text-sm text-gray-500">
                 {meta}
               </div>
             ) : null}

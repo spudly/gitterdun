@@ -7,10 +7,10 @@ export const VerticalLayoutExample: FC = () => {
   return (
     <div className="max-w-md space-y-4">
       <InputGroup>
-        <div>
+        <div className="flex flex-col gap-2">
           {/* eslint-disable-next-line jsx-a11y/label-has-associated-control -- TextInput component renders an input with matching id */}
           <label
-            className="mb-2 block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-700"
             htmlFor="email"
           >
             Email Address
@@ -24,10 +24,10 @@ export const VerticalLayoutExample: FC = () => {
         </div>
       </InputGroup>
       <InputGroup helpText="Must be at least 8 characters long">
-        <div>
+        <div className="flex flex-col gap-2">
           {/* eslint-disable-next-line jsx-a11y/label-has-associated-control -- TextInput component renders an input with matching id */}
           <label
-            className="mb-2 block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-700"
             htmlFor="password"
           >
             Password
@@ -48,10 +48,10 @@ export const HorizontalLayoutExample: FC = () => {
   return (
     <div className="max-w-2xl space-y-4">
       <InputGroup layout="horizontal">
-        <div>
+        <div className="flex flex-col gap-2">
           {/* eslint-disable-next-line jsx-a11y/label-has-associated-control -- TextInput component renders an input with matching id */}
           <label
-            className="mb-2 block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-700"
             htmlFor="first-name-h"
           >
             First Name
@@ -60,10 +60,10 @@ export const HorizontalLayoutExample: FC = () => {
         </div>
       </InputGroup>
       <InputGroup layout="horizontal">
-        <div>
+        <div className="flex flex-col gap-2">
           {/* eslint-disable-next-line jsx-a11y/label-has-associated-control -- TextInput component renders an input with matching id */}
           <label
-            className="mb-2 block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-700"
             htmlFor="last-name-h"
           >
             Last Name
@@ -79,10 +79,10 @@ export const ErrorStatesExample: FC = () => {
   return (
     <div className="max-w-md space-y-4">
       <InputGroup error="Please enter a valid email address">
-        <div>
+        <div className="flex flex-col gap-2">
           {/* eslint-disable-next-line jsx-a11y/label-has-associated-control -- TextInput component renders an input with matching id */}
           <label
-            className="mb-2 block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-700"
             htmlFor="email-error"
           >
             Email
@@ -96,10 +96,10 @@ export const ErrorStatesExample: FC = () => {
         </div>
       </InputGroup>
       <InputGroup error="Password is required">
-        <div>
+        <div className="flex flex-col gap-2">
           {/* eslint-disable-next-line jsx-a11y/label-has-associated-control -- TextInput component renders an input with matching id */}
           <label
-            className="mb-2 block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-700"
             htmlFor="password-error"
           >
             Password

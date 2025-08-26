@@ -20,14 +20,14 @@ export const EmptyState: FC<EmptyStateProps> = ({
   const hasDescription = description !== null && description !== undefined;
 
   return (
-    <div className={clsx('py-12 text-center', className)}>
-      {hasIcon ? <div className="mb-4 text-gray-400">{icon}</div> : null}
+    <div className={clsx('flex flex-col items-center gap-4 py-12', className)}>
+      {hasIcon ? <div className="text-gray-400">{icon}</div> : null}
 
-      <h3 className="mb-2 text-lg font-medium text-gray-900">{title}</h3>
+      <div className="flex flex-col items-center gap-2">
+        <h3 className="text-lg font-medium text-gray-900">{title}</h3>
 
-      {hasDescription ? (
-        <p className="mb-4 text-gray-500">{description}</p>
-      ) : null}
+        {hasDescription ? <p className="text-gray-500">{description}</p> : null}
+      </div>
 
       {action}
     </div>

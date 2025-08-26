@@ -17,11 +17,8 @@ export const FormCardField: FC<FormCardFieldProps> = ({
   required = false,
 }) => {
   return (
-    <div>
-      <label
-        className="mb-2 block text-sm font-medium text-gray-700"
-        htmlFor={id}
-      >
+    <div className="flex flex-col gap-2">
+      <label className="block text-sm font-medium text-gray-700" htmlFor={id}>
         {label}
       </label>
       <TextInput

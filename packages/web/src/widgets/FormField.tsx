@@ -24,13 +24,13 @@ export const FormField: FC<FormFieldProps> = ({
   return (
     <div className={clsx('space-y-1')}>
       <label
-        className="block text-sm font-medium text-gray-700"
+        className="flex gap-1 text-sm font-medium text-gray-700"
         htmlFor={htmlFor}
       >
-        {label}
+        <span>{label}</span>
 
         {required ? (
-          <span aria-hidden className="ml-1 text-red-500">
+          <span aria-hidden className="text-red-500">
             *
           </span>
         ) : null}

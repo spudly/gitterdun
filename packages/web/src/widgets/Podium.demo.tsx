@@ -96,12 +96,12 @@ const PodiumDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Usage Example</h3>
 
-        <div className="rounded-lg bg-gray-50 p-6">
-          <h3 className="mb-4 text-xl font-semibold">Monthly Leaderboard</h3>
+        <div className="flex flex-col gap-6 rounded-lg bg-gray-50 p-6">
+          <h3 className="text-xl font-semibold">Monthly Leaderboard</h3>
 
           <Podium items={sampleLeaderboard} />
 
-          <div className="mt-6 text-center">
+          <div className="text-center">
             <p className="text-sm text-gray-600">
               Congratulations to our top performers this month!
             </p>

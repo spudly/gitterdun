@@ -62,20 +62,20 @@ const ProgressBarDemo: FC = () => {
         <h3 className="text-lg font-semibold">Goal Progress Examples</h3>
 
         <div className="space-y-6">
-          <div>
-            <h4 className="mb-2 font-medium">Daily Chores</h4>
+          <div className="flex flex-col gap-2">
+            <h4 className="font-medium">Daily Chores</h4>
 
             <ProgressBar max={5} showPercentage value={3} variant="success" />
           </div>
 
-          <div>
-            <h4 className="mb-2 font-medium">Weekly Goal</h4>
+          <div className="flex flex-col gap-2">
+            <h4 className="font-medium">Weekly Goal</h4>
 
             <ProgressBar max={10} showPercentage value={7} variant="warning" />
           </div>
 
-          <div>
-            <h4 className="mb-2 font-medium">Monthly Challenge</h4>
+          <div className="flex flex-col gap-2">
+            <h4 className="font-medium">Monthly Challenge</h4>
 
             <ProgressBar max={30} showPercentage value={15} variant="danger" />
           </div>

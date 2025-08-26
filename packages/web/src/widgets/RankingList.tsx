@@ -68,9 +68,9 @@ export const RankingList: FC<RankingListProps> = ({
         {items.map(item => (
           <div className="px-6 py-4" key={item.id}>
             <div className="flex items-center justify-between">
-              <div className="flex items-center">
+              <div className="flex items-center gap-4">
                 {showRank ? (
-                  <div className="mr-4 flex size-8 items-center justify-center rounded-full bg-gray-100 text-sm font-medium text-gray-700">
+                  <div className="flex size-8 items-center justify-center rounded-full bg-gray-100 text-sm font-medium text-gray-700">
                     {item.rank}
                   </div>
                 ) : null}

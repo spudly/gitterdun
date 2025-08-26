@@ -26,14 +26,14 @@ export const PageHeader: FC<PageHeaderProps> = ({
   return (
     <div className={clsx('mb-8', className)}>
       <div className="flex items-center justify-between">
-        <div>
+        <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
 
           {hasSubtitle ? (
             Array.isArray(subtitle) ? (
-              <div className="mt-1 flex gap-2 text-gray-600">{subtitle}</div>
+              <div className="flex gap-2 text-gray-600">{subtitle}</div>
             ) : (
-              <p className="mt-1 text-gray-600">{subtitle}</p>
+              <p className="text-gray-600">{subtitle}</p>
             )
           ) : null}
         </div>

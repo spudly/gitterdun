@@ -8,13 +8,13 @@ type UserCellProps = {readonly user: User};
 
 export const UserNameCell: FC<UserCellProps> = ({user}) => {
   return (
-    <div className="flex items-center">
+    <div className="flex items-center gap-4">
       <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gray-300">
         <span className="text-sm font-medium text-gray-700">
           {user.name.charAt(0)}
         </span>
       </div>
-      <div className="ml-4">
+      <div>
         <div className="text-sm font-medium text-gray-900">{user.name}</div>
         <div className="text-sm text-gray-500">ID: {user.id}</div>
       </div>

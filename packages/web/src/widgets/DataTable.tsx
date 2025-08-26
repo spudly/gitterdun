@@ -52,10 +52,10 @@ export const DataTable = <T extends object>({
   if (loading) {
     return (
       <div className="overflow-hidden bg-white shadow sm:rounded-md">
-        <div className="px-4 py-8 text-center">
-          <div className="mx-auto size-8 animate-spin rounded-full border-b-2 border-indigo-600" />
+        <div className="flex flex-col items-center gap-2 px-4 py-8">
+          <div className="size-8 animate-spin rounded-full border-b-2 border-indigo-600" />
 
-          <p className="mt-2 text-gray-600">
+          <p className="text-gray-600">
             <FormattedMessage
               defaultMessage="Loading..."
               id="datatable.loading"
