@@ -1,0 +1,20 @@
+{
+  "name": "@gitterdun/e2e",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report",
+    "install": "playwright install",
+    "install:browsers": "playwright install",
+    "ai:check": "echo 'E2E tests don't need ai:check - they validate integration'"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.47.0",
+    "@types/node": "^22.10.7",
+    "typescript": "^5.9.2"
+  }
+}
