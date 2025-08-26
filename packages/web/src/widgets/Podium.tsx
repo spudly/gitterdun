@@ -25,11 +25,11 @@ const MEDALS = {1: '🥇', 2: '🥈', 3: '🥉'};
 
 export const Podium: FC<PodiumProps> = ({items, showMedals = true}) => {
   return (
-    <div className={clsx('mb-8 grid grid-cols-1 gap-6 md:grid-cols-3')}>
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
       {items.slice(0, 3).map(item => (
         <div
           className={clsx(
-            'text-center',
+            'flex flex-col items-center gap-4',
             item.rank === 1
               ? 'order-2'
               : item.rank === 2
@@ -40,14 +40,14 @@ export const Podium: FC<PodiumProps> = ({items, showMedals = true}) => {
         >
           <div
             className={clsx(
-              'relative mx-auto flex size-24 items-center justify-center rounded-full text-2xl font-bold text-white',
+              'relative flex size-24 items-center justify-center rounded-full text-2xl font-bold text-white',
               RANK_STYLES[item.rank],
             )}
           >
             {showMedals ? MEDALS[item.rank] : item.rank}
           </div>
 
-          <div className="mt-4">
+          <div className="text-center">
             {item.content}
 
             {typeof item.score === 'number'

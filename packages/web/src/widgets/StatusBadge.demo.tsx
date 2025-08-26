@@ -123,8 +123,8 @@ const StatusBadgeDemo: FC = () => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Usage in Context</h3>
 
-        <div className="rounded-lg bg-gray-100 p-4">
-          <div className="mb-2 flex items-center justify-between">
+        <div className="flex flex-col gap-2 rounded-lg bg-gray-100 p-4">
+          <div className="flex items-center justify-between">
             <span className="font-medium">Task Status</span>
 
             <StatusBadge status="completed">Completed</StatusBadge>

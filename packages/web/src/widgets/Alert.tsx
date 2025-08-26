@@ -48,8 +48,9 @@ export const Alert: FC<AlertProps> = ({
 
   return (
     <div className={baseStyles} role="alert">
-      <div className="flex">
-        <div className="shrink-0">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex gap-3">
+          <div className="shrink-0">
           {type === 'success' && (
             <svg
               className={clsx('size-5', ICON_STYLES[type])}
@@ -105,18 +106,19 @@ export const Alert: FC<AlertProps> = ({
               />
             </svg>
           )}
-        </div>
+          </div>
 
-        <div className="ml-3 flex-1">
-          {title !== undefined && title !== '' ? (
-            <h3 className="text-sm font-medium">{title}</h3>
-          ) : null}
+          <div className="flex-1">
+            {title !== undefined && title !== '' ? (
+              <h3 className="text-sm font-medium">{title}</h3>
+            ) : null}
 
-          <div className="text-sm">{children}</div>
+            <div className="text-sm">{children}</div>
+          </div>
         </div>
 
         {onDismiss ? (
-          <div className="ml-auto pl-3">
+          <div className="shrink-0">
             <button
               className={clsx(
                 'inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2',

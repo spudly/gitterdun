@@ -46,12 +46,12 @@ export const StatCard: FC<StatCardProps> = ({
 }) => {
   return (
     <div className="rounded-lg bg-white p-6 shadow">
-      <div className="flex items-center">
+      <div className="flex items-center gap-4">
         <div className={clsx('rounded-lg p-2', getStatColorClass(color))}>
           {icon}
         </div>
 
-        <div className="ml-4">
+        <div>
           <Text as="p" muted size="sm" weight="medium">
             {label}
           </Text>

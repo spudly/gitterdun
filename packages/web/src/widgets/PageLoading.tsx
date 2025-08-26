@@ -5,10 +5,10 @@ type PageLoadingProps = {readonly message?: string};
 
 export const PageLoading: FC<PageLoadingProps> = ({message = 'Loading...'}) => {
   return (
-    <div className="text-center">
+    <div className="flex flex-col items-center gap-4">
       <Spinner size="lg" />
 
-      <p className="mt-4 text-gray-600">{message}</p>
+      <p className="text-gray-600">{message}</p>
     </div>
   );
 };

@@ -71,12 +71,12 @@ describe('<Heading />', () => {
 
     test('allows parent to control spacing via external classes', () => {
       render(
-        <div className="mb-4">
+        <div className="flex flex-col gap-4">
           <Heading level={2}>Externally Spaced</Heading>
         </div>,
       );
       const container = screen.getByText('Externally Spaced').parentElement;
-      expect(container).toHaveClass('mb-4');
+      expect(container).toHaveClass('gap-4');
     });
   });
 

@@ -26,7 +26,7 @@ export const SelectInput: FC<SelectInputProps> = ({
     ? 'border-red-500 focus:ring-red-500'
     : 'border-gray-300';
   return (
-    <div className={className}>
+    <div className={clsx(className, 'flex flex-col gap-1')}>
       <select
         className={clsx(base, errorCls)}
         onChange={event => onChange?.(event.target.value, event)}
@@ -36,7 +36,7 @@ export const SelectInput: FC<SelectInputProps> = ({
       </select>
 
       {hasError ? (
-        <div className="mt-1 text-xs text-red-600">{error}</div>
+        <div className="text-xs text-red-600">{error}</div>
       ) : null}
     </div>
   );

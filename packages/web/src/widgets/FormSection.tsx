@@ -21,9 +21,9 @@ export const FormSection: FC<FormSectionProps> = ({
   const baseStyles = clsx(VARIANT_STYLES[variant]);
 
   return (
-    <div className={baseStyles}>
+    <div className={clsx(baseStyles, 'flex flex-col gap-3')}>
       {typeof title === 'string' && title.length > 0 ? (
-        <h3 className="mb-3 text-lg font-semibold text-gray-900">{title}</h3>
+        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
       ) : null}
 
       {children}

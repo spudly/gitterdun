@@ -1,3 +1,4 @@
+/* eslint-disable gitterdun/no-tailwind-margins -- test file contains margin classes as test data */
 import {RuleTester} from 'eslint';
 import {noTailwindMargins} from '../noTailwindMargins.js';
 

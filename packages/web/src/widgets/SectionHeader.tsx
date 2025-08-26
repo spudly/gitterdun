@@ -17,9 +17,9 @@ type SectionHeaderProps = {
 };
 
 const VARIANT_STYLES = {
-  default: 'text-lg font-semibold mb-3',
-  large: 'text-xl font-semibold mb-4',
-  compact: 'text-base font-semibold mb-2',
+  default: 'text-lg font-semibold',
+  large: 'text-xl font-semibold',
+  compact: 'text-base font-semibold',
 };
 
 export const SectionHeader: FC<SectionHeaderProps> = ({

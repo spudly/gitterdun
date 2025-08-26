@@ -17,9 +17,9 @@ export const FormCardField: FC<FormCardFieldProps> = ({
   required = false,
 }) => {
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       <label
-        className="mb-2 block text-sm font-medium text-gray-700"
+        className="block text-sm font-medium text-gray-700"
         htmlFor={id}
       >
         {label}

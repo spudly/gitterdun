@@ -84,7 +84,7 @@ export const LocaleSelector: FC<LocaleSelectorProps> = ({
 
       {open ? (
         <div
-          className="absolute right-0 z-10 mt-2 w-44 rounded border bg-white shadow"
+          className="absolute right-0 top-full z-10 w-44 rounded border bg-white shadow"
           role="menu"
         >
           <ul>

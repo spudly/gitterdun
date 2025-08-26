@@ -22,14 +22,14 @@ type JSXAttribute = {
 /**
  * Detects if a string contains Tailwind CSS margin classes
  */
-const hasTailwindMarginClasses = (classNameValue: string): string[] => {
+const hasTailwindMarginClasses = (classNameValue: string): Array<string> => {
   const marginPrefixes = [
     'm-', 'mt-', 'mr-', 'mb-', 'ml-', 'mx-', 'my-',
     '-m-', '-mt-', '-mr-', '-mb-', '-ml-', '-mx-', '-my-'
   ];
   
   const classes = classNameValue.split(/\s+/).filter(Boolean);
-  const violatingClasses: string[] = [];
+  const violatingClasses: Array<string> = [];
   
   for (const className of classes) {
     for (const prefix of marginPrefixes) {
@@ -41,6 +41,58 @@ const hasTailwindMarginClasses = (classNameValue: string): string[] => {
   }
   
   return violatingClasses;
+};
+
+/**
+ * Reports margin class violations to the ESLint context
+ */
+const reportViolatingClasses = (
+  context: Rule.RuleContext,
+  node: JSXAttribute | Literal,
+  violatingClasses: Array<string>
+): void => {
+  if (violatingClasses.length > 0) {
+    context.report({
+      node,
+      messageId: violatingClasses.length === 1 ? 'noMarginClasses' : 'noMarginClassesMultiple',
+      data: {
+        className: violatingClasses[0] ?? '',
+        classNames: violatingClasses.join(', '),
+      },
+    });
+  }
+};
+
+/**
+ * Handles JSX string literal values
+ */
+const handleLiteralValue = (
+  context: Rule.RuleContext,
+  node: JSXAttribute,
+  literal: Literal
+): void => {
+  if (typeof literal.value === 'string') {
+    const violatingClasses = hasTailwindMarginClasses(literal.value);
+    reportViolatingClasses(context, node, violatingClasses);
+  }
+};
+
+/**
+ * Handles JSX template literal expressions
+ */
+const handleTemplateLiteral = (
+  context: Rule.RuleContext,
+  node: JSXAttribute,
+  expression: NonNullable<JSXAttribute['value']>['expression']
+): void => {
+  if (expression && expression.type === 'TemplateLiteral' && expression.quasis) {
+    for (const quasi of expression.quasis) {
+      if (quasi.value.raw) {
+        const violatingClasses = hasTailwindMarginClasses(quasi.value.raw);
+        reportViolatingClasses(context, node, violatingClasses);
+      }
+    }
+  }
 };
 
 export const noTailwindMargins: Rule.RuleModule = {
@@ -62,11 +114,11 @@ export const noTailwindMargins: Rule.RuleModule = {
     return {
       JSXAttribute(node: JSXAttribute) {
         // Only check className and class attributes
-        if (!node.name || node.name.type !== 'JSXIdentifier') {
+        if (!node.name) {
           return;
         }
         
-        const attributeName = node.name.name;
+        const {name: attributeName} = node.name;
         if (attributeName !== 'className' && attributeName !== 'class') {
           return;
         }
@@ -74,44 +126,13 @@ export const noTailwindMargins: Rule.RuleModule = {
         // Handle string literal values
         if (node.value && node.value.type === 'Literal') {
           const literal = node.value as Literal;
-          if (typeof literal.value === 'string') {
-            const violatingClasses = hasTailwindMarginClasses(literal.value);
-            
-            if (violatingClasses.length > 0) {
-              context.report({
-                node,
-                messageId: violatingClasses.length === 1 ? 'noMarginClasses' : 'noMarginClassesMultiple',
-                data: {
-                  className: violatingClasses[0] || '',
-                  classNames: violatingClasses.join(', '),
-                },
-              });
-            }
-          }
+          handleLiteralValue(context, node, literal);
         }
 
         // Handle template literal expressions (e.g., className={`flex ${someVar}`})
         if (node.value && node.value.type === 'JSXExpressionContainer') {
-          const expression = node.value.expression;
-          
-          if (expression && expression.type === 'TemplateLiteral' && expression.quasis) {
-            for (const quasi of expression.quasis) {
-              if (quasi.value.raw) {
-                const violatingClasses = hasTailwindMarginClasses(quasi.value.raw);
-                
-                if (violatingClasses.length > 0) {
-                  context.report({
-                    node,
-                    messageId: violatingClasses.length === 1 ? 'noMarginClasses' : 'noMarginClassesMultiple',
-                    data: {
-                      className: violatingClasses[0] || '',
-                      classNames: violatingClasses.join(', '),
-                    },
-                  });
-                }
-              }
-            }
-          }
+          const {expression} = node.value;
+          handleTemplateLiteral(context, node, expression);
         }
       },
 
@@ -119,22 +140,12 @@ export const noTailwindMargins: Rule.RuleModule = {
       Literal(node: Literal) {
         if (typeof node.value === 'string') {
           // Simple heuristic: if it looks like CSS classes (contains common Tailwind patterns)
-          const value = node.value;
-          const hasTailwindPattern = /\b(flex|grid|text-|bg-|border-|p-|space-)/;
+          const {value} = node;
+          const hasTailwindPattern = /\b(?:flex|grid|text-|bg-|border-|p-|space-)/;
           
           if (hasTailwindPattern.test(value)) {
             const violatingClasses = hasTailwindMarginClasses(value);
-            
-            if (violatingClasses.length > 0) {
-              context.report({
-                node,
-                messageId: violatingClasses.length === 1 ? 'noMarginClasses' : 'noMarginClassesMultiple',
-                data: {
-                  className: violatingClasses[0] || '',
-                  classNames: violatingClasses.join(', '),
-                },
-              });
-            }
+            reportViolatingClasses(context, node, violatingClasses);
           }
         }
       },

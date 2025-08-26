@@ -43,9 +43,9 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="border-b bg-white shadow-sm">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold text-indigo-600">
                 <FormattedMessage
                   defaultMessage="Gitterdun"
@@ -53,7 +53,7 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
                 />
               </h1>
 
-              <span className="ml-2 text-sm text-gray-500">
+              <span className="text-sm text-gray-500">
                 <FormattedMessage
                   defaultMessage="Chore Wrangler"
                   id="widgets.Layout.chore-wrangler"
@@ -138,7 +138,7 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex space-x-8">
           {/* Sidebar Navigation */}
           <div className="w-64 shrink-0">
@@ -148,7 +148,7 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
                 return (
                   <Link
                     className={clsx(
-                      'group flex w-full items-center border-l-4 px-3 py-2 text-sm font-medium transition-colors duration-200',
+                      'group flex w-full items-center gap-3 border-l-4 px-3 py-2 text-sm font-medium transition-colors duration-200',
                       isActive
                         ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
                         : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900',
@@ -156,7 +156,7 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
                     key={item.path}
                     to={item.path}
                   >
-                    <span className="mr-3 shrink-0 text-lg">{item.icon}</span>
+                    <span className="shrink-0 text-lg">{item.icon}</span>
 
                     <span>
                       <FormattedMessage {...item.message} />
