@@ -7,6 +7,5 @@ export const pick = <OBJ extends object, KEY extends keyof OBJ>(
       acc[key] = obj[key];
       return acc;
     },
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- this is the type it will be when reduce is finished
     {} as Pick<OBJ, KEY>,
   );

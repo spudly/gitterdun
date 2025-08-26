@@ -41,7 +41,6 @@ const Leaderboard: FC = () => {
 
   const podiumItems = leaderboard.slice(0, 3).map((entry, index) => ({
     id: entry.id,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- it's hard to reconcile this type with both typescript and the eslint error
     rank: (index + 1) as 1 | 2 | 3,
     content: (
       <>
