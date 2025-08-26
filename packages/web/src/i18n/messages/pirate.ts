@@ -77,7 +77,8 @@ export default {
   'demos.loading': 'Loading demo...',
   'demos.title': 'Widget Demos',
   'pages.Family.please-log-in-to-manage-your-f': 'Log in to command yer clan.',
-  'pages.Family.your-families': 'Yer Clans',
+  'pages.Family.family': 'Clan',
+  'pages.Family.your-family': 'Yer Clan',
   'pages.Family.members': 'Crew',
   'pages.Leaderboard.loading-leaderboard': 'Chartin’ the legend board...',
   'pages.Leaderboard.count-points': '{count} doubloons',
@@ -96,8 +97,7 @@ export default {
   'datatable.loading': 'Loadin’...',
   'admin.users.delete': 'Scuttle',
   'pages.Leaderboard.points-pts': '{points} pts',
-  'pages.admin.AdminInvitations.could-not-create-invitation-pl':
-    'Couldn’t create invite. Try again.',
+  // AdminInvitations (obsolete - removed)
   // AdminChoresManagement
   'pages.admin.AdminChoresManagement.chores-management': 'Chores Command',
   'pages.admin.AdminChoresManagement.points-points': 'Doubloons: {points}',
@@ -111,24 +111,8 @@ export default {
   'pages.admin.AdminChoresManagement.approved': 'Blessed by the Captain',
   'pages.admin.AdminChoresManagement.pending': 'Awaitin’',
   'pages.admin.AdminChoresManagement.bonus': 'Bounty',
-  // AdminFamilyCreation
-  'pages.admin.AdminFamilyCreation.family-name': 'Clan name',
-  'pages.admin.AdminFamilyCreation.create-family': 'Raise a Clan',
-  'pages.admin.AdminFamilyCreation.family-created-redirecting':
-    'Clan forged. Settin’ sail...',
-  'pages.admin.AdminFamilyCreation.failed-to-create-family':
-    'Couldn’t forge clan',
-  'pages.admin.AdminFamilyCreation.could-not-create-family-please':
-    'Couldn’t forge clan. Try again, matey.',
-  // AdminInvitations
-  'pages.admin.AdminInvitations.family-id': 'Clan ID',
-  'pages.admin.AdminInvitations.invite-email': 'Summon email',
-  'pages.admin.AdminInvitations.invite': 'Invite',
-  'pages.admin.AdminInvitations.enter-family-id-and-email':
-    'Enter clan ID and email',
-  'pages.admin.AdminInvitations.invitation-created-see-server-':
-    'Invitation sent (see ship logs in dev)',
-  'pages.admin.AdminInvitations.failed-to-invite': 'Invite sunk',
+  // AdminFamilyCreation (obsolete - removed)
+  // AdminInvitations (obsolete - removed)
 
   // FamilySelector
   'pages.family.FamilySelector.choose-a-family': 'Choose a clan',
@@ -139,6 +123,10 @@ export default {
   'pages.family.CreateChildForm.username': 'Deckname',
 
   'pages.family.CreateChildForm.password': 'Secret Code',
+  'pages.family.CreateChildForm.username-required': 'Deckname be required',
+  'pages.family.CreateChildForm.email-invalid': 'Enter a proper parrot mail',
+  'pages.family.CreateChildForm.password-too-short':
+    'Secret must be at least 4 chars',
 
   // InviteMemberForm
   'pages.family.InviteMemberForm.invite-member': 'Invite Crew',

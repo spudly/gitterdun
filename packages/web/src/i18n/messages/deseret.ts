@@ -69,7 +69,8 @@ export default {
 
   'pages.Family.please-log-in-to-manage-your-f':
     '𐐑𐐮𐐯𐐯𐐡𐐨 𐐷𐐭𐑅 𐐢𐐭𐐹 𐐢𐐬𐐘 𐐻𐐬 𐐣𐐰𐐤𐐰𐐖 𐐏𐐭𐐲 𐐑𐐰𐐣𐐮𐐮.',
-  'pages.Family.your-families': '𐐏𐐭𐐲 𐐙𐐰𐐣𐐮𐐮𐑅',
+  'pages.Family.family': '𐐆𐐯𐐣𐐮𐐮',
+  'pages.Family.your-family': '𐐏𐐭𐐲 𐐆𐐯𐐣𐐮𐐮',
   'pages.Family.members': '𐐣𐐯𐐺𐐲𐐡𐑅',
 
   'pages.Leaderboard.loading-leaderboard': '𐐢𐐬𐐲𐐼𐐮𐐤 𐐢𐐨𐐼𐐲𐐺𐐱𐐊𐐡𐐼…',
@@ -83,18 +84,7 @@ export default {
   'pages.Leaderboard.streak-count': '𐐝𐐻𐐯𐐯𐐽 𐐗𐐬𐐭𐐤𐐻',
   'pages.Leaderboard.full-rankings': '𐐙𐐲𐐤 𐐡𐐰𐐤𐐿𐐮𐐤𐐖𐑅',
   'pages.Leaderboard.points-pts': '{points} 𐐑𐐬𐐌𐐤𐐻𐑅',
-
-  'alert.dismiss': '𐐗𐐮𐐣𐐣𐐯𐐝',
-  'podium.points': '{score} 𐐑𐐬𐐌𐐤𐐻𐑅',
-  'progress.label': '𐐑𐐲𐐖𐐯𐐡𐐮𐐝',
-  'membersList.userWithEmail': '{username} ({email})',
-  'datatable.loading': '𐐢𐐬𐐲𐐼𐐮𐐤…',
-  'admin.users.delete': '𐐗𐐮𐐣𐐣𐐯𐐝',
-
-  'pages.admin.AdminInvitations.could-not-create-invitation-pl':
-    '𐐗𐐲𐐭𐐮𐐼 𐐤𐐬𐐻 𐐗𐐮𐐯𐐺𐐾 𐐆𐐯𐐮𐐯𐐻𐐨𐐰𐐡𐐮𐐯𐐤. 𐐆𐐶𐐯𐐲 𐐡𐐯𐐼𐐭𐐰𐐡𐐨.',
-
-  // AdminChoresManagement
+  // AdminChoresManagement (required keys)
   'pages.admin.AdminChoresManagement.chores-management': '𐐗𐐬𐐡𐐨𐐯𐐡 𐐣𐐰𐐤𐐰𐐖𐐨𐐤𐐮',
   'pages.admin.AdminChoresManagement.points-points': '𐐑𐐬𐐌𐐤𐐻𐑅: {points}',
   'pages.admin.AdminChoresManagement.bonus-points': '𐐒𐐬𐐤𐐭𐑅: +{points}',
@@ -108,43 +98,31 @@ export default {
   'pages.admin.AdminChoresManagement.pending': '𐐑𐐯𐐤𐐼𐐮𐐤𐐖',
   'pages.admin.AdminChoresManagement.bonus': '𐐒𐐬𐐤𐐭𐑅',
 
-  // AdminFamilyCreation
-  'pages.admin.AdminFamilyCreation.family-name': '𐐙𐐰𐐣 𐐲𐐺 𐐆𐐯𐐣𐐮𐐮',
-  'pages.admin.AdminFamilyCreation.create-family': '𐐗𐐯𐐯𐐻 𐐲 𐐆𐐯𐐣𐐮𐐮',
-  'pages.admin.AdminFamilyCreation.family-created-redirecting':
-    '𐐆𐐯𐐣𐐮𐐮 𐐗𐐯𐐯𐐻. 𐐡𐐯𐐼𐐨𐐯𐐤𐐯…',
-  'pages.admin.AdminFamilyCreation.failed-to-create-family':
-    '𐐙𐐩𐐮𐐢𐐯𐐼 𐐻𐐬 𐐗𐐯𐐯𐐻 𐐆𐐯𐐣𐐮𐐮',
-  'pages.admin.AdminFamilyCreation.could-not-create-family-please':
-    '𐐗𐐲𐐭𐐮𐐼 𐐤𐐬𐐻 𐐗𐐯𐐯𐐻 𐐆𐐯𐐣𐐮𐐮. 𐐆𐐶𐐯𐐲 𐐡𐐯𐐼𐐭𐐰𐐡𐐨.',
-
-  // AdminInvitations
-  'pages.admin.AdminInvitations.family-id': '𐐆𐐯𐐣𐐮𐐮 ID',
-  'pages.admin.AdminInvitations.invite-email': '𐐇𐐣𐐰𐐮𐐮𐐢 𐐲𐐯𐐮𐐻',
-  'pages.admin.AdminInvitations.invite': '𐐲𐐯𐐮𐐻',
-  'pages.admin.AdminInvitations.enter-family-id-and-email':
-    '𐐇𐐤𐐻𐐯𐐻 𐐆𐐯𐐣𐐮𐐮 ID 𐐺𐐰 𐐇𐐣𐐰𐐮𐐮𐐢',
-  'pages.admin.AdminInvitations.invitation-created-see-server-':
-    '𐐆𐐯𐐮𐐯𐐻𐐨𐐰𐐡𐐮𐐯𐐤 𐐗𐐯𐐯𐐻 (𐐝𐐨 𐐝𐐮𐐹 𐐮𐐯𐐖𐑂 𐐮𐐤 𐐼𐐯𐐶)',
-  'pages.admin.AdminInvitations.failed-to-invite': '𐐙𐐩𐐮𐐢𐐯𐐼 𐐻𐐬 𐐲𐐯𐐮𐐻',
-
+  'alert.dismiss': '𐐗𐐮𐐣𐐣𐐯𐐝',
+  'podium.points': '{score} 𐐑𐐬𐐌𐐤𐐻𐑅',
+  'progress.label': '𐐑𐐲𐐖𐐯𐐡𐐮𐐝',
+  'membersList.userWithEmail': '{username} ({email})',
+  'datatable.loading': '𐐢𐐬𐐲𐐼𐐮𐐤…',
+  'admin.users.delete': '𐐗𐐮𐐣𐐣𐐯𐐝',
   // FamilySelector
   'pages.family.FamilySelector.choose-a-family': '𐐗𐐭𐐯𐐮 𐐆𐐯𐐣𐐮𐐮',
   'pages.family.FamilySelector.new-family-name': '𐐤𐐭 𐐆𐐯𐐣𐐮𐐮 𐐙𐐰𐐣',
   'pages.family.FamilySelector.create': '𐐗𐐯𐐯𐐻',
-
-  // CreateChildForm
-  'pages.family.CreateChildForm.create-child-account': '𐐗𐐯𐐯𐐻 𐐗𐐮𐐤𐐼 𐐈𐐿𐐬𐐭𐐤𐐻',
-  'pages.family.CreateChildForm.username': '𐐏𐐭𐑅𐐯𐐡 𐐙𐐰𐐣',
-  'pages.family.CreateChildForm.password': '𐐑𐐰𐐝𐐶𐐲𐐡𐐼',
-
   // InviteMemberForm
   'pages.family.InviteMemberForm.invite-member': '𐐲𐐯𐐮𐐻 𐐣𐐯𐐺𐐯𐐡',
   'pages.family.InviteMemberForm.email': '𐐇𐐣𐐰𐐮𐐮𐐢',
   'pages.family.InviteMemberForm.parent': '𐐑𐐯𐐯𐐻',
   'pages.family.InviteMemberForm.child': '𐐗𐐮𐐤𐐼',
   'pages.family.InviteMemberForm.send': '𐐇𐐣𐐶𐐬𐐌𐐯',
-
+  // CreateChildForm required keys
+  'pages.family.CreateChildForm.create-child-account': '𐐗𐐯𐐯𐐻 𐐗𐐮𐐤𐐼 𐐈𐐿𐐬𐐭𐐤𐐻',
+  'pages.family.CreateChildForm.username': '𐐏𐐭𐑅𐐯𐐡 𐐙𐐰𐐣',
+  'pages.family.CreateChildForm.password': '𐐑𐐰𐐝𐐶𐐲𐐡𐐼',
+  'pages.family.CreateChildForm.username-required': '𐐏𐐭𐑅𐐯𐐡 𐐙𐐰𐐣 𐐇𐐣 𐐡𐐯𐐼𐐭𐐰𐐡𐐨',
+  'pages.family.CreateChildForm.email-invalid':
+    '𐐆𐐶𐐯𐐲 𐐮𐐻𐐯 𐐯𐐤 𐐆𐐣𐐾𐐲𐐡 𐐆𐐣𐐶𐐰𐐮𐐼 𐐇𐐣𐐰𐐮𐐮𐐢',
+  'pages.family.CreateChildForm.password-too-short':
+    '𐐑𐐰𐐝𐐶𐐲𐐡𐐼 𐐆𐐣 𐐲𐐼𐐨𐐟𐐲𐐮 4 𐐗𐐪𐐻𐐨𐑉𐐯𐐺𐑂',
   'pages.Landing.title': '𐐎𐐮𐐻𐐻𐐯𐐡𐐼𐐲𐐡 𐐲 𐐘𐐮𐐻𐐻𐐯𐐡𐐲𐐡',
   'pages.Landing.subtitle':
     '𐐬𐑉𐑜𐐲𐑌𐐲𐐟 𐐗𐐬𐑉𐐯𐑊𐑇. 𐑋𐐪𐐻𐐬𐑅𐐨𐑌𐐯 𐑌𐐨𐐲𐑉 𐑁𐐰𐑋𐐨𐑊𐐨. 𐐐𐐲𐑆 𐑁𐐲𐑌 𐑑𐐯𐑒𐐯𐑉.',

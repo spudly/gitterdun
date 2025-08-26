@@ -80,7 +80,8 @@ export default {
   'demos.title': 'Idget-way Emos-day',
   'pages.Family.please-log-in-to-manage-your-f':
     'Ease-play og-lay in to anage-may our-yay amily-fay.',
-  'pages.Family.your-families': 'Our-yay Amilies-fay',
+  'pages.Family.family': 'Amily-fay',
+  'pages.Family.your-family': 'Our-yay Amily-fay',
   'pages.Family.members': 'Embers-may',
   'pages.Leaderboard.loading-leaderboard': 'Oading-lay eaderboard-lay...',
   'pages.Leaderboard.count-points': '{count} oints-pay',
@@ -99,8 +100,7 @@ export default {
   'datatable.loading': 'Oading-lay...',
   'admin.users.delete': 'Elete-day',
   'pages.Leaderboard.points-pts': '{points} ts-pay',
-  'pages.admin.AdminInvitations.could-not-create-invitation-pl':
-    'Ould-cay ot-nay eate-cray invitation-way. Ease-play y-tray again-way.',
+  // AdminInvitations (obsolete - removed)
   // AdminChoresManagement
   'pages.admin.AdminChoresManagement.chores-management':
     'Ores-chay Anagement-may',
@@ -115,24 +115,8 @@ export default {
   'pages.admin.AdminChoresManagement.approved': 'Approved-way',
   'pages.admin.AdminChoresManagement.pending': 'Ending-pay',
   'pages.admin.AdminChoresManagement.bonus': 'Onus-bay',
-  // AdminFamilyCreation
-  'pages.admin.AdminFamilyCreation.family-name': 'Amily-fay ame-nay',
-  'pages.admin.AdminFamilyCreation.create-family': 'Eate-cray Amily-fay',
-  'pages.admin.AdminFamilyCreation.family-created-redirecting':
-    'Amily-fay eated-cray. Edirecting-ray...',
-  'pages.admin.AdminFamilyCreation.failed-to-create-family':
-    'Ailed-fay to eate-cray amily-fay',
-  'pages.admin.AdminFamilyCreation.could-not-create-family-please':
-    'Ould-cay ot-nay eate-cray amily-fay. Ease-play y-tray again-way.',
-  // AdminInvitations
-  'pages.admin.AdminInvitations.family-id': 'Amily-fay ID',
-  'pages.admin.AdminInvitations.invite-email': 'Invite-way email-way',
-  'pages.admin.AdminInvitations.invite': 'Invite-way',
-  'pages.admin.AdminInvitations.enter-family-id-and-email':
-    'Enter-way amily-fay ID and email-way',
-  'pages.admin.AdminInvitations.invitation-created-see-server-':
-    'Invitation-way eated-cray (ee-say erver-say ogs-lay or-fay oken-tay in ev-day)',
-  'pages.admin.AdminInvitations.failed-to-invite': 'Ailed-fay to invite-way',
+  // AdminFamilyCreation (obsolete - removed)
+  // AdminInvitations (obsolete - removed)
 
   // FamilySelector
   'pages.family.FamilySelector.choose-a-family': 'Oose-chay a amily-fay',
@@ -144,6 +128,12 @@ export default {
   'pages.family.CreateChildForm.username': 'Ername-usay',
 
   'pages.family.CreateChildForm.password': 'Assword-pay',
+  'pages.family.CreateChildForm.username-required':
+    'Ername-usay is equired-ray',
+  'pages.family.CreateChildForm.email-invalid':
+    'Lease-pay enter-way a alid-vay email-way',
+  'pages.family.CreateChildForm.password-too-short':
+    'Assword-pay ust-may e-bay at-least-ay 4 aracters-chay',
 
   // InviteMemberForm
   'pages.family.InviteMemberForm.invite-member': 'Invite-way Ember-may',

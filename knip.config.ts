@@ -7,7 +7,6 @@ const config: KnipConfig = {
     '.': {
       ignoreDependencies: [
         'husky', // Used by Git hooks, not imported
-        'ts-jest', // Used in some environments; referenced by tooling but not imported in source
       ],
     },
 
