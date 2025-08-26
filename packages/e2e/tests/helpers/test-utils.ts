@@ -3,11 +3,7 @@ import {expect} from '@playwright/test';
 
 export type UserCredentials = {username: string; password: string};
 
-export type FamilySetup = {
-  parent: UserCredentials;
-  child: UserCredentials;
-  familyName: string;
-};
+
 
 /**
  * Register and login a user with the given suffix
@@ -48,7 +44,7 @@ export const loginAs = async (
 /**
  * Create a family setup with parent and child
  */
-export const setupFamily = async (page: Page): Promise<FamilySetup> => {
+export const setupFamily = async (page: Page) => {
   const timestamp = Date.now() + Math.random();
   const parentUsername = `parent${timestamp}`;
   const parentPassword = 'parentpassword123';
