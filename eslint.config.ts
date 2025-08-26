@@ -740,6 +740,7 @@ const eslintConfig = [
       'tailwindcss/no-contradicting-classname': 'warn',
       'tailwindcss/no-custom-classname': 'warn',
       'tailwindcss/no-unnecessary-arbitrary-value': 'warn',
+      'gitterdun/no-tailwind-margins': 'error',
     },
   },
   {
