@@ -18,7 +18,6 @@ const config: KnipConfig = {
       ignoreDependencies: [
         '@babel/preset-typescript', // Used by jest transform via babelConfig in web/jest.config.ts
         'babel-plugin-dynamic-import-node', // Used by jest transform via babelConfig in web/jest.config.ts
-        'ts-jest', // Present for Jest TS support; not directly imported in project files
       ],
     },
 
