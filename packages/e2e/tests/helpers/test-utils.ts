@@ -1,10 +1,7 @@
 import type {Page} from '@playwright/test';
 import {expect} from '@playwright/test';
 
-export type UserCredentials = {
-  username: string;
-  password: string;
-};
+export type UserCredentials = {username: string; password: string};
 
 export type FamilySetup = {
   parent: UserCredentials;

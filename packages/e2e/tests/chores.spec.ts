@@ -1,52 +1,7 @@
-import type {Page} from '@playwright/test';
 import {test, expect} from '@playwright/test';
+import {setupFamily, loginAs} from './helpers/test-utils';
 
 test.describe('Chores Workflow', () => {
-  // Helper function to set up a family with parent and child
-  const setupFamily = async (page: Page) => {
-    const timestamp = Date.now() + Math.random();
-    const parentUsername = `parent${timestamp}`;
-    const parentPassword = 'parentpassword123';
-    const childUsername = `child${timestamp}`;
-    const childPassword = 'childpassword123';
-
-    // Register parent user
-    await page.goto('/register');
-    await page.fill('#username', parentUsername);
-    await page.fill('#password', parentPassword);
-    await page.click('button[type="submit"]');
-    await expect(page).toHaveURL('/');
-
-    // Create family
-    await page.goto('/family');
-    const familyName = `Test Family ${timestamp}`;
-    await page.fill('input[placeholder*="family name"]', familyName);
-    await page.click('button:has-text("Create")');
-    await expect(page.locator('text=Members')).toBeVisible();
-
-    // Add child to family
-    await page.fill('input#child-username', childUsername);
-    await page.fill('input#child-password', childPassword);
-    await page.click('button:has-text("Create Child")');
-    await expect(page.locator(`text=${childUsername}`)).toBeVisible();
-
-    return {
-      parent: {username: parentUsername, password: parentPassword},
-      child: {username: childUsername, password: childPassword},
-      familyName,
-    };
-  };
-
-  // Helper function to login as a specific user
-  const loginAs = async (page: Page, username: string, password: string) => {
-    await page.context().clearCookies();
-    await page.goto('/login');
-    await page.fill('#email', username);
-    await page.fill('#password', password);
-    await page.click('button[type="submit"]');
-    await expect(page).toHaveURL('/');
-  };
-
   test('should create a new chore as admin', async ({page}) => {
     // Set up family
     await setupFamily(page);

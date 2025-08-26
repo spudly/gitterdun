@@ -2,7 +2,6 @@ import {test, expect} from '@playwright/test';
 import {registerAndLogin} from './helpers/test-utils';
 
 test.describe('Family Management', () => {
-
   test('should create a new family', async ({page}) => {
     // Register and login as a user
     await registerAndLogin(page);

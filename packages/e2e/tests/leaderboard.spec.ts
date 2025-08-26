@@ -1,67 +1,14 @@
 import type {Page} from '@playwright/test';
 import {test, expect} from '@playwright/test';
+import type {UserCredentials} from './helpers/test-utils';
+import {setupFamilyWithChildren, loginAs} from './helpers/test-utils';
 
 test.describe('Leaderboard and Points System', () => {
-  // Helper function to set up a family with multiple children
-  const setupFamilyWithChildren = async (page: Page) => {
-    const timestamp = Date.now() + Math.random();
-    const parentUsername = `parent${timestamp}`;
-    const parentPassword = 'parentpassword123';
-
-    // Register parent user
-    await page.goto('/register');
-    await page.fill('#username', parentUsername);
-    await page.fill('#password', parentPassword);
-    await page.click('button[type="submit"]');
-    await expect(page).toHaveURL('/');
-
-    // Create family
-    await page.goto('/family');
-    const familyName = `Test Family ${timestamp}`;
-    await page.fill('input[placeholder*="family name"]', familyName);
-    await page.click('button:has-text("Create")');
-    await expect(page.locator('text=Members')).toBeVisible();
-
-    // Add first child
-    const child1Username = `child1_${timestamp}`;
-    const child1Password = 'childpassword123';
-    await page.fill('input#child-username', child1Username);
-    await page.fill('input#child-password', child1Password);
-    await page.click('button:has-text("Create Child")');
-    await expect(page.locator(`text=${child1Username}`)).toBeVisible();
-
-    // Add second child
-    const child2Username = `child2_${timestamp}`;
-    const child2Password = 'childpassword123';
-    await page.fill('input#child-username', child2Username);
-    await page.fill('input#child-password', child2Password);
-    await page.click('button:has-text("Create Child")');
-    await expect(page.locator(`text=${child2Username}`)).toBeVisible();
-
-    return {
-      parent: {username: parentUsername, password: parentPassword},
-      child1: {username: child1Username, password: child1Password},
-      child2: {username: child2Username, password: child2Password},
-      familyName,
-    };
-  };
-
-  // Helper function to login as a specific user
-  const loginAs = async (page: Page, username: string, password: string) => {
-    await page.context().clearCookies();
-    await page.goto('/login');
-    await page.fill('#email', username);
-    await page.fill('#password', password);
-    await page.click('button[type="submit"]');
-    await expect(page).toHaveURL('/');
-  };
-
   type ChoreTestData = {
     choreTitle: string;
     points: string;
     childUsername: string;
-    parentUsername: string;
-    parentPassword: string;
+    parent: UserCredentials;
   };
 
   // Helper function to create and complete a chore
@@ -92,7 +39,7 @@ test.describe('Leaderboard and Points System', () => {
       .click();
 
     // Approve as parent
-    await loginAs(page, data.parentUsername, data.parentPassword);
+    await loginAs(page, data.parent.username, data.parent.password);
     await page.goto('/admin');
     await page
       .locator(`text=${data.choreTitle}`)
@@ -138,8 +85,7 @@ test.describe('Leaderboard and Points System', () => {
       choreTitle,
       points: '20',
       childUsername: child1.username,
-      parentUsername: parent.username,
-      parentPassword: parent.password,
+      parent,
     });
 
     // Navigate to leaderboard
@@ -159,15 +105,13 @@ test.describe('Leaderboard and Points System', () => {
       choreTitle: `High Points ${Date.now()}`,
       points: '30',
       childUsername: child1.username,
-      parentUsername: parent.username,
-      parentPassword: parent.password,
+      parent,
     });
     await createAndCompleteChore(page, {
       choreTitle: `Low Points ${Date.now()}`,
       points: '10',
       childUsername: child2.username,
-      parentUsername: parent.username,
-      parentPassword: parent.password,
+      parent,
     });
 
     // Navigate to leaderboard
@@ -204,15 +148,13 @@ test.describe('Leaderboard and Points System', () => {
       choreTitle: `Chore 1 ${Date.now()}`,
       points: '15',
       childUsername: child1.username,
-      parentUsername: parent.username,
-      parentPassword: parent.password,
+      parent,
     });
     await createAndCompleteChore(page, {
       choreTitle: `Chore 2 ${Date.now()}`,
       points: '25',
       childUsername: child1.username,
-      parentUsername: parent.username,
-      parentPassword: parent.password,
+      parent,
     });
 
     // Navigate to leaderboard
@@ -238,8 +180,7 @@ test.describe('Leaderboard and Points System', () => {
       choreTitle: `New Chore ${Date.now()}`,
       points: '50',
       childUsername: child1.username,
-      parentUsername: parent.username,
-      parentPassword: parent.password,
+      parent,
     });
 
     // Return to leaderboard
@@ -324,8 +265,7 @@ test.describe('Leaderboard and Points System', () => {
       choreTitle: `Nav Test ${Date.now()}`,
       points: '35',
       childUsername: child1.username,
-      parentUsername: parent.username,
-      parentPassword: parent.password,
+      parent,
     });
 
     // Visit leaderboard
