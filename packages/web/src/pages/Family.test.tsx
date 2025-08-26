@@ -13,9 +13,9 @@ jest.mock('../hooks/useUser', () => ({
 
 jest.mock('../lib/api', () => ({
   familiesApi: {
-    myFamilies: jest.fn(async () => ({
+    myFamily: jest.fn(async () => ({
       success: true,
-      data: [{id: 1, name: 'Fam', owner_id: 1, created_at: ''}],
+      data: {id: 1, name: 'Fam', owner_id: 1, created_at: ''},
     })),
     listMembers: jest.fn(async () => ({success: true, data: []})),
     create: jest.fn(async () => ({success: true})),
@@ -58,9 +58,7 @@ describe('family page', () => {
     render(wrap(<Family />), {wrapper: Wrapper});
 
     // Should provide all core family management features
-    await expect(
-      screen.findByText('Your Families'),
-    ).resolves.toBeInTheDocument();
+    await expect(screen.findByText('Your Family')).resolves.toBeInTheDocument();
 
     // Should allow family creation
     expect(screen.getByPlaceholderText('New family name')).toBeInTheDocument();
@@ -68,26 +66,16 @@ describe('family page', () => {
       screen.getAllByRole('button', {name: 'Create'})[0],
     ).toBeInTheDocument();
 
-    // Should show family selector
-    expect(screen.getByRole('combobox')).toBeInTheDocument();
+    // No selector now; create-only when no family
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
   });
 
   test('provides complete family management functionality when family is selected', async () => {
     const Wrapper = createWrapper({i18n: true, queryClient: true});
     render(wrap(<Family />), {wrapper: Wrapper});
 
-    await screen.findByText('Your Families');
-
-    // Should provide all core family management features even without selecting a family
-    expect(screen.getByPlaceholderText('New family name')).toBeInTheDocument();
-    expect(
-      screen.getAllByRole('button', {name: 'Create'})[0],
-    ).toBeInTheDocument();
-    expect(screen.getByRole('combobox')).toBeInTheDocument();
-
-    // Note: Member management sections are only visible when a family is selected
-    // Since our mock returns a family with id: 1, the Family component should
-    // automatically select it via useEffect, making members section visible
+    await screen.findByText('Your Family');
+    // With a family present, members section is visible
     await expect(screen.findByText('Members')).resolves.toBeInTheDocument();
   });
 
@@ -96,55 +84,62 @@ describe('family page', () => {
       const Wrapper = createWrapper({i18n: true, queryClient: true});
       render(wrap(<Family />), {wrapper: Wrapper});
     });
-    expect(screen.getByText('Your Families')).toBeInTheDocument();
+    expect(screen.getByText('Your Family')).toBeInTheDocument();
   });
 
   test('allows creating a new family and child & inviting a member', async () => {
     const {familiesApi, invitationsApi} = jest.mocked(apiModule);
+    // First load: no family → show create form
+    familiesApi.myFamily.mockResolvedValueOnce({success: true, data: null});
     familiesApi.create.mockResolvedValueOnce({success: true});
+    // After create, refetch returns the new family
+    familiesApi.myFamily.mockResolvedValueOnce({
+      success: true,
+      data: {id: 1, name: 'Fam', owner_id: 1, created_at: ''},
+    });
+    familiesApi.listMembers.mockResolvedValueOnce({success: true, data: []});
     familiesApi.createChild.mockResolvedValueOnce({success: true});
     invitationsApi.create.mockResolvedValueOnce({success: true});
 
     const Wrapper = createWrapper({i18n: true, queryClient: true});
     render(wrap(<Family />), {wrapper: Wrapper});
-    await screen.findByText('Your Families');
+
+    await screen.findByText('Your Family');
+    // Create family
     await userEvent.type(
       screen.getByPlaceholderText('New family name'),
       'NewFam',
     );
-    await userEvent.click(screen.getAllByRole('button', {name: 'Create'})[0]!);
-    // Without a selected family, member sections are hidden.
-    // Simulate a selection by setting state indirectly
-    const selects = screen.getAllByRole('combobox');
-    const familySelect = selects[0]!;
-    await act(async () => {
-      await userEvent.selectOptions(familySelect, '1');
-    });
-    // Create child
-    // Since members section depends on selection, skip the child creation inputs if not present
+    await userEvent.click(screen.getByRole('button', {name: 'Create'}));
+    expect(familiesApi.create).toHaveBeenCalledWith({name: 'NewFam'});
+
+    // After refetch, member sections are visible
     const usernameInput = await screen.findByPlaceholderText('Username');
     await userEvent.type(usernameInput, 'kid');
     await userEvent.type(
       screen.getAllByPlaceholderText('Email')[0]!,
       'kid@ex.com',
     );
-    await userEvent.type(screen.getAllByPlaceholderText('Password')[0]!, 'pw');
+    await userEvent.type(
+      screen.getAllByPlaceholderText('Password')[0]!,
+      'pw12',
+    );
     await act(async () => {
       await userEvent.click(
-        screen.getAllByRole('button', {name: 'Create'})[1]!,
+        screen.getAllByRole('button', {name: 'Create'})[0]!,
       );
     });
+
     // Invite
     const inviteEmailInput = screen.getAllByPlaceholderText('Email')[1]!;
     await userEvent.type(inviteEmailInput, 'm@ex.com');
     await act(async () => {
       await userEvent.click(screen.getByRole('button', {name: 'Send'}));
     });
-    expect(familiesApi.create).toHaveBeenCalledWith({name: 'NewFam'});
     expect(familiesApi.createChild).toHaveBeenCalledWith(1, {
       username: 'kid',
       email: 'kid@ex.com',
-      password: 'pw',
+      password: 'pw12',
     });
     expect(invitationsApi.create).toHaveBeenCalledWith(1, {
       email: 'm@ex.com',
@@ -155,17 +150,14 @@ describe('family page', () => {
   test('skips actions when inputs are empty (validation branches)', async () => {
     const Wrapper2 = createWrapper({i18n: true, queryClient: true});
     render(wrap(<Family />), {wrapper: Wrapper2});
-    await screen.findByText('Your Families');
+    await screen.findByText('Your Family');
     // Click create with empty family name (guard branch)
     await userEvent.click(screen.getAllByRole('button', {name: 'Create'})[0]!);
-    // Select a family to reveal sections
-    await userEvent.selectOptions(screen.getAllByRole('combobox')[0]!, '1');
+    // No selector now
     // Child create with missing inputs (guard branch)
-    await userEvent.click(screen.getAllByRole('button', {name: 'Create'})[1]!);
     // Invite with empty email should no-op (exercise path only)
-    await userEvent.selectOptions(screen.getAllByRole('combobox')[0]!, '1');
     await userEvent.click(screen.getByRole('button', {name: 'Send'}));
     // Nothing to assert on API; ensure page is still rendered
-    expect(screen.getByText('Your Families')).toBeInTheDocument();
+    expect(screen.getByText('Your Family')).toBeInTheDocument();
   });
 });

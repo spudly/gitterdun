@@ -9,6 +9,7 @@ type CreateChoreParams = {
   pointReward: number;
   bonusPoints: number;
   penaltyPoints: number;
+  startDate: string | null;
   dueDate: string | null;
   recurrenceRule: string | null;
   choreType: string;
@@ -55,6 +56,7 @@ export const createChoreInDb = (params: CreateChoreParams) => {
     pointReward,
     bonusPoints,
     penaltyPoints,
+    startDate,
     dueDate,
     recurrenceRule,
     choreType,
@@ -69,6 +71,7 @@ export const createChoreInDb = (params: CreateChoreParams) => {
           point_reward,
           bonus_points,
           penalty_points,
+          start_date,
           due_date,
           recurrence_rule,
           chore_type,
@@ -83,6 +86,7 @@ export const createChoreInDb = (params: CreateChoreParams) => {
       pointReward,
       bonusPoints,
       penaltyPoints,
+      startDate,
       dueDate,
       recurrenceRule,
       choreType,

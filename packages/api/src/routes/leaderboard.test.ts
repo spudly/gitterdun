@@ -42,7 +42,7 @@ const mockedLeaderboardEntrySchema = jest.mocked(LeaderboardEntrySchema);
 const mockedAsError = jest.mocked(asError);
 
 describe('leaderboard routes', () => {
-  let app: express.Application | undefined;
+  let app: ReturnType<typeof express> | undefined;
   let server: Server | undefined;
   let baseUrl: string | undefined;
 

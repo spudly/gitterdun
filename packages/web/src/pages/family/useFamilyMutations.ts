@@ -2,7 +2,14 @@ import {useMutation} from '@tanstack/react-query';
 import type {UseQueryResult} from '@tanstack/react-query';
 import {familiesApi, invitationsApi} from '../../lib/api.js';
 
-type QueryWithRefetch = Pick<UseQueryResult, 'refetch'>;
+type QueryWithRefetch = Pick<UseQueryResult, 'refetch'> | undefined;
+
+type CreateChildInput = {
+  familyId: number;
+  username: string;
+  email: string | undefined;
+  password: string;
+};
 
 export const useFamilyMutations = (
   myFamiliesQuery: QueryWithRefetch,
@@ -11,24 +18,19 @@ export const useFamilyMutations = (
   const createFamilyMutation = useMutation({
     mutationFn: familiesApi.create,
     onSuccess: async () => {
-      await myFamiliesQuery.refetch();
+      await myFamiliesQuery?.refetch();
     },
   });
 
   const createChildMutation = useMutation({
-    mutationFn: async (params: {
-      familyId: number;
-      username: string;
-      email: string;
-      password: string;
-    }) =>
+    mutationFn: async (params: CreateChildInput) =>
       familiesApi.createChild(params.familyId, {
         username: params.username,
         email: params.email,
         password: params.password,
       }),
     onSuccess: async () => {
-      await membersQuery.refetch();
+      await membersQuery?.refetch();
     },
   });
 

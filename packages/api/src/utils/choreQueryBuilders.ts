@@ -4,6 +4,8 @@ type ChoreFilters = {
   status?: string | undefined;
   choreType?: string | undefined;
   userId?: number | undefined;
+  sortBy?: 'created_at' | 'start_date' | 'due_date' | undefined;
+  order?: 'asc' | 'desc' | undefined;
 };
 
 type FilterResult = {queryAddition: string; param?: string | number};
@@ -57,17 +59,24 @@ const getUserIdFilter = (userId?: number): FilterResult => {
 
 const applyChoreFilters = (
   baseQuery: string,
-  {status, choreType, userId}: ChoreFilters,
+  {status, choreType, userId, sortBy, order}: ChoreFilters,
 ) => {
   const statusFilter = getStatusFilter(status);
   const choreTypeFilter = getChoreTypeFilter(choreType);
   const userIdFilter = getUserIdFilter(userId);
 
-  const query =
+  let query =
     baseQuery
     + statusFilter.queryAddition
     + choreTypeFilter.queryAddition
     + userIdFilter.queryAddition;
+
+  if (sortBy) {
+    const direction = order?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+    const allowed = ['created_at', 'start_date', 'due_date'] as const;
+    const safeColumn = allowed.includes(sortBy) ? sortBy : 'created_at';
+    query += ` ORDER BY c.${safeColumn} ${direction}`;
+  }
   const params = [
     statusFilter.param,
     choreTypeFilter.param,
@@ -81,7 +90,15 @@ export const buildChoresQuery = (
   status?: string,
   choreType?: string,
   userId?: number,
+  sortBy?: 'created_at' | 'start_date' | 'due_date',
+  order?: 'asc' | 'desc',
 ) => {
   const baseQuery = getBaseChoresQuery();
-  return applyChoreFilters(baseQuery, {status, choreType, userId});
+  return applyChoreFilters(baseQuery, {
+    status,
+    choreType,
+    userId,
+    sortBy,
+    order,
+  });
 };

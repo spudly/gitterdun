@@ -4,7 +4,30 @@ import {createWrapper} from '../test/createWrapper';
 import Admin from './Admin';
 
 jest.mock('../hooks/useUser', () => ({
-  useUser: jest.fn(() => ({user: {id: 1, role: 'admin'}})),
+  useUser: jest.fn(() => ({
+    user: {
+      id: 1,
+      username: 'admin',
+      email: 'admin@example.com',
+      role: 'admin',
+      points: 0,
+      streak_count: 0,
+      created_at: '',
+      updated_at: '',
+    },
+    isLoading: false,
+    error: null,
+    login: jest.fn(),
+    register: jest.fn(),
+    logout: jest.fn(),
+    forgotPassword: jest.fn(),
+    resetPassword: jest.fn(),
+    isLoggingIn: false,
+    isRegistering: false,
+    isLoggingOut: false,
+    loginError: null,
+    registerError: null,
+  })),
 }));
 
 jest.mock('../lib/api', () => ({
@@ -27,10 +50,8 @@ describe('admin page', () => {
     });
     render(<Admin />, {wrapper: Wrapper});
 
-    // Should render the admin panel title
     await expect(screen.findByText('Admin Panel')).resolves.toBeInTheDocument();
 
-    // Should NOT contain family management functionality
     expect(screen.queryByText('Family Management')).not.toBeInTheDocument();
     expect(
       screen.queryByPlaceholderText('Family name'),
@@ -42,11 +63,37 @@ describe('admin page', () => {
     expect(
       screen.queryByRole('button', {name: 'Invite'}),
     ).not.toBeInTheDocument();
+    expect(screen.queryByText('Chores Management')).not.toBeInTheDocument();
   });
 
   test('denies access for non-admin users', () => {
-    const useUserMock = jest.requireMock('../hooks/useUser').useUser;
-    useUserMock.mockReturnValueOnce({user: {id: 1, role: 'user'}});
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- wrong
+    const mocked = jest.requireMock('../hooks/useUser') as {useUser: any};
+    const useUserMock: any = mocked.useUser;
+    useUserMock.mockReturnValueOnce({
+      user: {
+        id: 1,
+        username: 'u',
+        email: 'e@x',
+        role: 'user',
+        points: 0,
+        streak_count: 0,
+        created_at: '',
+        updated_at: '',
+      },
+      isLoading: false,
+      error: null,
+      login: jest.fn(),
+      register: jest.fn(),
+      logout: jest.fn(),
+      forgotPassword: jest.fn(),
+      resetPassword: jest.fn(),
+      isLoggingIn: false,
+      isRegistering: false,
+      isLoggingOut: false,
+      loginError: null,
+      registerError: null,
+    });
 
     const Wrapper = createWrapper({
       i18n: true,
@@ -62,8 +109,24 @@ describe('admin page', () => {
   });
 
   test('denies access for unauthenticated users', () => {
-    const useUserMock = jest.requireMock('../hooks/useUser').useUser;
-    useUserMock.mockReturnValueOnce({user: null});
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- wrong
+    const mocked = jest.requireMock('../hooks/useUser') as {useUser: any};
+    const useUserMock: any = mocked.useUser;
+    useUserMock.mockReturnValueOnce({
+      user: null,
+      isLoading: false,
+      error: null,
+      login: jest.fn(),
+      register: jest.fn(),
+      logout: jest.fn(),
+      forgotPassword: jest.fn(),
+      resetPassword: jest.fn(),
+      isLoggingIn: false,
+      isRegistering: false,
+      isLoggingOut: false,
+      loginError: null,
+      registerError: null,
+    });
 
     const Wrapper = createWrapper({
       i18n: true,

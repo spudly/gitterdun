@@ -25,6 +25,8 @@ type ProcessChoresParams = {
   userId?: number | undefined;
   page?: number | undefined;
   limit?: number | undefined;
+  sortBy?: 'created_at' | 'start_date' | 'due_date' | undefined;
+  order?: 'asc' | 'desc' | undefined;
 };
 
 const getChoresCount = (query: string, params: Array<string | number>) => {
@@ -76,11 +78,15 @@ export const processChoresRequest = ({
   userId,
   page,
   limit,
+  sortBy,
+  order,
 }: ProcessChoresParams) => {
   const {query, params: queryParams} = buildChoresQuery(
     status,
     choreType,
     userId,
+    sortBy,
+    order,
   );
   const total = getChoresCount(query, queryParams);
 

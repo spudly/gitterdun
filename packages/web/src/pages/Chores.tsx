@@ -60,8 +60,15 @@ const Chores: FC = () => {
   const intl = useIntl();
 
   const {data: choresResponse, isLoading} = useQuery({
-    queryKey: ['chores'],
-    queryFn: async () => choresApi.getAll(),
+    queryKey: ['chores', user?.id],
+    queryFn: async () =>
+      choresApi.getAll({
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- will never be called if user is null/undefined
+        user_id: user!.id,
+        status: 'pending',
+        sort_by: 'start_date',
+        order: 'asc',
+      }),
     enabled: Boolean(user),
   });
 
@@ -144,6 +151,21 @@ const Chores: FC = () => {
                 <Button size="sm" variant="primary">
                   <FormattedMessage {...messages.complete} />
                 </Button>
+              ) : chore.status === 'completed' ? (
+                <>
+                  <Button size="sm" variant="primary">
+                    <FormattedMessage
+                      defaultMessage="Approve"
+                      id="pages.admin.AdminChoresManagement.approve"
+                    />
+                  </Button>
+                  <Button size="sm" variant="danger">
+                    <FormattedMessage
+                      defaultMessage="Reject"
+                      id="pages.admin.AdminChoresManagement.reject"
+                    />
+                  </Button>
+                </>
               ) : undefined
             }
             title={chore.title}

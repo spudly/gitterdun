@@ -85,6 +85,40 @@ describe('chores page', () => {
     await expect(screen.findByText('Bonus: +1')).resolves.toBeInTheDocument();
   });
 
+  test('shows Approve/Reject for completed chores (user-level)', async () => {
+    const mocked = jest.mocked(apiModule);
+    mocked.choresApi.getAll.mockResolvedValueOnce({
+      success: true,
+      data: [
+        {
+          id: 5,
+          title: 'Completed Chore',
+          description: '',
+          point_reward: 5,
+          bonus_points: 1,
+          penalty_points: 0,
+          chore_type: 'bonus',
+          status: 'completed',
+          created_by: 1,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      ],
+    });
+    render(<Chores />, {
+      wrapper: createWrapper({i18n: true, queryClient: true}),
+    });
+
+    await expect(screen.findByText('Chores')).resolves.toBeInTheDocument();
+    await expect(
+      screen.findByRole('button', {name: 'Approve'}),
+    ).resolves.toBeInTheDocument();
+    await expect(
+      screen.findByRole('button', {name: 'Reject'}),
+    ).resolves.toBeInTheDocument();
+    await expect(screen.findByText('Bonus: +1')).resolves.toBeInTheDocument();
+  });
+
   test('renders penalty and due date meta when present', async () => {
     const mocked = jest.mocked(apiModule);
     mocked.choresApi.getAll.mockResolvedValueOnce({

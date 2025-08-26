@@ -38,25 +38,19 @@ export const ensureFamilyMembership = (
   userId: number,
   role: string,
 ): void => {
-  const member = db
-    .prepare(sql`
-      SELECT
-        1
-      FROM
-        family_members
-      WHERE
-        family_id = ?
-        AND user_id = ?
-    `)
-    .get(familyId, userId);
-  if (member === undefined) {
-    db.prepare(sql`
-      INSERT INTO
-        family_members (family_id, user_id, role)
-      VALUES
-        (?, ?, ?)
-    `).run(familyId, userId, role);
-  }
+  // Enforce single-family membership: remove any existing memberships first
+  db.prepare(sql`
+    DELETE FROM family_members
+    WHERE
+      user_id = ?
+  `).run(userId);
+
+  db.prepare(sql`
+    INSERT INTO
+      family_members (family_id, user_id, role)
+    VALUES
+      (?, ?, ?)
+  `).run(familyId, userId, role);
 };
 
 export const markInvitationAccepted = (token: string): void => {

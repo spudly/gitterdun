@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS chores (
   point_reward INTEGER NOT NULL DEFAULT 0,
   bonus_points INTEGER DEFAULT 0,
   penalty_points INTEGER DEFAULT 0,
+  start_date datetime,
   due_date datetime,
   recurrence_rule TEXT, -- iCalendar RFC 5545 format
   chore_type TEXT NOT NULL DEFAULT 'required', -- 'required' or 'bonus'
@@ -132,6 +133,8 @@ CREATE INDEX IF NOT EXISTS idx_chores_status ON chores (status);
 
 CREATE INDEX IF NOT EXISTS idx_chores_due_date ON chores (due_date);
 
+CREATE INDEX IF NOT EXISTS idx_chores_start_date ON chores (start_date);
+
 CREATE INDEX IF NOT EXISTS idx_chore_assignments_user_id ON chore_assignments (user_id);
 
 CREATE INDEX IF NOT EXISTS idx_chore_assignments_chore_id ON chore_assignments (chore_id);
@@ -157,6 +160,9 @@ CREATE TABLE IF NOT EXISTS family_members (
   role TEXT NOT NULL CHECK (role IN ('parent', 'child')),
   PRIMARY KEY (family_id, user_id)
 );
+
+-- Enforce single-family per user (SQLite)
+CREATE UNIQUE INDEX IF NOT EXISTS ux_family_members_user_id ON family_members (user_id);
 
 -- Invitations to join a family
 CREATE TABLE IF NOT EXISTS family_invitations (

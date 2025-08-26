@@ -10,7 +10,6 @@ import {Stack} from '../widgets/Stack.js';
 import {Card} from '../widgets/Card.js';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {AdminStats} from './admin/AdminStats.js';
-import {AdminChoresManagement} from './admin/AdminChoresManagement.js';
 import {AdminUsers} from './admin/AdminUsers.js';
 
 const useAdminSetup = () => {
@@ -73,7 +72,6 @@ const Admin: FC = () => {
 
       <Stack gap="lg">
         <AdminStats chores={chores} />
-        <AdminChoresManagement chores={chores} />
         <AdminUsers />
       </Stack>
     </PageContainer>

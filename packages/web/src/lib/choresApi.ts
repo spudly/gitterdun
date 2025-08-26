@@ -10,6 +10,8 @@ export const choresApi = {
     user_id?: number;
     page?: number;
     limit?: number;
+    sort_by?: 'created_at' | 'start_date' | 'due_date';
+    order?: 'asc' | 'desc';
   }) => api.get('/chores', z.array(ChoreWithUsernameSchema), params),
 
   getById: async (id: number) =>
@@ -21,6 +23,7 @@ export const choresApi = {
     point_reward: number;
     bonus_points?: number;
     penalty_points?: number;
+    start_date?: string;
     due_date?: string;
     recurrence_rule?: string;
     chore_type: string;
@@ -35,6 +38,7 @@ export const choresApi = {
       point_reward?: number;
       bonus_points?: number;
       penalty_points?: number;
+      start_date?: string;
       due_date?: string;
       recurrence_rule?: string;
       chore_type?: string;

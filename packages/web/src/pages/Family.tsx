@@ -8,7 +8,6 @@ import {FormSection} from '../widgets/FormSection.js';
 import {GridContainer} from '../widgets/GridContainer.js';
 import {Stack} from '../widgets/Stack.js';
 import {useUser} from '../hooks/useUser.js';
-import {FamilySelector} from './family/FamilySelector.js';
 import {FamilyMembers} from './family/FamilyMembers.js';
 import {CreateChildForm} from './family/CreateChildForm.js';
 import {InviteMemberForm} from './family/InviteMemberForm.js';
@@ -18,20 +17,20 @@ const useFamilySetup = () => {
   const {user} = useUser();
   const [selectedFamilyId, setSelectedFamilyId] = useState<number | null>(null);
   const [newFamilyName, setNewFamilyName] = useState('');
-  const myFamiliesQuery = useQuery({
-    queryKey: ['families', 'mine'],
-    queryFn: async () => familiesApi.myFamilies(),
+  const myFamilyQuery = useQuery({
+    queryKey: ['family', 'mine'],
+    queryFn: async () => familiesApi.myFamily(),
     enabled: Boolean(user),
   });
   useEffect(() => {
-    const first = myFamiliesQuery.data?.data?.[0];
-    if (first != null && selectedFamilyId == null) {
-      const candidate = (first as {id?: unknown}).id;
+    const fam = myFamilyQuery.data?.data;
+    if (fam != null && selectedFamilyId == null) {
+      const candidate = (fam as {id?: unknown}).id;
       if (typeof candidate === 'number') {
         setSelectedFamilyId(candidate);
       }
     }
-  }, [myFamiliesQuery.data?.data, selectedFamilyId]);
+  }, [myFamilyQuery.data?.data, selectedFamilyId]);
   const membersQuery = useQuery({
     queryKey: ['family', selectedFamilyId, 'members'],
     queryFn: async () => {
@@ -43,12 +42,13 @@ const useFamilySetup = () => {
     enabled: selectedFamilyId != null,
   });
   const {createFamilyMutation, createChildMutation, inviteMutation} =
-    useFamilyMutations(myFamiliesQuery, membersQuery);
-  const familyOptions = myFamiliesQuery.data?.data ?? [];
+    useFamilyMutations(myFamilyQuery, membersQuery);
+  const familyOptions = myFamilyQuery.data?.data
+    ? [myFamilyQuery.data.data]
+    : [];
   return {
     user,
     selectedFamilyId,
-    setSelectedFamilyId,
     newFamilyName,
     setNewFamilyName,
     createFamilyMutation,
@@ -64,7 +64,6 @@ const Family: FC = () => {
   const {
     user,
     selectedFamilyId,
-    setSelectedFamilyId,
     newFamilyName,
     setNewFamilyName,
     createFamilyMutation,
@@ -89,21 +88,45 @@ const Family: FC = () => {
     <PageContainer>
       <FormSection
         title={intl.formatMessage({
-          defaultMessage: 'Your Families',
-          id: 'pages.Family.your-families',
+          defaultMessage: 'Your Family',
+          id: 'pages.Family.your-family',
         })}
       >
-        <FamilySelector
-          families={familyOptions}
-          newFamilyName={newFamilyName}
-          onCreateFamily={() => {
-            createFamilyMutation.mutate({name: newFamilyName});
-            setNewFamilyName('');
-          }}
-          onFamilySelect={setSelectedFamilyId}
-          onNewFamilyNameChange={setNewFamilyName}
-          selectedFamilyId={selectedFamilyId}
-        />
+        {familyOptions.length === 0 ? (
+          <Stack gap="md">
+            <div>
+              <input
+                className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                onChange={event => {
+                  setNewFamilyName(event.target.value);
+                }}
+                placeholder={intl.formatMessage({
+                  defaultMessage: 'New family name',
+                  id: 'pages.family.FamilySelector.new-family-name',
+                })}
+                value={newFamilyName}
+              />
+            </div>
+            <button
+              className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-60"
+              onClick={() => {
+                if (newFamilyName.trim() === '') {
+                  return;
+                }
+                createFamilyMutation.mutate({name: newFamilyName});
+                setNewFamilyName('');
+              }}
+              type="button"
+            >
+              <span className="flex items-center gap-2 opacity-100">
+                {intl.formatMessage({
+                  defaultMessage: 'Create',
+                  id: 'pages.family.FamilySelector.create',
+                })}
+              </span>
+            </button>
+          </Stack>
+        ) : null}
       </FormSection>
 
       {selectedFamilyId !== null ? (
