@@ -130,14 +130,14 @@ const RankingListDemo: FC = () => {
       </div>
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Usage Example</h3>
-        <div className="rounded-lg bg-gray-50 p-6">
-          <h3 className="mb-4 text-xl font-semibold">Monthly Leaderboard</h3>
+        <div className="flex flex-col gap-6 rounded-lg bg-gray-50 p-6">
+          <h3 className="text-xl font-semibold">Monthly Leaderboard</h3>
           <RankingList
             items={sampleRankings}
             subtitle="Sorted by total points"
             title="Full Rankings"
           />
-          <div className="mt-6 text-center">
+          <div className="text-center">
             <p className="text-sm text-gray-600">
               Keep up the great work! Rankings update daily.
             </p>
