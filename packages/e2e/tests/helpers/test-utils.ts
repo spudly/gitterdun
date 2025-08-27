@@ -1,7 +1,19 @@
 import type {Page} from '@playwright/test';
 import {expect} from '@playwright/test';
 
-export type UserCredentials = {username: string; password: string};
+type UserCredentials = {username: string; password: string};
+
+const generateShortId = (): string =>
+  `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+
+const buildUsername = (prefix: string, suffix = '', maxLength = 50): string => {
+  const id = generateShortId();
+  const base = `${prefix}_${id}`;
+  const candidate = `${base}${suffix}`;
+  return candidate.length > maxLength
+    ? candidate.slice(0, maxLength)
+    : candidate;
+};
 
 /**
  * Register and login a user with the given suffix
@@ -10,13 +22,12 @@ export const registerAndLogin = async (
   page: Page,
   suffix = '',
 ): Promise<UserCredentials> => {
-  const timestamp = Date.now() + Math.random();
-  const username = `testuser${timestamp}${suffix}`;
+  const username = buildUsername('tu', suffix);
   const password = 'testpassword123';
 
   await page.goto('/register');
-  await page.fill('#username', username);
-  await page.fill('#password', password);
+  await page.getByRole('textbox', {name: 'Username'}).fill(username);
+  await page.getByRole('textbox', {name: 'Password'}).fill(password);
   await page.click('button[type="submit"]');
   await expect(page).toHaveURL('/');
 
@@ -33,8 +44,8 @@ export const loginAs = async (
 ): Promise<void> => {
   await page.context().clearCookies();
   await page.goto('/login');
-  await page.fill('#email', username);
-  await page.fill('#password', password);
+  await page.getByRole('textbox', {name: 'Username or Email'}).fill(username);
+  await page.getByRole('textbox', {name: 'Password'}).fill(password);
   await page.click('button[type="submit"]');
   await expect(page).toHaveURL('/');
 };
@@ -43,34 +54,31 @@ export const loginAs = async (
  * Create a family setup with parent and child
  */
 export const setupFamily = async (page: Page) => {
-  const timestamp = Date.now() + Math.random();
-  const parentUsername = `parent${timestamp}`;
-  const parentPassword = 'parentpassword123';
-  const childUsername = `child${timestamp}`;
+  const id = generateShortId();
+  const childUsername = `c_${id}`;
   const childPassword = 'childpassword123';
 
-  // Register parent user
-  await page.goto('/register');
-  await page.fill('#username', parentUsername);
-  await page.fill('#password', parentPassword);
+  // Login as admin user (which already exists)
+  await page.goto('/login');
+  await page.getByRole('textbox', {name: 'Username or Email'}).fill('admin');
+  await page.getByRole('textbox', {name: 'Password'}).fill('admin123');
   await page.click('button[type="submit"]');
   await expect(page).toHaveURL('/');
 
-  // Create family
+  // Navigate to family page (admin user already has a family)
   await page.goto('/family');
-  const familyName = `Test Family ${timestamp}`;
-  await page.fill('input[placeholder*="family name"]', familyName);
-  await page.click('button:has-text("Create")');
-  await expect(page.locator('text=Members')).toBeVisible();
+  // Wait for the family page to load (admin already has a family)
+  await expect(page.getByRole('heading', {name: 'Your Family'})).toBeVisible();
+  const familyName = `Admin Family`; // Use admin's existing family
 
   // Add child to family
-  await page.fill('input#child-username', childUsername);
-  await page.fill('input#child-password', childPassword);
-  await page.click('button:has-text("Create Child")');
+  await page.getByRole('textbox', {name: 'Username'}).fill(childUsername);
+  await page.getByRole('textbox', {name: 'Password'}).fill(childPassword);
+  await page.click('button:has-text("Create")');
   await expect(page.locator(`text=${childUsername}`)).toBeVisible();
 
   return {
-    parent: {username: parentUsername, password: parentPassword},
+    parent: {username: 'admin', password: 'admin123'},
     child: {username: childUsername, password: childPassword},
     familyName,
   };
@@ -84,9 +92,11 @@ const addChildToFamily = async (
   username: string,
   password: string,
 ) => {
-  await page.fill('input#child-username', username);
-  await page.fill('input#child-password', password);
-  await page.click('button:has-text("Create Child")');
+  // Target the Create Child form specifically to avoid conflicts with invite form
+  const createChildForm = page.locator('div').filter({hasText: /^Create$/});
+  await createChildForm.getByPlaceholder('Username').fill(username);
+  await createChildForm.getByPlaceholder('Password').fill(password);
+  await page.click('button:has-text("Create")');
   await expect(page.locator(`text=${username}`)).toBeVisible();
 };
 
@@ -94,19 +104,19 @@ const addChildToFamily = async (
  * Create a family setup with multiple children for leaderboard testing
  */
 export const setupFamilyWithChildren = async (page: Page) => {
-  const timestamp = Date.now() + Math.random();
-  const parent = await registerAndLogin(page, `_parent_${timestamp}`);
+  const id = generateShortId();
+  const parent = await registerAndLogin(page, '_p');
 
   // Create family
   await page.goto('/family');
-  const familyName = `Test Family ${timestamp}`;
-  await page.fill('input[placeholder*="family name"]', familyName);
+  const familyName = `Test Family ${id}`;
+  await page.fill('input[placeholder*="New family name"]', familyName);
   await page.click('button:has-text("Create")');
   await expect(page.locator('text=Members')).toBeVisible();
 
   // Add children
-  const child1Username = `child1_${timestamp}`;
-  const child2Username = `child2_${timestamp}`;
+  const child1Username = `c1_${id}`;
+  const child2Username = `c2_${id}`;
   const childPassword = 'childpassword123';
 
   await addChildToFamily(page, child1Username, childPassword);

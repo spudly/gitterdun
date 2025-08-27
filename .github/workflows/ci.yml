@@ -265,7 +265,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ github.sha }}
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        run: npm run ci:install:browsers
 
       - name: Debug system info
         run: |

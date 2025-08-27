@@ -1,0 +1,19 @@
+# Node Version Management
+
+Always use the Node.js version specified in the `.nvmrc` file at the project root.
+
+## Instructions for Cursor
+
+1. **Terminal Commands**: Before running any npm, node, or terminal commands, ensure you're using the correct Node version by checking that `node --version` returns the correct version number, as specified in the `.nvmrc` file at the project root.
+
+2. **Installation Reminder**: If the required Node version is not installed, stop and inform the user that they need to install it.
+
+3. **Consistency**: Always prefer nvm for Node version management over other package managers like Homebrew for this project.
+
+## Verification
+
+You can verify the correct Node version is active by running:
+
+```bash
+node --version
+```

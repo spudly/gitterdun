@@ -29,7 +29,7 @@ test.describe('Authentication Flow', () => {
     await expect(page).toHaveURL('/');
 
     // Should see dashboard content
-    await expect(page.locator('text=Dashboard')).toBeVisible();
+    await expect(page.getByRole('heading', {name: 'Dashboard'})).toBeVisible();
   });
 
   test('should login with existing credentials', async ({page}) => {
@@ -64,7 +64,7 @@ test.describe('Authentication Flow', () => {
     await expect(page).toHaveURL('/');
 
     // Should see dashboard content
-    await expect(page.locator('text=Dashboard')).toBeVisible();
+    await expect(page.getByRole('heading', {name: 'Dashboard'})).toBeVisible();
   });
 
   test('should show error for invalid login credentials', async ({page}) => {
@@ -78,7 +78,8 @@ test.describe('Authentication Flow', () => {
     await page.click('button[type="submit"]');
 
     // Should show error message
-    await expect(page.locator('[role="alert"]')).toBeVisible();
+    await expect(page.getByRole('alert').first()).toBeVisible();
+    await expect(page.getByText(/Login failed/i).first()).toBeVisible();
 
     // Should stay on login page
     await expect(page).toHaveURL('/login');

@@ -49,5 +49,7 @@ export const setSessionCookie = (
     sameSite: 'lax',
     expires: expiresAt,
     path: '/',
+    // Set domain to localhost for cross-port cookie sharing in development
+    domain: process.env['NODE_ENV'] === 'production' ? undefined : 'localhost',
   });
 };

@@ -20,6 +20,7 @@
     "test:e2e:ui": "npm run test:ui --workspace=packages/e2e",
     "test:e2e:debug": "npm run test:debug --workspace=packages/e2e",
     "install:browsers": "npm run install --workspace=packages/e2e",
+    "ci:install:browsers": "npm run install:browsers --workspace=packages/e2e -- --with-deps chromium",
     "prettier:fix": "node --experimental-strip-types node_modules/prettier/bin/prettier.cjs --write .",
     "prettier:check": "node --experimental-strip-types node_modules/prettier/bin/prettier.cjs --check .",
     "lint-staged": "NODE_OPTIONS='--experimental-strip-types' lint-staged",

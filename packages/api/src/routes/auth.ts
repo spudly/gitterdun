@@ -49,6 +49,9 @@ router.post('/register', async (req, res) => {
       : {username, password, role},
   );
 
+  // Automatically log in the user after successful registration
+  createLoginSession(res, validatedUser.id);
+
   logger.info(`New user registered: ${username}`);
   res
     .status(201)
