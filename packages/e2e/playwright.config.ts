@@ -28,27 +28,20 @@ export default defineConfig({
   },
 
   /* Configure projects for major browsers */
-  projects: [
-    {name: 'chromium', use: {...devices['Desktop Chrome']}},
-
-    {name: 'firefox', use: {...devices['Desktop Firefox']}},
-
-    {name: 'webkit', use: {...devices['Desktop Safari']}},
-
-    /* Test against mobile viewports. */
-    {name: 'Mobile Chrome', use: {...devices['Pixel 5']}},
-    {name: 'Mobile Safari', use: {...devices['iPhone 12']}},
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
-  ],
+  projects:
+    process.env['CI'] === 'true'
+      ? [
+          // Only run Chromium in CI for faster execution
+          {name: 'chromium', use: {...devices['Desktop Chrome']}},
+        ]
+      : [
+          // Full browser matrix for local development
+          {name: 'chromium', use: {...devices['Desktop Chrome']}},
+          {name: 'firefox', use: {...devices['Desktop Firefox']}},
+          {name: 'webkit', use: {...devices['Desktop Safari']}},
+          {name: 'Mobile Chrome', use: {...devices['Pixel 5']}},
+          {name: 'Mobile Safari', use: {...devices['iPhone 12']}},
+        ],
 
   /* Run your local dev server before starting the tests */
   webServer: [
@@ -57,7 +50,7 @@ export default defineConfig({
       url: 'http://localhost:8000/api/health',
       reuseExistingServer: process.env['CI'] !== 'true',
       cwd: '../..',
-      timeout: 120 * 1000,
+      timeout: process.env['CI'] === 'true' ? 300 * 1000 : 120 * 1000, // 5min for CI, 2min local
       stderr: 'pipe',
       stdout: 'pipe',
     },
@@ -66,7 +59,7 @@ export default defineConfig({
       url: 'http://localhost:8001',
       reuseExistingServer: process.env['CI'] !== 'true',
       cwd: '../..',
-      timeout: 120 * 1000,
+      timeout: process.env['CI'] === 'true' ? 300 * 1000 : 120 * 1000, // 5min for CI, 2min local
       stderr: 'pipe',
       stdout: 'pipe',
     },
