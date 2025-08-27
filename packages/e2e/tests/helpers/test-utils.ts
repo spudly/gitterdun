@@ -69,11 +69,18 @@ export const setupFamily = async (page: Page) => {
   await page.goto('/family');
   // Wait for the family page to load (admin already has a family)
   await expect(page.getByRole('heading', {name: 'Your Family'})).toBeVisible();
+
+  // Wait for the family to be loaded and the create child form to be visible
+  // The form only appears when a family is selected, so we need to wait for it
+  await expect(page.getByText('Create Child Account')).toBeVisible({
+    timeout: 10000,
+  });
+
   const familyName = `Admin Family`; // Use admin's existing family
 
-  // Add child to family
-  await page.getByRole('textbox', {name: 'Username'}).fill(childUsername);
-  await page.getByRole('textbox', {name: 'Password'}).fill(childPassword);
+  // Add child to family using placeholder text selectors since the inputs don't have proper labels
+  await page.getByPlaceholder('Username').fill(childUsername);
+  await page.getByPlaceholder('Password').fill(childPassword);
   await page.click('button:has-text("Create")');
   await expect(page.locator(`text=${childUsername}`)).toBeVisible();
 
