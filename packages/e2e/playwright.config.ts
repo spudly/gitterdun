@@ -44,24 +44,27 @@ export default defineConfig({
         ],
 
   /* Run your local dev server before starting the tests */
-  webServer: [
-    {
-      command: 'npm run dev:api',
-      url: 'http://localhost:8000/api/health',
-      reuseExistingServer: process.env['CI'] !== 'true',
-      cwd: '../..',
-      timeout: process.env['CI'] === 'true' ? 300 * 1000 : 120 * 1000, // 5min for CI, 2min local
-      stderr: 'pipe',
-      stdout: 'pipe',
-    },
-    {
-      command: 'npm run dev:web',
-      url: 'http://localhost:8001',
-      reuseExistingServer: process.env['CI'] !== 'true',
-      cwd: '../..',
-      timeout: process.env['CI'] === 'true' ? 300 * 1000 : 120 * 1000, // 5min for CI, 2min local
-      stderr: 'pipe',
-      stdout: 'pipe',
-    },
-  ],
+  webServer:
+    process.env['PLAYWRIGHT_SKIP_WEBSERVER'] === '1'
+      ? undefined
+      : [
+          {
+            command: 'npm run dev:api',
+            url: 'http://localhost:8000/api/health',
+            reuseExistingServer: process.env['CI'] !== 'true',
+            cwd: '../..',
+            timeout: process.env['CI'] === 'true' ? 300 * 1000 : 120 * 1000, // 5min for CI, 2min local
+            stderr: 'pipe',
+            stdout: 'pipe',
+          },
+          {
+            command: 'npm run dev:web',
+            url: 'http://localhost:8001',
+            reuseExistingServer: process.env['CI'] !== 'true',
+            cwd: '../..',
+            timeout: process.env['CI'] === 'true' ? 300 * 1000 : 120 * 1000, // 5min for CI, 2min local
+            stderr: 'pipe',
+            stdout: 'pipe',
+          },
+        ],
 });

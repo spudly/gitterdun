@@ -25,13 +25,13 @@ npm run install:browsers
 
 ### Command Line
 
-Run all tests:
+Run all tests (starts servers automatically):
 
 ```bash
 npm test --workspace=packages/e2e
 ```
 
-Run tests with UI mode:
+Run tests with UI mode (servers must be started manually):
 
 ```bash
 npm run test:ui --workspace=packages/e2e
@@ -47,6 +47,20 @@ Run tests in headed mode (see browser):
 
 ```bash
 npm run test:headed --workspace=packages/e2e
+```
+
+**Note for UI Mode**: The UI mode skips automatic server startup to avoid
+conflicts. Start servers manually before using UI mode:
+
+```bash
+# Terminal 1: Start API server
+npm run dev:api
+
+# Terminal 2: Start web server
+npm run dev:web
+
+# Terminal 3: Run UI mode
+npm run test:ui --workspace=packages/e2e
 ```
 
 ### From Root Directory
