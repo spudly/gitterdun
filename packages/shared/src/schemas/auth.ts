@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {MIN_PASSWORD_LENGTH} from '../constants.js';
 
 const IdentifierSchema = z
   .object({email: z.email()})
@@ -13,7 +14,7 @@ export const ForgotPasswordRequestSchema = z.object({email: z.email()});
 
 export const ResetPasswordSchema = z.object({
   token: z.string().min(1),
-  password: z.string().min(4),
+  password: z.string().min(MIN_PASSWORD_LENGTH),
 });
 
 export type Login = z.infer<typeof LoginSchema>;

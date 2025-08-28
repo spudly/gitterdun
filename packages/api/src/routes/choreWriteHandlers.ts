@@ -1,4 +1,5 @@
 import express from 'express';
+import {StatusCodes} from 'http-status-codes';
 import {CreateChoreSchema} from '@gitterdun/shared';
 import db from '../lib/db';
 import {logger} from '../utils/logger';
@@ -62,7 +63,7 @@ export const handleCreateChore = async (
 
     logger.info({choreId: newChore.id, title}, 'New chore created');
     return res
-      .status(201)
+      .status(StatusCodes.CREATED)
       .json({
         success: true,
         data: newChore,

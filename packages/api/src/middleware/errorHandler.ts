@@ -1,11 +1,15 @@
 import express from 'express';
+import {StatusCodes} from 'http-status-codes';
 import {logger} from '../utils/logger';
 import {ZodError} from 'zod';
 
-const sendZodErrorResponse = (res: express.Response, err: ZodError): void => {
+export const sendZodErrorResponse = (
+  res: express.Response,
+  err: ZodError,
+): void => {
   const isProd = process.env['NODE_ENV'] === 'production';
   res
-    .status(400)
+    .status(StatusCodes.BAD_REQUEST)
     .json(
       isProd
         ? {success: false, error: 'Invalid request data'}
@@ -13,11 +17,13 @@ const sendZodErrorResponse = (res: express.Response, err: ZodError): void => {
     );
 };
 
-const sendJsonParseErrorResponse = (res: express.Response): void => {
-  res.status(400).json({success: false, error: 'Invalid JSON payload'});
+export const sendJsonParseErrorResponse = (res: express.Response): void => {
+  res
+    .status(StatusCodes.BAD_REQUEST)
+    .json({success: false, error: 'Invalid JSON payload'});
 };
 
-const sendErrorResponse = (
+export const sendErrorResponse = (
   res: express.Response,
   status: number,
   message: string,
@@ -33,7 +39,10 @@ const sendErrorResponse = (
     });
 };
 
-const handleErrorInstance = (err: Error, res: express.Response): void => {
+export const handleErrorInstance = (
+  err: Error,
+  res: express.Response,
+): void => {
   const errorObj = err as Error & {type?: string; status?: number};
 
   if (errorObj.type === 'entity.parse.failed') {
@@ -41,10 +50,14 @@ const handleErrorInstance = (err: Error, res: express.Response): void => {
     return;
   }
 
-  sendErrorResponse(res, errorObj.status ?? 500, errorObj.message);
+  sendErrorResponse(
+    res,
+    errorObj.status ?? StatusCodes.INTERNAL_SERVER_ERROR,
+    errorObj.message,
+  );
 };
 
-const handleError = (err: unknown, res: express.Response): void => {
+export const handleError = (err: unknown, res: express.Response): void => {
   logger.error({error: err}, 'Error');
 
   if (err instanceof ZodError) {
@@ -57,7 +70,11 @@ const handleError = (err: unknown, res: express.Response): void => {
     return;
   }
 
-  sendErrorResponse(res, 500, 'Internal server error');
+  sendErrorResponse(
+    res,
+    StatusCodes.INTERNAL_SERVER_ERROR,
+    'Internal server error',
+  );
 };
 
 const globalErrorHandler = (
@@ -69,11 +86,13 @@ const globalErrorHandler = (
   handleError(err, res);
 };
 
-const notFoundHandler = (
+export const notFoundHandler = (
   _req: express.Request,
   res: express.Response,
 ): void => {
-  res.status(404).json({success: false, error: 'API endpoint not found'});
+  res
+    .status(StatusCodes.NOT_FOUND)
+    .json({success: false, error: 'API endpoint not found'});
 };
 
 export const setupErrorHandling = (app: express.Express): void => {

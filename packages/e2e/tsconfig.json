@@ -1,0 +1,6 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {"noEmit": true, "allowImportingTsExtensions": true},
+  "include": ["**/*.ts", "tests/**/*"],
+  "exclude": ["node_modules", "test-results", "playwright-report"]
+}

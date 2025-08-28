@@ -1,6 +1,7 @@
 import type {FC} from 'react';
 import type {RankingItem} from './RankingList.js';
 import {RankingList} from './RankingList.js';
+import {RANKS} from '../constants.js';
 const RankingListDemo: FC = () => {
   const sampleRankings: Array<RankingItem> = [
     {
@@ -122,7 +123,7 @@ const RankingListDemo: FC = () => {
         <h3 className="text-lg font-semibold">Custom Styling</h3>
 
         <RankingList
-          items={sampleRankings.slice(0, 3)}
+          items={sampleRankings.slice(0, RANKS.length)}
           outlineColor="blue"
           outlined
           title="Top Performers"

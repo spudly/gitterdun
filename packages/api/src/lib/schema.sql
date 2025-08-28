@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS goals (
 -- Badges table
 CREATE TABLE IF NOT EXISTS badges (
   id serial PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
+  name VARCHAR(255) NOT NULL,
   description TEXT,
   icon VARCHAR(100),
   points_required INTEGER DEFAULT 0,
@@ -172,7 +172,7 @@ ON CONFLICT DO NOTHING;
 -- Families: group of users managed by a parent (owner)
 CREATE TABLE IF NOT EXISTS families (
   id serial PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
+  name VARCHAR(255) NOT NULL,
   owner_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
   created_at timestamp DEFAULT CURRENT_TIMESTAMP
 );

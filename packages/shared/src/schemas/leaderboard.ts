@@ -1,4 +1,8 @@
 import {z} from 'zod';
+import {
+  MAX_LEADERBOARD_LIMIT,
+  DEFAULT_LEADERBOARD_LIMIT,
+} from '../constants.js';
 
 export const LeaderboardRowSchema = z.object({
   id: z.number(),
@@ -10,7 +14,12 @@ export const LeaderboardRowSchema = z.object({
 });
 
 export const LeaderboardQuerySchema = z.object({
-  limit: z.coerce.number().int().min(1).max(100).default(10),
+  limit: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(MAX_LEADERBOARD_LIMIT)
+    .default(DEFAULT_LEADERBOARD_LIMIT),
   sortBy: z.enum(['points', 'streak']).default('points'),
 });
 

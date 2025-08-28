@@ -1,9 +1,10 @@
 import {z} from 'zod';
+import {MAX_NAME_LENGTH} from '../constants.js';
 
 export const GoalSchema = z.object({
   id: z.number(),
   user_id: z.number(),
-  title: z.string().min(1).max(255),
+  title: z.string().min(1).max(MAX_NAME_LENGTH),
   description: z.string().optional(),
   target_points: z.number().int().min(0),
   current_points: z.number().int().min(0).default(0),
@@ -17,13 +18,13 @@ export const GoalSchema = z.object({
 });
 
 export const CreateGoalSchema = z.object({
-  title: z.string().min(1).max(255),
+  title: z.string().min(1).max(MAX_NAME_LENGTH),
   description: z.string().optional(),
   target_points: z.number().int().min(0),
 });
 
 export const UpdateGoalSchema = z.object({
-  title: z.string().min(1).max(255).optional(),
+  title: z.string().min(1).max(MAX_NAME_LENGTH).optional(),
   description: z.string().optional(),
   target_points: z.number().int().min(0).optional(),
   current_points: z.number().int().min(0).optional(),

@@ -8,6 +8,11 @@ import {
 } from '@gitterdun/shared';
 import db from '../lib/db';
 import {sql} from './sql';
+import {
+  BCRYPT_SALT_ROUNDS,
+  INVITATION_TOKEN_BYTES,
+  INVITATION_EXPIRATION_MS,
+} from '../constants';
 
 type InvitationToken = {token: string; expiresAt: Date};
 
@@ -46,8 +51,8 @@ export const validateParentMembership = (
 };
 
 export const generateInvitationToken = (): InvitationToken => {
-  const token = crypto.randomBytes(24).toString('hex');
-  const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24h
+  const token = crypto.randomBytes(INVITATION_TOKEN_BYTES).toString('hex');
+  const expiresAt = new Date(Date.now() + INVITATION_EXPIRATION_MS);
   return {token, expiresAt};
 };
 
@@ -119,7 +124,7 @@ const createNewUser = async (
   email: string,
   password: string,
 ): Promise<number> => {
-  const hash = await bcrypt.hash(password, 12);
+  const hash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
   const createdRow = db
     .prepare(sql`
       INSERT INTO

@@ -2,6 +2,7 @@ import {ChoreWithUsernameSchema, CountRowSchema} from '@gitterdun/shared';
 import {z} from 'zod';
 import db from '../lib/db';
 import {buildChoresQuery} from './choreQueryBuilders';
+import {DEFAULT_CHORE_PAGINATION_LIMIT} from '../constants';
 
 type ChoreWithUsername = z.infer<typeof ChoreWithUsernameSchema>;
 
@@ -92,7 +93,7 @@ export const processChoresRequest = ({
 
   // Provide default values for pagination
   const safePage = page ?? 1;
-  const safeLimit = limit ?? 10;
+  const safeLimit = limit ?? DEFAULT_CHORE_PAGINATION_LIMIT;
 
   const {finalQuery, finalParams} = buildPaginatedChoresQuery({
     baseQuery: query,

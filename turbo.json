@@ -1,7 +1,14 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "noUpdateNotifier": true,
-  "globalEnv": ["DB_PATH", "NODE_ENV", "PORT", "LOG_LEVEL"],
+  "globalEnv": [
+    "DB_PATH",
+    "NODE_ENV",
+    "PORT",
+    "LOG_LEVEL",
+    "CI",
+    "PLAYWRIGHT_SKIP_WEBSERVER"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

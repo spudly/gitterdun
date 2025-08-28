@@ -8,6 +8,7 @@ const config: KnipConfig = {
       ignoreDependencies: [
         'husky', // Used by Git hooks, not imported
       ],
+      ignoreBinaries: [],
     },
 
     'packages/web': {
@@ -45,7 +46,7 @@ const config: KnipConfig = {
     '**/coverage/**', // Test coverage reports
     '**/dist/**', // Build output
     '**/.turbo/**', // Turbo cache
-    'types/eslint-plugin-eslint-comments.ts', // Ambient type shim used by ESLint config
+    'types/**', // TypeScript ambient declaration files
   ],
 };
 

@@ -1,4 +1,5 @@
 import express from 'express';
+import {StatusCodes} from 'http-status-codes';
 import {IdParamSchema, GoalSchema} from '@gitterdun/shared';
 import {logger} from '../utils/logger';
 
@@ -57,7 +58,7 @@ router.post('/', async (req, res) => {
   );
 
   res
-    .status(201)
+    .status(StatusCodes.CREATED)
     .json({
       success: true,
       data: validatedGoal,
@@ -72,7 +73,9 @@ router.get('/:id', async (req, res) => {
 
   const goal = fetchGoalById(id);
   if (goal === undefined) {
-    res.status(404).json({success: false, error: 'Goal not found'});
+    res
+      .status(StatusCodes.NOT_FOUND)
+      .json({success: false, error: 'Goal not found'});
     return;
   }
 
@@ -85,7 +88,9 @@ router.put('/:id', async (req, res) => {
   const {goalId, updateData} = validateUpdateGoalRequest(req);
 
   if (!checkGoalExists(goalId)) {
-    res.status(404).json({success: false, error: 'Goal not found'});
+    res
+      .status(StatusCodes.NOT_FOUND)
+      .json({success: false, error: 'Goal not found'});
     return;
   }
 
@@ -107,7 +112,9 @@ router.delete('/:id', async (req, res) => {
   validateGoalId(id);
 
   if (!checkGoalExists(id)) {
-    res.status(404).json({success: false, error: 'Goal not found'});
+    res
+      .status(StatusCodes.NOT_FOUND)
+      .json({success: false, error: 'Goal not found'});
     return;
   }
 

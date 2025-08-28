@@ -5,6 +5,7 @@ import path from 'node:path';
 import dotenv from 'dotenv';
 import {initializeDatabase} from './lib/initDb';
 import {logger} from './utils/logger';
+import {DEFAULT_PORT} from './constants';
 
 import authRoutes from './routes/auth';
 import choreRoutes from './routes/chores';
@@ -21,7 +22,7 @@ dotenv.config();
 
 const appRootDir = path.resolve();
 const isProduction = process.env['NODE_ENV'] === 'production';
-const PORT = process.env['PORT'] ?? 8000;
+const PORT = process.env['PORT'] ?? DEFAULT_PORT;
 
 const initializeApp = async (): Promise<express.Express> => {
   logger.info('Starting server initialization...');

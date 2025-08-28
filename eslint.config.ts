@@ -13,6 +13,8 @@ import jestPlugin from 'eslint-plugin-jest';
 import tailwindcssPlugin from 'eslint-plugin-tailwindcss';
 import gitterdunPlugin from 'eslint-plugin-gitterdun';
 import turboPlugin from 'eslint-plugin-turbo';
+import playwrightPlugin from 'eslint-plugin-playwright';
+import uiTestingPlugin from 'eslint-plugin-ui-testing';
 
 const WORKSPACE_ROOT_DIR = dirname(fileURLToPath(import.meta.url));
 
@@ -33,13 +35,16 @@ const eslintConfig = [
 
       'jsx-a11y': jsxA11yPlugin,
       'react-hooks': reactHooks,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- not my types
+
       comments: commentsPlugin,
       jest: jestPlugin,
 
       tailwindcss: tailwindcssPlugin,
       gitterdun: gitterdunPlugin,
       turbo: turboPlugin,
+      playwright: playwrightPlugin,
+
+      'ui-testing': uiTestingPlugin,
     },
     files: ['**/*.{ts,tsx,js,jsx,cjs,mjs,mts,cts}'],
     settings: {
@@ -126,7 +131,7 @@ const eslintConfig = [
           depth: 5,
         },
       ],
-      curly: ['warn', 'all'],
+      curly: ['error', 'all'],
       'import/default': 'off',
       'default-param-last': 'off', //  use @typescript-eslint version instead
       'dot-notation': 'off', //  use @typescript-eslint version instead
@@ -163,7 +168,7 @@ const eslintConfig = [
       'jsx-a11y/interactive-supports-focus': 'error',
       'react/jsx-curly-newline': 'off', // using Prettier for styling
       'react/jsx-filename-extension': [
-        'warn',
+        'error',
         {allow: 'as-needed', extensions: ['.tsx']},
       ],
       'react/jsx-first-prop-new-line': 'off',
@@ -275,7 +280,7 @@ const eslintConfig = [
       ],
       'no-loop-func': 'off', //  use @typescript-eslint version instead
       'no-loss-of-precision': 'off', //  use @typescript-eslint version instead
-      'no-magic-numbers': 'off',
+      'no-magic-numbers': 'off', //  use @typescript-eslint version instead
       'no-multiple-empty-lines': 'off', // using Prettier for styling
       'import/no-named-as-default-member': 'off',
       'import/no-named-default': 'error',
@@ -387,39 +392,39 @@ const eslintConfig = [
       'jsx-a11y/tabindex-no-positive': 'error',
       'import/unambiguous': 'off',
       'valid-typeof': 'off',
-      'import/consistent-type-specifier-style': 'warn',
-      'import/enforce-node-protocol-usage': ['warn', 'always'],
-      'import/max-dependencies': ['warn', {max: 20}],
-      'import/no-anonymous-default-export': 'warn',
-      'import/no-deprecated': 'warn',
-      'import/no-empty-named-blocks': 'warn',
+      'import/consistent-type-specifier-style': 'error',
+      'import/enforce-node-protocol-usage': ['error', 'always'],
+      'import/max-dependencies': ['error', {max: 20}],
+      'import/no-anonymous-default-export': 'error',
+      'import/no-deprecated': 'error',
+      'import/no-empty-named-blocks': 'error',
       'import/no-internal-modules': 'off', // this one is bizarre
-      'import/no-mutable-exports': 'warn',
-      'import/no-named-as-default': 'warn',
-      'import/no-namespace': 'warn',
+      'import/no-mutable-exports': 'error',
+      'import/no-named-as-default': 'error',
+      'import/no-namespace': 'error',
       'import/no-nodejs-modules': 'off', // needed for scripts
-      'import/no-restricted-paths': 'warn',
-      'import/no-unused-modules': 'warn',
-      'jsx-a11y/anchor-ambiguous-text': 'warn',
-      'jsx-a11y/no-aria-hidden-on-focusable': 'warn',
-      'jsx-a11y/prefer-tag-over-role': 'warn',
-      'comments/disable-enable-pair': 'warn',
-      'comments/no-aggregating-enable': 'warn',
-      'comments/no-duplicate-disable': 'warn',
-      'comments/no-restricted-disable': 'warn',
-      'comments/no-unlimited-disable': 'warn',
-      'comments/no-unused-disable': 'warn',
-      'comments/no-unused-enable': 'warn',
+      'import/no-restricted-paths': 'error',
+      'import/no-unused-modules': 'error',
+      'jsx-a11y/anchor-ambiguous-text': 'error',
+      'jsx-a11y/no-aria-hidden-on-focusable': 'error',
+      'jsx-a11y/prefer-tag-over-role': 'error',
+      'comments/disable-enable-pair': 'error',
+      'comments/no-aggregating-enable': 'error',
+      'comments/no-duplicate-disable': 'error',
+      'comments/no-restricted-disable': 'error',
+      'comments/no-unlimited-disable': 'error',
+      'comments/no-unused-disable': 'error',
+      'comments/no-unused-enable': 'error',
       'comments/no-use': 'off', // we need to disable for edge cases
-      'comments/require-description': ['warn', {ignore: ['eslint-enable']}],
-      'react/boolean-prop-naming': 'warn',
-      'react/button-has-type': 'warn',
-      'react/checked-requires-onchange-or-readonly': 'warn',
-      'react/default-props-match-prop-types': 'warn',
-      'react/destructuring-assignment': 'warn',
-      'react/display-name': 'warn',
+      'comments/require-description': ['error', {ignore: ['eslint-enable']}],
+      'react/boolean-prop-naming': 'error',
+      'react/button-has-type': 'error',
+      'react/checked-requires-onchange-or-readonly': 'error',
+      'react/default-props-match-prop-types': 'error',
+      'react/destructuring-assignment': 'error',
+      'react/display-name': 'error',
       'react/forbid-component-props': [
-        'warn',
+        'error',
         {
           forbid: [
             {propName: 'className', allowedFor: ['Link']},
@@ -427,248 +432,248 @@ const eslintConfig = [
           ],
         },
       ],
-      'react/forbid-dom-props': 'warn',
-      'react/forbid-elements': 'warn',
-      'react/forbid-foreign-prop-types': 'warn',
-      'react/forbid-prop-types': 'warn',
-      'react/forward-ref-uses-ref': 'warn',
-      'react/hook-use-state': 'warn',
-      'react/iframe-missing-sandbox': 'warn',
-      'react/jsx-boolean-value': 'warn',
-      'react/jsx-child-element-spacing': 'warn',
-      'react/jsx-closing-bracket-location': 'warn',
-      'react/jsx-closing-tag-location': 'warn',
-      'react/jsx-curly-brace-presence': 'warn',
-      'react/jsx-curly-spacing': 'warn',
-      'react/jsx-equals-spacing': 'warn',
-      'react/jsx-fragments': 'warn',
-      'react/jsx-handler-names': 'warn',
-      'react/jsx-key': 'warn',
-      'react/jsx-max-depth': ['warn', {max: 10}],
+      'react/forbid-dom-props': 'error',
+      'react/forbid-elements': 'error',
+      'react/forbid-foreign-prop-types': 'error',
+      'react/forbid-prop-types': 'error',
+      'react/forward-ref-uses-ref': 'error',
+      'react/hook-use-state': 'error',
+      'react/iframe-missing-sandbox': 'error',
+      'react/jsx-boolean-value': 'error',
+      'react/jsx-child-element-spacing': 'error',
+      'react/jsx-closing-bracket-location': 'error',
+      'react/jsx-closing-tag-location': 'error',
+      'react/jsx-curly-brace-presence': 'error',
+      'react/jsx-curly-spacing': 'error',
+      'react/jsx-equals-spacing': 'error',
+      'react/jsx-fragments': 'error',
+      'react/jsx-handler-names': 'error',
+      'react/jsx-key': 'error',
+      'react/jsx-max-depth': ['error', {max: 10}],
       'react/jsx-max-props-per-line': 'off', // use Prettier for styling
       'react/jsx-newline': 'off', // use Prettier for styling
       'react/jsx-no-bind': 'off', // react-compiler handles these types of issues
-      'react/jsx-no-comment-textnodes': 'warn',
-      'react/jsx-no-constructed-context-values': 'warn',
-      'react/jsx-no-duplicate-props': 'warn',
-      'react/jsx-no-leaked-render': 'warn',
-      'react/jsx-no-script-url': 'warn',
-      'react/jsx-no-target-blank': 'warn',
-      'react/jsx-no-undef': 'warn',
-      'react/jsx-no-useless-fragment': 'warn',
-      'react/jsx-pascal-case': 'warn',
-      'react/jsx-props-no-multi-spaces': 'warn',
-      'react/jsx-props-no-spread-multi': 'warn',
-      'react/jsx-sort-props': 'warn',
-      'react/jsx-tag-spacing': 'warn',
-      'react/jsx-uses-react': 'warn',
-      'react/jsx-uses-vars': 'warn',
-      'react/no-access-state-in-setstate': 'warn',
-      'react/no-adjacent-inline-elements': 'warn',
-      'react/no-array-index-key': 'warn',
-      'react/no-arrow-function-lifecycle': 'warn',
-      'react/no-children-prop': 'warn',
-      'react/no-danger': 'warn',
-      'react/no-danger-with-children': 'warn',
-      'react/no-deprecated': 'warn',
-      'react/no-did-mount-set-state': 'warn',
-      'react/no-did-update-set-state': 'warn',
-      'react/no-direct-mutation-state': 'warn',
-      'react/no-find-dom-node': 'warn',
-      'react/no-invalid-html-attribute': 'warn',
-      'react/no-is-mounted': 'warn',
-      'react/no-multi-comp': 'warn',
-      'react/no-namespace': 'warn',
-      'react/no-object-type-as-default-prop': 'warn',
-      'react/no-redundant-should-component-update': 'warn',
-      'react/no-render-return-value': 'warn',
-      'react/no-set-state': 'warn',
-      'react/no-string-refs': 'warn',
-      'react/no-this-in-sfc': 'warn',
-      'react/no-typos': 'warn',
-      'react/no-unescaped-entities': 'warn',
-      'react/no-unknown-property': 'warn',
-      'react/no-unsafe': 'warn',
-      'react/no-unstable-nested-components': 'warn',
-      'react/no-unused-class-component-methods': 'warn',
-      'react/no-unused-prop-types': 'warn',
-      'react/no-unused-state': 'warn',
-      'react/no-will-update-set-state': 'warn',
-      'react/prefer-es6-class': 'warn',
-      'react/prefer-exact-props': 'warn',
+      'react/jsx-no-comment-textnodes': 'error',
+      'react/jsx-no-constructed-context-values': 'error',
+      'react/jsx-no-duplicate-props': 'error',
+      'react/jsx-no-leaked-render': 'error',
+      'react/jsx-no-script-url': 'error',
+      'react/jsx-no-target-blank': 'error',
+      'react/jsx-no-undef': 'error',
+      'react/jsx-no-useless-fragment': 'error',
+      'react/jsx-pascal-case': 'error',
+      'react/jsx-props-no-multi-spaces': 'error',
+      'react/jsx-props-no-spread-multi': 'error',
+      'react/jsx-sort-props': 'error',
+      'react/jsx-tag-spacing': 'error',
+      'react/jsx-uses-react': 'error',
+      'react/jsx-uses-vars': 'error',
+      'react/no-access-state-in-setstate': 'error',
+      'react/no-adjacent-inline-elements': 'error',
+      'react/no-array-index-key': 'error',
+      'react/no-arrow-function-lifecycle': 'error',
+      'react/no-children-prop': 'error',
+      'react/no-danger': 'error',
+      'react/no-danger-with-children': 'error',
+      'react/no-deprecated': 'error',
+      'react/no-did-mount-set-state': 'error',
+      'react/no-did-update-set-state': 'error',
+      'react/no-direct-mutation-state': 'error',
+      'react/no-find-dom-node': 'error',
+      'react/no-invalid-html-attribute': 'error',
+      'react/no-is-mounted': 'error',
+      'react/no-multi-comp': 'error',
+      'react/no-namespace': 'error',
+      'react/no-object-type-as-default-prop': 'error',
+      'react/no-redundant-should-component-update': 'error',
+      'react/no-render-return-value': 'error',
+      'react/no-set-state': 'error',
+      'react/no-string-refs': 'error',
+      'react/no-this-in-sfc': 'error',
+      'react/no-typos': 'error',
+      'react/no-unescaped-entities': 'error',
+      'react/no-unknown-property': 'error',
+      'react/no-unsafe': 'error',
+      'react/no-unstable-nested-components': 'error',
+      'react/no-unused-class-component-methods': 'error',
+      'react/no-unused-prop-types': 'error',
+      'react/no-unused-state': 'error',
+      'react/no-will-update-set-state': 'error',
+      'react/prefer-es6-class': 'error',
+      'react/prefer-exact-props': 'error',
       'react/prefer-read-only-props': 'off', // noisy
-      'react/prefer-stateless-function': 'warn',
+      'react/prefer-stateless-function': 'error',
       'react/prop-types': 'off', // propTypes are so last decade
-      'react/require-optimization': 'warn',
-      'react/require-render-return': 'warn',
-      'react/self-closing-comp': 'warn',
-      'react/sort-comp': 'warn',
-      'react/sort-default-props': 'warn',
-      'react/sort-prop-types': 'warn',
-      'react/state-in-constructor': 'warn',
-      'react/static-property-placement': 'warn',
-      'react/style-prop-object': 'warn',
-      'react/void-dom-elements-no-children': 'warn',
-      'accessor-pairs': 'warn',
-      'array-callback-return': 'warn',
-      'block-scoped-var': 'warn',
+      'react/require-optimization': 'error',
+      'react/require-render-return': 'error',
+      'react/self-closing-comp': 'error',
+      'react/sort-comp': 'error',
+      'react/sort-default-props': 'error',
+      'react/sort-prop-types': 'error',
+      'react/state-in-constructor': 'error',
+      'react/static-property-placement': 'error',
+      'react/style-prop-object': 'error',
+      'react/void-dom-elements-no-children': 'error',
+      'accessor-pairs': 'error',
+      'array-callback-return': 'error',
+      'block-scoped-var': 'error',
       'capitalized-comments': 'off', // use Prettier for styling
-      'class-methods-use-this': 'warn',
-      complexity: 'warn',
-      'consistent-return': 'warn',
-      'consistent-this': 'warn',
-      'default-case': 'warn',
-      'default-case-last': 'warn',
-      eqeqeq: ['warn', 'always', {null: 'ignore'}],
-      'for-direction': 'warn',
-      'func-name-matching': 'warn',
-      'func-names': 'warn',
-      'func-style': 'warn',
-      'grouped-accessor-pairs': 'warn',
-      'guard-for-in': 'warn',
-      'id-denylist': 'warn',
-      'id-length': 'warn',
-      'id-match': 'warn',
+      'class-methods-use-this': 'error',
+      complexity: 'error',
+      'consistent-return': 'error',
+      'consistent-this': 'error',
+      'default-case': 'error',
+      'default-case-last': 'error',
+      eqeqeq: ['error', 'always', {null: 'ignore'}],
+      'for-direction': 'error',
+      'func-name-matching': 'error',
+      'func-names': 'error',
+      'func-style': 'error',
+      'grouped-accessor-pairs': 'error',
+      'guard-for-in': 'error',
+      'id-denylist': 'error',
+      'id-length': 'error',
+      'id-match': 'error',
       'init-declarations': 'off', // typescript makes sure variables are initialized before use
       'line-comment-position': 'off', // use Prettier for styling
-      'logical-assignment-operators': 'warn',
-      'max-classes-per-file': 'warn',
-      'max-depth': 'warn',
-      'max-lines': ['warn', 200],
-      'max-lines-per-function': 'off', // ['warn', {max: 20, skipBlankLines: true, skipComments: true, IIFEs: true},], // TODO: re-enable
-      'max-nested-callbacks': 'warn',
-      'max-params': ['warn', {max: 5}],
-      'max-statements': ['warn', {max: 20}],
+      'logical-assignment-operators': 'error',
+      'max-classes-per-file': 'error',
+      'max-depth': 'error',
+      'max-lines': ['error', 200],
+      'max-lines-per-function': 'off', // ['error', {max: 20, skipBlankLines: true, skipComments: true, IIFEs: true},], // TODO: re-enable
+      'max-nested-callbacks': 'error',
+      'max-params': ['error', {max: 5}],
+      'max-statements': ['error', {max: 20}],
       'multiline-comment-style': 'off', // use Prettier for styling
-      'new-cap': 'warn',
-      'no-alert': 'warn',
-      'no-async-promise-executor': 'warn',
-      'no-await-in-loop': 'warn',
-      'no-bitwise': 'warn',
-      'no-caller': 'warn',
-      'no-case-declarations': 'warn',
-      'no-class-assign': 'warn',
-      'no-compare-neg-zero': 'warn',
-      'no-cond-assign': 'warn',
-      'no-console': 'warn',
-      'no-constant-binary-expression': 'warn',
-      'no-constant-condition': 'warn',
-      'no-constructor-return': 'warn',
+      'new-cap': 'error',
+      'no-alert': 'error',
+      'no-async-promise-executor': 'error',
+      'no-await-in-loop': 'error',
+      'no-bitwise': 'error',
+      'no-caller': 'error',
+      'no-case-declarations': 'error',
+      'no-class-assign': 'error',
+      'no-compare-neg-zero': 'error',
+      'no-cond-assign': 'error',
+      'no-console': 'error',
+      'no-constant-binary-expression': 'error',
+      'no-constant-condition': 'error',
+      'no-constructor-return': 'error',
       'no-continue': 'off', // comes in handy
-      'no-control-regex': 'warn',
-      'no-debugger': 'warn',
-      'no-delete-var': 'warn',
-      'no-div-regex': 'warn',
-      'no-dupe-else-if': 'warn',
-      'no-duplicate-case': 'warn',
+      'no-control-regex': 'error',
+      'no-debugger': 'error',
+      'no-delete-var': 'error',
+      'no-div-regex': 'error',
+      'no-dupe-else-if': 'error',
+      'no-duplicate-case': 'error',
       'no-duplicate-imports': 'off', // if we import both a type and a value, we'll get a duplicate import error
-      'no-else-return': 'warn',
-      'no-empty': 'warn',
-      'no-empty-character-class': 'warn',
-      'no-empty-pattern': 'warn',
-      'no-empty-static-block': 'warn',
+      'no-else-return': 'error',
+      'no-empty': 'error',
+      'no-empty-character-class': 'error',
+      'no-empty-pattern': 'error',
+      'no-empty-static-block': 'error',
       'no-eq-null': 'off', // allow == and != with null
       'no-undefined': 'off', // prefer undefined over null for TypeScript optional properties
-      'no-eval': 'warn',
-      'no-ex-assign': 'warn',
-      'no-extend-native': 'warn',
-      'no-extra-bind': 'warn',
-      'no-extra-boolean-cast': 'warn',
-      'no-extra-label': 'warn',
-      'no-fallthrough': 'warn',
-      'no-global-assign': 'warn',
-      'no-implicit-coercion': 'warn',
-      'no-implicit-globals': 'warn',
+      'no-eval': 'error',
+      'no-ex-assign': 'error',
+      'no-extend-native': 'error',
+      'no-extra-bind': 'error',
+      'no-extra-boolean-cast': 'error',
+      'no-extra-label': 'error',
+      'no-fallthrough': 'error',
+      'no-global-assign': 'error',
+      'no-implicit-coercion': 'error',
+      'no-implicit-globals': 'error',
       'no-inline-comments': 'off', // use Prettier for styling
-      'no-inner-declarations': 'warn',
-      'no-invalid-regexp': 'warn',
-      'no-invalid-this': 'warn',
-      'no-irregular-whitespace': 'warn',
-      'no-iterator': 'warn',
-      'no-label-var': 'warn',
-      'no-labels': 'warn',
-      'no-lone-blocks': 'warn',
-      'no-lonely-if': 'warn',
-      'no-misleading-character-class': 'warn',
-      'no-multi-assign': 'warn',
-      'no-multi-str': 'warn',
+      'no-inner-declarations': 'error',
+      'no-invalid-regexp': 'error',
+      'no-invalid-this': 'error',
+      'no-irregular-whitespace': 'error',
+      'no-iterator': 'error',
+      'no-label-var': 'error',
+      'no-labels': 'error',
+      'no-lone-blocks': 'error',
+      'no-lonely-if': 'error',
+      'no-misleading-character-class': 'error',
+      'no-multi-assign': 'error',
+      'no-multi-str': 'error',
       'no-negated-condition': 'off',
-      'no-new': 'warn',
-      'no-new-native-nonconstructor': 'warn',
-      'no-new-wrappers': 'warn',
-      'no-nonoctal-decimal-escape': 'warn',
-      'no-object-constructor': 'warn',
-      'no-octal': 'warn',
-      'no-octal-escape': 'warn',
-      'no-param-reassign': 'warn',
+      'no-new': 'error',
+      'no-new-native-nonconstructor': 'error',
+      'no-new-wrappers': 'error',
+      'no-nonoctal-decimal-escape': 'error',
+      'no-object-constructor': 'error',
+      'no-octal': 'error',
+      'no-octal-escape': 'error',
+      'no-param-reassign': 'error',
       'no-plusplus': 'off', // these are only confusing if you don't know the language
-      'no-promise-executor-return': 'warn',
-      'no-proto': 'warn',
-      'no-prototype-builtins': 'warn',
-      'no-regex-spaces': 'warn',
-      'no-restricted-exports': 'warn',
-      'no-restricted-globals': 'warn',
-      'no-restricted-imports': 'warn',
-      'no-restricted-properties': 'warn',
-      'no-restricted-syntax': 'warn',
-      'no-return-assign': 'warn',
-      'no-script-url': 'warn',
-      'no-self-assign': 'warn',
-      'no-self-compare': 'warn',
-      'no-sequences': 'warn',
-      'no-shadow-restricted-names': 'warn',
-      'no-sparse-arrays': 'warn',
-      'no-template-curly-in-string': 'warn',
+      'no-promise-executor-return': 'error',
+      'no-proto': 'error',
+      'no-prototype-builtins': 'error',
+      'no-regex-spaces': 'error',
+      'no-restricted-exports': 'error',
+      'no-restricted-globals': 'error',
+      'no-restricted-imports': 'error',
+      'no-restricted-properties': 'error',
+      'no-restricted-syntax': 'error',
+      'no-return-assign': 'error',
+      'no-script-url': 'error',
+      'no-self-assign': 'error',
+      'no-self-compare': 'error',
+      'no-sequences': 'error',
+      'no-shadow-restricted-names': 'error',
+      'no-sparse-arrays': 'error',
+      'no-template-curly-in-string': 'error',
       'no-ternary': 'off',
-      'no-undef-init': 'warn',
-      'no-unexpected-multiline': 'warn',
-      'no-unmodified-loop-condition': 'warn',
-      'no-unneeded-ternary': 'warn',
-      'no-unreachable-loop': 'warn',
-      'no-unsafe-finally': 'warn',
-      'no-unsafe-optional-chaining': 'warn',
-      'no-unused-labels': 'warn',
-      'no-unused-private-class-members': 'warn',
-      'no-useless-backreference': 'warn',
-      'no-useless-call': 'warn',
-      'no-useless-catch': 'warn',
-      'no-useless-computed-key': 'warn',
-      'no-useless-concat': 'warn',
-      'no-useless-escape': 'warn',
-      'no-useless-rename': 'warn',
-      'no-useless-return': 'warn',
-      'no-var': 'warn',
-      'no-void': 'warn',
+      'no-undef-init': 'error',
+      'no-unexpected-multiline': 'error',
+      'no-unmodified-loop-condition': 'error',
+      'no-unneeded-ternary': 'error',
+      'no-unreachable-loop': 'error',
+      'no-unsafe-finally': 'error',
+      'no-unsafe-optional-chaining': 'error',
+      'no-unused-labels': 'error',
+      'no-unused-private-class-members': 'error',
+      'no-useless-backreference': 'error',
+      'no-useless-call': 'error',
+      'no-useless-catch': 'error',
+      'no-useless-computed-key': 'error',
+      'no-useless-concat': 'error',
+      'no-useless-escape': 'error',
+      'no-useless-rename': 'error',
+      'no-useless-return': 'error',
+      'no-var': 'error',
+      'no-void': 'error',
       'no-warning-comments': 'off', // TODO: re-enable
-      'no-with': 'warn',
-      'object-shorthand': 'warn',
+      'no-with': 'error',
+      'object-shorthand': 'error',
       'one-var': 'off', // use Prettier for styling
-      'operator-assignment': 'warn',
-      'prefer-arrow-callback': 'warn',
-      'prefer-const': 'warn',
-      'prefer-destructuring': 'warn',
-      'prefer-exponentiation-operator': 'warn',
-      'prefer-named-capture-group': 'warn',
-      'prefer-numeric-literals': 'warn',
-      'prefer-object-has-own': 'warn',
-      'prefer-object-spread': 'warn',
-      'prefer-promise-reject-errors': 'warn',
-      'prefer-regex-literals': 'warn',
-      'prefer-rest-params': 'warn',
-      'prefer-spread': 'warn',
-      'prefer-template': 'warn',
-      radix: 'warn',
-      'require-atomic-updates': 'warn',
+      'operator-assignment': 'error',
+      'prefer-arrow-callback': 'error',
+      'prefer-const': 'error',
+      'prefer-destructuring': 'error',
+      'prefer-exponentiation-operator': 'error',
+      'prefer-named-capture-group': 'error',
+      'prefer-numeric-literals': 'error',
+      'prefer-object-has-own': 'error',
+      'prefer-object-spread': 'error',
+      'prefer-promise-reject-errors': 'error',
+      'prefer-regex-literals': 'error',
+      'prefer-rest-params': 'error',
+      'prefer-spread': 'error',
+      'prefer-template': 'error',
+      radix: 'error',
+      'require-atomic-updates': 'error',
       'require-unicode-regexp': 'off', // almost always unnecessary
-      'require-yield': 'warn',
+      'require-yield': 'error',
       'sort-imports': 'off', // handled by import/order
       'sort-keys': 'off', // order affects readability. we can always sort on-demand
       'sort-vars': 'off', // order affects readability. we can always sort on-demand
-      'symbol-description': 'warn',
-      'unicode-bom': 'warn',
-      'use-isnan': 'warn',
-      'vars-on-top': 'warn',
-      yoda: 'warn',
+      'symbol-description': 'error',
+      'unicode-bom': 'error',
+      'use-isnan': 'error',
+      'vars-on-top': 'error',
+      yoda: 'error',
       'jest/consistent-test-it': 'off', // for tests only
       'jest/expect-expect': 'off', // for tests only
       'jest/max-expects': 'off', // for tests only
@@ -679,7 +684,7 @@ const eslintConfig = [
       'jest/no-conditional-in-test': 'off', // for tests only
       'jest/no-confusing-set-timeout': 'off', // for tests only
       'jest/no-deprecated-functions': 'off', // for tests only
-      'jest/no-disabled-tests': 'off', // for tests only
+      'jest/no-disabled-tests': 'warn', // for tests only
       'jest/no-done-callback': 'off', // for tests only
       'jest/no-duplicate-hooks': 'off', // for tests only
       'jest/no-export': 'off', // for tests only
@@ -733,14 +738,81 @@ const eslintConfig = [
       'jest/valid-expect-in-promise': 'off', // for tests only
       'jest/valid-title': 'off', // for tests only
       'tailwindcss/classnames-order': 'off', // using prettier-plugin-tailwindcss for this
-      'tailwindcss/enforces-negative-arbitrary-values': 'warn',
-      'tailwindcss/enforces-shorthand': 'warn',
-      'tailwindcss/migration-from-tailwind-2': 'warn',
-      'tailwindcss/no-arbitrary-value': 'warn',
-      'tailwindcss/no-contradicting-classname': 'warn',
-      'tailwindcss/no-custom-classname': 'warn',
-      'tailwindcss/no-unnecessary-arbitrary-value': 'warn',
+      'tailwindcss/enforces-negative-arbitrary-values': 'error',
+      'tailwindcss/enforces-shorthand': 'error',
+      'tailwindcss/migration-from-tailwind-2': 'error',
+      'tailwindcss/no-arbitrary-value': 'error',
+      'tailwindcss/no-contradicting-classname': 'error',
+      'tailwindcss/no-custom-classname': 'error',
+      'tailwindcss/no-unnecessary-arbitrary-value': 'error',
       'gitterdun/no-tailwind-margins': 'error',
+      'playwright/expect-expect': 'off', // enabled later in this file, only for e2e tests
+      'playwright/max-expects': 'off', // enabled later in this file, only for e2e tests
+      'playwright/max-nested-describe': 'off', // enabled later in this file, only for e2e tests
+      'playwright/missing-playwright-await': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-commented-out-tests': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-conditional-expect': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-conditional-in-test': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-duplicate-hooks': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-element-handle': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-eval': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-focused-test': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-force-option': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-get-by-title': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-hooks': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-nested-step': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-networkidle': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-nth-methods': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-page-pause': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-raw-locators': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-restricted-matchers': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-skipped-test': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-standalone-expect': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-unsafe-references': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-useless-await': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-useless-not': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-wait-for-selector': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-wait-for-timeout': 'off', // enabled later in this file, only for e2e tests
+      'playwright/prefer-comparison-matcher': 'off', // enabled later in this file, only for e2e tests
+      'playwright/prefer-equality-matcher': 'off', // enabled later in this file, only for e2e tests
+      'playwright/prefer-hooks-in-order': 'off', // enabled later in this file, only for e2e tests
+      'playwright/prefer-hooks-on-top': 'off', // enabled later in this file, only for e2e tests
+      'playwright/prefer-lowercase-title': 'off', // enabled later in this file, only for e2e tests
+      'playwright/prefer-native-locators': 'off', // enabled later in this file, only for e2e tests
+      'playwright/prefer-locator': 'off', // enabled later in this file, only for e2e tests
+      'playwright/prefer-strict-equal': 'off', // enabled later in this file, only for e2e tests
+      'playwright/prefer-to-be': 'off', // enabled later in this file, only for e2e tests
+      'playwright/prefer-to-contain': 'off', // enabled later in this file, only for e2e tests
+      'playwright/prefer-to-have-count': 'off', // enabled later in this file, only for e2e tests
+      'playwright/prefer-to-have-length': 'off', // enabled later in this file, only for e2e tests
+      'playwright/prefer-web-first-assertions': 'off', // enabled later in this file, only for e2e tests
+      'playwright/require-hook': 'off', // enabled later in this file, only for e2e tests
+      'playwright/require-soft-assertions': 'off', // enabled later in this file, only for e2e tests
+      'playwright/require-to-throw-message': 'off', // enabled later in this file, only for e2e tests
+      'playwright/require-top-level-describe': 'off', // enabled later in this file, only for e2e tests
+      'playwright/valid-describe-callback': 'off', // enabled later in this file, only for e2e tests
+      'playwright/valid-expect-in-promise': 'off', // enabled later in this file, only for e2e tests
+      'playwright/valid-expect': 'off', // enabled later in this file, only for e2e tests
+      'playwright/valid-title': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/missing-assertion-in-test': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-assertions-in-hooks': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-browser-commands-in-tests': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-css-page-layout-selector': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-disabled-tests': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-focused-tests': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-hard-wait': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-slowed-test': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-wait-for-navigation': 'off', // enabled later in this file, only for e2e tests
+      'playwright/valid-test-tags': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-absolute-url': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-implicit-wait': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-link-text-selector': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-tag-name-selector': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-wait-in-tests': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-xpath-page-layout-selector': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-xpath-selector': 'off', // enabled later in this file, only for e2e tests
+      'no-unassigned-vars': 'error',
+      'no-useless-assignment': 'error',
     },
   },
   {
@@ -795,12 +867,18 @@ const eslintConfig = [
       '@typescript-eslint/no-loop-func': ['error'],
       '@typescript-eslint/no-loss-of-precision': 'error',
       '@typescript-eslint/no-magic-numbers': [
-        'off',
+        'error',
         {
-          ignore: [],
+          ignore: [0, -1, 1],
           ignoreArrayIndexes: false,
           enforceConst: true,
-          detectObjects: true,
+          detectObjects: false,
+          ignoreEnums: true,
+          ignoreNumericLiteralTypes: true,
+          ignoreReadonlyClassProperties: true,
+          ignoreTypeIndexes: true,
+          ignoreDefaultValues: true,
+          ignoreClassFieldInitialValues: true,
         },
       ],
       '@typescript-eslint/no-redeclare': 'error',
@@ -838,116 +916,117 @@ const eslintConfig = [
       '@typescript-eslint/space-before-function-paren': 'off',
       '@typescript-eslint/space-infix-ops': 'off',
       // Auto-added: unconfigured plugin rules set to warn
-      '@typescript-eslint/adjacent-overload-signatures': 'warn',
+      '@typescript-eslint/adjacent-overload-signatures': 'error',
       '@typescript-eslint/array-type': [
-        'warn',
+        'error',
         {default: 'generic', readonly: 'generic'},
       ],
-      '@typescript-eslint/await-thenable': 'warn',
-      '@typescript-eslint/ban-ts-comment': 'warn',
-      '@typescript-eslint/ban-tslint-comment': 'warn',
-      '@typescript-eslint/class-literal-property-style': 'warn',
-      '@typescript-eslint/class-methods-use-this': 'warn',
-      '@typescript-eslint/consistent-generic-constructors': 'warn',
-      '@typescript-eslint/consistent-indexed-object-style': 'warn',
-      '@typescript-eslint/consistent-return': 'warn',
-      '@typescript-eslint/consistent-type-assertions': 'warn',
-      '@typescript-eslint/consistent-type-definitions': ['warn', 'type'],
-      '@typescript-eslint/consistent-type-exports': 'warn',
+      '@typescript-eslint/await-thenable': 'error',
+      '@typescript-eslint/ban-ts-comment': 'error',
+      '@typescript-eslint/ban-tslint-comment': 'error',
+      '@typescript-eslint/class-literal-property-style': 'error',
+      '@typescript-eslint/class-methods-use-this': 'error',
+      '@typescript-eslint/consistent-generic-constructors': 'error',
+      '@typescript-eslint/consistent-indexed-object-style': 'error',
+      '@typescript-eslint/consistent-return': 'error',
+      '@typescript-eslint/consistent-type-assertions': 'error',
+      '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+      '@typescript-eslint/consistent-type-exports': 'error',
       '@typescript-eslint/consistent-type-imports': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-member-accessibility': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/init-declarations': 'off',
-      '@typescript-eslint/max-params': ['warn', {max: 5}],
-      '@typescript-eslint/member-ordering': 'warn',
-      '@typescript-eslint/method-signature-style': 'warn',
-      '@typescript-eslint/no-array-delete': 'warn',
-      '@typescript-eslint/no-base-to-string': 'warn',
-      '@typescript-eslint/no-confusing-non-null-assertion': 'warn',
-      '@typescript-eslint/no-confusing-void-expression': 'warn',
-      '@typescript-eslint/no-deprecated': 'warn',
-      '@typescript-eslint/no-duplicate-enum-values': 'warn',
-      '@typescript-eslint/no-duplicate-type-constituents': 'warn',
-      '@typescript-eslint/no-dynamic-delete': 'warn',
-      '@typescript-eslint/no-empty-object-type': 'warn',
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-extra-non-null-assertion': 'warn',
-      '@typescript-eslint/no-extraneous-class': 'warn',
+      '@typescript-eslint/max-params': ['error', {max: 5}],
+      '@typescript-eslint/member-ordering': 'error',
+      '@typescript-eslint/method-signature-style': 'error',
+      '@typescript-eslint/no-array-delete': 'error',
+      '@typescript-eslint/no-base-to-string': 'error',
+      '@typescript-eslint/no-confusing-non-null-assertion': 'error',
+      '@typescript-eslint/no-confusing-void-expression': 'error',
+      '@typescript-eslint/no-deprecated': 'error',
+      '@typescript-eslint/no-duplicate-enum-values': 'error',
+      '@typescript-eslint/no-duplicate-type-constituents': 'error',
+      '@typescript-eslint/no-dynamic-delete': 'error',
+      '@typescript-eslint/no-empty-object-type': 'error',
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-extra-non-null-assertion': 'error',
+      '@typescript-eslint/no-extraneous-class': 'error',
       '@typescript-eslint/no-floating-promises': 'error',
-      '@typescript-eslint/no-for-in-array': 'warn',
-      '@typescript-eslint/no-import-type-side-effects': 'warn',
-      '@typescript-eslint/no-inferrable-types': 'warn',
-      '@typescript-eslint/no-invalid-this': 'warn',
-      '@typescript-eslint/no-invalid-void-type': 'warn',
-      '@typescript-eslint/no-meaningless-void-operator': 'warn',
-      '@typescript-eslint/no-misused-new': 'warn',
-      '@typescript-eslint/no-misused-promises': 'warn',
-      '@typescript-eslint/no-misused-spread': 'warn',
-      '@typescript-eslint/no-mixed-enums': 'warn',
-      '@typescript-eslint/no-namespace': 'warn',
-      '@typescript-eslint/no-non-null-asserted-nullish-coalescing': 'warn',
-      '@typescript-eslint/no-non-null-asserted-optional-chain': 'warn',
-      '@typescript-eslint/no-non-null-assertion': 'warn',
-      '@typescript-eslint/no-redundant-type-constituents': 'warn',
-      '@typescript-eslint/no-require-imports': 'warn',
-      '@typescript-eslint/no-restricted-imports': 'warn',
-      '@typescript-eslint/no-restricted-types': 'warn',
-      '@typescript-eslint/no-this-alias': 'warn',
-      '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'warn',
-      '@typescript-eslint/no-unnecessary-condition': 'warn',
-      '@typescript-eslint/no-unnecessary-parameter-property-assignment': 'warn',
-      '@typescript-eslint/no-unnecessary-qualifier': 'warn',
-      '@typescript-eslint/no-unnecessary-template-expression': 'warn',
-      '@typescript-eslint/no-unnecessary-type-arguments': 'warn',
-      '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
-      '@typescript-eslint/no-unnecessary-type-constraint': 'warn',
-      '@typescript-eslint/no-unnecessary-type-conversion': 'warn',
-      '@typescript-eslint/no-unnecessary-type-parameters': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn',
-      '@typescript-eslint/no-unsafe-assignment': 'warn',
+      '@typescript-eslint/no-for-in-array': 'error',
+      '@typescript-eslint/no-import-type-side-effects': 'error',
+      '@typescript-eslint/no-inferrable-types': 'error',
+      '@typescript-eslint/no-invalid-this': 'error',
+      '@typescript-eslint/no-invalid-void-type': 'error',
+      '@typescript-eslint/no-meaningless-void-operator': 'error',
+      '@typescript-eslint/no-misused-new': 'error',
+      '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/no-misused-spread': 'error',
+      '@typescript-eslint/no-mixed-enums': 'error',
+      '@typescript-eslint/no-namespace': 'error',
+      '@typescript-eslint/no-non-null-asserted-nullish-coalescing': 'error',
+      '@typescript-eslint/no-non-null-asserted-optional-chain': 'error',
+      '@typescript-eslint/no-non-null-assertion': 'error',
+      '@typescript-eslint/no-redundant-type-constituents': 'error',
+      '@typescript-eslint/no-require-imports': 'error',
+      '@typescript-eslint/no-restricted-imports': 'error',
+      '@typescript-eslint/no-restricted-types': 'error',
+      '@typescript-eslint/no-this-alias': 'error',
+      '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
+      '@typescript-eslint/no-unnecessary-condition': 'error',
+      '@typescript-eslint/no-unnecessary-parameter-property-assignment':
+        'error',
+      '@typescript-eslint/no-unnecessary-qualifier': 'error',
+      '@typescript-eslint/no-unnecessary-template-expression': 'error',
+      '@typescript-eslint/no-unnecessary-type-arguments': 'error',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'error',
+      '@typescript-eslint/no-unnecessary-type-constraint': 'error',
+      '@typescript-eslint/no-unnecessary-type-conversion': 'error',
+      '@typescript-eslint/no-unnecessary-type-parameters': 'error',
+      '@typescript-eslint/no-unsafe-argument': 'error',
+      '@typescript-eslint/no-unsafe-assignment': 'off', // fixing these errors usually makes the code worse
       '@typescript-eslint/no-unsafe-call': 'off', // fixing these errors usually makes the code worse
-      '@typescript-eslint/no-unsafe-declaration-merging': 'warn',
-      '@typescript-eslint/no-unsafe-enum-comparison': 'warn',
-      '@typescript-eslint/no-unsafe-function-type': 'warn',
-      '@typescript-eslint/no-unsafe-member-access': 'warn',
-      '@typescript-eslint/no-unsafe-return': 'warn',
+      '@typescript-eslint/no-unsafe-declaration-merging': 'error',
+      '@typescript-eslint/no-unsafe-enum-comparison': 'error',
+      '@typescript-eslint/no-unsafe-function-type': 'error',
+      '@typescript-eslint/no-unsafe-member-access': 'error',
+      '@typescript-eslint/no-unsafe-return': 'error',
       '@typescript-eslint/no-unsafe-type-assertion': 'off', // fixing these errors usually makes the code worse
-      '@typescript-eslint/no-unsafe-unary-minus': 'warn',
-      '@typescript-eslint/no-useless-empty-export': 'warn',
-      '@typescript-eslint/no-wrapper-object-types': 'warn',
-      '@typescript-eslint/non-nullable-type-assertion-style': 'warn',
-      '@typescript-eslint/only-throw-error': 'warn',
-      '@typescript-eslint/parameter-properties': 'warn',
-      '@typescript-eslint/prefer-as-const': 'warn',
-      '@typescript-eslint/prefer-destructuring': 'warn',
-      '@typescript-eslint/prefer-enum-initializers': 'warn',
-      '@typescript-eslint/prefer-find': 'warn',
-      '@typescript-eslint/prefer-for-of': 'warn',
-      '@typescript-eslint/prefer-function-type': 'warn',
-      '@typescript-eslint/prefer-includes': 'warn',
-      '@typescript-eslint/prefer-literal-enum-member': 'warn',
-      '@typescript-eslint/prefer-namespace-keyword': 'warn',
-      '@typescript-eslint/prefer-nullish-coalescing': 'warn',
-      '@typescript-eslint/prefer-optional-chain': 'warn',
-      '@typescript-eslint/prefer-promise-reject-errors': 'warn',
-      '@typescript-eslint/prefer-readonly': 'warn',
+      '@typescript-eslint/no-unsafe-unary-minus': 'error',
+      '@typescript-eslint/no-useless-empty-export': 'error',
+      '@typescript-eslint/no-wrapper-object-types': 'error',
+      '@typescript-eslint/non-nullable-type-assertion-style': 'error',
+      '@typescript-eslint/only-throw-error': 'error',
+      '@typescript-eslint/parameter-properties': 'error',
+      '@typescript-eslint/prefer-as-const': 'error',
+      '@typescript-eslint/prefer-destructuring': 'error',
+      '@typescript-eslint/prefer-enum-initializers': 'error',
+      '@typescript-eslint/prefer-find': 'error',
+      '@typescript-eslint/prefer-for-of': 'error',
+      '@typescript-eslint/prefer-function-type': 'error',
+      '@typescript-eslint/prefer-includes': 'error',
+      '@typescript-eslint/prefer-literal-enum-member': 'error',
+      '@typescript-eslint/prefer-namespace-keyword': 'error',
+      '@typescript-eslint/prefer-nullish-coalescing': 'error',
+      '@typescript-eslint/prefer-optional-chain': 'error',
+      '@typescript-eslint/prefer-promise-reject-errors': 'error',
+      '@typescript-eslint/prefer-readonly': 'error',
       '@typescript-eslint/prefer-readonly-parameter-types': 'off',
-      '@typescript-eslint/prefer-reduce-type-parameter': 'warn',
-      '@typescript-eslint/prefer-regexp-exec': 'warn',
-      '@typescript-eslint/prefer-return-this-type': 'warn',
-      '@typescript-eslint/prefer-string-starts-ends-with': 'warn',
-      '@typescript-eslint/promise-function-async': 'warn',
-      '@typescript-eslint/related-getter-setter-pairs': 'warn',
-      '@typescript-eslint/require-array-sort-compare': 'warn',
-      '@typescript-eslint/restrict-plus-operands': 'warn',
-      '@typescript-eslint/restrict-template-expressions': 'warn',
-      '@typescript-eslint/strict-boolean-expressions': 'warn',
-      '@typescript-eslint/switch-exhaustiveness-check': 'warn',
-      '@typescript-eslint/triple-slash-reference': 'warn',
-      '@typescript-eslint/unbound-method': 'warn',
-      '@typescript-eslint/unified-signatures': 'warn',
-      '@typescript-eslint/use-unknown-in-catch-callback-variable': 'warn',
+      '@typescript-eslint/prefer-reduce-type-parameter': 'error',
+      '@typescript-eslint/prefer-regexp-exec': 'error',
+      '@typescript-eslint/prefer-return-this-type': 'error',
+      '@typescript-eslint/prefer-string-starts-ends-with': 'error',
+      '@typescript-eslint/promise-function-async': 'error',
+      '@typescript-eslint/related-getter-setter-pairs': 'error',
+      '@typescript-eslint/require-array-sort-compare': 'error',
+      '@typescript-eslint/restrict-plus-operands': 'error',
+      '@typescript-eslint/restrict-template-expressions': 'error',
+      '@typescript-eslint/strict-boolean-expressions': 'error',
+      '@typescript-eslint/switch-exhaustiveness-check': 'error',
+      '@typescript-eslint/triple-slash-reference': 'error',
+      '@typescript-eslint/unbound-method': 'error',
+      '@typescript-eslint/unified-signatures': 'error',
+      '@typescript-eslint/use-unknown-in-catch-callback-variable': 'error',
     },
   },
   {
@@ -966,7 +1045,7 @@ const eslintConfig = [
         {enPath: 'packages/web/src/i18n/extracted/en.json'},
       ],
       'gitterdun/no-extra-i18n-messages': [
-        'warn',
+        'error',
         {enPath: 'packages/web/src/i18n/extracted/en.json'},
       ],
       'import/no-anonymous-default-export': 'off',
@@ -980,7 +1059,15 @@ const eslintConfig = [
     },
   },
   {
-    files: ['**/*.test.ts', '**/*.test.tsx', '**/test/**', '**/jest.setup.ts'],
+    files: [
+      '**/*.test.ts',
+      '**/*.test.tsx',
+      '**/*.spec.ts',
+      '**/*.spec.tsx',
+      '**/test/**',
+      '**/jest.setup.ts',
+      '**/tests/**',
+    ],
     rules: {
       // Allow literal strings in test files
       'react/jsx-no-literals': 'off',
@@ -993,32 +1080,35 @@ const eslintConfig = [
       'max-lines-per-function': 'off', // test describe blocks can have many test cases
       'max-statements': 'off', // test describe blocks can have many test statements
       '@typescript-eslint/no-unsafe-type-assertion': 'off', // we can be more loose in unit tests
-      'jest/consistent-test-it': ['warn', {fn: 'test', withinDescribe: 'test'}],
-      'jest/expect-expect': 'warn',
+      'jest/consistent-test-it': [
+        'error',
+        {fn: 'test', withinDescribe: 'test'},
+      ],
+      'jest/expect-expect': 'error',
       'jest/max-expects': 'off', // more expects is fine by me
-      'jest/max-nested-describe': 'warn',
-      'jest/no-alias-methods': 'warn',
-      'jest/no-commented-out-tests': 'warn',
-      'jest/no-conditional-expect': 'warn',
-      'jest/no-conditional-in-test': 'warn',
-      'jest/no-confusing-set-timeout': 'warn',
-      'jest/no-deprecated-functions': 'warn',
-      'jest/no-disabled-tests': 'warn',
-      'jest/no-done-callback': 'warn',
-      'jest/no-duplicate-hooks': 'warn',
-      'jest/no-export': 'warn',
-      'jest/no-focused-tests': 'warn',
+      'jest/max-nested-describe': 'error',
+      'jest/no-alias-methods': 'error',
+      'jest/no-commented-out-tests': 'error',
+      'jest/no-conditional-expect': 'error',
+      'jest/no-conditional-in-test': 'error',
+      'jest/no-confusing-set-timeout': 'error',
+      'jest/no-deprecated-functions': 'error',
+      'jest/no-disabled-tests': 'error',
+      'jest/no-done-callback': 'error',
+      'jest/no-duplicate-hooks': 'error',
+      'jest/no-export': 'error',
+      'jest/no-focused-tests': 'error',
       'jest/no-hooks': 'off', // no hooks? but why?
-      'jest/no-identical-title': 'warn',
-      'jest/no-interpolation-in-snapshots': 'warn',
-      'jest/no-jasmine-globals': 'warn',
-      'jest/no-large-snapshots': 'warn',
-      'jest/no-mocks-import': 'warn',
-      'jest/no-restricted-jest-methods': 'warn',
-      'jest/no-restricted-matchers': 'warn',
-      'jest/no-standalone-expect': 'warn',
-      'jest/no-test-prefixes': 'warn',
-      'jest/no-test-return-statement': 'warn',
+      'jest/no-identical-title': 'error',
+      'jest/no-interpolation-in-snapshots': 'error',
+      'jest/no-jasmine-globals': 'error',
+      'jest/no-large-snapshots': 'error',
+      'jest/no-mocks-import': 'error',
+      'jest/no-restricted-jest-methods': 'error',
+      'jest/no-restricted-matchers': 'error',
+      'jest/no-standalone-expect': 'error',
+      'jest/no-test-prefixes': 'error',
+      'jest/no-test-return-statement': 'error',
       'jest/no-untyped-mock-factory': 'off', // we can be more loose in unit tests
       'jest/padding-around-after-all-blocks': 'off', // use Prettier for styling
       'jest/padding-around-after-each-blocks': 'off', // use Prettier for styling
@@ -1028,40 +1118,183 @@ const eslintConfig = [
       'jest/padding-around-describe-blocks': 'off', // use Prettier for styling
       'jest/padding-around-expect-groups': 'off', // use Prettier for styling
       'jest/padding-around-test-blocks': 'off', // use Prettier for styling
-      'jest/prefer-called-with': 'warn',
-      'jest/prefer-comparison-matcher': 'warn',
-      'jest/prefer-each': 'warn',
+      'jest/prefer-called-with': 'error',
+      'jest/prefer-comparison-matcher': 'error',
+      'jest/prefer-each': 'error',
       'jest/prefer-ending-with-an-expect': 'off', // false positive when expect is in a loop
-      'jest/prefer-equality-matcher': 'warn',
+      'jest/prefer-equality-matcher': 'error',
       'jest/prefer-expect-assertions': 'off', // annoying
-      'jest/prefer-expect-resolves': 'warn',
-      'jest/prefer-hooks-in-order': 'warn',
-      'jest/prefer-hooks-on-top': 'warn',
-      'jest/prefer-importing-jest-globals': 'warn',
-      'jest/prefer-jest-mocked': 'warn',
-      'jest/prefer-lowercase-title': 'warn',
-      'jest/prefer-mock-promise-shorthand': 'warn',
-      'jest/prefer-snapshot-hint': 'warn',
-      'jest/prefer-spy-on': 'warn',
+      'jest/prefer-expect-resolves': 'error',
+      'jest/prefer-hooks-in-order': 'error',
+      'jest/prefer-hooks-on-top': 'error',
+      'jest/prefer-importing-jest-globals': 'error',
+      'jest/prefer-jest-mocked': 'error',
+      'jest/prefer-lowercase-title': 'error',
+      'jest/prefer-mock-promise-shorthand': 'error',
+      'jest/prefer-snapshot-hint': 'error',
+      'jest/prefer-spy-on': 'error',
       'jest/prefer-strict-equal': 'off', // i like this idea, but toStrictEqual has issues with arrays being created from inside a jest worker, resulting in false positive errors
-      'jest/prefer-to-be': 'warn',
-      'jest/prefer-to-contain': 'warn',
-      'jest/prefer-to-have-length': 'warn',
-      'jest/prefer-todo': 'warn',
-      'jest/require-hook': 'warn',
-      'jest/require-to-throw-message': 'warn',
+      'jest/prefer-to-be': 'error',
+      'jest/prefer-to-contain': 'error',
+      'jest/prefer-to-have-length': 'error',
+      'jest/prefer-todo': 'error',
+      'jest/require-hook': 'error',
+      'jest/require-to-throw-message': 'error',
       'jest/require-top-level-describe': 'off', // why enforce extra boilerplate?
-      'jest/unbound-method': 'warn',
-      'jest/valid-describe-callback': 'warn',
-      'jest/valid-expect': 'warn',
-      'jest/valid-expect-in-promise': 'warn',
-      'jest/valid-title': 'warn',
+      'jest/unbound-method': 'error',
+      'jest/valid-describe-callback': 'error',
+      'jest/valid-expect': 'error',
+      'jest/valid-expect-in-promise': 'error',
+      'jest/valid-title': 'error',
       '@typescript-eslint/no-unsafe-assignment': 'off', // we can be more loose in unit tests
       '@typescript-eslint/no-unsafe-argument': 'off', // we can be more loose in unit tests
       '@typescript-eslint/no-explicit-any': 'off', // we can be more loose in unit tests
+      '@typescript-eslint/no-magic-numbers': 'off', // we can be more loose in unit tests
     },
   },
   {files: ['**/scripts/**'], rules: {'no-console': 'off'}},
+  {
+    files: ['**/*.config.*'],
+    rules: {'@typescript-eslint/no-magic-numbers': 'off'},
+  },
+  {
+    files: [
+      '**/e2e/**/*.test.ts',
+      '**/e2e/**/*.test.tsx',
+      '**/e2e/**/*.spec.ts',
+      '**/e2e/**/*.spec.tsx',
+    ],
+    rules: {
+      'jest/consistent-test-it': 'off', // not a jest test
+      'jest/expect-expect': 'off', // not a jest test
+      'jest/max-expects': 'off', // not a jest test
+      'jest/max-nested-describe': 'off', // not a jest test
+      'jest/no-alias-methods': 'off', // not a jest test
+      'jest/no-commented-out-tests': 'off', // not a jest test
+      'jest/no-conditional-expect': 'off', // not a jest test
+      'jest/no-conditional-in-test': 'off', // not a jest test
+      'jest/no-confusing-set-timeout': 'off', // not a jest test
+      'jest/no-deprecated-functions': 'off', // not a jest test
+      'jest/no-disabled-tests': 'off', // not a jest test
+      'jest/no-done-callback': 'off', // not a jest test
+      'jest/no-duplicate-hooks': 'off', // not a jest test
+      'jest/no-export': 'off', // not a jest test
+      'jest/no-focused-tests': 'off', // not a jest test
+      'jest/no-hooks': 'off', // not a jest test
+      'jest/no-identical-title': 'off', // not a jest test
+      'jest/no-interpolation-in-snapshots': 'off', // not a jest test
+      'jest/no-jasmine-globals': 'off', // not a jest test
+      'jest/no-large-snapshots': 'off', // not a jest test
+      'jest/no-mocks-import': 'off', // not a jest test
+      'jest/no-restricted-jest-methods': 'off', // not a jest test
+      'jest/no-restricted-matchers': 'off', // not a jest test
+      'jest/no-standalone-expect': 'off', // not a jest test
+      'jest/no-test-prefixes': 'off', // not a jest test
+      'jest/no-test-return-statement': 'off', // not a jest test
+      'jest/no-untyped-mock-factory': 'off', // not a jest test
+      'jest/padding-around-after-all-blocks': 'off', // not a jest test
+      'jest/padding-around-after-each-blocks': 'off', // not a jest test
+      'jest/padding-around-all': 'off', // not a jest test
+      'jest/padding-around-before-all-blocks': 'off', // not a jest test
+      'jest/padding-around-before-each-blocks': 'off', // not a jest test
+      'jest/padding-around-describe-blocks': 'off', // not a jest test
+      'jest/padding-around-expect-groups': 'off', // not a jest test
+      'jest/padding-around-test-blocks': 'off', // not a jest test
+      'jest/prefer-called-with': 'off', // not a jest test
+      'jest/prefer-comparison-matcher': 'off', // not a jest test
+      'jest/prefer-each': 'off', // not a jest test
+      'jest/prefer-ending-with-an-expect': 'off', // not a jest test
+      'jest/prefer-equality-matcher': 'off', // not a jest test
+      'jest/prefer-expect-assertions': 'off', // not a jest test
+      'jest/prefer-expect-resolves': 'off', // not a jest test
+      'jest/prefer-hooks-in-order': 'off', // not a jest test
+      'jest/prefer-hooks-on-top': 'off', // not a jest test
+      'jest/prefer-importing-jest-globals': 'off', // not a jest test
+      'jest/prefer-jest-mocked': 'off', // not a jest test
+      'jest/prefer-lowercase-title': 'off', // not a jest test
+      'jest/prefer-mock-promise-shorthand': 'off', // not a jest test
+      'jest/prefer-snapshot-hint': 'off', // not a jest test
+      'jest/prefer-spy-on': 'off', // not a jest test
+      'jest/prefer-strict-equal': 'off', // not a jest test
+      'jest/prefer-to-be': 'off', // not a jest test
+      'jest/prefer-to-contain': 'off', // not a jest test
+      'jest/prefer-to-have-length': 'off', // not a jest test
+      'jest/prefer-todo': 'off', // not a jest test
+      'jest/require-hook': 'off', // not a jest test
+      'jest/require-to-throw-message': 'off', // not a jest test
+      'jest/require-top-level-describe': 'off', // not a jest test
+      'jest/unbound-method': 'off', // not a jest test
+      'jest/valid-describe-callback': 'off', // not a jest test
+      'jest/valid-expect-in-promise': 'off', // not a jest test
+      'jest/valid-expect': 'off', // not a jest test
+      'jest/valid-title': 'off', // not a jest test
+      'playwright/expect-expect': 'error',
+      'playwright/max-expects': 'off', //testing multiple things is good for e2e performance
+      'playwright/max-nested-describe': 'error',
+      'playwright/missing-playwright-await': 'error',
+      'playwright/no-commented-out-tests': 'error',
+      'playwright/no-conditional-expect': 'error',
+      'playwright/no-conditional-in-test': 'error',
+      'playwright/no-duplicate-hooks': 'error',
+      'playwright/no-element-handle': 'error',
+      'playwright/no-eval': 'error',
+      'playwright/no-focused-test': 'error',
+      'playwright/no-force-option': 'error',
+      'playwright/no-get-by-title': 'error',
+      'playwright/no-hooks': 'error',
+      'playwright/no-nested-step': 'error',
+      'playwright/no-networkidle': 'error',
+      'playwright/no-nth-methods': 'error',
+      'playwright/no-page-pause': 'error',
+      'playwright/no-raw-locators': 'error',
+      'playwright/no-restricted-matchers': 'error',
+      'playwright/no-skipped-test': 'warn',
+      'playwright/no-slowed-test': 'error',
+      'playwright/no-standalone-expect': 'error',
+      'playwright/no-unsafe-references': 'error',
+      'playwright/no-useless-await': 'error',
+      'playwright/no-useless-not': 'error',
+      'playwright/no-wait-for-navigation': 'error',
+      'playwright/no-wait-for-selector': 'error',
+      'playwright/no-wait-for-timeout': 'error',
+      'playwright/prefer-comparison-matcher': 'error',
+      'playwright/prefer-equality-matcher': 'error',
+      'playwright/prefer-hooks-in-order': 'error',
+      'playwright/prefer-hooks-on-top': 'error',
+      'playwright/prefer-locator': 'error',
+      'playwright/prefer-lowercase-title': 'error',
+      'playwright/prefer-native-locators': 'error',
+      'playwright/prefer-strict-equal': 'error',
+      'playwright/prefer-to-be': 'error',
+      'playwright/prefer-to-contain': 'error',
+      'playwright/prefer-to-have-count': 'error',
+      'playwright/prefer-to-have-length': 'error',
+      'playwright/prefer-web-first-assertions': 'error',
+      'playwright/require-hook': 'error',
+      'playwright/require-soft-assertions': 'off', // probably not a good idea
+      'playwright/require-to-throw-message': 'error',
+      'playwright/require-top-level-describe': 'error',
+      'playwright/valid-describe-callback': 'error',
+      'playwright/valid-expect-in-promise': 'error',
+      'playwright/valid-expect': 'error',
+      'playwright/valid-test-tags': 'error',
+      'playwright/valid-title': 'error',
+      'ui-testing/missing-assertion-in-test': 'error',
+      'ui-testing/no-absolute-url': ['error', 'playwright'],
+      'ui-testing/no-assertions-in-hooks': 'error',
+      'ui-testing/no-browser-commands-in-tests': 'off', // not sure I like the idea of requiring an abstraction layer per page like it suggests
+      'ui-testing/no-css-page-layout-selector': ['error', 'playwright'],
+      'ui-testing/no-disabled-tests': 'off', // handled by playwright/no-skipped-test
+      'ui-testing/no-focused-tests': 'error',
+      'ui-testing/no-hard-wait': ['error', 'playwright'],
+      'ui-testing/no-implicit-wait': 'error',
+      'ui-testing/no-link-text-selector': 'error',
+      'ui-testing/no-tag-name-selector': 'error',
+      'ui-testing/no-wait-in-tests': ['error', 'playwright'],
+      'ui-testing/no-xpath-page-layout-selector': 'error',
+      'ui-testing/no-xpath-selector': 'error',
+    },
+  },
 ];
 
 export default eslintConfig;

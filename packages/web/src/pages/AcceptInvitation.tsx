@@ -11,6 +11,7 @@ import {Button} from '../widgets/Button.js';
 import {Alert} from '../widgets/Alert.js';
 import {Stack} from '../widgets/Stack.js';
 import {useToast} from '../widgets/ToastProvider.js';
+import {ACCEPT_INVITATION_REDIRECT_DELAY} from '../constants';
 
 type InvitationSubmitParams = {
   token: string;
@@ -55,7 +56,7 @@ const useInvitationSubmit = ({
           setMessage(intl.formatMessage(submitMessages.accepted));
           setTimeout(() => {
             onAccepted();
-          }, 1200);
+          }, ACCEPT_INVITATION_REDIRECT_DELAY);
         } else {
           setMessage(intl.formatMessage(submitMessages.failedAccept));
         }

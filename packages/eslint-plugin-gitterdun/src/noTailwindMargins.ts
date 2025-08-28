@@ -149,7 +149,7 @@ export const noTailwindMargins: Rule.RuleModule = {
           return;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access -- ESLint AST property access
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- ESLint AST property access
         const {name: attributeName} = node.name;
         if (attributeName !== 'className' && attributeName !== 'class') {
           return;
@@ -168,7 +168,7 @@ export const noTailwindMargins: Rule.RuleModule = {
         // Handle template literal expressions (e.g., className={`flex ${someVar}`})
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/no-unsafe-member-access -- ESLint AST property access
         if (node.value && node.value.type === 'JSXExpressionContainer') {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access -- ESLint AST property access
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- ESLint AST property access
           const {expression} = node.value;
           // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- ESLint AST node argument
           handleTemplateLiteral(context, node, expression);
@@ -186,7 +186,7 @@ export const noTailwindMargins: Rule.RuleModule = {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- ESLint AST property access
         if (typeof node.value === 'string') {
           // Simple heuristic: if it looks like CSS classes (contains common Tailwind patterns)
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- ESLint AST property access
+
           const {value} = node;
           const hasTailwindPattern =
             /\b(?:flex|grid|text-|bg-|border-|p-|space-)/;

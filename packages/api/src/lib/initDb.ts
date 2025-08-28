@@ -4,6 +4,7 @@ import db from './db';
 import {asError, CountRowSchema} from '@gitterdun/shared';
 import {logger} from '../utils/logger';
 import {sql} from '../utils/sql';
+import {BCRYPT_SALT_ROUNDS} from '../constants';
 
 const readSchemaFile = (): string => {
   const schemaPath = path.join(process.cwd(), 'src/lib/schema.sqlite.sql');
@@ -33,7 +34,10 @@ const checkAdminExists = (): boolean => {
 
 const createDefaultAdmin = async (): Promise<void> => {
   const bcrypt = await import('bcryptjs');
-  const hashedPassword = bcrypt.default.hashSync('admin123', 10);
+  const hashedPassword = bcrypt.default.hashSync(
+    'admin123',
+    BCRYPT_SALT_ROUNDS,
+  );
 
   db.prepare(sql`
     INSERT INTO

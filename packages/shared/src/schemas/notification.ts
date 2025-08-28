@@ -1,9 +1,10 @@
 import {z} from 'zod';
+import {MAX_NAME_LENGTH} from '../constants.js';
 
 export const NotificationSchema = z.object({
   id: z.number(),
   user_id: z.number(),
-  title: z.string().min(1).max(255),
+  title: z.string().min(1).max(MAX_NAME_LENGTH),
   message: z.string().min(1),
   type: z.enum([
     'chore_due',

@@ -11,6 +11,7 @@ import {Alert} from '../widgets/Alert.js';
 import {Stack} from '../widgets/Stack.js';
 import {useToast} from '../widgets/ToastProvider.js';
 import {FormattedMessage, defineMessages, useIntl} from 'react-intl';
+import {PASSWORD_RESET_REDIRECT_DELAY} from '../constants';
 
 const ResetPassword: FC = () => {
   const {resetPassword} = useUser();
@@ -81,7 +82,7 @@ const ResetPassword: FC = () => {
           safeAsync(async () => {
             await navigate('/login');
           }, 'Failed to redirect to login');
-        }, 1200);
+        }, PASSWORD_RESET_REDIRECT_DELAY);
       } catch {
         setMessage(intl.formatMessage(messages.couldNotReset));
       }

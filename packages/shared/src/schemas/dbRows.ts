@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {MAX_USERNAME_LENGTH, MAX_NAME_LENGTH} from '../constants.js';
 
 export const SessionRowSchema = z.object({
   user_id: z.number(),
@@ -33,8 +34,8 @@ export const UserPasswordHashRowSchema = z.object({
 
 export const UserWithPasswordRowSchema = z.object({
   id: z.number(),
-  username: z.string().min(1).max(50),
-  email: z.email().max(255).nullable(),
+  username: z.string().min(1).max(MAX_USERNAME_LENGTH),
+  email: z.email().max(MAX_NAME_LENGTH).nullable(),
   password_hash: z.string(),
   role: z.enum(['admin', 'user']),
   points: z.number().int().min(0),

@@ -1,9 +1,11 @@
+import {MAX_SLUG_LENGTH, SRC_PREFIX_LENGTH} from '../constants';
+
 export const slugifyDefaultMessage = (defaultMessage: string): string => {
   return defaultMessage
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(?:^-|-$)/g, '')
-    .slice(0, 30);
+    .slice(0, MAX_SLUG_LENGTH);
 };
 
 export const computeHumanReadableId = (
@@ -13,7 +15,7 @@ export const computeHumanReadableId = (
   const afterSrc = sourceFilePath.split('/src/')[1] ?? sourceFilePath;
   let relativeFromSrc = afterSrc.replace(/^\/+/, '');
   if (relativeFromSrc.startsWith('src/')) {
-    relativeFromSrc = relativeFromSrc.slice(4);
+    relativeFromSrc = relativeFromSrc.slice(SRC_PREFIX_LENGTH);
   }
   const fileScope = relativeFromSrc
     .replace(/\.[tj]sx?$/, '')

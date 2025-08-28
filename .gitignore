@@ -1,47 +1,31 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-node_modules
-/.pnp
-.pnp.*
-.yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-
-# testing
-/coverage
-
-
-# build artifacts
-/build
-/dist
-**/dist
-
-# misc
 .DS_Store
+.env*
+.nyc_output
+.pnp
+.pnp.*
+.pnpm-debug.log*
+.turbo
+.vscode
+.yarn/*
+*.log
 *.pem
-
-# debug
+*.timestamp-*.*
+*.tsbuildinfo
+build
+coverage
+data
+dist
+extracted
+node_modules
 npm-debug.log*
+playwright-report
+playwright/.cache
+test-results
+Thumbs.db
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-
-# typescript
-*.tsbuildinfo
-
-# configs
-.vscode
-
-data
-
-coverage
-.nyc_output
-.turbo
-*.timestamp-*.*# Testing lint-staged fix
-extracted
+temp

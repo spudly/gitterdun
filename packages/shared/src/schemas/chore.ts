@@ -1,8 +1,9 @@
 import {z} from 'zod';
+import {MAX_NAME_LENGTH} from '../constants.js';
 
 export const ChoreSchema = z.object({
   id: z.number(),
-  title: z.string().min(1).max(255),
+  title: z.string().min(1).max(MAX_NAME_LENGTH),
   description: z.string().optional(),
   point_reward: z.number().int().min(0),
   bonus_points: z.number().int().min(0).default(0),
@@ -30,7 +31,7 @@ export const ChoreWithUsernameSchema = ChoreSchema.extend({
 });
 
 export const CreateChoreSchema = z.object({
-  title: z.string().min(1).max(255),
+  title: z.string().min(1).max(MAX_NAME_LENGTH),
   description: z.string().optional(),
   point_reward: z.number().int().min(0),
   bonus_points: z.number().int().min(0).optional().default(0),
@@ -48,7 +49,7 @@ export const CreateChoreSchema = z.object({
 });
 
 export const UpdateChoreSchema = z.object({
-  title: z.string().min(1).max(255).optional(),
+  title: z.string().min(1).max(MAX_NAME_LENGTH).optional(),
   description: z.string().optional(),
   point_reward: z.number().int().min(0).optional(),
   bonus_points: z.number().int().min(0).optional(),

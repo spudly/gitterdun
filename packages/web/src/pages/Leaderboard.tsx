@@ -8,6 +8,7 @@ import {RankingList} from '../widgets/RankingList.js';
 import {PageLoading} from '../widgets/PageLoading.js';
 import {Text} from '../widgets/Text.js';
 import {useIntl} from 'react-intl';
+import {PODIUM_ITEMS_COUNT, SILVER_RANK, BRONZE_RANK} from '../constants';
 
 const Leaderboard: FC = () => {
   const intl = useIntl();
@@ -39,37 +40,39 @@ const Leaderboard: FC = () => {
     );
   }
 
-  const podiumItems = leaderboard.slice(0, 3).map((entry, index) => ({
-    id: entry.id,
-    rank: (index + 1) as 1 | 2 | 3,
-    content: (
-      <>
-        <Text as="h3" size="lg" weight="semibold">
-          {entry.username}
-        </Text>
+  const podiumItems = leaderboard
+    .slice(0, PODIUM_ITEMS_COUNT)
+    .map((entry, index) => ({
+      id: entry.id,
+      rank: (index + 1) as 1 | typeof SILVER_RANK | typeof BRONZE_RANK,
+      content: (
+        <>
+          <Text as="h3" size="lg" weight="semibold">
+            {entry.username}
+          </Text>
 
-        <Text muted>
-          {intl.formatMessage(
-            {
-              defaultMessage: '{count} points',
-              id: 'pages.Leaderboard.count-points',
-            },
-            {count: entry.points},
-          )}
-        </Text>
+          <Text muted>
+            {intl.formatMessage(
+              {
+                defaultMessage: '{count} points',
+                id: 'pages.Leaderboard.count-points',
+              },
+              {count: entry.points},
+            )}
+          </Text>
 
-        <Text muted size="sm">
-          {intl.formatMessage(
-            {
-              defaultMessage: '{count} chores',
-              id: 'pages.Leaderboard.count-chores',
-            },
-            {count: entry.chores_completed},
-          )}
-        </Text>
-      </>
-    ),
-  }));
+          <Text muted size="sm">
+            {intl.formatMessage(
+              {
+                defaultMessage: '{count} chores',
+                id: 'pages.Leaderboard.count-chores',
+              },
+              {count: entry.chores_completed},
+            )}
+          </Text>
+        </>
+      ),
+    }));
 
   const rankingItems = leaderboard.map(entry => ({
     id: entry.id,

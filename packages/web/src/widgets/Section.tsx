@@ -8,8 +8,10 @@ const SectionContext = createContext<{level: number}>({level: 1});
 
 type GapSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
+const MAX_HEADING_LEVEL = 6;
+
 const isHeadingLevel = (level: number): level is HeadingLevel =>
-  Number.isInteger(level) && level >= 1 && level <= 6;
+  Number.isInteger(level) && level >= 1 && level <= MAX_HEADING_LEVEL;
 
 export const Section: FC<
   PropsWithChildren<{
@@ -20,7 +22,8 @@ export const Section: FC<
 > = ({header, headingLevel, gap, children}) => {
   const {level: contextLevel} = useContext(SectionContext);
 
-  const currentLevel = headingLevel ?? Math.min(contextLevel + 1, 6);
+  const currentLevel =
+    headingLevel ?? Math.min(contextLevel + 1, MAX_HEADING_LEVEL);
 
   if (!isHeadingLevel(currentLevel)) {
     throw new Error('Invalid heading level');
