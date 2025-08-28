@@ -51,6 +51,31 @@ export const loginAs = async (
 };
 
 /**
+ * Ensure admin user has a family and wait for create child form to be visible
+ */
+const ensureFamilyExists = async (page: Page): Promise<void> => {
+  const createFamilyButton = page.getByRole('button', {name: 'Create'}).first();
+  const createFamilyInput = page.getByPlaceholder('New family name');
+
+  // If there's no family, create one
+  if (await createFamilyInput.isVisible()) {
+    await createFamilyInput.fill('Test Family');
+    await createFamilyButton.click();
+
+    // Wait for the family creation to complete and form to update
+    await expect(page.getByText('Create Child Account')).toBeVisible({
+      timeout: 15000,
+    });
+  } else {
+    // Wait for the existing family to load and the create child form to be visible
+    // The form only appears when a family is selected, so we need to wait for it
+    await expect(page.getByText('Create Child Account')).toBeVisible({
+      timeout: 10000,
+    });
+  }
+};
+
+/**
  * Create a family setup with parent and child
  */
 export const setupFamily = async (page: Page) => {
@@ -65,18 +90,12 @@ export const setupFamily = async (page: Page) => {
   await page.click('button[type="submit"]');
   await expect(page).toHaveURL('/');
 
-  // Navigate to family page (admin user already has a family)
+  // Navigate to family page and ensure family exists
   await page.goto('/family');
-  // Wait for the family page to load (admin already has a family)
   await expect(page.getByRole('heading', {name: 'Your Family'})).toBeVisible();
+  await ensureFamilyExists(page);
 
-  // Wait for the family to be loaded and the create child form to be visible
-  // The form only appears when a family is selected, so we need to wait for it
-  await expect(page.getByText('Create Child Account')).toBeVisible({
-    timeout: 10000,
-  });
-
-  const familyName = `Admin Family`; // Use admin's existing family
+  const familyName = `Test Family`; // Use created or existing family
 
   // Add child to family using placeholder text selectors since the inputs don't have proper labels
   await page.getByPlaceholder('Username').fill(childUsername);
