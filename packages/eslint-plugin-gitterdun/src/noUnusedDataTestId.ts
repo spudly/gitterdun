@@ -2,7 +2,10 @@ import type {Rule} from 'eslint';
 import {buildUsedTestIds} from './testIdScanner.js';
 
 // Simple cache to avoid recomputing across multiple files within the same ESLint run
-const cacheKeyToUsedIds: Map<string, Set<string>> = new Map<string, Set<string>>();
+const cacheKeyToUsedIds: Map<string, Set<string>> = new Map<
+  string,
+  Set<string>
+>();
 
 const buildUsedIdsCached = (globs: Array<string>): Set<string> => {
   const cacheKey = JSON.stringify({
@@ -49,7 +52,8 @@ export const noUnusedDataTestId: Rule.RuleModule = {
     const globs = Array.isArray(option.testFileGlobs)
       ? option.testFileGlobs
       : [];
-    const usedIds = globs.length > 0 ? buildUsedIdsCached(globs) : new Set<string>();
+    const usedIds =
+      globs.length > 0 ? buildUsedIdsCached(globs) : new Set<string>();
 
     return {
       JSXAttribute(attributeNode) {
@@ -58,13 +62,19 @@ export const noUnusedDataTestId: Rule.RuleModule = {
           name?: {type?: string; name?: unknown};
           value?:
             | {type?: 'Literal'; value?: unknown}
-            | {type?: 'JSXExpressionContainer'; expression?: {type?: string; value?: unknown}};
+            | {
+                type?: 'JSXExpressionContainer';
+                expression?: {type?: string; value?: unknown};
+              };
         };
 
         if (named.type !== 'JSXAttribute') {
           return;
         }
-        if (named.name?.type !== 'JSXIdentifier' || typeof named.name.name !== 'string') {
+        if (
+          named.name?.type !== 'JSXIdentifier'
+          || typeof named.name.name !== 'string'
+        ) {
           return;
         }
         if (named.name.name !== 'data-testid') {
@@ -72,7 +82,11 @@ export const noUnusedDataTestId: Rule.RuleModule = {
         }
 
         let testId: string | null = null;
-        if (named.value && named.value.type === 'Literal' && typeof named.value.value === 'string') {
+        if (
+          named.value
+          && named.value.type === 'Literal'
+          && typeof named.value.value === 'string'
+        ) {
           testId = named.value.value;
         } else if (
           named.value
@@ -86,7 +100,11 @@ export const noUnusedDataTestId: Rule.RuleModule = {
 
         if (testId !== null) {
           if (!usedIds.has(testId)) {
-            context.report({node: attributeNode, messageId: 'unusedDataTestId', data: {testId}});
+            context.report({
+              node: attributeNode,
+              messageId: 'unusedDataTestId',
+              data: {testId},
+            });
           }
         }
       },

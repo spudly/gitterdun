@@ -1,16 +1,28 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const toPosix = (filePath: string): string => filePath.split(path.sep).join('/');
-const escapeRegex = (input: string): string => input.replace(/[.+^${}()|[\]\\]/g, '\\$&');
+const toPosix = (filePath: string): string =>
+  filePath.split(path.sep).join('/');
+const escapeRegex = (input: string): string =>
+  input.replace(/[.+^${}()|[\]\\]/g, '\\$&');
 const globToRegExp = (globPattern: string): RegExp => {
   const posixGlob = toPosix(globPattern);
   let pattern = posixGlob.replace(/\*\*/g, '§§DOUBLESTAR§§');
-  pattern = escapeRegex(pattern).replace(/§§DOUBLESTAR§§/g, '.*').replace(/\*/g, '[^/]*').replace(/\?/g, '[^/]');
+  pattern = escapeRegex(pattern)
+    .replace(/§§DOUBLESTAR§§/g, '.*')
+    .replace(/\*/g, '[^/]*')
+    .replace(/\?/g, '[^/]');
   return new RegExp(`^${pattern}$`);
 };
 
-const defaultIgnoreDirs = new Set(['node_modules', '.git', 'dist', 'build', 'coverage', 'playwright-report']);
+const defaultIgnoreDirs = new Set([
+  'node_modules',
+  '.git',
+  'dist',
+  'build',
+  'coverage',
+  'playwright-report',
+]);
 
 const walkFiles = (rootDir: string): Array<string> => {
   const results: Array<string> = [];
@@ -40,7 +52,10 @@ const walkFiles = (rootDir: string): Array<string> => {
   return results;
 };
 
-const filterByGlobs = (allFiles: Array<string>, globs: Array<string>): Array<string> => {
+const filterByGlobs = (
+  allFiles: Array<string>,
+  globs: Array<string>,
+): Array<string> => {
   const regs = globs.map(globToRegExp);
   return allFiles
     .map(absPath => toPosix(path.relative(process.cwd(), absPath)))
@@ -56,7 +71,7 @@ const ID_PATTERNS: Array<RegExp> = [
   /\[\s*data-testid\s*=\s*(?<id>[^\]"'\s]+)\s*\]/g,
 ];
 
-export const extractTestIdsFromContent = (content: string): Set<string> => {
+const extractTestIdsFromContent = (content: string): Set<string> => {
   const ids = new Set<string>();
   for (const pattern of ID_PATTERNS) {
     for (const match of content.matchAll(pattern)) {
