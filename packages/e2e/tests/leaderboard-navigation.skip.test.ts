@@ -43,7 +43,7 @@ const createAndCompleteChore = async (
 };
 
 test.describe('leaderboard Navigation - Skipped Tests', () => {
-  test.skip('should allow navigation between pages while maintaining leaderboard state', async ({
+  test('should allow navigation between pages while maintaining leaderboard state', async ({
     page,
   }) => {
     const {parent, child1} = await setupFamilyWithChildren(page);

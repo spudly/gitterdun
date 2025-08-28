@@ -43,7 +43,7 @@ const createAndCompleteChore = async (
 };
 
 test.describe('leaderboard Points System - Skipped Tests', () => {
-  test.skip('should track points from completed chores', async ({page}) => {
+  test('should track points from completed chores', async ({page}) => {
     const {parent, child1} = await setupFamilyWithChildren(page);
     const choreTitle = `Points Chore ${Date.now()}`;
 
@@ -59,9 +59,7 @@ test.describe('leaderboard Points System - Skipped Tests', () => {
     await expect(page.getByText('20')).toBeVisible();
   });
 
-  test.skip('should show cumulative points from multiple chores', async ({
-    page,
-  }) => {
+  test('should show cumulative points from multiple chores', async ({page}) => {
     const {parent, child1} = await setupFamilyWithChildren(page);
 
     await createAndCompleteChore(page, {
@@ -82,7 +80,7 @@ test.describe('leaderboard Points System - Skipped Tests', () => {
     await expect(page.getByText('40')).toBeVisible();
   });
 
-  test.skip('should update leaderboard when new chores are completed', async ({
+  test('should update leaderboard when new chores are completed', async ({
     page,
   }) => {
     const {parent, child1} = await setupFamilyWithChildren(page);

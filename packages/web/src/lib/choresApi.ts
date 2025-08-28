@@ -55,4 +55,25 @@ export const choresApi = {
       z.object({success: z.boolean()}).loose(),
       data,
     ),
+
+  assign: async (id: number, data: {userId: number}) =>
+    api.post(
+      `/chores/${id}/assign`,
+      z.object({success: z.boolean()}).loose(),
+      data,
+    ),
+
+  approve: async (id: number, data: {approvedBy: number}) =>
+    api.post(
+      `/chores/${id}/approve`,
+      z.object({success: z.boolean()}).loose(),
+      data,
+    ),
+
+  reject: async (id: number) =>
+    api.post(
+      `/chores/${id}/reject`,
+      z.object({success: z.boolean()}).loose(),
+      {},
+    ),
 };

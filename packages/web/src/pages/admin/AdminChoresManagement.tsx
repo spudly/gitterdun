@@ -11,6 +11,8 @@ import {Button} from '../../widgets/Button.js';
 import {Text} from '../../widgets/Text.js';
 import {Toolbar} from '../../widgets/Toolbar.js';
 import {InlineMeta} from '../../widgets/InlineMeta.js';
+import {useMutation, useQueryClient} from '@tanstack/react-query';
+import {choresApi} from '../../lib/api.js';
 
 type AdminChoresManagementProps = {readonly chores: Array<ChoreWithUsername>};
 
@@ -18,6 +20,19 @@ export const AdminChoresManagement: FC<AdminChoresManagementProps> = ({
   chores,
 }) => {
   const intl = useIntl();
+  const queryClient = useQueryClient();
+  const approveMutation = useMutation({
+    mutationFn: async (id: number) => choresApi.approve(id, {approvedBy: 1}),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({queryKey: ['chores', 'admin']});
+    },
+  });
+  const rejectMutation = useMutation({
+    mutationFn: async (id: number) => choresApi.reject(id),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({queryKey: ['chores', 'admin']});
+    },
+  });
 
   const messages = defineMessages({
     header: {
@@ -133,11 +148,19 @@ export const AdminChoresManagement: FC<AdminChoresManagementProps> = ({
               <Toolbar>
                 {chore.status === 'completed' && (
                   <>
-                    <Button size="sm" variant="primary">
+                    <Button
+                      onClick={() => approveMutation.mutate(chore.id)}
+                      size="sm"
+                      variant="primary"
+                    >
                       <FormattedMessage {...messages.approve} />
                     </Button>
 
-                    <Button size="sm" variant="danger">
+                    <Button
+                      onClick={() => rejectMutation.mutate(chore.id)}
+                      size="sm"
+                      variant="danger"
+                    >
                       <FormattedMessage {...messages.reject} />
                     </Button>
                   </>

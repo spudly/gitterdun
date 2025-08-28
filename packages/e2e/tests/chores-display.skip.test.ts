@@ -2,7 +2,7 @@ import {test, expect} from '@playwright/test';
 import {setupFamily, loginAs} from './helpers/test-utils';
 
 test.describe('chores Display - Skipped Tests', () => {
-  test.skip('should show chores list for child user', async ({page}) => {
+  test('should show chores list for child user', async ({page}) => {
     const {child} = await setupFamily(page);
     await loginAs(page, child.username, child.password);
     await page.goto('/chores');
@@ -12,7 +12,7 @@ test.describe('chores Display - Skipped Tests', () => {
     await expect(page.getByTestId('chores-list')).toBeVisible();
   });
 
-  test.skip('should show points and status for chores', async ({page}) => {
+  test('should show points and status for chores', async ({page}) => {
     const {child} = await setupFamily(page);
     const choreTitle = `Points Test ${Date.now()}`;
     const chorePoints = '25';
@@ -38,9 +38,7 @@ test.describe('chores Display - Skipped Tests', () => {
     await expect(page.getByText('Pending')).toBeVisible();
   });
 
-  test.skip('should navigate between chores and admin pages', async ({
-    page,
-  }) => {
+  test('should navigate between chores and admin pages', async ({page}) => {
     await setupFamily(page);
     await page.goto('/chores');
     await expect(page).toHaveURL('/chores');

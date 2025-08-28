@@ -2,7 +2,7 @@ import {test, expect} from '@playwright/test';
 import {setupFamily, loginAs} from './helpers/test-utils';
 
 test.describe('chores Completion - Skipped Tests', () => {
-  test.skip('should complete a chore as child', async ({page}) => {
+  test('should complete a chore as child', async ({page}) => {
     const {child} = await setupFamily(page);
     await page.goto('/admin');
     const choreTitle = `Complete Me ${Date.now()}`;
@@ -34,7 +34,7 @@ test.describe('chores Completion - Skipped Tests', () => {
     await expect(page.getByText('Completed')).toBeVisible();
   });
 
-  test.skip('should approve completed chore as parent', async ({page}) => {
+  test('should approve completed chore as parent', async ({page}) => {
     const {parent, child} = await setupFamily(page);
     await page.goto('/admin');
     const choreTitle = `Approve Me ${Date.now()}`;
@@ -75,7 +75,7 @@ test.describe('chores Completion - Skipped Tests', () => {
     await expect(page.getByText('Approved')).toBeVisible();
   });
 
-  test.skip('should reject completed chore as parent', async ({page}) => {
+  test('should reject completed chore as parent', async ({page}) => {
     const {parent, child} = await setupFamily(page);
     await page.goto('/admin');
     const choreTitle = `Reject Me ${Date.now()}`;

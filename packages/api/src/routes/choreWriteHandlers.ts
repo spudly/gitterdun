@@ -24,6 +24,11 @@ import {
 } from '../utils/choreCrud';
 import {processChoreUpdate} from '../utils/choreUpdates';
 import {executeChoreCompletionTransaction} from '../utils/choreCompletion';
+import {
+  assignChoreToSingleUser,
+  approveChoreAssignment,
+  rejectChoreAssignment,
+} from '../utils/choreModeration';
 
 // POST /api/chores - Create a new chore
 export const handleCreateChore = async (
@@ -127,5 +132,70 @@ export const handleCompleteChore = async (
     });
   } catch (error) {
     return handleChoreCompletionError(error, res);
+  }
+};
+
+// POST /api/chores/:id/assign - Assign a chore to a user
+export const handleAssignChore = async (
+  req: express.Request,
+  res: express.Response,
+) => {
+  try {
+    const choreId = Number((req.params as Record<string, string>)['id']);
+    const {userId} = req.body as {userId?: number};
+    if (!Number.isInteger(choreId) || !Number.isInteger(userId)) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({success: false, error: 'Invalid chore or user id'});
+    }
+    assignChoreToSingleUser(choreId, userId!);
+    return res.json({success: true});
+  } catch (error) {
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({success: false, error: (error as Error).message});
+  }
+};
+
+// POST /api/chores/:id/approve - Approve a completed chore
+export const handleApproveChore = async (
+  req: express.Request,
+  res: express.Response,
+) => {
+  try {
+    const choreId = Number((req.params as Record<string, string>)['id']);
+    const {approvedBy} = req.body as {approvedBy?: number};
+    if (!Number.isInteger(choreId) || !Number.isInteger(approvedBy)) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({success: false, error: 'Invalid chore id or approver id'});
+    }
+    approveChoreAssignment(choreId, approvedBy!);
+    return res.json({success: true});
+  } catch (error) {
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({success: false, error: (error as Error).message});
+  }
+};
+
+// POST /api/chores/:id/reject - Reject a completed chore
+export const handleRejectChore = async (
+  req: express.Request,
+  res: express.Response,
+) => {
+  try {
+    const choreId = Number((req.params as Record<string, string>)['id']);
+    if (!Number.isInteger(choreId)) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({success: false, error: 'Invalid chore id'});
+    }
+    rejectChoreAssignment(choreId);
+    return res.json({success: true});
+  } catch (error) {
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({success: false, error: (error as Error).message});
   }
 };

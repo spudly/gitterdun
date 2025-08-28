@@ -42,7 +42,7 @@ jest.mock('../lib/api', () => ({
 }));
 
 describe('admin page', () => {
-  test('renders admin panel with appropriate sections but no family management', async () => {
+  test('renders admin panel with stats, users, and chores management', async () => {
     const Wrapper = createWrapper({
       i18n: true,
       queryClient: true,
@@ -52,18 +52,17 @@ describe('admin page', () => {
 
     await expect(screen.findByText('Admin Panel')).resolves.toBeInTheDocument();
 
-    expect(screen.queryByText('Family Management')).not.toBeInTheDocument();
-    expect(
-      screen.queryByPlaceholderText('Family name'),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', {name: 'Create Family'}),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByPlaceholderText('Family ID')).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', {name: 'Invite'}),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByText('Chores Management')).not.toBeInTheDocument();
+    // Shows stats section
+    expect(screen.getByText('Total Chores')).toBeInTheDocument();
+    expect(screen.getByText('Pending Approval')).toBeInTheDocument();
+    expect(screen.getByText('Approved')).toBeInTheDocument();
+    expect(screen.getByText('Bonus Chores')).toBeInTheDocument();
+
+    // Shows users section
+    expect(screen.getByRole('region', {name: 'Users'})).toBeInTheDocument();
+
+    // Shows chores management section
+    expect(screen.getByText('Chores Management')).toBeInTheDocument();
   });
 
   test('denies access for non-admin users', () => {

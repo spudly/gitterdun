@@ -1,5 +1,5 @@
 import type {FC} from 'react';
-import {useQuery} from '@tanstack/react-query';
+import {useQuery, useQueryClient} from '@tanstack/react-query';
 import type {ChoreWithUsername} from '@gitterdun/shared';
 import {choresApi} from '../lib/api.js';
 import {useUser} from '../hooks/useUser.js';
@@ -58,6 +58,7 @@ const messages = defineMessages({
 const Chores: FC = () => {
   const {user} = useUser();
   const intl = useIntl();
+  const queryClient = useQueryClient();
 
   const {data: choresResponse, isLoading} = useQuery({
     queryKey: ['chores', user?.id],
@@ -65,7 +66,6 @@ const Chores: FC = () => {
       choresApi.getAll({
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- will never be called if user is null/undefined
         user_id: user!.id,
-        status: 'pending',
         sort_by: 'start_date',
         order: 'asc',
       }),
@@ -73,6 +73,8 @@ const Chores: FC = () => {
   });
 
   const chores = choresResponse?.data ?? [];
+
+  // keep for potential future optimistic update flows
 
   if (isLoading) {
     return (
@@ -106,83 +108,95 @@ const Chores: FC = () => {
     <PageContainer>
       <PageHeader title={intl.formatMessage(messages.header)} />
 
-      <List>
-        {chores.map((chore: ChoreWithUsername) => (
-          <ListRow
-            description={chore.description}
-            key={chore.id}
-            left={renderStatusDot(chore.status)}
-            meta={
-              <InlineMeta>
-                <span>
-                  {intl.formatMessage(messages.pointsWithValue, {
-                    points: chore.point_reward,
-                  })}
-                </span>
-
-                {chore.bonus_points > 0 && (
+      <div data-testid="chores-list">
+        <List>
+          {chores.map((chore: ChoreWithUsername) => (
+            <ListRow
+              description={chore.description}
+              key={chore.id}
+              left={renderStatusDot(chore.status)}
+              meta={
+                <InlineMeta>
                   <span>
-                    {intl.formatMessage(messages.bonusWithPoints, {
-                      points: chore.bonus_points,
+                    {intl.formatMessage(messages.pointsWithValue, {
+                      points: chore.point_reward,
                     })}
                   </span>
-                )}
 
-                {chore.penalty_points > 0 && (
-                  <span>
-                    {intl.formatMessage(messages.penaltyWithPoints, {
-                      points: chore.penalty_points,
-                    })}
-                  </span>
-                )}
+                  {chore.bonus_points > 0 && (
+                    <span>
+                      {intl.formatMessage(messages.bonusWithPoints, {
+                        points: chore.bonus_points,
+                      })}
+                    </span>
+                  )}
 
-                {typeof chore.due_date === 'string'
-                && chore.due_date.length > 0 ? (
-                  <span>
-                    {intl.formatMessage(messages.dueWithDate, {
-                      date: new Date(chore.due_date).toLocaleDateString(),
-                    })}
-                  </span>
-                ) : null}
-              </InlineMeta>
-            }
-            right={
-              chore.status === 'pending' ? (
-                <Button size="sm" variant="primary">
-                  <FormattedMessage {...messages.complete} />
-                </Button>
-              ) : chore.status === 'completed' ? (
+                  {chore.penalty_points > 0 && (
+                    <span>
+                      {intl.formatMessage(messages.penaltyWithPoints, {
+                        points: chore.penalty_points,
+                      })}
+                    </span>
+                  )}
+
+                  {typeof chore.due_date === 'string'
+                  && chore.due_date.length > 0 ? (
+                    <span>
+                      {intl.formatMessage(messages.dueWithDate, {
+                        date: new Date(chore.due_date).toLocaleDateString(),
+                      })}
+                    </span>
+                  ) : null}
+                </InlineMeta>
+              }
+              right={
+                chore.status === 'pending' ? (
+                  <Button
+                    onClick={async () => {
+                      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- guarded by enabled
+                      await choresApi.complete(chore.id, {userId: user!.id});
+                      await queryClient.invalidateQueries({
+                        queryKey: ['chores', user?.id],
+                      });
+                    }}
+                    size="sm"
+                    variant="primary"
+                  >
+                    <FormattedMessage {...messages.complete} />
+                  </Button>
+                ) : chore.status === 'completed' ? (
+                  <>
+                    <Button size="sm" variant="primary">
+                      <FormattedMessage
+                        defaultMessage="Approve"
+                        id="pages.admin.AdminChoresManagement.approve"
+                      />
+                    </Button>
+                    <Button size="sm" variant="danger">
+                      <FormattedMessage
+                        defaultMessage="Reject"
+                        id="pages.admin.AdminChoresManagement.reject"
+                      />
+                    </Button>
+                  </>
+                ) : undefined
+              }
+              title={chore.title}
+              titleRight={
                 <>
-                  <Button size="sm" variant="primary">
-                    <FormattedMessage
-                      defaultMessage="Approve"
-                      id="pages.admin.AdminChoresManagement.approve"
-                    />
-                  </Button>
-                  <Button size="sm" variant="danger">
-                    <FormattedMessage
-                      defaultMessage="Reject"
-                      id="pages.admin.AdminChoresManagement.reject"
-                    />
-                  </Button>
-                </>
-              ) : undefined
-            }
-            title={chore.title}
-            titleRight={
-              <>
-                {renderStatusText(chore.status)}
+                  {renderStatusText(chore.status)}
 
-                {chore.chore_type === 'bonus' && (
-                  <Badge variant="purple">
-                    <FormattedMessage {...messages.typeBonus} />
-                  </Badge>
-                )}
-              </>
-            }
-          />
-        ))}
-      </List>
+                  {chore.chore_type === 'bonus' && (
+                    <Badge variant="purple">
+                      <FormattedMessage {...messages.typeBonus} />
+                    </Badge>
+                  )}
+                </>
+              }
+            />
+          ))}
+        </List>
+      </div>
     </PageContainer>
   );
 };

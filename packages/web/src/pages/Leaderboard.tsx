@@ -133,31 +133,36 @@ const Leaderboard: FC = () => {
 
       <Podium items={podiumItems} />
 
-      <RankingList
-        items={rankingItems}
-        subtitle={intl.formatMessage(
-          {
-            defaultMessage: 'Sorted by {criterion}',
-            id: 'pages.Leaderboard.sorted-by-criterion',
-          },
-          {
-            criterion:
-              sortBy === 'points'
-                ? intl.formatMessage({
-                    defaultMessage: 'total points',
-                    id: 'pages.Leaderboard.total-points',
-                  })
-                : intl.formatMessage({
-                    defaultMessage: 'streak count',
-                    id: 'pages.Leaderboard.streak-count',
-                  }),
-          },
-        )}
-        title={intl.formatMessage({
-          defaultMessage: 'Full Rankings',
-          id: 'pages.Leaderboard.full-rankings',
-        })}
-      />
+      <div data-testid="leaderboard">
+        <RankingList
+          items={rankingItems.map(item => ({
+            ...item,
+            content: <div data-testid="leaderboard-member">{item.content}</div>,
+          }))}
+          subtitle={intl.formatMessage(
+            {
+              defaultMessage: 'Sorted by {criterion}',
+              id: 'pages.Leaderboard.sorted-by-criterion',
+            },
+            {
+              criterion:
+                sortBy === 'points'
+                  ? intl.formatMessage({
+                      defaultMessage: 'total points',
+                      id: 'pages.Leaderboard.total-points',
+                    })
+                  : intl.formatMessage({
+                      defaultMessage: 'streak count',
+                      id: 'pages.Leaderboard.streak-count',
+                    }),
+            },
+          )}
+          title={intl.formatMessage({
+            defaultMessage: 'Full Rankings',
+            id: 'pages.Leaderboard.full-rankings',
+          })}
+        />
+      </div>
     </PageContainer>
   );
 };

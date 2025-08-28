@@ -64,7 +64,7 @@ const approveChore = async (
 };
 
 test.describe('leaderboard Bonus Points - Skipped Tests', () => {
-  test.skip('should handle bonus points correctly', async ({page}) => {
+  test('should handle bonus points correctly', async ({page}) => {
     const {parent, child1} = await setupFamilyWithChildren(page);
     const choreTitle = `Bonus Chore ${Date.now()}`;
 

@@ -5,4 +5,7 @@ export {
   handleUpdateChore,
   handleDeleteChore,
   handleCompleteChore,
+  handleAssignChore,
+  handleApproveChore,
+  handleRejectChore,
 } from './choreWriteHandlers';

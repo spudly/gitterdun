@@ -43,7 +43,7 @@ const createAndCompleteChore = async (
 };
 
 test.describe('leaderboard Ranking - Skipped Tests', () => {
-  test.skip('should show family members on leaderboard', async ({page}) => {
+  test('should show family members on leaderboard', async ({page}) => {
     const {child1, child2} = await setupFamilyWithChildren(page);
     await page.goto('/leaderboard');
 
@@ -51,7 +51,7 @@ test.describe('leaderboard Ranking - Skipped Tests', () => {
     await expect(page.getByText(child2.username)).toBeVisible();
   });
 
-  test.skip('should rank children by points correctly', async ({page}) => {
+  test('should rank children by points correctly', async ({page}) => {
     const {parent, child1, child2} = await setupFamilyWithChildren(page);
 
     await createAndCompleteChore(page, {
@@ -87,7 +87,7 @@ test.describe('leaderboard Ranking - Skipped Tests', () => {
     expect(child1Index).toBeLessThan(child2Index);
   });
 
-  test.skip('should show leaderboard even with no completed chores', async ({
+  test('should show leaderboard even with no completed chores', async ({
     page,
   }) => {
     const {child1, child2} = await setupFamilyWithChildren(page);
