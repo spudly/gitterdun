@@ -1,12 +1,11 @@
 import type {FC} from 'react';
 import {useMemo, useState} from 'react';
-import {CreateChildSchema} from '@gitterdun/shared';
+import {CreateChildSchema, MIN_PASSWORD_LENGTH} from '@gitterdun/shared';
 import {Button} from '../../widgets/Button.js';
 import {TextInput} from '../../widgets/TextInput.js';
 import {Stack} from '../../widgets/Stack.js';
 import {Text} from '../../widgets/Text.js';
 import {defineMessages, useIntl} from 'react-intl';
-import {MIN_PASSWORD_LENGTH} from '../../constants';
 
 type CreateChildPayload = {
   familyId: number;

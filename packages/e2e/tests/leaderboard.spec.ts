@@ -14,7 +14,9 @@ test.describe('leaderboard and Points System', () => {
     await expect.soft(page.locator('text=Leaderboard')).toBeVisible();
 
     // Should see leaderboard content (RankingList component)
-    await expect.soft(page.locator('div.rounded-lg.bg-white.shadow')).toBeVisible();
+    await expect
+      .soft(page.locator('div.rounded-lg.bg-white.shadow'))
+      .toBeVisible();
   });
 
   // Note: Additional test cases have been moved to leaderboard.skip.spec.ts

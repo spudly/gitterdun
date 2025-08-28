@@ -1,11 +1,6 @@
 import type {NavigationItem} from './widgets/Layout';
 import {defineMessages} from 'react-intl';
-import {
-  ONE_SECOND_MS,
-  ONE_MINUTE_MS,
-  ONE_HOUR_MS,
-  MIN_PASSWORD_LENGTH,
-} from '@gitterdun/shared';
+import {ONE_MINUTE_MS, ONE_HOUR_MS} from '@gitterdun/shared';
 
 const navMessages = defineMessages({
   dashboard: {defaultMessage: 'Dashboard', id: 'pages.Dashboard.dashboard'},
@@ -34,14 +29,14 @@ export const NAVIGATION_ITEMS: Array<NavigationItem> = [
 export const USER_STALE_TIME = ONE_HOUR_MS;
 
 /** Default query stale time in minutes */
-export const DEFAULT_QUERY_STALE_MINUTES = 5;
+const DEFAULT_QUERY_STALE_MINUTES = 5;
 
 /** Default query stale time - 5 minutes */
 export const DEFAULT_QUERY_STALE_TIME =
   DEFAULT_QUERY_STALE_MINUTES * ONE_MINUTE_MS;
 
 /** Garbage collection time in minutes */
-export const DEFAULT_GC_MINUTES = 10;
+const DEFAULT_GC_MINUTES = 10;
 
 /** Garbage collection time for unused cache entries - 10 minutes */
 export const DEFAULT_GC_TIME = DEFAULT_GC_MINUTES * ONE_MINUTE_MS;
@@ -75,9 +70,6 @@ export const TOAST_TIMEOUT_DURATION = 4500;
 /** Password reset redirect delay in milliseconds */
 export const PASSWORD_RESET_REDIRECT_DELAY = 1200;
 
-/** Full percentage value (100%) */
-export const FULL_PERCENTAGE = 100;
-
 /**
  * Ranking and position constants
  */
@@ -97,9 +89,6 @@ export const RANKS = [GOLD_RANK, SILVER_RANK, BRONZE_RANK];
 /**
  * Grid and layout constants
  */
-
-/** Default section spacing value */
-export const DEFAULT_SECTION_SPACING = 6;
 
 /** Number of characters to display in avatar initials */
 export const AVATAR_INITIALS_LENGTH = 2;

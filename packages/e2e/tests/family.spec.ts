@@ -137,9 +137,9 @@ test.describe('family Management', () => {
 
     // Should not proceed (button might be disabled or form validation prevents it)
     // The exact behavior depends on implementation
-    await expect.soft(
-      page.locator('input[placeholder*="New family name"]'),
-    ).toBeVisible();
+    await expect
+      .soft(page.locator('input[placeholder*="New family name"]'))
+      .toBeVisible();
   });
 
   test('should require valid child information', async ({page}) => {
@@ -162,6 +162,8 @@ test.describe('family Management', () => {
 
     // Form should still be visible with empty fields
     const createChildForm = page.locator('div').filter({hasText: /^Create$/});
-    await expect.soft(createChildForm.getByPlaceholder('Username')).toBeVisible();
+    await expect
+      .soft(createChildForm.getByPlaceholder('Username'))
+      .toBeVisible();
   });
 });

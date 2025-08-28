@@ -71,7 +71,7 @@ test.describe('leaderboard Ranking - Skipped Tests', () => {
     });
 
     await page.goto('/leaderboard');
-    const leaderboard = page.getByTestId("leaderboard");
+    const leaderboard = page.getByTestId('leaderboard');
 
     const allMembers = await leaderboard
       .locator('[data-testid="leaderboard-member"]')

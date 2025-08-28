@@ -77,7 +77,7 @@ export const handleError = (err: unknown, res: express.Response): void => {
   );
 };
 
-export const globalErrorHandler = (
+const globalErrorHandler = (
   err: unknown,
   _req: express.Request,
   res: express.Response,

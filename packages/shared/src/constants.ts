@@ -5,10 +5,10 @@
 /**
  * Time calculation constants
  */
-export const ONE_SECOND_MS = 1000;
-export const SECONDS_PER_MINUTE = 60;
-export const MINUTES_PER_HOUR = 60;
-export const HOURS_PER_DAY = 24;
+const ONE_SECOND_MS = 1000;
+const SECONDS_PER_MINUTE = 60;
+const MINUTES_PER_HOUR = 60;
+const HOURS_PER_DAY = 24;
 export const ONE_MINUTE_MS = SECONDS_PER_MINUTE * ONE_SECOND_MS;
 export const ONE_HOUR_MS = MINUTES_PER_HOUR * ONE_MINUTE_MS;
 export const ONE_DAY_MS = HOURS_PER_DAY * ONE_HOUR_MS;

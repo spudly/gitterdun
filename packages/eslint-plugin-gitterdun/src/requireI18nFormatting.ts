@@ -69,7 +69,6 @@ export const requireI18nFormatting: Rule.RuleModule = {
           isNodeType(expr, 'MemberExpression')
           && isIdentifierWithName(getProp(expr, 'property'), 'defaultMessage')
         ) {
-           
           context.report({node, messageId: 'requireFormatting'});
         }
       },

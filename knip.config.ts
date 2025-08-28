@@ -8,9 +8,7 @@ const config: KnipConfig = {
       ignoreDependencies: [
         'husky', // Used by Git hooks, not imported
       ],
-      ignoreBinaries: [
-        'playwright', // Used in CI workflow, not directly in package.json scripts
-      ],
+      ignoreBinaries: [],
     },
 
     'packages/web': {

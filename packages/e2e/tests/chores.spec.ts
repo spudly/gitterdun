@@ -13,9 +13,9 @@ test.describe('chores Workflow', () => {
     await expect.soft(page).toHaveURL('/admin');
 
     // Should see admin interface
-    await expect.soft(
-      page.getByRole('heading', {name: 'Admin Panel'}),
-    ).toBeVisible();
+    await expect
+      .soft(page.getByRole('heading', {name: 'Admin Panel'}))
+      .toBeVisible();
 
     // Should see chore statistics section
     await expect.soft(page.getByText('Total Chores')).toBeVisible();
@@ -24,15 +24,17 @@ test.describe('chores Workflow', () => {
     await expect.soft(page.getByText('Bonus Chores')).toBeVisible();
 
     // Should see users management section with admin user
-    await expect.soft(page.getByRole('cell', {name: 'admin'}).first()).toBeVisible();
-    await expect.soft(
-      page.getByRole('cell', {name: 'admin@gitterdun.com'}),
-    ).toBeVisible();
+    await expect
+      .soft(page.getByRole('cell', {name: 'admin'}).first())
+      .toBeVisible();
+    await expect
+      .soft(page.getByRole('cell', {name: 'admin@gitterdun.com'}))
+      .toBeVisible();
 
     // Should see Delete buttons for user management
-    await expect.soft(
-      page.getByRole('button', {name: 'Delete'}).first(),
-    ).toBeVisible();
+    await expect
+      .soft(page.getByRole('button', {name: 'Delete'}).first())
+      .toBeVisible();
   });
 
   // Note: Additional test cases have been moved to chores.skip.spec.ts

@@ -20,8 +20,8 @@ test.describe('chores Assignment - Skipped Tests', () => {
     await page.selectOption('select', child.username);
     await page.click('button:has-text("Assign Chore")');
 
-    await expect.soft(
-      page.locator(`text=Assigned to: ${child.username}`),
-    ).toBeVisible();
+    await expect
+      .soft(page.locator(`text=Assigned to: ${child.username}`))
+      .toBeVisible();
   });
 });

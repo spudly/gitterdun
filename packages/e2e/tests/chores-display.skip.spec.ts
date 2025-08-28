@@ -9,7 +9,7 @@ test.describe('chores Display - Skipped Tests', () => {
     await expect.soft(page).toHaveURL('/chores');
 
     await expect.soft(page.locator('text=Chores')).toBeVisible();
-    await expect.soft(page.getByTestId("chores-list")).toBeVisible();
+    await expect.soft(page.getByTestId('chores-list')).toBeVisible();
   });
 
   test.skip('should show points and status for chores', async ({page}) => {
@@ -35,7 +35,9 @@ test.describe('chores Display - Skipped Tests', () => {
     await page.goto('/chores');
 
     await expect.soft(page.locator(`text=${choreTitle}`)).toBeVisible();
-    await expect.soft(page.locator(`text=Points: ${chorePoints}`)).toBeVisible();
+    await expect
+      .soft(page.locator(`text=Points: ${chorePoints}`))
+      .toBeVisible();
     await expect.soft(page.locator('text=Pending')).toBeVisible();
   });
 

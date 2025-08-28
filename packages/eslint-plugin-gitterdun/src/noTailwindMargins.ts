@@ -186,7 +186,7 @@ export const noTailwindMargins: Rule.RuleModule = {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- ESLint AST property access
         if (typeof node.value === 'string') {
           // Simple heuristic: if it looks like CSS classes (contains common Tailwind patterns)
-           
+
           const {value} = node;
           const hasTailwindPattern =
             /\b(?:flex|grid|text-|bg-|border-|p-|space-)/;

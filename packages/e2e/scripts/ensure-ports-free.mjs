@@ -25,7 +25,7 @@ export const checkNodeVersion = () => {
       `E2E precheck: Node.js version mismatch!
   Expected: v${expectedNodeVersion} (from .nvmrc)
   Current:  v${currentNodeVersion}
-  Please run: nvm use`
+  Please run: nvm use`,
     );
     process.exit(1);
   }

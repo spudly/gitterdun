@@ -29,7 +29,9 @@ test.describe('authentication Flow', () => {
     await expect.soft(page).toHaveURL('/');
 
     // Should see dashboard content
-    await expect.soft(page.getByRole('heading', {name: 'Dashboard'})).toBeVisible();
+    await expect
+      .soft(page.getByRole('heading', {name: 'Dashboard'}))
+      .toBeVisible();
   });
 
   test('should login with existing credentials', async ({page}) => {
@@ -64,7 +66,9 @@ test.describe('authentication Flow', () => {
     await expect.soft(page).toHaveURL('/');
 
     // Should see dashboard content
-    await expect.soft(page.getByRole('heading', {name: 'Dashboard'})).toBeVisible();
+    await expect
+      .soft(page.getByRole('heading', {name: 'Dashboard'}))
+      .toBeVisible();
   });
 
   test('should show error for invalid login credentials', async ({page}) => {
