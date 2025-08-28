@@ -7,21 +7,20 @@ test.describe('chores Assignment - Skipped Tests', () => {
     await page.goto('/admin');
     const choreTitle = `Assigned Chore ${Date.now()}`;
 
-    await page.click('button:has-text("Create Chore")');
-    await page.fill('input[placeholder*="title"]', choreTitle);
-    await page.fill('input[type="number"]', '5');
-    await page.click('button:has-text("Create")');
+    await page.getByRole('button', {name: 'Create Chore'}).click();
+    await page.getByPlaceholder(/title/i).fill(choreTitle);
+    await page.getByRole('spinbutton').fill('5');
+    await page.getByRole('button', {name: 'Create'}).click();
 
     await page
-      .locator(`text=${choreTitle}`)
-      .locator('..')
-      .locator('button:has-text("Assign")')
+      .getByText(choreTitle)
+      .getByRole('button', {name: 'Assign'})
       .click();
-    await page.selectOption('select', child.username);
-    await page.click('button:has-text("Assign Chore")');
+    await page.getByRole('combobox').selectOption(child.username);
+    await page.getByRole('button', {name: 'Assign Chore'}).click();
 
     await expect
-      .soft(page.locator(`text=Assigned to: ${child.username}`))
+      .soft(page.getByText(`Assigned to: ${child.username}`))
       .toBeVisible();
   });
 });

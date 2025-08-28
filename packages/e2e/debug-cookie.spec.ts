@@ -23,18 +23,18 @@ test.describe('cookie Debug', () => {
     const username = `cookie_test_${Date.now()}`;
     await page.goto('/register');
 
-    await page.fill('#username', username);
-    await page.fill('#password', 'testpassword123');
-    await page.click('button[type="submit"]');
-    await expect.soft(page).toHaveURL('/');
+    await page.getByLabel('Username').fill(username);
+    await page.getByLabel('Password').fill('testpassword123');
+    await page.getByRole('button', {name: /submit|register|sign up/i}).click();
+    await expect(page).toHaveURL('/');
 
     const sidCookie = await checkSessionCookie(page);
-    expect.soft(sidCookie).toBeDefined();
+    expect(sidCookie).toBeDefined();
 
     const response = await testApiEndpoint(page);
-    expect.soft(response).toBeDefined();
+    expect(response).toBeDefined();
 
     // Test should pass regardless to see debug info
-    expect.soft(true).toBe(true);
+    expect(true).toBe(true);
   });
 });

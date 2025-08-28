@@ -15,33 +15,30 @@ const createAndCompleteChore = async (
   const {choreTitle, points, childUsername, parent} = options;
 
   await page.goto('/admin');
-  await page.click('button:has-text("Create Chore")');
-  await page.fill('input[placeholder*="title"]', choreTitle);
-  await page.fill('input[type="number"]', points);
-  await page.click('button:has-text("Create")');
+  await page.getByRole('button', {name: 'Create Chore'}).click();
+  await page.getByPlaceholder(/title/i).fill(choreTitle);
+  await page.getByRole('spinbutton').fill(points);
+  await page.getByRole('button', {name: 'Create'}).click();
 
   await page
-    .locator(`text=${choreTitle}`)
-    .locator('..')
-    .locator('button:has-text("Assign")')
+    .getByText(choreTitle)
+    .getByRole('button', {name: 'Assign'})
     .click();
-  await page.selectOption('select', childUsername);
-  await page.click('button:has-text("Assign Chore")');
+  await page.getByRole('combobox').selectOption(childUsername);
+  await page.getByRole('button', {name: 'Assign Chore'}).click();
 
   await loginAs(page, childUsername, 'childpassword123');
   await page.goto('/chores');
   await page
-    .locator(`text=${choreTitle}`)
-    .locator('..')
-    .locator('button:has-text("Complete")')
+    .getByText(choreTitle)
+    .getByRole('button', {name: 'Complete'})
     .click();
 
   await loginAs(page, parent.username, parent.password);
   await page.goto('/admin');
   await page
-    .locator(`text=${choreTitle}`)
-    .locator('..')
-    .locator('button:has-text("Approve")')
+    .getByText(choreTitle)
+    .getByRole('button', {name: 'Approve'})
     .click();
 };
 
@@ -50,8 +47,8 @@ test.describe('leaderboard Ranking - Skipped Tests', () => {
     const {child1, child2} = await setupFamilyWithChildren(page);
     await page.goto('/leaderboard');
 
-    await expect.soft(page.locator(`text=${child1.username}`)).toBeVisible();
-    await expect.soft(page.locator(`text=${child2.username}`)).toBeVisible();
+    await expect(page.getByText(child1.username)).toBeVisible();
+    await expect(page.getByText(child2.username)).toBeVisible();
   });
 
   test.skip('should rank children by points correctly', async ({page}) => {
@@ -74,7 +71,7 @@ test.describe('leaderboard Ranking - Skipped Tests', () => {
     const leaderboard = page.getByTestId('leaderboard');
 
     const allMembers = await leaderboard
-      .locator('[data-testid="leaderboard-member"]')
+      .getByTestId('leaderboard-member')
       .all();
     const memberTexts = await Promise.all(
       allMembers.map(async member => member.textContent()),
@@ -87,7 +84,7 @@ test.describe('leaderboard Ranking - Skipped Tests', () => {
       Boolean(text?.includes(child2.username)),
     );
 
-    expect.soft(child1Index).toBeLessThan(child2Index);
+    expect(child1Index).toBeLessThan(child2Index);
   });
 
   test.skip('should show leaderboard even with no completed chores', async ({
@@ -96,7 +93,7 @@ test.describe('leaderboard Ranking - Skipped Tests', () => {
     const {child1, child2} = await setupFamilyWithChildren(page);
     await page.goto('/leaderboard');
 
-    await expect.soft(page.locator(`text=${child1.username}`)).toBeVisible();
-    await expect.soft(page.locator(`text=${child2.username}`)).toBeVisible();
+    await expect(page.getByText(child1.username)).toBeVisible();
+    await expect(page.getByText(child2.username)).toBeVisible();
   });
 });

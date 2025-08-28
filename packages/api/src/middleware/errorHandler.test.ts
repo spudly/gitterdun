@@ -7,7 +7,7 @@ import {
   test,
 } from '@jest/globals';
 import express from 'express';
-import {ZodError} from 'zod';
+import {ZodError, z} from 'zod';
 import {
   sendZodErrorResponse,
   sendJsonParseErrorResponse,
@@ -27,9 +27,12 @@ describe('errorHandler', () => {
   let statusMock: jest.Mock;
 
   beforeEach(() => {
-    jsonMock = jest.fn<express.Response['json']>().mockReturnThis();
-    statusMock = jest.fn<express.Response['status']>().mockReturnThis();
-    res = {status: statusMock, json: jsonMock};
+    jsonMock = jest.fn().mockReturnThis();
+    statusMock = jest.fn().mockReturnThis();
+    res = {
+      status: statusMock as express.Response['status'],
+      json: jsonMock as express.Response['json'],
+    };
     req = {method: 'GET', url: '/test'};
   });
 
@@ -42,23 +45,21 @@ describe('errorHandler', () => {
       const originalEnv = process.env['NODE_ENV'];
       process.env['NODE_ENV'] = 'development';
 
-      const zodError = new ZodError([
-        {
-          code: 'invalid_type',
-          expected: 'string',
-          received: 'number',
-          path: ['name'],
-          message: 'Expected string, received number',
-        },
-      ]);
+      const schema = z.object({name: z.string()});
+      let zodError: ZodError;
+      try {
+        schema.parse({name: 123});
+      } catch (error) {
+        zodError = error as ZodError;
+      }
 
-      sendZodErrorResponse(res as express.Response, zodError);
+      sendZodErrorResponse(res as express.Response, zodError!);
 
       expect(statusMock).toHaveBeenCalledWith(400);
       expect(jsonMock).toHaveBeenCalledWith({
         success: false,
         error: 'Invalid request data',
-        details: zodError.issues,
+        details: zodError!.issues,
       });
 
       process.env['NODE_ENV'] = originalEnv;
@@ -68,17 +69,15 @@ describe('errorHandler', () => {
       const originalEnv = process.env['NODE_ENV'];
       process.env['NODE_ENV'] = 'production';
 
-      const zodError = new ZodError([
-        {
-          code: 'invalid_type',
-          expected: 'string',
-          received: 'number',
-          path: ['name'],
-          message: 'Expected string, received number',
-        },
-      ]);
+      const schema = z.object({name: z.string()});
+      let zodError: ZodError;
+      try {
+        schema.parse({name: 123});
+      } catch (error) {
+        zodError = error as ZodError;
+      }
 
-      sendZodErrorResponse(res as express.Response, zodError);
+      sendZodErrorResponse(res as express.Response, zodError!);
 
       expect(statusMock).toHaveBeenCalledWith(400);
       expect(jsonMock).toHaveBeenCalledWith({
@@ -168,17 +167,15 @@ describe('errorHandler', () => {
 
   describe('handleError', () => {
     test('should handle ZodError with status 400', () => {
-      const zodError = new ZodError([
-        {
-          code: 'invalid_type',
-          expected: 'string',
-          received: 'number',
-          path: ['name'],
-          message: 'Expected string, received number',
-        },
-      ]);
+      const schema = z.object({name: z.string()});
+      let zodError: ZodError;
+      try {
+        schema.parse({name: 123});
+      } catch (error) {
+        zodError = error as ZodError;
+      }
 
-      handleError(zodError, res as express.Response);
+      handleError(zodError!, res as express.Response);
 
       expect(statusMock).toHaveBeenCalledWith(400);
     });

@@ -9,16 +9,16 @@ const createChoreWithBonus = async (
   basePoints: string,
 ) => {
   await page.goto('/admin');
-  await page.click('button:has-text("Create Chore")');
-  await page.fill('input[placeholder*="title"]', choreTitle);
-  await page.fill('input[type="number"]', basePoints);
+  await page.getByRole('button', {name: 'Create Chore'}).click();
+  await page.getByPlaceholder(/title/i).fill(choreTitle);
+  await page.getByRole('spinbutton').fill(basePoints);
 
-  const bonusInput = page.locator('input[placeholder*="bonus"]');
+  const bonusInput = page.getByPlaceholder(/bonus/i);
   if ((await bonusInput.count()) > 0) {
     await bonusInput.fill('5');
   }
 
-  await page.click('button:has-text("Create")');
+  await page.getByRole('button', {name: 'Create'}).click();
 };
 
 // Helper for assigning chore
@@ -28,12 +28,11 @@ const assignChore = async (
   childUsername: string,
 ) => {
   await page
-    .locator(`text=${choreTitle}`)
-    .locator('..')
-    .locator('button:has-text("Assign")')
+    .getByText(choreTitle)
+    .getByRole('button', {name: 'Assign'})
     .click();
-  await page.selectOption('select', childUsername);
-  await page.click('button:has-text("Assign Chore")');
+  await page.getByRole('combobox').selectOption(childUsername);
+  await page.getByRole('button', {name: 'Assign Chore'}).click();
 };
 
 // Helper for completing chore as child
@@ -45,9 +44,8 @@ const completeChore = async (
   await loginAs(page, childUsername, 'childpassword123');
   await page.goto('/chores');
   await page
-    .locator(`text=${choreTitle}`)
-    .locator('..')
-    .locator('button:has-text("Complete")')
+    .getByText(choreTitle)
+    .getByRole('button', {name: 'Complete'})
     .click();
 };
 
@@ -60,9 +58,8 @@ const approveChore = async (
   await loginAs(page, parent.username, parent.password);
   await page.goto('/admin');
   await page
-    .locator(`text=${choreTitle}`)
-    .locator('..')
-    .locator('button:has-text("Approve")')
+    .getByText(choreTitle)
+    .getByRole('button', {name: 'Approve'})
     .click();
 };
 
@@ -77,6 +74,6 @@ test.describe('leaderboard Bonus Points - Skipped Tests', () => {
     await approveChore(page, choreTitle, parent);
 
     await page.goto('/leaderboard');
-    await expect.soft(page.locator('text=15')).toBeVisible();
+    await expect(page.getByText('15')).toBeVisible();
   });
 });

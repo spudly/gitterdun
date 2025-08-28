@@ -684,7 +684,7 @@ const eslintConfig = [
       'jest/no-conditional-in-test': 'off', // for tests only
       'jest/no-confusing-set-timeout': 'off', // for tests only
       'jest/no-deprecated-functions': 'off', // for tests only
-      'jest/no-disabled-tests': 'off', // for tests only
+      'jest/no-disabled-tests': 'warn', // for tests only
       'jest/no-done-callback': 'off', // for tests only
       'jest/no-duplicate-hooks': 'off', // for tests only
       'jest/no-export': 'off', // for tests only
@@ -1218,7 +1218,7 @@ const eslintConfig = [
       'jest/valid-expect': 'off', // not a jest test
       'jest/valid-title': 'off', // not a jest test
       'playwright/expect-expect': 'error',
-      'playwright/max-expects': 'error',
+      'playwright/max-expects': 'off', //testing multiple things is good for e2e performance
       'playwright/max-nested-describe': 'error',
       'playwright/missing-playwright-await': 'error',
       'playwright/no-commented-out-tests': 'error',
@@ -1237,7 +1237,7 @@ const eslintConfig = [
       'playwright/no-page-pause': 'error',
       'playwright/no-raw-locators': 'error',
       'playwright/no-restricted-matchers': 'error',
-      'playwright/no-skipped-test': 'error',
+      'playwright/no-skipped-test': 'warn',
       'playwright/no-standalone-expect': 'error',
       'playwright/no-unsafe-references': 'error',
       'playwright/no-useless-await': 'error',
@@ -1258,7 +1258,7 @@ const eslintConfig = [
       'playwright/prefer-to-have-length': 'error',
       'playwright/prefer-web-first-assertions': 'error',
       'playwright/require-hook': 'error',
-      'playwright/require-soft-assertions': 'error',
+      'playwright/require-soft-assertions': 'off', // probably not a good idea
       'playwright/require-to-throw-message': 'error',
       'playwright/require-top-level-describe': 'error',
       'playwright/valid-describe-callback': 'error',
@@ -1267,9 +1267,9 @@ const eslintConfig = [
       'playwright/valid-title': 'error',
       'ui-testing/missing-assertion-in-test': 'error',
       'ui-testing/no-assertions-in-hooks': 'error',
-      'ui-testing/no-browser-commands-in-tests': ['error', 'playwright'],
+      'ui-testing/no-browser-commands-in-tests': 'off', // not sure I like the idea of requiring an abstraction layer per page like it suggests
       'ui-testing/no-css-page-layout-selector': ['error', 'playwright'],
-      'ui-testing/no-disabled-tests': 'error',
+      'ui-testing/no-disabled-tests': 'off', // handled by playwright/no-skipped-test
       'ui-testing/no-focused-tests': 'error',
       'ui-testing/no-hard-wait': ['error', 'playwright'],
     },

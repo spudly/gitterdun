@@ -6,10 +6,10 @@ test.describe('chores Display - Skipped Tests', () => {
     const {child} = await setupFamily(page);
     await loginAs(page, child.username, child.password);
     await page.goto('/chores');
-    await expect.soft(page).toHaveURL('/chores');
+    await expect(page).toHaveURL('/chores');
 
-    await expect.soft(page.locator('text=Chores')).toBeVisible();
-    await expect.soft(page.getByTestId('chores-list')).toBeVisible();
+    await expect(page.getByText('Chores')).toBeVisible();
+    await expect(page.getByTestId('chores-list')).toBeVisible();
   });
 
   test.skip('should show points and status for chores', async ({page}) => {
@@ -18,27 +18,24 @@ test.describe('chores Display - Skipped Tests', () => {
     const chorePoints = '25';
 
     await page.goto('/admin');
-    await page.click('button:has-text("Create Chore")');
-    await page.fill('input[placeholder*="title"]', choreTitle);
-    await page.fill('input[type="number"]', chorePoints);
-    await page.click('button:has-text("Create")');
+    await page.getByRole('button', {name: 'Create Chore'}).click();
+    await page.getByPlaceholder(/title/i).fill(choreTitle);
+    await page.getByRole('spinbutton').fill(chorePoints);
+    await page.getByRole('button', {name: 'Create'}).click();
 
     await page
-      .locator(`text=${choreTitle}`)
-      .locator('..')
-      .locator('button:has-text("Assign")')
+      .getByText(choreTitle)
+      .getByRole('button', {name: 'Assign'})
       .click();
-    await page.selectOption('select', child.username);
-    await page.click('button:has-text("Assign Chore")');
+    await page.getByRole('combobox').selectOption(child.username);
+    await page.getByRole('button', {name: 'Assign Chore'}).click();
 
     await loginAs(page, child.username, child.password);
     await page.goto('/chores');
 
-    await expect.soft(page.locator(`text=${choreTitle}`)).toBeVisible();
-    await expect
-      .soft(page.locator(`text=Points: ${chorePoints}`))
-      .toBeVisible();
-    await expect.soft(page.locator('text=Pending')).toBeVisible();
+    await expect(page.getByText(choreTitle)).toBeVisible();
+    await expect.soft(page.getByText(`Points: ${chorePoints}`)).toBeVisible();
+    await expect(page.getByText('Pending')).toBeVisible();
   });
 
   test.skip('should navigate between chores and admin pages', async ({
@@ -46,12 +43,12 @@ test.describe('chores Display - Skipped Tests', () => {
   }) => {
     await setupFamily(page);
     await page.goto('/chores');
-    await expect.soft(page).toHaveURL('/chores');
+    await expect(page).toHaveURL('/chores');
 
     await page.goto('/admin');
-    await expect.soft(page).toHaveURL('/admin');
+    await expect(page).toHaveURL('/admin');
 
     await page.goto('/chores');
-    await expect.soft(page).toHaveURL('/chores');
+    await expect(page).toHaveURL('/chores');
   });
 });

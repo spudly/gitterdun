@@ -15,33 +15,30 @@ const createAndCompleteChore = async (
   const {choreTitle, points, childUsername, parent} = options;
 
   await page.goto('/admin');
-  await page.click('button:has-text("Create Chore")');
-  await page.fill('input[placeholder*="title"]', choreTitle);
-  await page.fill('input[type="number"]', points);
-  await page.click('button:has-text("Create")');
+  await page.getByRole('button', {name: 'Create Chore'}).click();
+  await page.getByPlaceholder(/title/i).fill(choreTitle);
+  await page.getByRole('spinbutton').fill(points);
+  await page.getByRole('button', {name: 'Create'}).click();
 
   await page
-    .locator(`text=${choreTitle}`)
-    .locator('..')
-    .locator('button:has-text("Assign")')
+    .getByText(choreTitle)
+    .getByRole('button', {name: 'Assign'})
     .click();
-  await page.selectOption('select', childUsername);
-  await page.click('button:has-text("Assign Chore")');
+  await page.getByRole('combobox').selectOption(childUsername);
+  await page.getByRole('button', {name: 'Assign Chore'}).click();
 
   await loginAs(page, childUsername, 'childpassword123');
   await page.goto('/chores');
   await page
-    .locator(`text=${choreTitle}`)
-    .locator('..')
-    .locator('button:has-text("Complete")')
+    .getByText(choreTitle)
+    .getByRole('button', {name: 'Complete'})
     .click();
 
   await loginAs(page, parent.username, parent.password);
   await page.goto('/admin');
   await page
-    .locator(`text=${choreTitle}`)
-    .locator('..')
-    .locator('button:has-text("Approve")')
+    .getByText(choreTitle)
+    .getByRole('button', {name: 'Approve'})
     .click();
 };
 
@@ -58,8 +55,8 @@ test.describe('leaderboard Points System - Skipped Tests', () => {
     });
 
     await page.goto('/leaderboard');
-    await expect.soft(page.locator(`text=${child1.username}`)).toBeVisible();
-    await expect.soft(page.locator('text=20')).toBeVisible();
+    await expect(page.getByText(child1.username)).toBeVisible();
+    await expect(page.getByText('20')).toBeVisible();
   });
 
   test.skip('should show cumulative points from multiple chores', async ({
@@ -81,8 +78,8 @@ test.describe('leaderboard Points System - Skipped Tests', () => {
     });
 
     await page.goto('/leaderboard');
-    await expect.soft(page.locator(`text=${child1.username}`)).toBeVisible();
-    await expect.soft(page.locator('text=40')).toBeVisible();
+    await expect(page.getByText(child1.username)).toBeVisible();
+    await expect(page.getByText('40')).toBeVisible();
   });
 
   test.skip('should update leaderboard when new chores are completed', async ({
@@ -91,7 +88,7 @@ test.describe('leaderboard Points System - Skipped Tests', () => {
     const {parent, child1} = await setupFamilyWithChildren(page);
 
     await page.goto('/leaderboard');
-    await expect.soft(page.locator(`text=${child1.username}`)).toBeVisible();
+    await expect(page.getByText(child1.username)).toBeVisible();
 
     await createAndCompleteChore(page, {
       choreTitle: `New Chore ${Date.now()}`,
@@ -101,6 +98,6 @@ test.describe('leaderboard Points System - Skipped Tests', () => {
     });
 
     await page.goto('/leaderboard');
-    await expect.soft(page.locator('text=50')).toBeVisible();
+    await expect(page.getByText('50')).toBeVisible();
   });
 });

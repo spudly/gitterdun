@@ -10,7 +10,7 @@ test.describe('chores Workflow', () => {
 
     // Navigate to admin page
     await page.goto('/admin');
-    await expect.soft(page).toHaveURL('/admin');
+    await expect(page).toHaveURL('/admin');
 
     // Should see admin interface
     await expect
@@ -18,23 +18,19 @@ test.describe('chores Workflow', () => {
       .toBeVisible();
 
     // Should see chore statistics section
-    await expect.soft(page.getByText('Total Chores')).toBeVisible();
-    await expect.soft(page.getByText('Pending Approval')).toBeVisible();
-    await expect.soft(page.getByText('Approved')).toBeVisible();
-    await expect.soft(page.getByText('Bonus Chores')).toBeVisible();
+    await expect(page.getByText('Total Chores')).toBeVisible();
+    await expect(page.getByText('Pending Approval')).toBeVisible();
+    await expect(page.getByText('Approved')).toBeVisible();
+    await expect(page.getByText('Bonus Chores')).toBeVisible();
 
     // Should see users management section with admin user
-    await expect
-      .soft(page.getByRole('cell', {name: 'admin'}).first())
-      .toBeVisible();
+    await expect.soft(page.getByRole('cell', {name: 'admin'})).toBeVisible();
     await expect
       .soft(page.getByRole('cell', {name: 'admin@gitterdun.com'}))
       .toBeVisible();
 
     // Should see Delete buttons for user management
-    await expect
-      .soft(page.getByRole('button', {name: 'Delete'}).first())
-      .toBeVisible();
+    await expect.soft(page.getByRole('button', {name: 'Delete'})).toBeVisible();
   });
 
   // Note: Additional test cases have been moved to chores.skip.spec.ts

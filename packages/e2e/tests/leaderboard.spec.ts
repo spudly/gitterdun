@@ -8,15 +8,13 @@ test.describe('leaderboard and Points System', () => {
 
     // Navigate to leaderboard
     await page.goto('/leaderboard');
-    await expect.soft(page).toHaveURL('/leaderboard');
+    await expect(page).toHaveURL('/leaderboard');
 
     // Should see leaderboard header
-    await expect.soft(page.locator('text=Leaderboard')).toBeVisible();
+    await expect(page.getByText('Leaderboard')).toBeVisible();
 
     // Should see leaderboard content (RankingList component)
-    await expect
-      .soft(page.locator('div.rounded-lg.bg-white.shadow'))
-      .toBeVisible();
+    await expect.soft(page.getByRole('list')).toBeVisible();
   });
 
   // Note: Additional test cases have been moved to leaderboard.skip.spec.ts

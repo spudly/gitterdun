@@ -7,31 +7,31 @@ test.describe('chores Completion - Skipped Tests', () => {
     await page.goto('/admin');
     const choreTitle = `Complete Me ${Date.now()}`;
 
-    await page.click('button:has-text("Create Chore")');
-    await page.fill('input[placeholder*="title"]', choreTitle);
-    await page.fill('input[type="number"]', '10');
-    await page.click('button:has-text("Create")');
+    await page.getByRole('button', {name: 'Create Chore'}).click();
+    await page.getByPlaceholder(/title/i).fill(choreTitle);
+    await page.getByRole('spinbutton').fill('10');
+    await page.getByRole('button', {name: 'Create'}).click();
 
     await page
-      .locator(`text=${choreTitle}`)
-      .locator('..')
-      .locator('button:has-text("Assign")')
+      .getByText(choreTitle)
+
+      .getByRole('button', {name: 'Assign'})
       .click();
-    await page.selectOption('select', child.username);
-    await page.click('button:has-text("Assign Chore")');
+    await page.getByRole('combobox').selectOption(child.username);
+    await page.getByRole('button', {name: 'Assign Chore'}).click();
 
     await loginAs(page, child.username, child.password);
     await page.goto('/chores');
-    await expect.soft(page).toHaveURL('/chores');
+    await expect(page).toHaveURL('/chores');
 
-    await expect.soft(page.locator(`text=${choreTitle}`)).toBeVisible();
+    await expect(page.getByText(choreTitle)).toBeVisible();
     await page
-      .locator(`text=${choreTitle}`)
-      .locator('..')
-      .locator('button:has-text("Complete")')
+      .getByText(choreTitle)
+
+      .getByRole('button', {name: 'Complete'})
       .click();
 
-    await expect.soft(page.locator('text=Completed')).toBeVisible();
+    await expect(page.getByText('Completed')).toBeVisible();
   });
 
   test.skip('should approve completed chore as parent', async ({page}) => {
@@ -39,40 +39,40 @@ test.describe('chores Completion - Skipped Tests', () => {
     await page.goto('/admin');
     const choreTitle = `Approve Me ${Date.now()}`;
 
-    await page.click('button:has-text("Create Chore")');
-    await page.fill('input[placeholder*="title"]', choreTitle);
-    await page.fill('input[type="number"]', '15');
-    await page.click('button:has-text("Create")');
+    await page.getByRole('button', {name: 'Create Chore'}).click();
+    await page.getByPlaceholder(/title/i).fill(choreTitle);
+    await page.getByRole('spinbutton').fill('15');
+    await page.getByRole('button', {name: 'Create'}).click();
 
     await page
-      .locator(`text=${choreTitle}`)
-      .locator('..')
-      .locator('button:has-text("Assign")')
+      .getByText(choreTitle)
+
+      .getByRole('button', {name: 'Assign'})
       .click();
-    await page.selectOption('select', child.username);
-    await page.click('button:has-text("Assign Chore")');
+    await page.getByRole('combobox').selectOption(child.username);
+    await page.getByRole('button', {name: 'Assign Chore'}).click();
 
     await loginAs(page, child.username, child.password);
     await page.goto('/chores');
     await page
-      .locator(`text=${choreTitle}`)
-      .locator('..')
-      .locator('button:has-text("Complete")')
+      .getByText(choreTitle)
+
+      .getByRole('button', {name: 'Complete'})
       .click();
 
     await loginAs(page, parent.username, parent.password);
     await page.goto('/admin');
 
-    await expect.soft(page.locator(`text=${choreTitle}`)).toBeVisible();
-    await expect.soft(page.locator('text=Completed')).toBeVisible();
+    await expect(page.getByText(choreTitle)).toBeVisible();
+    await expect(page.getByText('Completed')).toBeVisible();
 
     await page
-      .locator(`text=${choreTitle}`)
-      .locator('..')
-      .locator('button:has-text("Approve")')
+      .getByText(choreTitle)
+
+      .getByRole('button', {name: 'Approve'})
       .click();
 
-    await expect.soft(page.locator('text=Approved')).toBeVisible();
+    await expect(page.getByText('Approved')).toBeVisible();
   });
 
   test.skip('should reject completed chore as parent', async ({page}) => {
@@ -80,36 +80,36 @@ test.describe('chores Completion - Skipped Tests', () => {
     await page.goto('/admin');
     const choreTitle = `Reject Me ${Date.now()}`;
 
-    await page.click('button:has-text("Create Chore")');
-    await page.fill('input[placeholder*="title"]', choreTitle);
-    await page.fill('input[type="number"]', '8');
-    await page.click('button:has-text("Create")');
+    await page.getByRole('button', {name: 'Create Chore'}).click();
+    await page.getByPlaceholder(/title/i).fill(choreTitle);
+    await page.getByRole('spinbutton').fill('8');
+    await page.getByRole('button', {name: 'Create'}).click();
 
     await page
-      .locator(`text=${choreTitle}`)
-      .locator('..')
-      .locator('button:has-text("Assign")')
+      .getByText(choreTitle)
+
+      .getByRole('button', {name: 'Assign'})
       .click();
-    await page.selectOption('select', child.username);
-    await page.click('button:has-text("Assign Chore")');
+    await page.getByRole('combobox').selectOption(child.username);
+    await page.getByRole('button', {name: 'Assign Chore'}).click();
 
     await loginAs(page, child.username, child.password);
     await page.goto('/chores');
     await page
-      .locator(`text=${choreTitle}`)
-      .locator('..')
-      .locator('button:has-text("Complete")')
+      .getByText(choreTitle)
+
+      .getByRole('button', {name: 'Complete'})
       .click();
 
     await loginAs(page, parent.username, parent.password);
     await page.goto('/admin');
 
     await page
-      .locator(`text=${choreTitle}`)
-      .locator('..')
-      .locator('button:has-text("Reject")')
+      .getByText(choreTitle)
+
+      .getByRole('button', {name: 'Reject'})
       .click();
 
-    await expect.soft(page.locator('text=Pending')).toBeVisible();
+    await expect(page.getByText('Pending')).toBeVisible();
   });
 });
