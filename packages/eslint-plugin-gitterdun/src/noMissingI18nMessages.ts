@@ -42,7 +42,7 @@ export const noMissingI18nMessages: Rule.RuleModule = {
     const enKeys = new Set(Object.keys(enJson));
 
     const localeAbs = resolveFromCwd(context.filename);
-    let source = '';
+    let source;
     try {
       source = fs.readFileSync(localeAbs, 'utf8');
     } catch {

@@ -801,6 +801,18 @@ const eslintConfig = [
       'ui-testing/no-disabled-tests': 'off', // enabled later in this file, only for e2e tests
       'ui-testing/no-focused-tests': 'off', // enabled later in this file, only for e2e tests
       'ui-testing/no-hard-wait': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-slowed-test': 'off', // enabled later in this file, only for e2e tests
+      'playwright/no-wait-for-navigation': 'off', // enabled later in this file, only for e2e tests
+      'playwright/valid-test-tags': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-absolute-url': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-implicit-wait': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-link-text-selector': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-tag-name-selector': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-wait-in-tests': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-xpath-page-layout-selector': 'off', // enabled later in this file, only for e2e tests
+      'ui-testing/no-xpath-selector': 'off', // enabled later in this file, only for e2e tests
+      'no-unassigned-vars': 'error',
+      'no-useless-assignment': 'error',
     },
   },
   {
@@ -1153,7 +1165,6 @@ const eslintConfig = [
       '**/e2e/**/*.spec.tsx',
     ],
     rules: {
-      // disable all jest rules for e2e tests
       'jest/consistent-test-it': 'off', // not a jest test
       'jest/expect-expect': 'off', // not a jest test
       'jest/max-expects': 'off', // not a jest test
@@ -1238,19 +1249,21 @@ const eslintConfig = [
       'playwright/no-raw-locators': 'error',
       'playwright/no-restricted-matchers': 'error',
       'playwright/no-skipped-test': 'warn',
+      'playwright/no-slowed-test': 'error',
       'playwright/no-standalone-expect': 'error',
       'playwright/no-unsafe-references': 'error',
       'playwright/no-useless-await': 'error',
       'playwright/no-useless-not': 'error',
+      'playwright/no-wait-for-navigation': 'error',
       'playwright/no-wait-for-selector': 'error',
       'playwright/no-wait-for-timeout': 'error',
       'playwright/prefer-comparison-matcher': 'error',
       'playwright/prefer-equality-matcher': 'error',
       'playwright/prefer-hooks-in-order': 'error',
       'playwright/prefer-hooks-on-top': 'error',
+      'playwright/prefer-locator': 'error',
       'playwright/prefer-lowercase-title': 'error',
       'playwright/prefer-native-locators': 'error',
-      'playwright/prefer-locator': 'error',
       'playwright/prefer-strict-equal': 'error',
       'playwright/prefer-to-be': 'error',
       'playwright/prefer-to-contain': 'error',
@@ -1264,14 +1277,22 @@ const eslintConfig = [
       'playwright/valid-describe-callback': 'error',
       'playwright/valid-expect-in-promise': 'error',
       'playwright/valid-expect': 'error',
+      'playwright/valid-test-tags': 'error',
       'playwright/valid-title': 'error',
       'ui-testing/missing-assertion-in-test': 'error',
+      'ui-testing/no-absolute-url': ['error', 'playwright'],
       'ui-testing/no-assertions-in-hooks': 'error',
       'ui-testing/no-browser-commands-in-tests': 'off', // not sure I like the idea of requiring an abstraction layer per page like it suggests
       'ui-testing/no-css-page-layout-selector': ['error', 'playwright'],
       'ui-testing/no-disabled-tests': 'off', // handled by playwright/no-skipped-test
       'ui-testing/no-focused-tests': 'error',
       'ui-testing/no-hard-wait': ['error', 'playwright'],
+      'ui-testing/no-implicit-wait': 'error',
+      'ui-testing/no-link-text-selector': 'error',
+      'ui-testing/no-tag-name-selector': 'error',
+      'ui-testing/no-wait-in-tests': ['error', 'playwright'],
+      'ui-testing/no-xpath-page-layout-selector': 'error',
+      'ui-testing/no-xpath-selector': 'error',
     },
   },
 ];
