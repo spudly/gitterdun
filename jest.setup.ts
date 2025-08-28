@@ -1,4 +1,4 @@
-import {afterAll, beforeAll, jest} from '@jest/globals';
+import {afterAll, beforeEach, jest} from '@jest/globals';
 
 // Shared Jest setup for console silencing across all packages
 
@@ -12,7 +12,7 @@ const originalConsole = {
   debug: console.debug,
 };
 
-beforeAll(() => {
+beforeEach(() => {
   // Silence all console output during tests unless explicitly needed
   jest.spyOn(console, 'log').mockImplementation(() => {});
   jest.spyOn(console, 'warn').mockImplementation(() => {});
