@@ -15,6 +15,7 @@ import gitterdunPlugin from 'eslint-plugin-gitterdun';
 import turboPlugin from 'eslint-plugin-turbo';
 import playwrightPlugin from 'eslint-plugin-playwright';
 import uiTestingPlugin from 'eslint-plugin-ui-testing';
+import testingLibraryPlugin from 'eslint-plugin-testing-library';
 
 const WORKSPACE_ROOT_DIR = dirname(fileURLToPath(import.meta.url));
 
@@ -45,6 +46,7 @@ const eslintConfig = [
       turbo: turboPlugin,
       playwright: playwrightPlugin,
 
+      'testing-library': testingLibraryPlugin,
       'ui-testing': uiTestingPlugin,
     },
     files: ['**/*.{ts,tsx,js,jsx,cjs,mjs,mts,cts}'],
@@ -1152,6 +1154,34 @@ const eslintConfig = [
       '@typescript-eslint/no-unsafe-argument': 'off', // we can be more loose in unit tests
       '@typescript-eslint/no-explicit-any': 'off', // we can be more loose in unit tests
       '@typescript-eslint/no-magic-numbers': 'off', // we can be more loose in unit tests
+      // Testing Library rules enabled as errors
+      'testing-library/await-async-events': 'error',
+      'testing-library/await-async-queries': 'error',
+      'testing-library/await-async-utils': 'error',
+      'testing-library/consistent-data-testid': 'error',
+      'testing-library/no-await-sync-events': 'error',
+      'testing-library/no-await-sync-queries': 'error',
+      'testing-library/no-container': 'error',
+      'testing-library/no-debugging-utils': 'error',
+      'testing-library/no-dom-import': 'error',
+      'testing-library/no-global-regexp-flag-in-query': 'error',
+      'testing-library/no-manual-cleanup': 'error',
+      'testing-library/no-node-access': 'error',
+      'testing-library/no-promise-in-fire-event': 'error',
+      'testing-library/no-render-in-lifecycle': 'error',
+      'testing-library/no-unnecessary-act': 'error',
+      'testing-library/no-wait-for-multiple-assertions': 'error',
+      'testing-library/no-wait-for-side-effects': 'error',
+      'testing-library/no-wait-for-snapshot': 'error',
+      'testing-library/prefer-explicit-assert': 'error',
+      'testing-library/prefer-find-by': 'error',
+      'testing-library/prefer-implicit-assert': 'error',
+      'testing-library/prefer-presence-queries': 'error',
+      'testing-library/prefer-query-by-disappearance': 'error',
+      'testing-library/prefer-query-matchers': 'error',
+      'testing-library/prefer-screen-queries': 'error',
+      'testing-library/prefer-user-event': 'error',
+      'testing-library/render-result-naming-convention': 'error',
     },
   },
   {files: ['**/scripts/**'], rules: {'no-console': 'off'}},
