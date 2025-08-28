@@ -1,5 +1,6 @@
 import type {FC} from 'react';
 import clsx from 'clsx';
+import {AVATAR_INITIALS_LENGTH} from '../constants';
 
 type AvatarSize = 'sm' | 'md' | 'lg';
 
@@ -32,7 +33,7 @@ export const AvatarCircle: FC<AvatarCircleProps> = ({
       )}
       title={label}
     >
-      {emoji ?? label.slice(0, 2).toUpperCase()}
+      {emoji ?? label.slice(0, AVATAR_INITIALS_LENGTH).toUpperCase()}
     </div>
   );
 };

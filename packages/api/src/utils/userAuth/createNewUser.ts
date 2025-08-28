@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import db from '../../lib/db';
 import {sql} from '../sql';
 import {UserSchema} from '@gitterdun/shared';
+import {BCRYPT_SALT_ROUNDS} from '../../constants';
 
 type CreateUserParams = {
   username: string;
@@ -16,8 +17,7 @@ export const createNewUser = async ({
   password,
   role,
 }: CreateUserParams) => {
-  const saltRounds = 12;
-  const passwordHash = await bcrypt.hash(password, saltRounds);
+  const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
 
   const result = db
     .prepare(sql`

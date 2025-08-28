@@ -1,15 +1,15 @@
 import {test, expect} from '@playwright/test';
 import {setupFamily, loginAs} from './helpers/test-utils';
 
-test.describe('Chores Display - Skipped Tests', () => {
+test.describe('chores Display - Skipped Tests', () => {
   test.skip('should show chores list for child user', async ({page}) => {
     const {child} = await setupFamily(page);
     await loginAs(page, child.username, child.password);
     await page.goto('/chores');
-    await expect(page).toHaveURL('/chores');
+    await expect.soft(page).toHaveURL('/chores');
 
-    await expect(page.locator('text=Chores')).toBeVisible();
-    await expect(page.locator('[data-testid="chores-list"]')).toBeVisible();
+    await expect.soft(page.locator('text=Chores')).toBeVisible();
+    await expect.soft(page.getByTestId("chores-list")).toBeVisible();
   });
 
   test.skip('should show points and status for chores', async ({page}) => {
@@ -34,9 +34,9 @@ test.describe('Chores Display - Skipped Tests', () => {
     await loginAs(page, child.username, child.password);
     await page.goto('/chores');
 
-    await expect(page.locator(`text=${choreTitle}`)).toBeVisible();
-    await expect(page.locator(`text=Points: ${chorePoints}`)).toBeVisible();
-    await expect(page.locator('text=Pending')).toBeVisible();
+    await expect.soft(page.locator(`text=${choreTitle}`)).toBeVisible();
+    await expect.soft(page.locator(`text=Points: ${chorePoints}`)).toBeVisible();
+    await expect.soft(page.locator('text=Pending')).toBeVisible();
   });
 
   test.skip('should navigate between chores and admin pages', async ({
@@ -44,12 +44,12 @@ test.describe('Chores Display - Skipped Tests', () => {
   }) => {
     await setupFamily(page);
     await page.goto('/chores');
-    await expect(page).toHaveURL('/chores');
+    await expect.soft(page).toHaveURL('/chores');
 
     await page.goto('/admin');
-    await expect(page).toHaveURL('/admin');
+    await expect.soft(page).toHaveURL('/admin');
 
     await page.goto('/chores');
-    await expect(page).toHaveURL('/chores');
+    await expect.soft(page).toHaveURL('/chores');
   });
 });

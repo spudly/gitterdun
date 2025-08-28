@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import db from '../lib/db';
 import {sql} from './sql';
 import {removeAllMembershipsForUser} from './familyMembership';
+import {BCRYPT_SALT_ROUNDS} from '../constants';
 
 export const createFamily = (name: string, userId: number) => {
   // Enforce single-family membership: remove any existing memberships first
@@ -109,7 +110,7 @@ export const createChildUser = async (
 ): Promise<number> => {
   const resolvedEmail: string | null =
     email != null && email.trim() !== '' ? email : null;
-  const passwordHash = await bcrypt.hash(password, 12);
+  const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
   const userRow = db
     .prepare(sql`
       INSERT INTO

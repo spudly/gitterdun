@@ -1,7 +1,7 @@
 import {test, expect} from '@playwright/test';
 import {setupFamily} from './helpers/test-utils';
 
-test.describe('Chores Workflow', () => {
+test.describe('chores Workflow', () => {
   test('should display admin interface with user management', async ({
     page,
   }) => {
@@ -10,27 +10,27 @@ test.describe('Chores Workflow', () => {
 
     // Navigate to admin page
     await page.goto('/admin');
-    await expect(page).toHaveURL('/admin');
+    await expect.soft(page).toHaveURL('/admin');
 
     // Should see admin interface
-    await expect(
+    await expect.soft(
       page.getByRole('heading', {name: 'Admin Panel'}),
     ).toBeVisible();
 
     // Should see chore statistics section
-    await expect(page.getByText('Total Chores')).toBeVisible();
-    await expect(page.getByText('Pending Approval')).toBeVisible();
-    await expect(page.getByText('Approved')).toBeVisible();
-    await expect(page.getByText('Bonus Chores')).toBeVisible();
+    await expect.soft(page.getByText('Total Chores')).toBeVisible();
+    await expect.soft(page.getByText('Pending Approval')).toBeVisible();
+    await expect.soft(page.getByText('Approved')).toBeVisible();
+    await expect.soft(page.getByText('Bonus Chores')).toBeVisible();
 
     // Should see users management section with admin user
-    await expect(page.getByRole('cell', {name: 'admin'}).first()).toBeVisible();
-    await expect(
+    await expect.soft(page.getByRole('cell', {name: 'admin'}).first()).toBeVisible();
+    await expect.soft(
       page.getByRole('cell', {name: 'admin@gitterdun.com'}),
     ).toBeVisible();
 
     // Should see Delete buttons for user management
-    await expect(
+    await expect.soft(
       page.getByRole('button', {name: 'Delete'}).first(),
     ).toBeVisible();
   });

@@ -8,6 +8,7 @@ import {
   useState,
 } from 'react';
 import {Alert} from './Alert.js';
+import {TOAST_TIMEOUT_DURATION} from '../constants';
 
 type ToastVariant = 'success' | 'error' | 'info' | 'warning';
 
@@ -53,7 +54,7 @@ export const ToastProvider: FC<{readonly children: ReactNode}> = ({
         id,
         title: opts.title,
         variant: opts.variant ?? 'info',
-        expiresAt: now + (opts.durationMs ?? 4500),
+        expiresAt: now + (opts.durationMs ?? TOAST_TIMEOUT_DURATION),
       } satisfies Omit<Toast, 'description'>;
       const toast: Toast =
         opts.description !== undefined && opts.description !== ''
@@ -62,7 +63,7 @@ export const ToastProvider: FC<{readonly children: ReactNode}> = ({
       setToasts(prev => [...prev, toast]);
       window.setTimeout(() => {
         removeToast(id);
-      }, opts.durationMs ?? 4500);
+      }, opts.durationMs ?? TOAST_TIMEOUT_DURATION);
     },
     [removeToast],
   );

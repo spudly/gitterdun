@@ -1,20 +1,20 @@
 import {test, expect} from '@playwright/test';
 import {setupFamilyWithChildren} from './helpers/test-utils';
 
-test.describe('Leaderboard and Points System', () => {
+test.describe('leaderboard and Points System', () => {
   test('should display leaderboard page', async ({page}) => {
     // Set up family
     await setupFamilyWithChildren(page);
 
     // Navigate to leaderboard
     await page.goto('/leaderboard');
-    await expect(page).toHaveURL('/leaderboard');
+    await expect.soft(page).toHaveURL('/leaderboard');
 
     // Should see leaderboard header
-    await expect(page.locator('text=Leaderboard')).toBeVisible();
+    await expect.soft(page.locator('text=Leaderboard')).toBeVisible();
 
     // Should see leaderboard content (RankingList component)
-    await expect(page.locator('div.rounded-lg.bg-white.shadow')).toBeVisible();
+    await expect.soft(page.locator('div.rounded-lg.bg-white.shadow')).toBeVisible();
   });
 
   // Note: Additional test cases have been moved to leaderboard.skip.spec.ts

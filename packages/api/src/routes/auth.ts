@@ -1,4 +1,5 @@
 import express from 'express';
+import {StatusCodes} from 'http-status-codes';
 import {
   LoginSchema,
   ForgotPasswordRequestSchema,
@@ -54,7 +55,7 @@ router.post('/register', async (req, res) => {
 
   logger.info(`New user registered: ${username}`);
   res
-    .status(201)
+    .status(StatusCodes.CREATED)
     .json({
       success: true,
       data: validatedUser,
@@ -74,7 +75,7 @@ router.post('/logout', (req, res) => {
   } catch (error) {
     logger.error({error: asError(error)}, 'Logout error');
     return res
-      .status(500)
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({success: false, error: 'Internal server error'});
   }
 });
@@ -84,13 +85,15 @@ router.get('/me', (req, res) => {
   try {
     const user = getUserFromSession(req);
     if (!user) {
-      return res.status(401).json({success: false, error: 'Not authenticated'});
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({success: false, error: 'Not authenticated'});
     }
     return res.json({success: true, data: user});
   } catch (error) {
     logger.error({error: asError(error)}, 'Me error');
     return res
-      .status(500)
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({success: false, error: 'Internal server error'});
   }
 });

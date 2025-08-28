@@ -1,7 +1,7 @@
 import {test, expect} from '@playwright/test';
 import {setupFamily, loginAs} from './helpers/test-utils';
 
-test.describe('Chores Completion - Skipped Tests', () => {
+test.describe('chores Completion - Skipped Tests', () => {
   test.skip('should complete a chore as child', async ({page}) => {
     const {child} = await setupFamily(page);
     await page.goto('/admin');
@@ -22,16 +22,16 @@ test.describe('Chores Completion - Skipped Tests', () => {
 
     await loginAs(page, child.username, child.password);
     await page.goto('/chores');
-    await expect(page).toHaveURL('/chores');
+    await expect.soft(page).toHaveURL('/chores');
 
-    await expect(page.locator(`text=${choreTitle}`)).toBeVisible();
+    await expect.soft(page.locator(`text=${choreTitle}`)).toBeVisible();
     await page
       .locator(`text=${choreTitle}`)
       .locator('..')
       .locator('button:has-text("Complete")')
       .click();
 
-    await expect(page.locator('text=Completed')).toBeVisible();
+    await expect.soft(page.locator('text=Completed')).toBeVisible();
   });
 
   test.skip('should approve completed chore as parent', async ({page}) => {
@@ -63,8 +63,8 @@ test.describe('Chores Completion - Skipped Tests', () => {
     await loginAs(page, parent.username, parent.password);
     await page.goto('/admin');
 
-    await expect(page.locator(`text=${choreTitle}`)).toBeVisible();
-    await expect(page.locator('text=Completed')).toBeVisible();
+    await expect.soft(page.locator(`text=${choreTitle}`)).toBeVisible();
+    await expect.soft(page.locator('text=Completed')).toBeVisible();
 
     await page
       .locator(`text=${choreTitle}`)
@@ -72,7 +72,7 @@ test.describe('Chores Completion - Skipped Tests', () => {
       .locator('button:has-text("Approve")')
       .click();
 
-    await expect(page.locator('text=Approved')).toBeVisible();
+    await expect.soft(page.locator('text=Approved')).toBeVisible();
   });
 
   test.skip('should reject completed chore as parent', async ({page}) => {
@@ -110,6 +110,6 @@ test.describe('Chores Completion - Skipped Tests', () => {
       .locator('button:has-text("Reject")')
       .click();
 
-    await expect(page.locator('text=Pending')).toBeVisible();
+    await expect.soft(page.locator('text=Pending')).toBeVisible();
   });
 });

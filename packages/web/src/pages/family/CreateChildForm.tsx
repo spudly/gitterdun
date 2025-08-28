@@ -6,6 +6,7 @@ import {TextInput} from '../../widgets/TextInput.js';
 import {Stack} from '../../widgets/Stack.js';
 import {Text} from '../../widgets/Text.js';
 import {defineMessages, useIntl} from 'react-intl';
+import {MIN_PASSWORD_LENGTH} from '../../constants';
 
 type CreateChildPayload = {
   familyId: number;
@@ -111,7 +112,7 @@ export const CreateChildForm: FC<CreateChildFormProps> = ({
           error={passwordError}
           onChange={val => {
             setChildPassword(val);
-            if (val.trim().length >= 4) {
+            if (val.trim().length >= MIN_PASSWORD_LENGTH) {
               setPasswordError(null);
             }
           }}

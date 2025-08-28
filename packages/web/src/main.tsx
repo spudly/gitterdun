@@ -4,16 +4,17 @@ import {BrowserRouter} from 'react-router-dom';
 import Layout from './widgets/Layout.js';
 import {ToastProvider} from './widgets/ToastProvider.js';
 import {Routes} from './Routes.js';
-import {NAVIGATION_ITEMS} from './constants.js';
+import {
+  NAVIGATION_ITEMS,
+  DEFAULT_QUERY_STALE_TIME,
+  DEFAULT_GC_TIME,
+} from './constants.js';
 import {I18nProvider} from './i18n/I18nProvider.js';
 
 // Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      gcTime: 1000 * 60 * 10, // 10 minutes
-    },
+    queries: {staleTime: DEFAULT_QUERY_STALE_TIME, gcTime: DEFAULT_GC_TIME},
   },
 });
 

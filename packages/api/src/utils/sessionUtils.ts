@@ -5,13 +5,14 @@ import {z} from 'zod';
 import db from '../lib/db';
 import {sql} from './sql';
 import {getCookie} from './cookieUtils';
+import {SECURE_TOKEN_BYTES, SESSION_EXPIRATION_MS} from '../constants';
 
 type User = z.infer<typeof UserSchema>;
 
 export const createSession = (userId: number) => {
-  const sessionId = crypto.randomBytes(32).toString('hex');
+  const sessionId = crypto.randomBytes(SECURE_TOKEN_BYTES).toString('hex');
   const now = new Date();
-  const expiresAt = new Date(now.getTime() + 1000 * 60 * 60 * 24 * 7); // 7 days
+  const expiresAt = new Date(now.getTime() + SESSION_EXPIRATION_MS);
 
   db.prepare(sql`
     INSERT INTO

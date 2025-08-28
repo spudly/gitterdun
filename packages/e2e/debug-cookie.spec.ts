@@ -18,7 +18,7 @@ const testApiEndpoint = async (page: Page): Promise<unknown> => {
   });
 };
 
-test.describe('Cookie Debug', () => {
+test.describe('cookie Debug', () => {
   test('check if cookies are set after registration', async ({page}) => {
     const username = `cookie_test_${Date.now()}`;
     await page.goto('/register');
@@ -26,15 +26,15 @@ test.describe('Cookie Debug', () => {
     await page.fill('#username', username);
     await page.fill('#password', 'testpassword123');
     await page.click('button[type="submit"]');
-    await expect(page).toHaveURL('/');
+    await expect.soft(page).toHaveURL('/');
 
     const sidCookie = await checkSessionCookie(page);
-    expect(sidCookie).toBeDefined();
+    expect.soft(sidCookie).toBeDefined();
 
     const response = await testApiEndpoint(page);
-    expect(response).toBeDefined();
+    expect.soft(response).toBeDefined();
 
     // Test should pass regardless to see debug info
-    expect(true).toBe(true);
+    expect.soft(true).toBe(true);
   });
 });

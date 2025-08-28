@@ -30,6 +30,7 @@ export const ProgressBar: FC<ProgressBarProps> = ({
   showPercentage = false,
   padded = false,
 }) => {
+  // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- should always be 100
   const percentage = Math.min((value / max) * 100, 100);
 
   return (

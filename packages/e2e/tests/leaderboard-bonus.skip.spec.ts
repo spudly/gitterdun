@@ -66,7 +66,7 @@ const approveChore = async (
     .click();
 };
 
-test.describe('Leaderboard Bonus Points - Skipped Tests', () => {
+test.describe('leaderboard Bonus Points - Skipped Tests', () => {
   test.skip('should handle bonus points correctly', async ({page}) => {
     const {parent, child1} = await setupFamilyWithChildren(page);
     const choreTitle = `Bonus Chore ${Date.now()}`;
@@ -77,6 +77,6 @@ test.describe('Leaderboard Bonus Points - Skipped Tests', () => {
     await approveChore(page, choreTitle, parent);
 
     await page.goto('/leaderboard');
-    await expect(page.locator('text=15')).toBeVisible();
+    await expect.soft(page.locator('text=15')).toBeVisible();
   });
 });

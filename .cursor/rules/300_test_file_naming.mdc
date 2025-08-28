@@ -1,0 +1,29 @@
+# Test File Naming Convention
+
+Always use `*.test.*` extension for test files instead of `*.spec.*`.
+
+## Instructions for Cursor
+
+1. **New Test Files**: When creating new test files, always use the pattern `*.test.*` (e.g., `component.test.tsx`, `utils.test.ts`, `integration.test.js`).
+
+2. **File Suggestions**: When suggesting test file names or creating test files, never use the `*.spec.*` pattern.
+
+3. **Consistency**: This convention should be followed across all packages in the monorepo (web, api, shared, eslint-plugin-gitterdun).
+
+## Examples
+
+✅ **Correct naming:**
+- `Button.test.tsx`
+- `api.test.ts`
+- `utils.test.js`
+- `integration.test.ts`
+
+❌ **Avoid these patterns:**
+- `Button.spec.tsx`
+- `api.spec.ts`
+- `utils.spec.js`
+- `integration.spec.ts`
+
+## Note
+
+The e2e package currently uses `*.spec.*` files, but for new test files or when refactoring, prefer the `*.test.*` convention for consistency with the rest of the codebase.

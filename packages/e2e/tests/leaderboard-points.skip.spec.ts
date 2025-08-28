@@ -45,7 +45,7 @@ const createAndCompleteChore = async (
     .click();
 };
 
-test.describe('Leaderboard Points System - Skipped Tests', () => {
+test.describe('leaderboard Points System - Skipped Tests', () => {
   test.skip('should track points from completed chores', async ({page}) => {
     const {parent, child1} = await setupFamilyWithChildren(page);
     const choreTitle = `Points Chore ${Date.now()}`;
@@ -58,8 +58,8 @@ test.describe('Leaderboard Points System - Skipped Tests', () => {
     });
 
     await page.goto('/leaderboard');
-    await expect(page.locator(`text=${child1.username}`)).toBeVisible();
-    await expect(page.locator('text=20')).toBeVisible();
+    await expect.soft(page.locator(`text=${child1.username}`)).toBeVisible();
+    await expect.soft(page.locator('text=20')).toBeVisible();
   });
 
   test.skip('should show cumulative points from multiple chores', async ({
@@ -81,8 +81,8 @@ test.describe('Leaderboard Points System - Skipped Tests', () => {
     });
 
     await page.goto('/leaderboard');
-    await expect(page.locator(`text=${child1.username}`)).toBeVisible();
-    await expect(page.locator('text=40')).toBeVisible();
+    await expect.soft(page.locator(`text=${child1.username}`)).toBeVisible();
+    await expect.soft(page.locator('text=40')).toBeVisible();
   });
 
   test.skip('should update leaderboard when new chores are completed', async ({
@@ -91,7 +91,7 @@ test.describe('Leaderboard Points System - Skipped Tests', () => {
     const {parent, child1} = await setupFamilyWithChildren(page);
 
     await page.goto('/leaderboard');
-    await expect(page.locator(`text=${child1.username}`)).toBeVisible();
+    await expect.soft(page.locator(`text=${child1.username}`)).toBeVisible();
 
     await createAndCompleteChore(page, {
       choreTitle: `New Chore ${Date.now()}`,
@@ -101,6 +101,6 @@ test.describe('Leaderboard Points System - Skipped Tests', () => {
     });
 
     await page.goto('/leaderboard');
-    await expect(page.locator('text=50')).toBeVisible();
+    await expect.soft(page.locator('text=50')).toBeVisible();
   });
 });

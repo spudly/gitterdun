@@ -45,13 +45,13 @@ const createAndCompleteChore = async (
     .click();
 };
 
-test.describe('Leaderboard Ranking - Skipped Tests', () => {
+test.describe('leaderboard Ranking - Skipped Tests', () => {
   test.skip('should show family members on leaderboard', async ({page}) => {
     const {child1, child2} = await setupFamilyWithChildren(page);
     await page.goto('/leaderboard');
 
-    await expect(page.locator(`text=${child1.username}`)).toBeVisible();
-    await expect(page.locator(`text=${child2.username}`)).toBeVisible();
+    await expect.soft(page.locator(`text=${child1.username}`)).toBeVisible();
+    await expect.soft(page.locator(`text=${child2.username}`)).toBeVisible();
   });
 
   test.skip('should rank children by points correctly', async ({page}) => {
@@ -71,7 +71,7 @@ test.describe('Leaderboard Ranking - Skipped Tests', () => {
     });
 
     await page.goto('/leaderboard');
-    const leaderboard = page.locator('[data-testid="leaderboard"]');
+    const leaderboard = page.getByTestId("leaderboard");
 
     const allMembers = await leaderboard
       .locator('[data-testid="leaderboard-member"]')
@@ -87,7 +87,7 @@ test.describe('Leaderboard Ranking - Skipped Tests', () => {
       Boolean(text?.includes(child2.username)),
     );
 
-    expect(child1Index).toBeLessThan(child2Index);
+    expect.soft(child1Index).toBeLessThan(child2Index);
   });
 
   test.skip('should show leaderboard even with no completed chores', async ({
@@ -96,7 +96,7 @@ test.describe('Leaderboard Ranking - Skipped Tests', () => {
     const {child1, child2} = await setupFamilyWithChildren(page);
     await page.goto('/leaderboard');
 
-    await expect(page.locator(`text=${child1.username}`)).toBeVisible();
-    await expect(page.locator(`text=${child2.username}`)).toBeVisible();
+    await expect.soft(page.locator(`text=${child1.username}`)).toBeVisible();
+    await expect.soft(page.locator(`text=${child2.username}`)).toBeVisible();
   });
 });

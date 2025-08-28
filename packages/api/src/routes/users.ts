@@ -1,4 +1,5 @@
 import express from 'express';
+import {StatusCodes} from 'http-status-codes';
 import {z} from 'zod';
 import db from '../lib/db';
 import {sql} from '../utils/sql';
@@ -12,7 +13,9 @@ const router = express.Router();
 const requireAdmin = (req: express.Request, res: express.Response): boolean => {
   const user = getUserFromSession(req);
   if (!user || user.role !== 'admin') {
-    res.status(403).json({success: false, error: 'Forbidden'});
+    res
+      .status(StatusCodes.FORBIDDEN)
+      .json({success: false, error: 'Forbidden'});
     return false;
   }
   return true;
@@ -44,7 +47,9 @@ router.get('/', (req, res) => {
     res.json({success: true, data: users});
   } catch (error) {
     logger.error({error: asError(error)}, 'List users error');
-    res.status(500).json({success: false, error: 'Internal server error'});
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({success: false, error: 'Internal server error'});
   }
 });
 
@@ -77,13 +82,17 @@ router.delete('/:id', (req, res) => {
       `)
       .run(id);
     if (info.changes === 0) {
-      res.status(404).json({success: false, error: 'User not found'});
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json({success: false, error: 'User not found'});
       return;
     }
     res.json({success: true});
   } catch (error) {
     logger.error({error: asError(error)}, 'Delete user error');
-    res.status(500).json({success: false, error: 'Internal server error'});
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({success: false, error: 'Internal server error'});
   }
 });
 

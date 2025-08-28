@@ -1,4 +1,5 @@
 import express from 'express';
+import {StatusCodes} from 'http-status-codes';
 import {
   CreateFamilySchema,
   CreateChildSchema,
@@ -29,7 +30,7 @@ router.post('/', (req, res) => {
   const {name} = CreateFamilySchema.parse(req.body);
   const family = createFamily(name, userId);
 
-  res.status(201).json({success: true, data: family});
+  res.status(StatusCodes.CREATED).json({success: true, data: family});
 });
 
 // GET /api/families/:id/members - list members
@@ -38,7 +39,9 @@ router.get('/:id/members', (req, res) => {
   const {id: familyId} = IdParamSchema.parse(req.params);
 
   if (!checkIsFamilyMember(userId, familyId)) {
-    res.status(403).json({success: false, error: 'Forbidden'});
+    res
+      .status(StatusCodes.FORBIDDEN)
+      .json({success: false, error: 'Forbidden'});
     return;
   }
 
@@ -61,14 +64,18 @@ router.post('/:id/children', async (req, res) => {
   validateParentMembership(userId, familyId);
 
   if (checkUserExists(email, username)) {
-    res.status(409).json({success: false, error: 'User exists'});
+    res
+      .status(StatusCodes.CONFLICT)
+      .json({success: false, error: 'User exists'});
     return;
   }
 
   const childId = await createChildUser(username, email, password);
   addChildToFamily(familyId, childId);
 
-  res.status(201).json({success: true, message: 'Child created'});
+  res
+    .status(StatusCodes.CREATED)
+    .json({success: true, message: 'Child created'});
 });
 
 // GET /api/families/mine - return the single family for the current user

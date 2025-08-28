@@ -69,7 +69,7 @@ export const requireI18nFormatting: Rule.RuleModule = {
           isNodeType(expr, 'MemberExpression')
           && isIdentifierWithName(getProp(expr, 'property'), 'defaultMessage')
         ) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- TODO: fix
+           
           context.report({node, messageId: 'requireFormatting'});
         }
       },

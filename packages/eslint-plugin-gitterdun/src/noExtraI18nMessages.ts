@@ -7,6 +7,7 @@ import {
   readJson,
   resolveFromCwd,
 } from './utils.js';
+import {MAX_DISPLAYED_ERROR_ITEMS} from './constants.js';
 
 const meta = {
   type: 'problem',
@@ -62,7 +63,8 @@ export const noExtraI18nMessages: Rule.RuleModule = {
         data: {
           locale: path.basename(localeAbs),
           keys:
-            obsolete.slice(0, 5).join(', ') + (obsolete.length > 5 ? '…' : ''),
+            obsolete.slice(0, MAX_DISPLAYED_ERROR_ITEMS).join(', ')
+            + (obsolete.length > MAX_DISPLAYED_ERROR_ITEMS ? '…' : ''),
         },
       });
     }

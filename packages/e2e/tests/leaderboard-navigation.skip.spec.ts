@@ -45,7 +45,7 @@ const createAndCompleteChore = async (
     .click();
 };
 
-test.describe('Leaderboard Navigation - Skipped Tests', () => {
+test.describe('leaderboard Navigation - Skipped Tests', () => {
   test.skip('should allow navigation between pages while maintaining leaderboard state', async ({
     page,
   }) => {
@@ -59,12 +59,12 @@ test.describe('Leaderboard Navigation - Skipped Tests', () => {
     });
 
     await page.goto('/leaderboard');
-    await expect(page.locator('text=35')).toBeVisible();
+    await expect.soft(page.locator('text=35')).toBeVisible();
 
     await page.goto('/dashboard');
     await page.goto('/chores');
     await page.goto('/leaderboard');
 
-    await expect(page.locator('text=35')).toBeVisible();
+    await expect.soft(page.locator('text=35')).toBeVisible();
   });
 });

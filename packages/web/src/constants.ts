@@ -1,5 +1,11 @@
 import type {NavigationItem} from './widgets/Layout';
 import {defineMessages} from 'react-intl';
+import {
+  ONE_SECOND_MS,
+  ONE_MINUTE_MS,
+  ONE_HOUR_MS,
+  MIN_PASSWORD_LENGTH,
+} from '@gitterdun/shared';
 
 const navMessages = defineMessages({
   dashboard: {defaultMessage: 'Dashboard', id: 'pages.Dashboard.dashboard'},
@@ -19,3 +25,81 @@ export const NAVIGATION_ITEMS: Array<NavigationItem> = [
   {message: navMessages.leaderboard, path: '/leaderboard', icon: '🏆'},
   {message: navMessages.family, path: '/family', icon: '👪'},
 ];
+
+/**
+ * Time constants - using shared constants for consistency
+ */
+
+/** Cache stale time for user data - 1 hour */
+export const USER_STALE_TIME = ONE_HOUR_MS;
+
+/** Default query stale time in minutes */
+export const DEFAULT_QUERY_STALE_MINUTES = 5;
+
+/** Default query stale time - 5 minutes */
+export const DEFAULT_QUERY_STALE_TIME =
+  DEFAULT_QUERY_STALE_MINUTES * ONE_MINUTE_MS;
+
+/** Garbage collection time in minutes */
+export const DEFAULT_GC_MINUTES = 10;
+
+/** Garbage collection time for unused cache entries - 10 minutes */
+export const DEFAULT_GC_TIME = DEFAULT_GC_MINUTES * ONE_MINUTE_MS;
+
+/** Timeout delay for navigation after accepting invitation - 1.2 seconds */
+export const ACCEPT_INVITATION_REDIRECT_DELAY = 1200;
+
+/**
+ * UI and display constants
+ */
+
+/** Maximum length for slugified i18n message IDs */
+export const MAX_SLUG_LENGTH = 30;
+
+/** Length of 'src/' prefix to remove from file paths */
+export const SRC_PREFIX_LENGTH = 4;
+
+/** Number of top performers to show in leaderboard podium */
+export const PODIUM_ITEMS_COUNT = 3;
+
+/** Number of days threshold for chores to be considered "due soon" */
+export const DUE_SOON_THRESHOLD_DAYS = 3;
+
+/**
+ * UI component constants
+ */
+
+/** Default toast timeout duration in milliseconds */
+export const TOAST_TIMEOUT_DURATION = 4500;
+
+/** Password reset redirect delay in milliseconds */
+export const PASSWORD_RESET_REDIRECT_DELAY = 1200;
+
+/** Full percentage value (100%) */
+export const FULL_PERCENTAGE = 100;
+
+/**
+ * Ranking and position constants
+ */
+
+/** First place (gold) rank */
+export const GOLD_RANK = 1;
+
+/** Second place (silver) rank */
+export const SILVER_RANK = 2;
+
+/** Third place (bronze) rank */
+export const BRONZE_RANK = 3;
+
+/** Array of all podium ranks in order */
+export const RANKS = [GOLD_RANK, SILVER_RANK, BRONZE_RANK];
+
+/**
+ * Grid and layout constants
+ */
+
+/** Default section spacing value */
+export const DEFAULT_SECTION_SPACING = 6;
+
+/** Number of characters to display in avatar initials */
+export const AVATAR_INITIALS_LENGTH = 2;

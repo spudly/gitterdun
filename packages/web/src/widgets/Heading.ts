@@ -9,6 +9,7 @@ export const Heading: FC<PropsWithChildren<{level?: HeadingLevel}>> = ({
   level = 1,
 }) => {
   const className = clsx({
+    /* eslint-disable @typescript-eslint/no-magic-numbers -- h1-h6 shouldn't need constants */
     'text-4xl': level === 1,
     'text-3xl': level === 2,
     'text-2xl': level === 3,
@@ -17,6 +18,7 @@ export const Heading: FC<PropsWithChildren<{level?: HeadingLevel}>> = ({
     'font-bold': level === 1 || level === 2 || level === 3,
     'font-semibold': level === 4 || level === 5,
     'font-medium': level === 6,
+    /* eslint-enable @typescript-eslint/no-magic-numbers */
   });
 
   const tagName = `h${level}`;

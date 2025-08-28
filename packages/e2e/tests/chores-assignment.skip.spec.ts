@@ -1,7 +1,7 @@
 import {test, expect} from '@playwright/test';
 import {setupFamily} from './helpers/test-utils';
 
-test.describe('Chores Assignment - Skipped Tests', () => {
+test.describe('chores Assignment - Skipped Tests', () => {
   test.skip('should assign chore to child', async ({page}) => {
     const {child} = await setupFamily(page);
     await page.goto('/admin');
@@ -20,7 +20,7 @@ test.describe('Chores Assignment - Skipped Tests', () => {
     await page.selectOption('select', child.username);
     await page.click('button:has-text("Assign Chore")');
 
-    await expect(
+    await expect.soft(
       page.locator(`text=Assigned to: ${child.username}`),
     ).toBeVisible();
   });

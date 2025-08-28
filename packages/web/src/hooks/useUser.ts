@@ -2,6 +2,7 @@ import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query';
 import {UserSchema} from '@gitterdun/shared';
 import type {User} from '@gitterdun/shared';
 import {authApi} from '../lib/api.js';
+import {USER_STALE_TIME} from '../constants';
 
 const NO_DATA_SUCCESS = {__noData: true} as const;
 
@@ -64,7 +65,7 @@ export const useUser = () => {
   } = useQuery<UserQueryData>({
     queryKey: ['user'],
     queryFn,
-    staleTime: 1000 * 60 * 60,
+    staleTime: USER_STALE_TIME,
     retry: false,
   });
 

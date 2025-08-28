@@ -1,6 +1,6 @@
 import {test, expect} from '@playwright/test';
 
-test.describe('Authentication Flow', () => {
+test.describe('authentication Flow', () => {
   test.beforeEach(async ({page}) => {
     await page.goto('/');
   });
@@ -10,7 +10,7 @@ test.describe('Authentication Flow', () => {
   }) => {
     // Navigate to register page
     await page.click('a[href="/register"]');
-    await expect(page).toHaveURL('/register');
+    await expect.soft(page).toHaveURL('/register');
 
     // Fill registration form
     const timestamp = Date.now();
@@ -26,10 +26,10 @@ test.describe('Authentication Flow', () => {
     await page.click('button[type="submit"]');
 
     // Should redirect to dashboard on successful registration
-    await expect(page).toHaveURL('/');
+    await expect.soft(page).toHaveURL('/');
 
     // Should see dashboard content
-    await expect(page.getByRole('heading', {name: 'Dashboard'})).toBeVisible();
+    await expect.soft(page.getByRole('heading', {name: 'Dashboard'})).toBeVisible();
   });
 
   test('should login with existing credentials', async ({page}) => {
@@ -42,7 +42,7 @@ test.describe('Authentication Flow', () => {
     await page.fill('#username', username);
     await page.fill('#password', password);
     await page.click('button[type="submit"]');
-    await expect(page).toHaveURL('/');
+    await expect.soft(page).toHaveURL('/');
 
     // Logout (assuming there's a way to logout)
     // For now, we'll clear storage to simulate logout
@@ -51,7 +51,7 @@ test.describe('Authentication Flow', () => {
 
     // Navigate to login page
     await page.goto('/login');
-    await expect(page).toHaveURL('/login');
+    await expect.soft(page).toHaveURL('/login');
 
     // Fill login form
     await page.fill('#email', username);
@@ -61,10 +61,10 @@ test.describe('Authentication Flow', () => {
     await page.click('button[type="submit"]');
 
     // Should redirect to dashboard
-    await expect(page).toHaveURL('/');
+    await expect.soft(page).toHaveURL('/');
 
     // Should see dashboard content
-    await expect(page.getByRole('heading', {name: 'Dashboard'})).toBeVisible();
+    await expect.soft(page.getByRole('heading', {name: 'Dashboard'})).toBeVisible();
   });
 
   test('should show error for invalid login credentials', async ({page}) => {
@@ -78,11 +78,11 @@ test.describe('Authentication Flow', () => {
     await page.click('button[type="submit"]');
 
     // Should show error message
-    await expect(page.getByRole('alert').first()).toBeVisible();
-    await expect(page.getByText(/Login failed/i).first()).toBeVisible();
+    await expect.soft(page.getByRole('alert').first()).toBeVisible();
+    await expect.soft(page.getByText(/Login failed/i).first()).toBeVisible();
 
     // Should stay on login page
-    await expect(page).toHaveURL('/login');
+    await expect.soft(page).toHaveURL('/login');
   });
 
   test('should require username and password for registration', async ({
@@ -94,7 +94,7 @@ test.describe('Authentication Flow', () => {
     await page.click('button[type="submit"]');
 
     // Form should not submit (button should be disabled or form validation should prevent submission)
-    await expect(page).toHaveURL('/register');
+    await expect.soft(page).toHaveURL('/register');
   });
 
   test('should navigate between login and register pages', async ({page}) => {
@@ -102,10 +102,10 @@ test.describe('Authentication Flow', () => {
 
     // Go to register page
     await page.click('a[href="/register"]');
-    await expect(page).toHaveURL('/register');
+    await expect.soft(page).toHaveURL('/register');
 
     // Should be able to go back to login
     await page.goBack();
-    await expect(page).toHaveURL('/login');
+    await expect.soft(page).toHaveURL('/login');
   });
 });

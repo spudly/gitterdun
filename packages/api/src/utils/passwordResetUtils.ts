@@ -4,10 +4,15 @@ import {IdRowSchema, PasswordResetRowSchema} from '@gitterdun/shared';
 import db from '../lib/db';
 import {logger} from './logger';
 import {sql} from './sql';
+import {
+  BCRYPT_SALT_ROUNDS,
+  SECURE_TOKEN_BYTES,
+  PASSWORD_RESET_EXPIRATION_MS,
+} from '../constants';
 
 const createPasswordResetToken = (userId: number) => {
-  const token = crypto.randomBytes(32).toString('hex');
-  const expiresAt = new Date(Date.now() + 1000 * 60 * 15); // 15 minutes
+  const token = crypto.randomBytes(SECURE_TOKEN_BYTES).toString('hex');
+  const expiresAt = new Date(Date.now() + PASSWORD_RESET_EXPIRATION_MS);
   db.prepare(sql`
     INSERT INTO
       password_resets (token, user_id, created_at, expires_at, used)
@@ -77,7 +82,7 @@ export const resetUserPassword = async (
   password: string,
   token: string,
 ) => {
-  const hashed = await bcrypt.hash(password, 12);
+  const hashed = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
   db.prepare(sql`
     UPDATE users
     SET

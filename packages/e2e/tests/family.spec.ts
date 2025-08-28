@@ -1,15 +1,15 @@
 import {test, expect} from '@playwright/test';
 import {registerAndLogin} from './helpers/test-utils';
 
-test.describe('Family Management', () => {
+test.describe('family Management', () => {
   test('should create a new family', async ({page}) => {
     // Register and login as a user
     await registerAndLogin(page);
 
     // Wait for authentication to be fully established by checking for authenticated user elements
     // This should be visible in the navigation only when user is authenticated
-    await expect(page.getByRole('navigation')).toBeVisible();
-    await expect(page.getByText('Points', {exact: true})).toBeVisible();
+    await expect.soft(page.getByRole('navigation')).toBeVisible();
+    await expect.soft(page.getByText('Points', {exact: true})).toBeVisible();
 
     // Wait for network to be idle to ensure all authentication requests have completed
     await page.waitForLoadState('networkidle');
@@ -22,7 +22,7 @@ test.describe('Family Management', () => {
 
     // Wait for the family page to load properly without redirecting to landing
     await page.waitForLoadState('networkidle');
-    await expect(page).toHaveURL('/family');
+    await expect.soft(page).toHaveURL('/family');
 
     // Should see family creation form (no existing family)
     const familyName = `Test Family ${Date.now()}`;
@@ -32,8 +32,8 @@ test.describe('Family Management', () => {
     await page.click('button:has-text("Create")');
 
     // Should see the family has been created
-    await expect(page.locator('text=Your Family')).toBeVisible();
-    await expect(page.locator('text=Members')).toBeVisible();
+    await expect.soft(page.locator('text=Your Family')).toBeVisible();
+    await expect.soft(page.locator('text=Members')).toBeVisible();
   });
 
   test('should add a child to the family', async ({page}) => {
@@ -47,7 +47,7 @@ test.describe('Family Management', () => {
     await page.click('button:has-text("Create")');
 
     // Wait for family to be created and members section to appear
-    await expect(page.locator('text=Members')).toBeVisible();
+    await expect.soft(page.locator('text=Members')).toBeVisible();
 
     // Fill child creation form
     const timestamp = Date.now();
@@ -65,7 +65,7 @@ test.describe('Family Management', () => {
     await page.click('button:has-text("Create")');
 
     // Should see the child has been added to the members list
-    await expect(page.locator(`text=${childUsername}`)).toBeVisible();
+    await expect.soft(page.locator(`text=${childUsername}`)).toBeVisible();
   });
 
   test('should invite a family member', async ({page}) => {
@@ -79,7 +79,7 @@ test.describe('Family Management', () => {
     await page.click('button:has-text("Create")');
 
     // Wait for family to be created
-    await expect(page.locator('text=Members')).toBeVisible();
+    await expect.soft(page.locator('text=Members')).toBeVisible();
 
     // Fill invitation form
     const inviteEmail = `invite${Date.now()}@example.com`;
@@ -107,10 +107,10 @@ test.describe('Family Management', () => {
     await page.click('button:has-text("Create")');
 
     // Wait for family to be created
-    await expect(page.locator('text=Members')).toBeVisible();
+    await expect.soft(page.locator('text=Members')).toBeVisible();
 
     // Should show the current user as a member - target the actual members list
-    await expect(page.locator('ul.space-y-1')).toBeVisible();
+    await expect.soft(page.locator('ul.space-y-1')).toBeVisible();
 
     // Add a child and verify they appear in the list
     const childUsername = `child${Date.now()}`;
@@ -122,7 +122,7 @@ test.describe('Family Management', () => {
     await page.click('button:has-text("Create")');
 
     // Both parent and child should be visible in members list
-    await expect(page.locator(`text=${childUsername}`)).toBeVisible();
+    await expect.soft(page.locator(`text=${childUsername}`)).toBeVisible();
   });
 
   test('should require family name to create family', async ({page}) => {
@@ -137,7 +137,7 @@ test.describe('Family Management', () => {
 
     // Should not proceed (button might be disabled or form validation prevents it)
     // The exact behavior depends on implementation
-    await expect(
+    await expect.soft(
       page.locator('input[placeholder*="New family name"]'),
     ).toBeVisible();
   });
@@ -153,15 +153,15 @@ test.describe('Family Management', () => {
     await page.click('button:has-text("Create")');
 
     // Wait for family to be created
-    await expect(page.locator('text=Members')).toBeVisible();
+    await expect.soft(page.locator('text=Members')).toBeVisible();
 
     // Try to create child without required fields - the button should be disabled
     const createButton = page.getByRole('button', {name: 'Create'});
-    await expect(createButton).toBeVisible();
-    await expect(createButton).toBeDisabled();
+    await expect.soft(createButton).toBeVisible();
+    await expect.soft(createButton).toBeDisabled();
 
     // Form should still be visible with empty fields
     const createChildForm = page.locator('div').filter({hasText: /^Create$/});
-    await expect(createChildForm.getByPlaceholder('Username')).toBeVisible();
+    await expect.soft(createChildForm.getByPlaceholder('Username')).toBeVisible();
   });
 });

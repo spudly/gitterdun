@@ -1,10 +1,11 @@
 import type {FC, ReactNode} from 'react';
 import {FormattedMessage} from 'react-intl';
 import clsx from 'clsx';
+import {GOLD_RANK, SILVER_RANK, BRONZE_RANK, RANKS} from '../constants';
 
 export type PodiumItem = {
   id: string | number;
-  rank: 1 | 2 | 3;
+  rank: typeof GOLD_RANK | typeof SILVER_RANK | typeof BRONZE_RANK;
   content: ReactNode;
   score?: string | number;
   subtitle?: string;
@@ -16,23 +17,23 @@ type PodiumProps = {
 };
 
 const RANK_STYLES = {
-  1: 'order-2 bg-yellow-500',
-  2: 'order-1 bg-gray-400',
-  3: 'order-3 bg-orange-500',
+  [GOLD_RANK]: 'order-2 bg-yellow-500',
+  [SILVER_RANK]: 'order-1 bg-gray-400',
+  [BRONZE_RANK]: 'order-3 bg-orange-500',
 };
 
-const MEDALS = {1: '🥇', 2: '🥈', 3: '🥉'};
+const MEDALS = {[GOLD_RANK]: '🥇', [SILVER_RANK]: '🥈', [BRONZE_RANK]: '🥉'};
 
 export const Podium: FC<PodiumProps> = ({items, showMedals = true}) => {
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-      {items.slice(0, 3).map(item => (
+      {items.slice(0, RANKS.length).map(item => (
         <div
           className={clsx(
             'flex flex-col items-center gap-4',
-            item.rank === 1
+            item.rank === GOLD_RANK
               ? 'order-2'
-              : item.rank === 2
+              : item.rank === SILVER_RANK
                 ? 'order-1'
                 : 'order-3',
           )}
