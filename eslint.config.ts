@@ -26,6 +26,7 @@ const eslintConfig = [
       '**/coverage/**',
       'node_modules/**',
       'packages/eslint-plugin-i18n/**',
+      '**/playwright-report/**',
     ],
   },
   {
@@ -429,6 +430,7 @@ const eslintConfig = [
           forbid: [
             {propName: 'className', allowedFor: ['Link']},
             {propName: 'style', allowedFor: ['Link']},
+            {propName: 'data-test-id'}, // use data-testid instead (no extra hyphen)
           ],
         },
       ],
