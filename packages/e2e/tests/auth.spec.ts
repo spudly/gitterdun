@@ -78,9 +78,10 @@ test.describe('authentication Flow', () => {
     // Submit login
     await page.getByRole('button', {name: /submit|login|sign in/i}).click();
 
-    // Should show error message
-    await expect(page.getByRole('alert')).toBeVisible();
-    await expect(page.getByText(/Login failed/i)).toBeVisible();
+    // Should show specific login error alert
+    await expect(
+      page.getByRole('alert').filter({hasText: /^Login failed$/}),
+    ).toBeVisible();
 
     // Should stay on login page
     await expect(page).toHaveURL('/login');

@@ -4,7 +4,7 @@ import {CreateChildSchema, MIN_PASSWORD_LENGTH} from '@gitterdun/shared';
 import {Button} from '../../widgets/Button.js';
 import {TextInput} from '../../widgets/TextInput.js';
 import {Stack} from '../../widgets/Stack.js';
-import {Text} from '../../widgets/Text.js';
+import {Section} from '../../widgets/Section.js';
 import {defineMessages, useIntl} from 'react-intl';
 
 type CreateChildPayload = {
@@ -76,11 +76,7 @@ export const CreateChildForm: FC<CreateChildFormProps> = ({
   }, [childUsername, childEmail, childPassword, selectedFamilyId]);
 
   return (
-    <Stack gap="sm">
-      <Text as="h3" weight="semibold">
-        {intl.formatMessage(messages.header)}
-      </Text>
-
+    <Section header={intl.formatMessage(messages.header)}>
       <Stack gap="sm">
         <TextInput
           error={usernameError}
@@ -167,6 +163,6 @@ export const CreateChildForm: FC<CreateChildFormProps> = ({
           {intl.formatMessage(messages.create)}
         </Button>
       </Stack>
-    </Stack>
+    </Section>
   );
 };

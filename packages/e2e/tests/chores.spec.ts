@@ -23,14 +23,14 @@ test.describe('chores Workflow', () => {
     await expect(page.getByText('Approved')).toBeVisible();
     await expect(page.getByText('Bonus Chores')).toBeVisible();
 
-    // Should see users management section with admin user
-    await expect.soft(page.getByRole('cell', {name: 'admin'})).toBeVisible();
+    // Should see users management section with admin user (scoped to Users section)
+    const usersRegion = page.getByRole('region', {name: 'Users'});
+    // Target the admin user row by username only (email may be null)
+    const adminRow = usersRegion.getByRole('row', {name: /\badmin\b/i});
+    await expect.soft(adminRow).toBeVisible();
     await expect
-      .soft(page.getByRole('cell', {name: 'admin@gitterdun.com'}))
+      .soft(adminRow.getByRole('button', {name: 'Delete'}))
       .toBeVisible();
-
-    // Should see Delete buttons for user management
-    await expect.soft(page.getByRole('button', {name: 'Delete'})).toBeVisible();
   });
 
   // Note: Additional test cases have been moved to chores.skip.spec.ts

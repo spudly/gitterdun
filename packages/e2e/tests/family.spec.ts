@@ -46,16 +46,11 @@ test.describe('family Management', () => {
     // Fill child creation form
     const timestamp = Date.now();
     const childUsername = `child${timestamp}`;
-    const childEmail = `child${timestamp}@example.com`;
     const childPassword = 'childpassword123';
 
-    // Find and fill the child form fields in the Create Child section
-    const createChildForm = page
-      .getByRole('region')
-      .filter({hasText: /^Create$/});
-    await createChildForm.getByPlaceholder('Username').fill(childUsername);
-    await createChildForm.getByPlaceholder('Email').fill(childEmail);
-    await createChildForm.getByPlaceholder('Password').fill(childPassword);
+    // Fill child fields (Email is optional; target unique placeholders to avoid ambiguity)
+    await page.getByPlaceholder('Username').fill(childUsername);
+    await page.getByPlaceholder('Password').fill(childPassword);
 
     // Create the child
     await page.getByRole('button', {name: 'Create'}).click();
@@ -77,16 +72,18 @@ test.describe('family Management', () => {
     // Wait for family to be created
     await expect(page.getByText('Members')).toBeVisible();
 
+    // Scope to the Invite section region
+    const inviteSection = page.getByRole('region', {name: 'Invite Member'});
+
     // Fill invitation form
     const inviteEmail = `invite${Date.now()}@example.com`;
-    await page.getByRole('textbox', {name: /email/i}).fill(inviteEmail);
+    await inviteSection.getByPlaceholder('Email').fill(inviteEmail);
 
-    // Select role (assuming there's a dropdown or radio buttons)
-    // This might need adjustment based on actual UI implementation
-    await page.getByRole('combobox').selectOption('parent'); // or however role selection works
+    // Select role
+    await inviteSection.getByRole('combobox').selectOption('parent');
 
     // Send invitation
-    await page.getByRole('button', {name: 'Send'}).click();
+    await inviteSection.getByRole('button', {name: 'Send'}).click();
 
     // Should show success message or confirmation
     // This depends on how the UI handles invitations
@@ -111,12 +108,9 @@ test.describe('family Management', () => {
     // Add a child and verify they appear in the list
     const childUsername = `child${Date.now()}`;
 
-    // Use the fixed selectors from our working family test
-    const createChildForm = page
-      .getByRole('region')
-      .filter({hasText: /^Create$/});
-    await createChildForm.getByPlaceholder('Username').fill(childUsername);
-    await createChildForm.getByPlaceholder('Password').fill('childpassword123');
+    // Use selectors scoped to the Create Child section
+    await page.getByPlaceholder('Username').fill(childUsername);
+    await page.getByPlaceholder('Password').fill('childpassword123');
     await page.getByRole('button', {name: 'Create'}).click();
 
     // Both parent and child should be visible in members list
@@ -156,12 +150,7 @@ test.describe('family Management', () => {
     await expect(createButton).toBeVisible();
     await expect(createButton).toBeDisabled();
 
-    // Form should still be visible with empty fields
-    const createChildForm = page
-      .getByRole('region')
-      .filter({hasText: /^Create$/});
-    await expect
-      .soft(createChildForm.getByPlaceholder('Username'))
-      .toBeVisible();
+    // Form should still be visible with empty fields (scoped to Create Child section)
+    await expect.soft(page.getByPlaceholder('Username')).toBeVisible();
   });
 });

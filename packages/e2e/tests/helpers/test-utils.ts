@@ -60,6 +60,7 @@ const ensureFamilyExists = async (page: Page): Promise<void> => {
   // If there's no family, create one
   if (await createFamilyInput.isVisible()) {
     await createFamilyInput.fill('Test Family');
+    await expect(createFamilyButton).toBeEnabled();
     await createFamilyButton.click();
 
     // Wait for the family creation to complete and form to update
@@ -81,6 +82,7 @@ const ensureFamilyExists = async (page: Page): Promise<void> => {
 export const setupFamily = async (page: Page) => {
   const id = generateShortId();
   const childUsername = `c_${id}`;
+  const childEmail = `${childUsername}@example.com`;
   const childPassword = 'childpassword123';
 
   // Login as admin user (which already exists)
@@ -97,11 +99,15 @@ export const setupFamily = async (page: Page) => {
 
   const familyName = `Test Family`; // Use created or existing family
 
-  // Add child to family using placeholder text selectors since the inputs don't have proper labels
-  await page.getByPlaceholder('Username').fill(childUsername);
-  await page.getByPlaceholder('Password').fill(childPassword);
-  await page.click('button:has-text("Create")');
-  await expect(page.locator(`text=${childUsername}`)).toBeVisible();
+  // Add child to family: scope to the Create Child section and fill all required fields
+  const createChildSection = page.getByRole('region', {
+    name: 'Create Child Account',
+  });
+  await createChildSection.getByPlaceholder('Username').fill(childUsername);
+  await createChildSection.getByPlaceholder('Email').fill(childEmail);
+  await createChildSection.getByPlaceholder('Password').fill(childPassword);
+  await createChildSection.getByRole('button', {name: 'Create'}).click();
+  await expect(page.getByText(childUsername)).toBeVisible({timeout: 15000});
 
   return {
     parent: {username: 'admin', password: 'admin123'},
@@ -118,12 +124,13 @@ const addChildToFamily = async (
   username: string,
   password: string,
 ) => {
-  // Target the Create Child form specifically to avoid conflicts with invite form
-  const createChildForm = page.locator('div').filter({hasText: /^Create$/});
-  await createChildForm.getByPlaceholder('Username').fill(username);
-  await createChildForm.getByPlaceholder('Password').fill(password);
-  await page.click('button:has-text("Create")');
-  await expect(page.locator(`text=${username}`)).toBeVisible();
+  // Target the Create Child section specifically to avoid conflicts with invite form
+  const section = page.getByRole('region', {name: 'Create Child Account'});
+  await section.getByPlaceholder('Username').fill(username);
+  await section.getByPlaceholder('Email').fill(`${username}@example.com`);
+  await section.getByPlaceholder('Password').fill(password);
+  await section.getByRole('button', {name: 'Create'}).click();
+  await expect(page.getByText(username)).toBeVisible({timeout: 15000});
 };
 
 /**

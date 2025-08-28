@@ -13,8 +13,10 @@ test.describe('leaderboard and Points System', () => {
     // Should see leaderboard header
     await expect(page.getByText('Leaderboard')).toBeVisible();
 
-    // Should see leaderboard content (RankingList component)
-    await expect.soft(page.getByRole('list')).toBeVisible();
+    // Should see the Full Rankings section header rendered by RankingList
+    await expect
+      .soft(page.getByRole('heading', {name: 'Full Rankings'}))
+      .toBeVisible();
   });
 
   // Note: Additional test cases have been moved to leaderboard.skip.spec.ts
