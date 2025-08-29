@@ -24,11 +24,7 @@ import {
 } from '../utils/choreCrud';
 import {processChoreUpdate} from '../utils/choreUpdates';
 import {executeChoreCompletionTransaction} from '../utils/choreCompletion';
-import {
-  assignChoreToSingleUser,
-  approveChoreAssignment,
-  rejectChoreAssignment,
-} from '../utils/choreModeration';
+import {assignChoreToSingleUser, approveChoreAssignment} from '../utils/choreModeration';
 
 // POST /api/chores - Create a new chore
 export const handleCreateChore = async (
@@ -143,12 +139,12 @@ export const handleAssignChore = async (
   try {
     const choreId = Number((req.params as Record<string, string>)['id']);
     const {userId} = req.body as {userId?: number};
-    if (!Number.isInteger(choreId) || !Number.isInteger(userId)) {
+    if (!Number.isInteger(choreId) || typeof userId !== 'number' || !Number.isInteger(userId)) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({success: false, error: 'Invalid chore or user id'});
     }
-    assignChoreToSingleUser(choreId, userId!);
+    assignChoreToSingleUser(choreId, userId);
     return res.json({success: true});
   } catch (error) {
     return res
@@ -165,12 +161,12 @@ export const handleApproveChore = async (
   try {
     const choreId = Number((req.params as Record<string, string>)['id']);
     const {approvedBy} = req.body as {approvedBy?: number};
-    if (!Number.isInteger(choreId) || !Number.isInteger(approvedBy)) {
+    if (!Number.isInteger(choreId) || typeof approvedBy !== 'number' || !Number.isInteger(approvedBy)) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({success: false, error: 'Invalid chore id or approver id'});
     }
-    approveChoreAssignment(choreId, approvedBy!);
+    approveChoreAssignment(choreId, approvedBy);
     return res.json({success: true});
   } catch (error) {
     return res
@@ -179,23 +175,4 @@ export const handleApproveChore = async (
   }
 };
 
-// POST /api/chores/:id/reject - Reject a completed chore
-export const handleRejectChore = async (
-  req: express.Request,
-  res: express.Response,
-) => {
-  try {
-    const choreId = Number((req.params as Record<string, string>)['id']);
-    if (!Number.isInteger(choreId)) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({success: false, error: 'Invalid chore id'});
-    }
-    rejectChoreAssignment(choreId);
-    return res.json({success: true});
-  } catch (error) {
-    return res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({success: false, error: (error as Error).message});
-  }
-};
+// POST /api/chores/:id/reject - moved to separate handler to keep file size small

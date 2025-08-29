@@ -12,48 +12,10 @@ import {Badge} from '../widgets/Badge.js';
 import {InlineMeta} from '../widgets/InlineMeta.js';
 import {Button} from '../widgets/Button.js';
 import {PageLoading} from '../widgets/PageLoading.js';
-import {defineMessages, FormattedMessage, useIntl} from 'react-intl';
+import {FormattedMessage, useIntl} from 'react-intl';
+import {choresMessages as messages} from './chores.messages.js';
 
-const messages = defineMessages({
-  loading: {
-    defaultMessage: 'Loading chores...',
-    id: 'pages.Chores.loading-chores',
-  },
-  header: {defaultMessage: 'Chores', id: 'pages.Chores.chores'},
-  statusCompleted: {
-    defaultMessage: 'Completed',
-    id: 'pages.admin.AdminChoresManagement.completed',
-  },
-  statusApproved: {
-    defaultMessage: 'Approved',
-    id: 'pages.admin.AdminChoresManagement.approved',
-  },
-  statusPending: {
-    defaultMessage: 'Pending',
-    id: 'pages.admin.AdminChoresManagement.pending',
-  },
-  pointsWithValue: {
-    defaultMessage: 'Points: {points}',
-    id: 'pages.admin.AdminChoresManagement.points-points',
-  },
-  bonusWithPoints: {
-    defaultMessage: 'Bonus: +{points}',
-    id: 'pages.admin.AdminChoresManagement.bonus-points',
-  },
-  penaltyWithPoints: {
-    defaultMessage: 'Penalty: -{points}',
-    id: 'pages.admin.AdminChoresManagement.penalty-points',
-  },
-  dueWithDate: {
-    defaultMessage: 'Due: {date}',
-    id: 'pages.admin.AdminChoresManagement.due-date',
-  },
-  complete: {defaultMessage: 'Complete', id: 'pages.Chores.complete'},
-  typeBonus: {
-    defaultMessage: 'Bonus',
-    id: 'pages.admin.AdminChoresManagement.bonus',
-  },
-});
+// messages imported
 
 const Chores: FC = () => {
   const {user} = useUser();
@@ -152,12 +114,15 @@ const Chores: FC = () => {
               right={
                 chore.status === 'pending' ? (
                   <Button
-                    onClick={async () => {
-                      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- guarded by enabled
-                      await choresApi.complete(chore.id, {userId: user!.id});
-                      await queryClient.invalidateQueries({
-                        queryKey: ['chores', user?.id],
-                      });
+                    onClick={() => {
+                      const run = async () => {
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- guarded by enabled
+                        await choresApi.complete(chore.id, {userId: user!.id});
+                        await queryClient.invalidateQueries({
+                          queryKey: ['chores', user?.id],
+                        });
+                      };
+                      run().catch(() => {});
                     }}
                     size="sm"
                     variant="primary"

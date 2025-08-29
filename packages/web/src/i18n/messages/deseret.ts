@@ -43,6 +43,10 @@ export default {
   'pages.Admin.access-denied': '𐐈𐐿𐐨𐐝 𐐼𐐯𐐤𐐨𐐯𐐼',
   'pages.Admin.you-need-admin-privileges-to-v':
     '𐐏𐐭 𐐤𐐨𐐼 𐐈𐐼𐐮𐐤 𐐑𐐯𐐮𐐮𐐶𐐨𐐡𐐩𐑅 𐐻𐐬 𐐶𐐨𐐲 𐐝𐐻𐐨𐐡.',
+  'pages.Admin.create-chore': '𐐗𐐯𐐯𐐻 𐐗𐐬𐐡𐐨𐐯𐐡',
+  'pages.Admin.create': '𐐗𐐯𐐯𐐻',
+  'pages.Admin.title': '𐐓𐐮𐐻𐐢𐐲',
+  'pages.Admin.bonus': '𐐒𐐬𐐤𐐭𐑅',
 
   'pages.Chores.loading-chores': '𐐢𐐬𐐲𐐼𐐮𐐤 𐐗𐐬𐐡𐐨𐐯𐐡…',
   'pages.Chores.complete': '𐐗𐐬𐐣𐐺𐐨𐐻',
@@ -97,6 +101,10 @@ export default {
   'pages.admin.AdminChoresManagement.approved': '𐐈𐐹𐐯𐐬𐐶𐐲𐐼',
   'pages.admin.AdminChoresManagement.pending': '𐐑𐐯𐐤𐐼𐐮𐐤𐐖',
   'pages.admin.AdminChoresManagement.bonus': '𐐒𐐬𐐤𐐭𐑅',
+  'pages.admin.AdminChoresManagement.assign': '𐐈𐑅𐑅𐐲𐐡𐐨𐐤',
+  'pages.admin.AdminChoresManagement.assign-chore': '𐐈𐑅𐑅𐐲𐐡𐐨𐐤 𐐗𐐬𐐡𐐨𐐯𐐡',
+  'pages.admin.AdminChoresManagement.assigned-to': '𐐈𐑅𐑅𐐲𐐡𐐨𐐤 𐐻𐐬: {username}',
+  'pages.admin.AdminChoresManagement.assignee': '𐐈𐑅𐑅𐐲𐐡𐐨𐐤𐐯',
 
   'alert.dismiss': '𐐗𐐮𐐣𐐣𐐯𐐝',
   'podium.points': '{score} 𐐑𐐬𐐌𐐤𐐻𐑅',

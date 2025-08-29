@@ -51,7 +51,7 @@ const Admin: FC = () => {
     mutationFn: async () =>
       choresApi.create({
         title,
-        point_reward: Number(points) || 0,
+        point_reward: points,
         bonus_points: typeof bonus === 'number' ? bonus : 0,
         chore_type: 'required',
       }),
@@ -109,7 +109,7 @@ const Admin: FC = () => {
       <Stack gap="md">
         <Button
           onClick={() => {
-            setShowCreate(s => !s);
+            setShowCreate(show => !show);
           }}
           variant="primary"
         >
@@ -120,20 +120,33 @@ const Admin: FC = () => {
           <Card padded>
             <Stack gap="md">
               <TextInput
-                onChange={val => setTitle(val)}
+                onChange={value => {
+                  setTitle(value);
+                }}
                 placeholder={intl.formatMessage(messages.titlePlaceholder)}
                 value={title}
               />
               <input
-                onChange={e => setPoints(Number(e.target.value))}
+                aria-label={intl.formatMessage(messages.titlePlaceholder)}
+                onChange={event => {
+                  const next = Number(event.target.value);
+                  setPoints(Number.isNaN(next) ? 0 : next);
+                }}
                 placeholder={intl.formatMessage(messages.titlePlaceholder)}
                 type="number"
                 value={points}
               />
               <input
-                onChange={e =>
-                  setBonus(e.target.value === '' ? '' : Number(e.target.value))
-                }
+                aria-label={intl.formatMessage(messages.bonusPlaceholder)}
+                onChange={event => {
+                  const raw = event.target.value;
+                  if (raw === '') {
+                    setBonus('');
+                  } else {
+                    const next = Number(raw);
+                    setBonus(Number.isNaN(next) ? '' : next);
+                  }
+                }}
                 placeholder={intl.formatMessage(messages.bonusPlaceholder)}
                 type="number"
                 value={bonus}
@@ -144,7 +157,7 @@ const Admin: FC = () => {
                   const run = async () => {
                     await createMutation.mutateAsync();
                   };
-                  run();
+                  run().catch(() => {});
                 }}
               >
                 <FormattedMessage {...messages.create} />

@@ -38,7 +38,7 @@ export const getChoreForCompletion = (choreId: number) => {
 
 export const calculateCompletionPoints = (chore: Chore) => {
   const pointsEarned = chore.point_reward;
-  const bonusPointsEarned = chore.bonus_points ?? 0;
+  const bonusPointsEarned = typeof chore.bonus_points === 'number' ? chore.bonus_points : 0;
   const penaltyPointsEarned = 0; // TODO: Implement penalty logic
   return {pointsEarned, bonusPointsEarned, penaltyPointsEarned};
 };

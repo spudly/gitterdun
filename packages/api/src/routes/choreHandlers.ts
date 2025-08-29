@@ -7,5 +7,5 @@ export {
   handleCompleteChore,
   handleAssignChore,
   handleApproveChore,
-  handleRejectChore,
 } from './choreWriteHandlers';
+export {handleRejectChore} from './choreRejectHandler';
