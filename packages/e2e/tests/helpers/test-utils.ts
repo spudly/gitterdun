@@ -157,10 +157,10 @@ export const setupFamilyWithChildren = async (page: Page) => {
 
   // Create family
   await page.goto('/family');
+  await expect(page.getByRole('heading', {name: 'Your Family'})).toBeVisible();
   const familyName = `Test Family ${id}`;
-  const newFamilySection = page.getByRole('region', {name: 'Create Family'});
-  await newFamilySection.getByPlaceholder('New family name').fill(familyName);
-  await newFamilySection.getByRole('button', {name: 'Create'}).click();
+  await page.getByPlaceholder('New family name').fill(familyName);
+  await page.getByRole('button', {name: 'Create'}).click();
   await expect(page.getByRole('heading', {name: 'Members'})).toBeVisible();
   const child1Username = `c1_${id}`;
   const child2Username = `c2_${id}`;

@@ -134,4 +134,11 @@ export default {
   'pages.family.InviteMemberForm.parent': 'Parent',
   'pages.family.InviteMemberForm.child': 'Child',
   'pages.family.InviteMemberForm.send': 'Send',
+  // Icon titles
+  'icons.checkCircle.title': 'Check Circle Icon',
+  'icons.clock.title': "Ship's Clock Icon",
+  'icons.doc.title': 'Captain’s Log Icon',
+  'icons.infoCircle.title': 'Info Porthole Icon',
+  'icons.sparkles.title': 'Sparkles Icon',
+  'icons.trophy.title': 'Trophy Icon',
 };
