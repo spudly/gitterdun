@@ -11,8 +11,8 @@ describe('pageHeader', () => {
         title="Title"
       />,
     );
-    expect(screen.getByText('Title')).toBeInTheDocument();
-    expect(screen.getByText('Sub')).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: 'A'})).toBeInTheDocument();
+    expect(screen.getByText('Title')).toHaveTextContent('Title');
+    expect(screen.getByText('Sub')).toHaveTextContent('Sub');
+    expect(screen.getByRole('button', {name: 'A'})).toBeEnabled();
   });
 });

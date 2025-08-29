@@ -15,9 +15,9 @@ describe('formField', () => {
         <input id="email" />
       </FormField>,
     );
-    expect(screen.getByText('Email')).toBeInTheDocument();
-    expect(screen.getByText('*')).toBeInTheDocument();
-    expect(screen.getByText('help')).toBeInTheDocument();
+    expect(screen.getByText('Email')).toHaveTextContent('Email');
+    expect(screen.getByText('*')).toHaveTextContent('*');
+    expect(screen.getByText('help')).toHaveTextContent('help');
     expect(screen.getByRole('alert')).toHaveTextContent('err');
   });
 
@@ -27,6 +27,6 @@ describe('formField', () => {
         <input id="name" />
       </FormField>,
     );
-    expect(screen.getByText('Name')).toBeInTheDocument();
+    expect(screen.getByText('Name')).toHaveTextContent('Name');
   });
 });

@@ -5,19 +5,19 @@ import {Badge} from './Badge';
 describe('badge', () => {
   test('renders children', () => {
     render(<Badge variant="success">Yay</Badge>);
-    expect(screen.getByText('Yay')).toBeInTheDocument();
+    expect(screen.getByText('Yay')).toHaveTextContent('Yay');
   });
 
   test('handles other variants', () => {
     const {rerender} = render(<Badge variant="info">A</Badge>);
-    expect(screen.getByText('A')).toBeInTheDocument();
+    expect(screen.getByText('A')).toHaveTextContent('A');
     rerender(<Badge variant="warning">B</Badge>);
-    expect(screen.getByText('B')).toBeInTheDocument();
+    expect(screen.getByText('B')).toHaveTextContent('B');
     rerender(<Badge variant="danger">C</Badge>);
-    expect(screen.getByText('C')).toBeInTheDocument();
+    expect(screen.getByText('C')).toHaveTextContent('C');
     rerender(<Badge variant="purple">D</Badge>);
-    expect(screen.getByText('D')).toBeInTheDocument();
+    expect(screen.getByText('D')).toHaveTextContent('D');
     rerender(<Badge>Neutral</Badge>);
-    expect(screen.getByText('Neutral')).toBeInTheDocument();
+    expect(screen.getByText('Neutral')).toHaveTextContent('Neutral');
   });
 });

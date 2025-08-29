@@ -12,7 +12,7 @@ describe('status components', () => {
         <StatusDot color="green" label="ok" size={10} />
       </div>,
     );
-    expect(screen.getByText('Completed')).toBeInTheDocument();
+    expect(screen.getByText('Completed')).toHaveTextContent('Completed');
   });
 
   test('covers StatusBadge all statuses', () => {
@@ -23,7 +23,7 @@ describe('status components', () => {
     rerender(<StatusBadge status="pending">p</StatusBadge>);
     rerender(<StatusBadge status="completed">c</StatusBadge>);
     rerender(<StatusBadge status="approved">a</StatusBadge>);
-    expect(screen.getByText('a')).toBeInTheDocument();
+    expect(screen.getByText('a')).toHaveTextContent('a');
   });
 
   test('statusBadge helper covers all branches', () => {
@@ -39,9 +39,12 @@ describe('status components', () => {
 
   test('covers StatusDot all colors and unlabeled', () => {
     const {rerender} = render(<StatusDot color="blue" label="b" size={8} />);
+    expect(screen.getByRole('img', {name: 'b'})).toBeVisible();
     rerender(<StatusDot color="yellow" label="y" size={8} />);
+    expect(screen.getByRole('img', {name: 'y'})).toBeVisible();
     rerender(<StatusDot color="red" label="r" size={8} />);
+    expect(screen.getByRole('img', {name: 'r'})).toBeVisible();
     rerender(<StatusDot color="gray" size={8} />);
-    expect(document.querySelector('span')).toBeTruthy();
+    expect(screen.queryByRole('img')).toBeNull();
   });
 });

@@ -21,11 +21,11 @@ describe('rankingList & Podium', () => {
     const {rerender} = render(
       <RankingList items={items} subtitle="S" title="T" />,
     );
-    expect(screen.getByText('T')).toBeInTheDocument();
-    expect(screen.getByText('S')).toBeInTheDocument();
-    expect(screen.getByText('A')).toBeInTheDocument();
+    expect(screen.getByText('T')).toHaveTextContent('T');
+    expect(screen.getByText('S')).toHaveTextContent('S');
+    expect(screen.getByText('A')).toHaveTextContent('A');
     rerender(<RankingList items={items} showRank={false} />);
-    expect(screen.getByText('A')).toBeInTheDocument();
+    expect(screen.getByText('A')).toHaveTextContent('A');
   });
 
   test('renders podium medals and raw ranks', () => {
@@ -36,8 +36,8 @@ describe('rankingList & Podium', () => {
     ];
     const Wrapper = createWrapper({i18n: true});
     const {rerender} = render(<Podium items={items} />, {wrapper: Wrapper});
-    expect(screen.getByText('A')).toBeInTheDocument();
+    expect(screen.getByText('A')).toHaveTextContent('A');
     rerender(<Podium items={items} showMedals={false} />);
-    expect(screen.getByText('A')).toBeInTheDocument();
+    expect(screen.getByText('A')).toHaveTextContent('A');
   });
 });

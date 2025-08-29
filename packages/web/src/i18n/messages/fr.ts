@@ -150,4 +150,11 @@ export default {
   'pages.family.InviteMemberForm.parent': 'Parent',
   'pages.family.InviteMemberForm.child': 'Enfant',
   'pages.family.InviteMemberForm.send': 'Envoyer',
+  // Icon titles
+  'icons.checkCircle.title': 'Icône coche',
+  'icons.clock.title': 'Icône horloge',
+  'icons.doc.title': 'Icône document',
+  'icons.infoCircle.title': 'Icône information',
+  'icons.sparkles.title': 'Icône étincelles',
+  'icons.trophy.title': 'Icône trophée',
 };

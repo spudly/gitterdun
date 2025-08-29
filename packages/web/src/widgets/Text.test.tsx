@@ -17,8 +17,8 @@ describe('text', () => {
         <Text capitalize>cap words</Text>
       </>,
     );
-    expect(screen.getByText('Heading')).toBeInTheDocument();
-    expect(screen.getByText('Muted Upper')).toBeInTheDocument();
-    expect(screen.getByText('cap words')).toBeInTheDocument();
+    expect(screen.getByText('Heading')).toHaveTextContent('Heading');
+    expect(screen.getByText('Muted Upper')).toHaveTextContent('Muted Upper');
+    expect(screen.getByText('cap words')).toHaveTextContent('cap words');
   });
 });

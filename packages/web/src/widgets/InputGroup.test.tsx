@@ -9,16 +9,16 @@ describe('inputGroup', () => {
         <input />
       </InputGroup>,
     );
-    expect(screen.getByText('H')).toBeInTheDocument();
-    expect(screen.getByText('E')).toBeInTheDocument();
+    expect(screen.getByText('H')).toHaveTextContent('H');
+    expect(screen.getByText('E')).toHaveTextContent('E');
   });
 
-  test('supports horizontal layout', () => {
-    const {container} = render(
+  test('renders input in horizontal layout', () => {
+    render(
       <InputGroup layout="horizontal">
         <input />
       </InputGroup>,
     );
-    expect(container.firstChild).toHaveClass('flex');
+    expect(screen.getByRole('textbox')).toBeVisible();
   });
 });

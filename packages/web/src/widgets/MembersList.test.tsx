@@ -12,7 +12,7 @@ describe('membersList', () => {
       />,
       {wrapper: Wrapper},
     );
-    expect(screen.getByText(/U/u)).toBeInTheDocument();
-    expect(screen.getByText(/parent/u)).toBeInTheDocument();
+    expect(screen.getByText(/U/u)).toHaveTextContent('U');
+    expect(screen.getByText(/parent/u)).toHaveTextContent('parent');
   });
 });

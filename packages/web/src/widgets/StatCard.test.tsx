@@ -7,8 +7,8 @@ describe('statCard', () => {
     render(
       <StatCard color="blue" icon={<span>i</span>} label="L" value={123} />,
     );
-    expect(screen.getByText('L')).toBeInTheDocument();
-    expect(screen.getByText('123')).toBeInTheDocument();
+    expect(screen.getByText('L')).toHaveTextContent('L');
+    expect(screen.getByText('123')).toHaveTextContent('123');
   });
 
   test('covers color variants', () => {
@@ -17,14 +17,14 @@ describe('statCard', () => {
     rerender(<StatCard color="red" label="c" value="3" />);
     rerender(<StatCard color="purple" label="d" value="4" />);
     rerender(<StatCard color="gray" label="e" value="5" />);
-    expect(screen.getByText('e')).toBeInTheDocument();
-    expect(screen.getByText('5')).toBeInTheDocument();
+    expect(screen.getByText('e')).toHaveTextContent('e');
+    expect(screen.getByText('5')).toHaveTextContent('5');
   });
 
   test('uses default color when not provided', () => {
     render(<StatCard label="x" value="y" />);
-    expect(screen.getByText('x')).toBeInTheDocument();
-    expect(screen.getByText('y')).toBeInTheDocument();
+    expect(screen.getByText('x')).toHaveTextContent('x');
+    expect(screen.getByText('y')).toHaveTextContent('y');
   });
 
   test('helper covers all color branches', () => {

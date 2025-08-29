@@ -15,6 +15,7 @@ import gitterdunPlugin from 'eslint-plugin-gitterdun';
 import turboPlugin from 'eslint-plugin-turbo';
 import playwrightPlugin from 'eslint-plugin-playwright';
 import uiTestingPlugin from 'eslint-plugin-ui-testing';
+import testingLibraryPlugin from 'eslint-plugin-testing-library';
 
 const WORKSPACE_ROOT_DIR = dirname(fileURLToPath(import.meta.url));
 
@@ -25,7 +26,6 @@ const eslintConfig = [
       '**/build/**',
       '**/coverage/**',
       'node_modules/**',
-      'packages/eslint-plugin-i18n/**',
       '**/playwright-report/**',
     ],
   },
@@ -45,6 +45,7 @@ const eslintConfig = [
       turbo: turboPlugin,
       playwright: playwrightPlugin,
 
+      'testing-library': testingLibraryPlugin,
       'ui-testing': uiTestingPlugin,
     },
     files: ['**/*.{ts,tsx,js,jsx,cjs,mjs,mts,cts}'],
@@ -815,6 +816,37 @@ const eslintConfig = [
       'ui-testing/no-xpath-selector': 'off', // enabled later in this file, only for e2e tests
       'no-unassigned-vars': 'error',
       'no-useless-assignment': 'error',
+      'testing-library/await-async-events': 'off',
+      'testing-library/await-async-queries': 'off',
+      'testing-library/await-async-utils': 'off',
+      'testing-library/consistent-data-testid': 'off',
+      'testing-library/no-await-sync-events': 'off',
+      'testing-library/no-await-sync-queries': 'off',
+      'testing-library/no-container': 'off',
+      'testing-library/no-debugging-utils': 'off',
+      'testing-library/no-dom-import': 'off',
+      'testing-library/no-global-regexp-flag-in-query': 'off',
+      'testing-library/no-manual-cleanup': 'off',
+      'testing-library/no-node-access': 'off',
+      'testing-library/no-promise-in-fire-event': 'off',
+      'testing-library/no-render-in-lifecycle': 'off',
+      'testing-library/no-test-id-queries': 'off',
+      'testing-library/no-unnecessary-act': 'off',
+      'testing-library/no-wait-for-multiple-assertions': 'off',
+      'testing-library/no-wait-for-side-effects': 'off',
+      'testing-library/no-wait-for-snapshot': 'off',
+      'testing-library/prefer-explicit-assert': 'off',
+      'testing-library/prefer-find-by': 'off',
+      'testing-library/prefer-implicit-assert': 'off',
+      'testing-library/prefer-presence-queries': 'off',
+      'testing-library/prefer-query-by-disappearance': 'off',
+      'testing-library/prefer-query-matchers': 'off',
+      'testing-library/prefer-screen-queries': 'off',
+      'testing-library/prefer-user-event': 'off',
+      'testing-library/render-result-naming-convention': 'off',
+      'gitterdun/no-extra-i18n-messages': 'off', // enabled later in this file for i18n messages files
+      'gitterdun/no-missing-i18n-messages': 'off', // enabled later in this file for i18n messages files
+      'gitterdun/require-i18n-formatting': 'off', // enabled later in this file for tsx files
     },
   },
   {
@@ -1152,6 +1184,56 @@ const eslintConfig = [
       '@typescript-eslint/no-unsafe-argument': 'off', // we can be more loose in unit tests
       '@typescript-eslint/no-explicit-any': 'off', // we can be more loose in unit tests
       '@typescript-eslint/no-magic-numbers': 'off', // we can be more loose in unit tests
+      'testing-library/await-async-events': 'off', // handled by @typescript-eslint/no-floating-promises
+      'testing-library/await-async-queries': 'off', // handled by @typescript-eslint/no-floating-promises
+      'testing-library/await-async-utils': 'off', // handled by @typescript-eslint/no-floating-promises
+      'testing-library/consistent-data-testid': [
+        'error',
+        {
+          testIdPattern: '^{fileName}(\\.[a-z0-9]+)*$',
+          testIdAttribute: 'data-testid',
+        },
+      ],
+      'testing-library/no-await-sync-events': 'off', // handled by @typescript-eslint/await-thenable
+      'testing-library/no-await-sync-queries': 'off', // handled by @typescript-eslint/await-thenable
+      'testing-library/no-container': 'error',
+      'testing-library/no-debugging-utils': 'error',
+      'testing-library/no-dom-import': ['error', 'react'],
+      'testing-library/no-global-regexp-flag-in-query': 'error',
+      'testing-library/no-manual-cleanup': 'error',
+      'testing-library/no-node-access': 'error',
+      'testing-library/no-promise-in-fire-event': 'error',
+      'testing-library/no-render-in-lifecycle': 'error',
+      'testing-library/no-test-id-queries': 'off', // sometimes data-testid is necessary
+      'testing-library/no-unnecessary-act': 'error',
+      'testing-library/no-wait-for-multiple-assertions': 'error',
+      'testing-library/no-wait-for-side-effects': 'error',
+      'testing-library/no-wait-for-snapshot': 'error',
+      'testing-library/prefer-explicit-assert': 'off', // handled by jest/expect-expect
+      'testing-library/prefer-find-by': 'error',
+      'testing-library/prefer-implicit-assert': 'error',
+      'testing-library/prefer-presence-queries': 'error',
+      'testing-library/prefer-query-by-disappearance': 'error',
+      'testing-library/prefer-query-matchers': [
+        'error',
+        {
+          validEntries: [
+            {query: 'get', matcher: 'toBeInTheDocument'},
+            {query: 'get', matcher: 'toBeVisible'},
+            {query: 'get', matcher: 'toBeEnabled'},
+            {query: 'get', matcher: 'toBeDisabled'},
+            {query: 'get', matcher: 'toHaveAccessibleName'},
+            {query: 'get', matcher: 'toHaveTextContent'},
+            {query: 'get', matcher: 'toHaveValue'},
+            {query: 'get', matcher: 'toHaveAttribute'},
+            {query: 'get', matcher: 'toHaveClass'},
+            {query: 'query', matcher: 'toBeNull'},
+          ],
+        },
+      ],
+      'testing-library/prefer-screen-queries': 'error',
+      'testing-library/prefer-user-event': 'error',
+      'testing-library/render-result-naming-convention': 'error',
     },
   },
   {files: ['**/scripts/**'], rules: {'no-console': 'off'}},
@@ -1165,6 +1247,7 @@ const eslintConfig = [
       '**/e2e/**/*.test.tsx',
       '**/e2e/**/*.spec.ts',
       '**/e2e/**/*.spec.tsx',
+      '**/e2e/tests/**/*',
     ],
     rules: {
       'jest/consistent-test-it': 'off', // not a jest test
@@ -1230,6 +1313,34 @@ const eslintConfig = [
       'jest/valid-expect-in-promise': 'off', // not a jest test
       'jest/valid-expect': 'off', // not a jest test
       'jest/valid-title': 'off', // not a jest test
+      'testing-library/await-async-events': 'off', // not a jest/testing-library test
+      'testing-library/await-async-queries': 'off', // not a jest/testing-library test
+      'testing-library/await-async-utils': 'off', // not a jest/testing-library test
+      'testing-library/consistent-data-testid': 'off', // not a jest/testing-library test
+      'testing-library/no-await-sync-events': 'off', // not a jest/testing-library test
+      'testing-library/no-await-sync-queries': 'off', // not a jest/testing-library test
+      'testing-library/no-container': 'off', // not a jest/testing-library test
+      'testing-library/no-debugging-utils': 'off', // not a jest/testing-library test
+      'testing-library/no-dom-import': 'off', // not a jest/testing-library test
+      'testing-library/no-global-regexp-flag-in-query': 'off', // not a jest/testing-library test
+      'testing-library/no-manual-cleanup': 'off', // not a jest/testing-library test
+      'testing-library/no-node-access': 'off', // not a jest/testing-library test
+      'testing-library/no-promise-in-fire-event': 'off', // not a jest/testing-library test
+      'testing-library/no-render-in-lifecycle': 'off', // not a jest/testing-library test
+      'testing-library/no-test-id-queries': 'off', // not a jest/testing-library test
+      'testing-library/no-unnecessary-act': 'off', // not a jest/testing-library test
+      'testing-library/no-wait-for-multiple-assertions': 'off', // not a jest/testing-library test
+      'testing-library/no-wait-for-side-effects': 'off', // not a jest/testing-library test
+      'testing-library/no-wait-for-snapshot': 'off', // not a jest/testing-library test
+      'testing-library/prefer-explicit-assert': 'off', // not a jest/testing-library test
+      'testing-library/prefer-find-by': 'off', // not a jest/testing-library test
+      'testing-library/prefer-implicit-assert': 'off', // not a jest/testing-library test
+      'testing-library/prefer-presence-queries': 'off', // not a jest/testing-library test
+      'testing-library/prefer-query-by-disappearance': 'off', // not a jest/testing-library test
+      'testing-library/prefer-query-matchers': 'off', // not a jest/testing-library test
+      'testing-library/prefer-screen-queries': 'off', // not a jest/testing-library test
+      'testing-library/prefer-user-event': 'off', // not a jest/testing-library test
+      'testing-library/render-result-naming-convention': 'off', // not a jest/testing-library test
       'playwright/expect-expect': 'error',
       'playwright/max-expects': 'off', //testing multiple things is good for e2e performance
       'playwright/max-nested-describe': 'error',

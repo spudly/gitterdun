@@ -12,12 +12,14 @@ describe('landing page', () => {
     render(<Landing />, {wrapper: Wrapper});
     expect(
       screen.getByRole('heading', {name: /welcome to gitterdun/i}),
-    ).toBeInTheDocument();
+    ).toHaveTextContent(/welcome to gitterdun/i);
     expect(
       screen.getByText(
         /organize chores\. motivate your family\. have fun together\./i,
       ),
-    ).toBeInTheDocument();
+    ).toHaveTextContent(
+      /organize chores\. motivate your family\. have fun together\./i,
+    );
     expect(screen.getByRole('link', {name: /login/i})).toHaveAttribute(
       'href',
       '/login',

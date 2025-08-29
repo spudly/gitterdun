@@ -1,5 +1,5 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {Modal, isOverlayKey, shouldCloseOnOverlayClick} from './Modal';
 
@@ -11,8 +11,8 @@ describe('modal', () => {
         <div>Body</div>
       </Modal>,
     );
-    expect(screen.getByText('M')).toBeInTheDocument();
-    expect(screen.getByText('Body')).toBeInTheDocument();
+    expect(screen.getByText('M')).toHaveTextContent('M');
+    expect(screen.getByText('Body')).toHaveTextContent('Body');
     const overlay = screen.getByRole('button', {name: 'Close modal'});
     await userEvent.click(overlay);
     await userEvent.keyboard('{Escape}');
@@ -28,7 +28,7 @@ describe('modal', () => {
         <div>Body</div>
       </Modal>,
     );
-    expect(document.querySelector('.fixed')).toBeNull();
+    expect(screen.queryByRole('button', {name: 'Close modal'})).toBeNull();
     rerender(
       <Modal
         closeOnOverlayClick={false}
@@ -97,9 +97,9 @@ describe('modal', () => {
         <div>Body</div>
       </Modal>,
     );
-    const overlay = screen.getByRole('button', {name: 'Close modal'});
+    const overlayButton = screen.getByRole('button', {name: 'Close modal'});
     // Triggers onKeyDown branch and should close because closeOnOverlayClick=true
-    overlay.focus();
+    overlayButton.focus();
     await userEvent.keyboard('{Enter}');
     expect(onClose).toHaveBeenCalledWith();
   });
@@ -116,9 +116,10 @@ describe('modal', () => {
         <div>Body</div>
       </Modal>,
     );
-    const overlay = screen.getByRole('button', {name: 'Close modal'});
+    const overlayButton = screen.getByRole('button', {name: 'Close modal'});
     // Use a key that is not handled by isOverlayKey and is not Escape
-    fireEvent.keyDown(overlay, {key: 'A'});
+    overlayButton.focus();
+    await userEvent.keyboard('A');
     expect(onClose).not.toHaveBeenCalled();
   });
 });
