@@ -50,7 +50,7 @@ describe('register page', () => {
     await userEvent.type(screen.getByLabelText(/email/i), 'new@user.com');
     await userEvent.type(screen.getByLabelText(/password/i), 'password1');
     await userEvent.click(screen.getByRole('button', {name: /register/i}));
-    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
   test('submits without email (email optional)', async () => {

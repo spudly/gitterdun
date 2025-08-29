@@ -67,7 +67,7 @@ describe('family page', () => {
     expect(screen.getAllByRole('button', {name: 'Create'})[0]).toBeEnabled();
 
     // No selector now; create-only when no family
-    expect(screen.queryByRole('combobox')).toBeNull();
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
   });
 
   test('provides complete family management functionality when family is selected', async () => {

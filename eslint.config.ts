@@ -16,6 +16,7 @@ import turboPlugin from 'eslint-plugin-turbo';
 import playwrightPlugin from 'eslint-plugin-playwright';
 import uiTestingPlugin from 'eslint-plugin-ui-testing';
 import testingLibraryPlugin from 'eslint-plugin-testing-library';
+import jestDomPlugin from 'eslint-plugin-jest-dom';
 
 const WORKSPACE_ROOT_DIR = dirname(fileURLToPath(import.meta.url));
 
@@ -44,7 +45,7 @@ const eslintConfig = [
       gitterdun: gitterdunPlugin,
       turbo: turboPlugin,
       playwright: playwrightPlugin,
-
+      'jest-dom': jestDomPlugin,
       'testing-library': testingLibraryPlugin,
       'ui-testing': uiTestingPlugin,
     },
@@ -740,6 +741,17 @@ const eslintConfig = [
       'jest/valid-expect': 'off', // for tests only
       'jest/valid-expect-in-promise': 'off', // for tests only
       'jest/valid-title': 'off', // for tests only
+      'jest-dom/prefer-checked': 'error',
+      'jest-dom/prefer-empty': 'error',
+      'jest-dom/prefer-enabled-disabled': 'error',
+      'jest-dom/prefer-focus': 'error',
+      'jest-dom/prefer-in-document': 'error',
+      'jest-dom/prefer-required': 'error',
+      'jest-dom/prefer-to-have-attribute': 'error',
+      'jest-dom/prefer-to-have-class': 'error',
+      'jest-dom/prefer-to-have-style': 'error',
+      'jest-dom/prefer-to-have-text-content': 'error',
+      'jest-dom/prefer-to-have-value': 'error',
       'tailwindcss/classnames-order': 'off', // using prettier-plugin-tailwindcss for this
       'tailwindcss/enforces-negative-arbitrary-values': 'error',
       'tailwindcss/enforces-shorthand': 'error',
@@ -1218,7 +1230,6 @@ const eslintConfig = [
         'error',
         {
           validEntries: [
-            {query: 'get', matcher: 'toBeInTheDocument'},
             {query: 'get', matcher: 'toBeVisible'},
             {query: 'get', matcher: 'toBeEnabled'},
             {query: 'get', matcher: 'toBeDisabled'},

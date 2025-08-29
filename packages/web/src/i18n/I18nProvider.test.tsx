@@ -52,7 +52,7 @@ describe('i18nProvider', () => {
     );
 
     // English should show a playful tagline
-    expect(screen.getByRole('heading', {level: 2}).textContent).toMatch(
+    expect(screen.getByRole('heading', {level: 2})).toHaveTextContent(
       /Chore Wrangler/i,
     );
 
@@ -61,7 +61,7 @@ describe('i18nProvider', () => {
 
     // Tagline should update to pirate speak
     await waitFor(() => {
-      expect(screen.getByRole('heading', {level: 2}).textContent).toMatch(
+      expect(screen.getByRole('heading', {level: 2})).toHaveTextContent(
         /Chore Plunderin'|Chore Plunderin’/i,
       );
     });
@@ -78,7 +78,7 @@ describe('i18nProvider', () => {
     screen.getByRole('button', {name: 'fr'}).click();
 
     await waitFor(() => {
-      expect(screen.getByRole('heading', {level: 2}).textContent).toMatch(
+      expect(screen.getByRole('heading', {level: 2})).toHaveTextContent(
         /Dompteur de corvées/i,
       );
     });
@@ -94,7 +94,7 @@ describe('i18nProvider', () => {
     screen.getByRole('button', {name: 'deseret'}).click();
 
     await waitFor(() => {
-      expect(screen.getByRole('heading', {level: 2}).textContent).toMatch(
+      expect(screen.getByRole('heading', {level: 2})).toHaveTextContent(
         /𐐗𐐬𐐡 𐐎𐐪𐐡𐐨𐐯𐐡𐐮𐐡/i,
       );
     });

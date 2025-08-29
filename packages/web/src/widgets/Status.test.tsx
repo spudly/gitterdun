@@ -45,6 +45,6 @@ describe('status components', () => {
     rerender(<StatusDot color="red" label="r" size={8} />);
     expect(screen.getByRole('img', {name: 'r'})).toBeVisible();
     rerender(<StatusDot color="gray" size={8} />);
-    expect(screen.queryByRole('img')).toBeNull();
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 });

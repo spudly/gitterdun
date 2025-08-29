@@ -54,12 +54,18 @@ describe('admin page', () => {
       'Admin Panel',
     );
 
-    expect(screen.queryByText('Family Management')).toBeNull();
-    expect(screen.queryByPlaceholderText('Family name')).toBeNull();
-    expect(screen.queryByRole('button', {name: 'Create Family'})).toBeNull();
-    expect(screen.queryByPlaceholderText('Family ID')).toBeNull();
-    expect(screen.queryByRole('button', {name: 'Invite'})).toBeNull();
-    expect(screen.queryByText('Chores Management')).toBeNull();
+    expect(screen.queryByText('Family Management')).not.toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText('Family name'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', {name: 'Create Family'}),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('Family ID')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', {name: 'Invite'}),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Chores Management')).not.toBeInTheDocument();
   });
 
   test('denies access for non-admin users', () => {
