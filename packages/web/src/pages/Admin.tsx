@@ -127,12 +127,18 @@ const Admin: FC = () => {
                 value={title}
               />
               <input
-                aria-label={intl.formatMessage(messages.titlePlaceholder)}
+                aria-label={intl.formatMessage({
+                  defaultMessage: 'Points',
+                  id: 'widgets.Layout.points',
+                })}
                 onChange={event => {
                   const next = Number(event.target.value);
                   setPoints(Number.isNaN(next) ? 0 : next);
                 }}
-                placeholder={intl.formatMessage(messages.titlePlaceholder)}
+                placeholder={intl.formatMessage({
+                  defaultMessage: 'Points',
+                  id: 'widgets.Layout.points',
+                })}
                 type="number"
                 value={points}
               />
