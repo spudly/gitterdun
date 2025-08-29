@@ -71,11 +71,11 @@ describe('<Heading />', () => {
 
     test('allows parent to control spacing via external classes', () => {
       render(
-        <div aria-label="container" className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4" data-testid="Heading.container">
           <Heading level={2}>Externally Spaced</Heading>
         </div>,
       );
-      expect(screen.getByLabelText('container')).toHaveClass('gap-4');
+      expect(screen.getByTestId('Heading.container')).toHaveClass('gap-4');
     });
   });
 

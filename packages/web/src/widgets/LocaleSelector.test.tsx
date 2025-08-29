@@ -15,7 +15,7 @@ describe('localeSelector', () => {
       const {locale, setLocale} = useI18n();
       return (
         <div>
-          <span aria-label="locale">{locale}</span>
+          <span data-testid="LocaleSelector.locale">{locale}</span>
           <LocaleSelector
             onChange={next => {
               setLocale(next);
@@ -33,6 +33,8 @@ describe('localeSelector', () => {
     // The menu should be visible now that it's open
     expect(screen.getByRole('menu')).toBeVisible();
     await user.click(screen.getByRole('menuitemradio', {name: /pirate/i}));
-    expect(screen.getByLabelText('locale').textContent).toBe('pirate');
+    expect(screen.getByTestId('LocaleSelector.locale').textContent).toBe(
+      'pirate',
+    );
   });
 });

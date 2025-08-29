@@ -1190,7 +1190,7 @@ const eslintConfig = [
       'testing-library/consistent-data-testid': [
         'error',
         {
-          testIdPattern: '^{fileName}(-[a-z0-9]+)*$',
+          testIdPattern: '^{fileName}(\\.[a-z0-9]+)*$',
           testIdAttribute: 'data-testid',
         },
       ],

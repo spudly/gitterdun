@@ -128,7 +128,7 @@ describe('login page', () => {
   test('navigates to root on successful submit', async () => {
     const LocationProbe = () => {
       const loc = useLocation();
-      return <div aria-label="location">{loc.pathname}</div>;
+      return <div data-testid="Login.location">{loc.pathname}</div>;
     };
     const Wrapper = createWrapper({
       i18n: true,
@@ -145,7 +145,7 @@ describe('login page', () => {
     await userEvent.type(screen.getByLabelText(/password/iu), 'pw');
     await userEvent.click(screen.getByRole('button', {name: 'Login'}));
     await waitFor(() => {
-      expect(screen.getByLabelText('location').textContent).toBe('/');
+      expect(screen.getByTestId('Login.location').textContent).toBe('/');
     });
   });
 });
