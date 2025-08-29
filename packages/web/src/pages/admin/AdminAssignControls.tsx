@@ -70,19 +70,17 @@ export const AdminAssignControls: FC<AdminAssignControlsProps> = ({
 
       {isOpen ? (
         <>
-          <label htmlFor={`assignee-${choreId}`}>
+          <label>
             {intl.formatMessage({
               defaultMessage: 'Assignee',
               id: 'pages.admin.AdminChoresManagement.assignee',
             })}
-          </label>
-          <select
-            id={`assignee-${choreId}`}
-            onChange={event => {
-              setSelectedUsername(event.target.value);
-            }}
-            value={selectedUsername}
-          >
+            <select
+              onChange={event => {
+                setSelectedUsername(event.target.value);
+              }}
+              value={selectedUsername}
+            >
               <option value="" />
               {((membersQuery.data?.data ?? []) as Array<{
                 user_id: number;
@@ -95,7 +93,8 @@ export const AdminAssignControls: FC<AdminAssignControlsProps> = ({
                     {member.username}
                   </option>
                 ))}
-          </select>
+            </select>
+          </label>
           <Button
             onClick={() => {
               if (selectedUsername !== '') {
