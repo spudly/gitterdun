@@ -1,7 +1,7 @@
 import type {FC} from 'react';
 import {useState} from 'react';
 import {useMutation, useQuery} from '@tanstack/react-query';
-import {FormattedMessage} from 'react-intl';
+import {FormattedMessage, useIntl} from 'react-intl';
 import {familiesApi} from '../../lib/familiesApi.js';
 import {choresApi} from '../../lib/api.js';
 // using native select here to satisfy a11y lint rules
@@ -16,6 +16,7 @@ export const AdminAssignControls: FC<AdminAssignControlsProps> = ({
   choreId,
   onAssigned,
 }) => {
+  const intl = useIntl();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedUsername, setSelectedUsername] = useState<string>('');
 
@@ -69,33 +70,36 @@ export const AdminAssignControls: FC<AdminAssignControlsProps> = ({
 
       {isOpen ? (
         <>
-          <label htmlFor={`assignee-${choreId}`} id={`assignee-label-${choreId}`}>
-            <FormattedMessage
-              defaultMessage="Assignee"
-              id="pages.admin.AdminChoresManagement.assignee"
-            />
+          <label>
+            {intl.formatMessage({
+              defaultMessage: 'Assignee',
+              id: 'pages.admin.AdminChoresManagement.assignee',
+            })}
           </label>
-          <select
-            aria-labelledby={`assignee-label-${choreId}`}
-            id={`assignee-${choreId}`}
-            onChange={event => {
-              setSelectedUsername(event.target.value);
-            }}
-            value={selectedUsername}
-          >
-            <option value="" />
-            {((membersQuery.data?.data ?? []) as Array<{
-              user_id: number;
-              username: string;
-              role: string;
-            }>)
-              .filter(member => member.role === 'child')
-              .map(member => (
-                <option key={member.user_id} value={member.username}>
-                  {member.username}
-                </option>
-              ))}
-          </select>
+            <select
+              aria-label={intl.formatMessage({
+                defaultMessage: 'Assignee',
+                id: 'pages.admin.AdminChoresManagement.assignee',
+              })}
+              onChange={event => {
+                setSelectedUsername(event.target.value);
+              }}
+              value={selectedUsername}
+            >
+              <option value="" />
+              {((membersQuery.data?.data ?? []) as Array<{
+                user_id: number;
+                username: string;
+                role: string;
+              }>)
+                .filter(member => member.role === 'child')
+                .map(member => (
+                  <option key={member.user_id} value={member.username}>
+                    {member.username}
+                  </option>
+                ))}
+            </select>
+          </label>
           <Button
             onClick={() => {
               if (selectedUsername !== '') {
