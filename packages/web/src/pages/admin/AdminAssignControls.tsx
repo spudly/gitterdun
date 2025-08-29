@@ -70,12 +70,15 @@ export const AdminAssignControls: FC<AdminAssignControlsProps> = ({
 
       {isOpen ? (
         <>
-          <label>
-            {intl.formatMessage({
-              defaultMessage: 'Assignee',
-              id: 'pages.admin.AdminChoresManagement.assignee',
-            })}
+          <div>
+            <span id={`assignee-label-${choreId}`}>
+              {intl.formatMessage({
+                defaultMessage: 'Assignee',
+                id: 'pages.admin.AdminChoresManagement.assignee',
+              })}
+            </span>
             <select
+              aria-labelledby={`assignee-label-${choreId}`}
               onChange={event => {
                 setSelectedUsername(event.target.value);
               }}
@@ -94,7 +97,7 @@ export const AdminAssignControls: FC<AdminAssignControlsProps> = ({
                   </option>
                 ))}
             </select>
-          </label>
+          </div>
           <Button
             onClick={() => {
               if (selectedUsername !== '') {
