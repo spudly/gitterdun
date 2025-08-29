@@ -63,10 +63,13 @@ const filterByGlobs = (
 };
 
 const ID_PATTERNS: Array<RegExp> = [
-  /(?:get|find|query)(?:All)?ByTestId\s*\(\s*'(?<id>[^'"\n\r]+)'\s*\)/g,
+  // Single-quoted: allow embedded double quotes
+  /(?:get|find|query)(?:All)?ByTestId\s*\(\s*'(?<id>[^'\n\r]+)'\s*\)/g,
+  // Double-quoted: allow embedded single quotes
   /(?:get|find|query)(?:All)?ByTestId\s*\(\s*"(?<id>[^"\n\r]+)"\s*\)/g,
-  /\[\s*data-testid\s*=\s*"(?<id>[^"]+)"\s*\]/g,
-  /\[\s*data-testid\s*=\s*'(?<id>[^']+)'\s*\]/g,
+  // CSS attribute selectors
+  /\[\s*data-testid\s*=\s*"(?<id>[^"\n\r]+)"\s*\]/g,
+  /\[\s*data-testid\s*=\s*'(?<id>[^'\n\r]+)'\s*\]/g,
   /\[\s*data-testid\s*=\s*(?<id>[^\]"'\s]+)\s*\]/g,
 ];
 

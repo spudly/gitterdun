@@ -82,6 +82,16 @@ ruleTester.run(
         code: `<div data-testid={dynamicId} />`,
         options: [{testFileGlobs}],
       },
+      {
+        filename: '/project/packages/web/src/Component.tsx',
+        code: `<div data-testid='has-"quotes"' />`,
+        options: [{testFileGlobs}],
+      },
+      {
+        filename: '/project/packages/web/src/Component.tsx',
+        code: `<div data-testid="has-'quotes'" />`,
+        options: [{testFileGlobs}],
+      },
     ],
     invalid: [
       {
