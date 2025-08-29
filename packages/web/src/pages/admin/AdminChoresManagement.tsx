@@ -26,7 +26,9 @@ export const AdminChoresManagement: FC<AdminChoresManagementProps> = ({
   const queryClient = useQueryClient();
   const [assigningChoreId, setAssigningChoreId] = useState<number | null>(null);
   const [selectedUsername, setSelectedUsername] = useState<string>('');
-  const [assignedToMap, setAssignedToMap] = useState<Record<number, string>>({});
+  const [assignedToMap, setAssignedToMap] = useState<Record<number, string>>(
+    {},
+  );
 
   const myFamilyQuery = useQuery({
     queryKey: ['family', 'mine'],
@@ -55,15 +57,22 @@ export const AdminChoresManagement: FC<AdminChoresManagementProps> = ({
   });
   const assignMutation = useMutation({
     mutationFn: async (params: {choreId: number; username: string}) => {
-      const entry = (membersQuery.data?.data as Array<
-        {user_id: number; username: string; role: string}
-      >).find(m => m.username === params.username);
+      const entry = (
+        membersQuery.data?.data as Array<{
+          user_id: number;
+          username: string;
+          role: string;
+        }>
+      ).find(m => m.username === params.username);
       if (entry) {
         await choresApi.assign(params.choreId, {userId: entry.user_id});
       }
     },
     onSuccess: async (_data, variables) => {
-      setAssignedToMap(prev => ({...prev, [variables.choreId]: variables.username}));
+      setAssignedToMap(prev => ({
+        ...prev,
+        [variables.choreId]: variables.username,
+      }));
       setAssigningChoreId(null);
     },
   });
@@ -204,9 +213,13 @@ export const AdminChoresManagement: FC<AdminChoresManagementProps> = ({
                       value={selectedUsername}
                     >
                       <option value="" />
-                      {((membersQuery.data?.data as Array<
-                        {user_id: number; username: string; role: string}
-                      >) ?? [])
+                      {(
+                        (membersQuery.data?.data as Array<{
+                          user_id: number;
+                          username: string;
+                          role: string;
+                        }>) ?? []
+                      )
                         .filter(m => m.role === 'child')
                         .map(member => (
                           <option key={member.user_id} value={member.username}>
