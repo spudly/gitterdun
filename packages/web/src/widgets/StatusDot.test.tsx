@@ -5,7 +5,9 @@ import {StatusDot, getDotColorClass} from './StatusDot';
 describe('statusDot', () => {
   test('renders with label (role=img) and without', () => {
     const {rerender} = render(<StatusDot color="red" label="alert" size={8} />);
-    expect(screen.getByRole('img', {name: 'alert'})).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: 'alert'})).toHaveAccessibleName(
+      'alert',
+    );
     rerender(<StatusDot color="gray" size={6} />);
     // no role when no label
     expect(screen.queryByRole('img')).toBeNull();
@@ -30,7 +32,8 @@ describe('statusDot', () => {
   });
 
   test('component default color path', () => {
-    const {container} = render(<StatusDot />);
-    expect(container.firstChild).toBeInTheDocument();
+    render(<StatusDot />);
+    // assert that no labelled image exists when no label provided
+    expect(screen.queryByRole('img')).toBeNull();
   });
 });

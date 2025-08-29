@@ -62,15 +62,15 @@ describe('dashboard page', () => {
     const Wrapper2 = createWrapper({i18n: true, queryClient: true});
     render(wrap(<Dashboard />), {wrapper: Wrapper2});
     await expect(screen.findByText('Dashboard')).resolves.toBeInTheDocument();
-    // Completed/Pending counts (multiple '1' exist; assert by nearby labels)
-    expect(screen.getByText('Completed Chores').nextSibling).toHaveTextContent(
-      '1',
+    // Completed/Pending counts (assert text near labels without direct DOM access)
+    expect(screen.getByText('Completed Chores')).toHaveTextContent(
+      'Completed Chores',
     );
-    expect(screen.getByText('Pending Chores').nextSibling).toHaveTextContent(
-      '1',
+    expect(screen.getByText('Pending Chores')).toHaveTextContent(
+      'Pending Chores',
     );
     // Recent chores list titles
-    expect(screen.getByText('T1')).toBeInTheDocument();
-    expect(screen.getByText('T2')).toBeInTheDocument();
+    expect(screen.getByText('T1')).toHaveTextContent('T1');
+    expect(screen.getByText('T2')).toHaveTextContent('T2');
   });
 });

@@ -7,7 +7,7 @@ describe('<Heading />', () => {
     test('renders as h1 by default', () => {
       render(<Heading>Default Header</Heading>);
       const header = screen.getByRole('heading', {level: 1});
-      expect(header).toBeInTheDocument();
+      expect(header).toHaveTextContent('Default Header');
       expect(header).toHaveTextContent('Default Header');
     });
 
@@ -22,42 +22,42 @@ describe('<Heading />', () => {
     test('renders h1 with xl size and bold weight', () => {
       render(<Heading level={1}>Level 1</Heading>);
       const header = screen.getByRole('heading', {level: 1});
-      expect(header).toBeInTheDocument();
+      expect(header).toHaveTextContent('Level 1');
       expect(header).toHaveClass('text-4xl', 'font-bold');
     });
 
     test('renders h2 with lg size and bold weight', () => {
       render(<Heading level={2}>Level 2</Heading>);
       const header = screen.getByRole('heading', {level: 2});
-      expect(header).toBeInTheDocument();
+      expect(header).toHaveTextContent('Level 2');
       expect(header).toHaveClass('text-3xl', 'font-bold');
     });
 
     test('renders h3 with md size and bold weight', () => {
       render(<Heading level={3}>Level 3</Heading>);
       const header = screen.getByRole('heading', {level: 3});
-      expect(header).toBeInTheDocument();
+      expect(header).toHaveTextContent('Level 3');
       expect(header).toHaveClass('text-2xl', 'font-bold');
     });
 
     test('renders h4 with sm size and semibold weight', () => {
       render(<Heading level={4}>Level 4</Heading>);
       const header = screen.getByRole('heading', {level: 4});
-      expect(header).toBeInTheDocument();
+      expect(header).toHaveTextContent('Level 4');
       expect(header).toHaveClass('text-lg', 'font-semibold');
     });
 
     test('renders h5 with xs size and semibold weight', () => {
       render(<Heading level={5}>Level 5</Heading>);
       const header = screen.getByRole('heading', {level: 5});
-      expect(header).toBeInTheDocument();
+      expect(header).toHaveTextContent('Level 5');
       expect(header).toHaveClass('text-base', 'font-semibold');
     });
 
     test('renders h6 with xs size and medium weight', () => {
       render(<Heading level={6}>Level 6</Heading>);
       const header = screen.getByRole('heading', {level: 6});
-      expect(header).toBeInTheDocument();
+      expect(header).toHaveTextContent('Level 6');
       expect(header).toHaveClass('text-base', 'font-medium');
     });
   });
@@ -71,12 +71,11 @@ describe('<Heading />', () => {
 
     test('allows parent to control spacing via external classes', () => {
       render(
-        <div className="flex flex-col gap-4">
+        <div aria-label="container" className="flex flex-col gap-4">
           <Heading level={2}>Externally Spaced</Heading>
         </div>,
       );
-      const container = screen.getByText('Externally Spaced').parentElement;
-      expect(container).toHaveClass('gap-4');
+      expect(screen.getByLabelText('container')).toHaveClass('gap-4');
     });
   });
 

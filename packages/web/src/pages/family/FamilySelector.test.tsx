@@ -1,5 +1,6 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {fireEvent, render, screen} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {FamilySelector} from './FamilySelector';
 import {createWrapper} from '../../test/createWrapper';
 
@@ -27,12 +28,12 @@ describe('<FamilySelector />', () => {
 
     expect(
       screen.getByRole('option', {name: 'Choose a family'}),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: 'Create'})).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('New family name')).toBeInTheDocument();
+    ).toHaveTextContent('Choose a family');
+    expect(screen.getByRole('button', {name: 'Create'})).toBeEnabled();
+    expect(screen.getByPlaceholderText('New family name')).toBeVisible();
   });
 
-  test('selects a family and creates when valid', () => {
+  test('selects a family and creates when valid', async () => {
     const onFamilySelect = jest.fn();
     const onNewFamilyNameChange = jest.fn();
     const onCreateFamily = jest.fn();
@@ -48,10 +49,10 @@ describe('<FamilySelector />', () => {
       {wrapper: createWrapper({i18n: true})},
     );
 
-    fireEvent.change(screen.getByRole('combobox'), {target: {value: '2'}});
+    await userEvent.selectOptions(screen.getByRole('combobox'), '2');
     expect(onFamilySelect).toHaveBeenCalledWith(2);
 
-    fireEvent.click(screen.getByRole('button', {name: 'Create'}));
+    await userEvent.click(screen.getByRole('button', {name: 'Create'}));
     expect(onCreateFamily).toHaveBeenCalledWith();
   });
 });

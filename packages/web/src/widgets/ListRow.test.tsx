@@ -14,16 +14,16 @@ describe('listRow', () => {
         titleRight={<span>TR</span>}
       />,
     );
-    expect(screen.getByText('L')).toBeInTheDocument();
-    expect(screen.getByText('Title')).toBeInTheDocument();
-    expect(screen.getByText('TR')).toBeInTheDocument();
-    expect(screen.getByText('Desc')).toBeInTheDocument();
-    expect(screen.getByText('M')).toBeInTheDocument();
-    expect(screen.getByText('R')).toBeInTheDocument();
+    expect(screen.getByText('L')).toHaveTextContent('L');
+    expect(screen.getByText('Title')).toHaveTextContent('Title');
+    expect(screen.getByText('TR')).toHaveTextContent('TR');
+    expect(screen.getByText('Desc')).toHaveTextContent('Desc');
+    expect(screen.getByText('M')).toHaveTextContent('M');
+    expect(screen.getByText('R')).toHaveTextContent('R');
   });
 
   test('renders minimal', () => {
     render(<ListRow title="Only" />);
-    expect(screen.getByText('Only')).toBeInTheDocument();
+    expect(screen.getByText('Only')).toHaveTextContent('Only');
   });
 });

@@ -9,8 +9,8 @@ describe('sectionHeader', () => {
         <button type="button">C</button>
       </SectionHeader>,
     );
-    expect(screen.getByText('T')).toBeInTheDocument();
-    expect(screen.getByText('S')).toBeInTheDocument();
-    expect(screen.getByText('C')).toBeInTheDocument();
+    expect(screen.getByText('T')).toHaveTextContent('T');
+    expect(screen.getByText('S')).toHaveTextContent('S');
+    expect(screen.getByText('C')).toHaveTextContent('C');
   });
 });

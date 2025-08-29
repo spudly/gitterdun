@@ -12,8 +12,8 @@ describe('emptyState', () => {
         title="T"
       />,
     );
-    expect(screen.getByText('T')).toBeInTheDocument();
-    expect(screen.getByText('D')).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: 'A'})).toBeInTheDocument();
+    expect(screen.getByText('T')).toHaveTextContent('T');
+    expect(screen.getByText('D')).toHaveTextContent('D');
+    expect(screen.getByRole('button', {name: 'A'})).toBeEnabled();
   });
 });

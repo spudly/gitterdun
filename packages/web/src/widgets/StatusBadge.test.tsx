@@ -9,7 +9,7 @@ describe('statusBadge', () => {
         Info
       </StatusBadge>,
     );
-    expect(screen.getByText('Info')).toBeInTheDocument();
+    expect(screen.getByText('Info')).toHaveTextContent('Info');
   });
 
   test('helper default branch returns info styles', () => {
@@ -21,6 +21,6 @@ describe('statusBadge', () => {
 
   test('renders status text when children not provided', () => {
     render(<StatusBadge status="warning" />);
-    expect(screen.getByText('warning')).toBeInTheDocument();
+    expect(screen.getByText('warning')).toHaveTextContent('warning');
   });
 });

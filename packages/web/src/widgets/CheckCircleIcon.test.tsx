@@ -1,10 +1,12 @@
 import {describe, expect, test} from '@jest/globals';
-import {render} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
+import {createWrapper} from '../test/createWrapper';
 import {CheckCircleIcon} from './icons';
 
 describe('checkCircleIcon', () => {
   test('renders an svg', () => {
-    render(<CheckCircleIcon />);
-    expect(document.querySelectorAll('svg')).toHaveLength(1);
+    render(<CheckCircleIcon />, {wrapper: createWrapper({i18n: true})});
+    const svg = screen.getByLabelText('Check Circle Icon');
+    expect(svg).toHaveAttribute('viewBox', '0 0 24 24');
   });
 });

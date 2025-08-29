@@ -39,7 +39,9 @@ describe('acceptInvitation page', () => {
       </ToastProvider>,
       {wrapper: Wrapper},
     );
-    expect(screen.getByText('Missing token.')).toBeInTheDocument();
+    expect(screen.getByText('Missing token.')).toHaveTextContent(
+      'Missing token.',
+    );
   });
 
   test('renders form with valid token', () => {
@@ -55,11 +57,11 @@ describe('acceptInvitation page', () => {
     );
     expect(
       screen.getByRole('heading', {name: 'Accept Invitation'}),
-    ).toBeInTheDocument();
-    expect(screen.getByLabelText(/Username/iu)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Password/iu)).toBeInTheDocument();
+    ).toHaveTextContent('Accept Invitation');
+    expect(screen.getByLabelText(/Username/iu)).toBeVisible();
+    expect(screen.getByLabelText(/Password/iu)).toBeVisible();
     expect(
       screen.getByRole('button', {name: 'Accept Invitation'}),
-    ).toBeInTheDocument();
+    ).toBeEnabled();
   });
 });

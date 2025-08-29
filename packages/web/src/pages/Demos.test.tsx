@@ -1,5 +1,5 @@
 import {describe, expect, test} from '@jest/globals';
-import {render, screen, act} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import {Routes, Route} from 'react-router-dom';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -32,35 +32,35 @@ describe('demoParamsSchema', () => {
 
 describe('demos page', () => {
   test('renders list of demos at index route', async () => {
-    await act(async () => {
-      const Wrapper = createWrapper({
-        i18n: true,
-        router: {initialEntries: ['/__demos']},
-      });
-      render(
-        <Routes>
-          <Route element={<Demos />} path="/__demos" />
-        </Routes>,
-        {wrapper: Wrapper},
-      );
+    const Wrapper = createWrapper({
+      i18n: true,
+      router: {initialEntries: ['/__demos']},
     });
-    expect(screen.getByText('Widget Demos')).toBeInTheDocument();
+    render(
+      <Routes>
+        <Route element={<Demos />} path="/__demos" />
+      </Routes>,
+      {wrapper: Wrapper},
+    );
+    await expect(
+      screen.findByText('Widget Demos'),
+    ).resolves.toBeInTheDocument();
   });
 
   test('renders a specific demo when :name is provided', async () => {
-    await act(async () => {
-      const Wrapper = createWrapper({
-        i18n: true,
-        router: {initialEntries: ['/__demos/Button']},
-      });
-      render(
-        <Routes>
-          <Route element={<Demos />} path="/__demos/:name" />
-        </Routes>,
-        {wrapper: Wrapper},
-      );
+    const Wrapper = createWrapper({
+      i18n: true,
+      router: {initialEntries: ['/__demos/Button']},
     });
-    expect(screen.getByTestId('ButtonDemo')).toBeInTheDocument();
+    render(
+      <Routes>
+        <Route element={<Demos />} path="/__demos/:name" />
+      </Routes>,
+      {wrapper: Wrapper},
+    );
+    await expect(
+      screen.findByTestId('ButtonDemo'),
+    ).resolves.toBeInTheDocument();
   });
 
   test('all demo files are registered in the demos registry', () => {
@@ -85,7 +85,10 @@ describe('demos page', () => {
 
     // Check that each demo file has a corresponding link in the rendered component
     demoFiles.forEach(demoName => {
-      expect(screen.getByRole('link', {name: demoName})).toBeInTheDocument();
+      expect(screen.getByRole('link', {name: demoName})).toHaveAttribute(
+        'href',
+        expect.stringContaining(demoName),
+      );
     });
   });
 });

@@ -1,5 +1,5 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen, act} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import ForgotPassword from './ForgotPassword';
@@ -20,18 +20,18 @@ describe('forgotPassword page', () => {
     render(wrap(<ForgotPassword />), {wrapper: Wrapper});
     const input = screen.getByLabelText(/email/iu);
     await userEvent.type(input, 'e');
-    await act(async () => {
-      await userEvent.click(
-        screen.getByRole('button', {name: 'Send reset link'}),
-      );
-    });
+    await userEvent.click(
+      screen.getByRole('button', {name: 'Send reset link'}),
+    );
     const msgs = await screen.findAllByText(/reset link/);
     expect(msgs.length).toBeGreaterThan(0);
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/email/i)).toBeVisible();
     expect(
       screen.getByRole('button', {name: /send reset link/i}),
-    ).toBeInTheDocument();
-    expect(screen.getByText(/Forgot Password/i)).toBeInTheDocument();
+    ).toBeEnabled();
+    expect(screen.getByText(/Forgot Password/i)).toHaveTextContent(
+      /Forgot Password/i,
+    );
   });
 
   test('shows error message when request rejects (catch path)', async () => {
@@ -60,11 +60,9 @@ describe('forgotPassword page', () => {
     const Wrapper2 = createWrapper({i18n: true});
     render(wrap(<ForgotPassword />), {wrapper: Wrapper2});
     await userEvent.type(screen.getByLabelText(/email/iu), 'x@example.com');
-    await act(async () => {
-      await userEvent.click(
-        screen.getByRole('button', {name: 'Send reset link'}),
-      );
-    });
+    await userEvent.click(
+      screen.getByRole('button', {name: 'Send reset link'}),
+    );
     await expect(
       screen.findByText('Request failed'),
     ).resolves.toBeInTheDocument();

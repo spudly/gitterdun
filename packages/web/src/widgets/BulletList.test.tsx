@@ -9,33 +9,33 @@ describe('bulletList', () => {
         <li>X</li>
       </BulletList>,
     );
-    expect(screen.getByText('X')).toBeInTheDocument();
+    expect(screen.getByText('X')).toHaveTextContent('X');
   });
 
   test('covers indent and density variants', () => {
-    const {rerender, getByText} = render(
+    const {rerender} = render(
       <BulletList density="tight" indent="sm">
         <li>A</li>
       </BulletList>,
     );
-    expect(getByText('A')).toBeInTheDocument();
+    expect(screen.getByText('A')).toHaveTextContent('A');
     rerender(
       <BulletList density="normal" indent="md">
         <li>B</li>
       </BulletList>,
     );
-    expect(getByText('B')).toBeInTheDocument();
+    expect(screen.getByText('B')).toHaveTextContent('B');
     rerender(
       <BulletList density="tight" indent="lg">
         <li>C</li>
       </BulletList>,
     );
-    expect(getByText('C')).toBeInTheDocument();
+    expect(screen.getByText('C')).toHaveTextContent('C');
   });
 
   test('falls back to defaults on invalid props (runtime)', () => {
     // simulate bad runtime values and hit fallback branches
-    const {container} = render(
+    render(
       <BulletList
         // @ts-expect-error: intentaionally passing invalid props
         density="nope"
@@ -45,7 +45,7 @@ describe('bulletList', () => {
         <li>Z</li>
       </BulletList>,
     );
-    expect(container.querySelector('ul')).toBeInTheDocument();
+    expect(screen.getByText('Z')).toHaveTextContent('Z');
   });
 
   test('helper functions cover all branches', () => {
@@ -59,11 +59,11 @@ describe('bulletList', () => {
   });
 
   test('component defaults (no props) render', () => {
-    const {getByText} = render(
+    render(
       <BulletList>
         <li>default</li>
       </BulletList>,
     );
-    expect(getByText('default')).toBeInTheDocument();
+    expect(screen.getByText('default')).toHaveTextContent('default');
   });
 });

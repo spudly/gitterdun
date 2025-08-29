@@ -50,20 +50,16 @@ describe('admin page', () => {
     });
     render(<Admin />, {wrapper: Wrapper});
 
-    await expect(screen.findByText('Admin Panel')).resolves.toBeInTheDocument();
+    await expect(screen.findByText('Admin Panel')).resolves.toHaveTextContent(
+      'Admin Panel',
+    );
 
-    expect(screen.queryByText('Family Management')).not.toBeInTheDocument();
-    expect(
-      screen.queryByPlaceholderText('Family name'),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', {name: 'Create Family'}),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByPlaceholderText('Family ID')).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', {name: 'Invite'}),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByText('Chores Management')).not.toBeInTheDocument();
+    expect(screen.queryByText('Family Management')).toBeNull();
+    expect(screen.queryByPlaceholderText('Family name')).toBeNull();
+    expect(screen.queryByRole('button', {name: 'Create Family'})).toBeNull();
+    expect(screen.queryByPlaceholderText('Family ID')).toBeNull();
+    expect(screen.queryByRole('button', {name: 'Invite'})).toBeNull();
+    expect(screen.queryByText('Chores Management')).toBeNull();
   });
 
   test('denies access for non-admin users', () => {
@@ -102,10 +98,12 @@ describe('admin page', () => {
     });
     render(<Admin />, {wrapper: Wrapper});
 
-    expect(screen.getByText('Access Denied')).toBeInTheDocument();
+    expect(screen.getByText('Access Denied')).toHaveTextContent(
+      'Access Denied',
+    );
     expect(
       screen.getByText('You need admin privileges to view this page.'),
-    ).toBeInTheDocument();
+    ).toHaveTextContent('You need admin privileges to view this page.');
   });
 
   test('denies access for unauthenticated users', () => {
@@ -135,9 +133,11 @@ describe('admin page', () => {
     });
     render(<Admin />, {wrapper: Wrapper});
 
-    expect(screen.getByText('Access Denied')).toBeInTheDocument();
+    expect(screen.getByText('Access Denied')).toHaveTextContent(
+      'Access Denied',
+    );
     expect(
       screen.getByText('You need admin privileges to view this page.'),
-    ).toBeInTheDocument();
+    ).toHaveTextContent('You need admin privileges to view this page.');
   });
 });
