@@ -17,10 +17,11 @@ import playwrightPlugin from 'eslint-plugin-playwright';
 import uiTestingPlugin from 'eslint-plugin-ui-testing';
 import testingLibraryPlugin from 'eslint-plugin-testing-library';
 import jestDomPlugin from 'eslint-plugin-jest-dom';
+import type {Linter, ESLint} from 'eslint';
 
 const WORKSPACE_ROOT_DIR = dirname(fileURLToPath(import.meta.url));
 
-const eslintConfig = [
+const eslintConfig: Array<Linter.Config> = [
   {
     ignores: [
       '**/dist/**',
@@ -43,7 +44,7 @@ const eslintConfig = [
 
       tailwindcss: tailwindcssPlugin,
       gitterdun: gitterdunPlugin,
-      turbo: turboPlugin,
+      turbo: turboPlugin as unknown as ESLint.Plugin, // plugin has bad types
       playwright: playwrightPlugin,
       'jest-dom': jestDomPlugin,
       'testing-library': testingLibraryPlugin,
@@ -863,7 +864,9 @@ const eslintConfig = [
   },
   {
     files: ['**/*.{ts,tsx,mts,cts}'],
-    plugins: {'@typescript-eslint': typescriptEslint},
+    plugins: {
+      '@typescript-eslint': typescriptEslint as unknown as ESLint.Plugin, // plugin has bad types
+    },
     languageOptions: {
       parser: typescriptEslintParser,
       parserOptions: {
