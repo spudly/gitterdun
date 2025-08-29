@@ -3,7 +3,9 @@ import path from 'node:path';
 
 const toPosix = (filePath: string): string =>
   filePath.split(path.sep).join('/');
-  input.replace(/[.*+^${}()|[\]\\]/g, '\\$&');
+const escapeRegex = (input: string): string =>
+  // Intentionally do NOT escape * or ?; they are handled after this call
+  input.replace(/[.+^${}()|[\]\\]/g, '\\$&');
 const globToRegExp = (globPattern: string): RegExp => {
   const posixGlob = toPosix(globPattern);
   let pattern = posixGlob.replace(/\*\*/g, '§§DOUBLESTAR§§');
