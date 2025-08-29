@@ -2,6 +2,7 @@ const path = require('node:path');
 
 module.exports = {
   testEnvironment: 'node',
+  restoreMocks: true,
   transform: {
     '^.+\\.(t|j)sx?$': [
       'ts-jest',
