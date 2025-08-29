@@ -76,7 +76,7 @@ export const AdminAssignControls: FC<AdminAssignControlsProps> = ({
               id: 'pages.admin.AdminChoresManagement.assignee',
             })}
           </label>
-            <select
+          <select
               aria-label={intl.formatMessage({
                 defaultMessage: 'Assignee',
                 id: 'pages.admin.AdminChoresManagement.assignee',
@@ -99,7 +99,6 @@ export const AdminAssignControls: FC<AdminAssignControlsProps> = ({
                   </option>
                 ))}
             </select>
-          </label>
           <Button
             onClick={() => {
               if (selectedUsername !== '') {
