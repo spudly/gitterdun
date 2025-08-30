@@ -115,7 +115,6 @@ const Chores: FC = () => {
                   <Button
                     onClick={() => {
                       const run = async () => {
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- guarded by enabled
                         await choresApi.complete(chore.id, {userId: user!.id});
                         await queryClient.invalidateQueries({
                           queryKey: ['chores', user?.id],
