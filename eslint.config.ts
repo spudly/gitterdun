@@ -847,6 +847,17 @@ const eslintConfig = [
       'gitterdun/no-extra-i18n-messages': 'off', // enabled later in this file for i18n messages files
       'gitterdun/no-missing-i18n-messages': 'off', // enabled later in this file for i18n messages files
       'gitterdun/require-i18n-formatting': 'off', // enabled later in this file for tsx files
+      'gitterdun/no-unused-data-testid': [
+        'error',
+        {
+          testFileGlobs: [
+            'packages/web/src/**/*.test.ts',
+            'packages/web/src/**/*.test.tsx',
+            'packages/api/src/**/*.test.ts',
+            'packages/e2e/**/*.test.ts',
+          ],
+        },
+      ],
     },
   },
   {
