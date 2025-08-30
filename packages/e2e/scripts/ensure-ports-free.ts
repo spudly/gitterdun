@@ -4,13 +4,11 @@ import net from 'node:net';
 import path from 'node:path';
 import {execSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {DEFAULT_PORT as API_DEFAULT_PORT} from '@gitterdun/api';
-import {DEFAULT_PORT as WEB_DEFAULT_PORT} from '@gitterdun/web';
 
-const PORTS_TO_CHECK = [WEB_DEFAULT_PORT, API_DEFAULT_PORT];
+const PORTS_TO_CHECK: number[] = [8000, 8001];
 const LSOF_OUTPUT_MAX_LINES = 5;
 
-export const checkNodeVersion = () => {
+export const checkNodeVersion = (): void => {
   const currentNodeVersion = process.version.replace(/^v/, ''); // Remove 'v' prefix
   const currentDir = path.dirname(fileURLToPath(import.meta.url));
   const workspaceRoot = path.resolve(currentDir, '../../../');
@@ -25,22 +23,20 @@ export const checkNodeVersion = () => {
 
   if (currentNodeVersion !== expectedNodeVersion) {
     console.error(
-      `E2E precheck: Node.js version mismatch!
-  Expected: v${expectedNodeVersion} (from .nvmrc)
-  Current:  v${currentNodeVersion}
-  Please run: nvm use`,
+      `E2E precheck: Node.js version mismatch!\nExpected: v${expectedNodeVersion} (from .nvmrc)\nCurrent:  v${currentNodeVersion}\nPlease run: nvm use`,
     );
     process.exit(1);
   }
 
   console.log(`✅ Node.js version check passed: v${currentNodeVersion}`);
 };
+type PortStatus = {port: number; available: boolean; error?: Error};
 
-export const checkPort = port =>
+export const checkPort = (port: number): Promise<PortStatus> =>
   new Promise(resolve => {
     const server = net.createServer();
     server.once('error', err => {
-      resolve({port, available: false, error: err});
+      resolve({port, available: false, error: err as Error});
     });
     server.once('listening', () => {
       server.close(() => resolve({port, available: true}));
@@ -48,14 +44,21 @@ export const checkPort = port =>
     server.listen({host: '127.0.0.1', port});
   });
 
-export const parseLsofPids = (lsofOutput, commandName) => {
-  const pids = new Set();
+export const parseLsofPids = (
+  lsofOutput: string | Buffer,
+  commandName: string,
+): Set<number> => {
+  const pids = new Set<number>();
   if (!lsofOutput) {
     return pids;
   }
   const lines = String(lsofOutput).split('\n');
   for (let lineIndex = 1; lineIndex < lines.length; lineIndex++) {
-    const line = lines[lineIndex].trim();
+    const rawLine = lines[lineIndex];
+    if (!rawLine) {
+      continue;
+    }
+    const line = rawLine.trim();
     if (!line) {
       continue;
     }
@@ -71,27 +74,25 @@ export const parseLsofPids = (lsofOutput, commandName) => {
   }
   return pids;
 };
-
-const defaultKiller = pid => {
+const defaultKiller = (pid: number): void => {
   try {
     execSync(`kill -9 ${pid}`, {stdio: 'ignore'});
   } catch {
     // ignore kill errors (process may have already exited)
   }
 };
-
 export const autoKillByNameFromLsof = async (
-  commandName,
-  lsofOutput,
-  killer = defaultKiller,
-) => {
+  commandName: string,
+  lsofOutput: string | Buffer,
+  killer: (pid: number) => void = defaultKiller,
+): Promise<void> => {
   const pids = parseLsofPids(lsofOutput, commandName);
   for (const pid of pids) {
     killer(pid);
   }
 };
 
-const listPortDetails = port => {
+const listPortDetails = (port: number): string => {
   try {
     return execSync(`lsof -nP -iTCP:${port} -sTCP:LISTEN`, {
       stdio: ['ignore', 'pipe', 'pipe'],
@@ -103,8 +104,10 @@ const listPortDetails = port => {
   }
 };
 
-const attemptAutoKillCursorOwnedPorts = blockedPorts => {
-  const killPromises = [];
+const attemptAutoKillCursorOwnedPorts = (
+  blockedPorts: PortStatus[],
+): Promise<void[]> => {
+  const killPromises: Array<Promise<void>> = [];
   for (const {port} of blockedPorts) {
     const details = listPortDetails(port);
     if (!details) {
@@ -122,8 +125,10 @@ const attemptAutoKillCursorOwnedPorts = blockedPorts => {
   return Promise.all(killPromises);
 };
 
-const attemptAutoKillNodeOwnedPorts = blockedPorts => {
-  const killPromises = [];
+const attemptAutoKillNodeOwnedPorts = (
+  blockedPorts: PortStatus[],
+): Promise<void[]> => {
+  const killPromises: Array<Promise<void>> = [];
   for (const {port} of blockedPorts) {
     const details = listPortDetails(port);
     if (!details) {
@@ -141,8 +146,8 @@ const attemptAutoKillNodeOwnedPorts = blockedPorts => {
   return Promise.all(killPromises);
 };
 
-const logBlockedPortsAndExit = blockedPorts => {
-  const list = blockedPorts.map(status => status.port).join(', ');
+const logBlockedPortsAndExit = (blockedPorts: PortStatus[]): void => {
+  const list = blockedPorts.map((status: PortStatus) => status.port).join(', ');
   console.error(`E2E precheck: required ports in use: ${list}.`);
 
   for (const {port} of blockedPorts) {
@@ -161,12 +166,14 @@ const logBlockedPortsAndExit = blockedPorts => {
   process.exit(1);
 };
 
-const main = async () => {
+const main = async (): Promise<void> => {
   // Check Node.js version first before doing anything else
   checkNodeVersion();
 
-  let results = await Promise.all(PORTS_TO_CHECK.map(checkPort));
-  let blocked = results.filter(portStatus => !portStatus.available);
+  let results: PortStatus[] = await Promise.all(PORTS_TO_CHECK.map(checkPort));
+  let blocked = results.filter(
+    (portStatus: PortStatus) => !portStatus.available,
+  );
   if (blocked.length === 0) {
     return;
   }
@@ -175,7 +182,7 @@ const main = async () => {
 
   // Re-check after attempting to free Cursor-owned ports
   results = await Promise.all(PORTS_TO_CHECK.map(checkPort));
-  blocked = results.filter(portStatus => !portStatus.available);
+  blocked = results.filter((portStatus: PortStatus) => !portStatus.available);
   if (blocked.length === 0) {
     return;
   }
@@ -184,7 +191,7 @@ const main = async () => {
 
   // Re-check after attempting to free node-owned ports
   results = await Promise.all(PORTS_TO_CHECK.map(checkPort));
-  blocked = results.filter(portStatus => !portStatus.available);
+  blocked = results.filter((portStatus: PortStatus) => !portStatus.available);
   if (blocked.length > 0) {
     logBlockedPortsAndExit(blocked);
   }

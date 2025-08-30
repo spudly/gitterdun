@@ -658,7 +658,7 @@ export const RULES: MyRules = {
   'logical-assignment-operators': 'error',
   'max-classes-per-file': 'error',
   'max-depth': 'error',
-  'max-lines': [disableFor('configs', 'unitTests', 'e2eTests'), 200],
+  'max-lines': [disableFor('configs', 'unitTests', 'e2eTests', 'scripts'), 200],
   'max-lines-per-function': 'off', // ['error', {max: 20, skipBlankLines: true, skipComments: true, IIFEs: true},], // TODO: re-enable
   'max-nested-callbacks': 'error',
   'max-params': ['error', {max: 5}],
