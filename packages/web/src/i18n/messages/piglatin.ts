@@ -121,7 +121,8 @@ export default {
   'pages.admin.AdminChoresManagement.bonus': 'Onus-bay',
   'pages.admin.AdminChoresManagement.assign': 'Assign-way',
   'pages.admin.AdminChoresManagement.assign-chore': 'Assign-way Ore-chay',
-  'pages.admin.AdminChoresManagement.assigned-to': 'Assigned-way to: {username}',
+  'pages.admin.AdminChoresManagement.assigned-to':
+    'Assigned-way to: {username}',
   'pages.admin.AdminChoresManagement.assignee': 'Assignee-way',
   // AdminFamilyCreation (obsolete - removed)
   // AdminInvitations (obsolete - removed)

@@ -23,4 +23,3 @@ export const handleRejectChore = async (
       .json({success: false, error: (error as Error).message});
   }
 };
-

@@ -24,7 +24,10 @@ import {
 } from '../utils/choreCrud';
 import {processChoreUpdate} from '../utils/choreUpdates';
 import {executeChoreCompletionTransaction} from '../utils/choreCompletion';
-import {assignChoreToSingleUser, approveChoreAssignment} from '../utils/choreModeration';
+import {
+  assignChoreToSingleUser,
+  approveChoreAssignment,
+} from '../utils/choreModeration';
 
 // POST /api/chores - Create a new chore
 export const handleCreateChore = async (
@@ -139,7 +142,11 @@ export const handleAssignChore = async (
   try {
     const choreId = Number((req.params as Record<string, string>)['id']);
     const {userId} = req.body as {userId?: number};
-    if (!Number.isInteger(choreId) || typeof userId !== 'number' || !Number.isInteger(userId)) {
+    if (
+      !Number.isInteger(choreId)
+      || typeof userId !== 'number'
+      || !Number.isInteger(userId)
+    ) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({success: false, error: 'Invalid chore or user id'});
@@ -161,7 +168,11 @@ export const handleApproveChore = async (
   try {
     const choreId = Number((req.params as Record<string, string>)['id']);
     const {approvedBy} = req.body as {approvedBy?: number};
-    if (!Number.isInteger(choreId) || typeof approvedBy !== 'number' || !Number.isInteger(approvedBy)) {
+    if (
+      !Number.isInteger(choreId)
+      || typeof approvedBy !== 'number'
+      || !Number.isInteger(approvedBy)
+    ) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({success: false, error: 'Invalid chore id or approver id'});

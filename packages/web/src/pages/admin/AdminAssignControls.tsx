@@ -87,11 +87,13 @@ export const AdminAssignControls: FC<AdminAssignControlsProps> = ({
               value={selectedUsername}
             >
               <option value="" />
-              {((membersQuery.data?.data ?? []) as Array<{
-                user_id: number;
-                username: string;
-                role: string;
-              }>)
+              {(
+                (membersQuery.data?.data ?? []) as Array<{
+                  user_id: number;
+                  username: string;
+                  role: string;
+                }>
+              )
                 .filter(member => member.role === 'child')
                 .map(member => (
                   <option key={member.user_id} value={member.username}>
@@ -119,4 +121,3 @@ export const AdminAssignControls: FC<AdminAssignControlsProps> = ({
     </>
   );
 };
-

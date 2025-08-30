@@ -21,12 +21,29 @@ export const adminChoresMessages = defineMessages({
     defaultMessage: 'Due: {date}',
     id: 'pages.admin.AdminChoresManagement.due-date',
   },
-  approve: {defaultMessage: 'Approve', id: 'pages.admin.AdminChoresManagement.approve'},
-  reject: {defaultMessage: 'Reject', id: 'pages.admin.AdminChoresManagement.reject'},
+  approve: {
+    defaultMessage: 'Approve',
+    id: 'pages.admin.AdminChoresManagement.approve',
+  },
+  reject: {
+    defaultMessage: 'Reject',
+    id: 'pages.admin.AdminChoresManagement.reject',
+  },
   edit: {defaultMessage: 'Edit', id: 'pages.admin.AdminChoresManagement.edit'},
-  statusCompleted: {defaultMessage: 'Completed', id: 'pages.admin.AdminChoresManagement.completed'},
-  statusApproved: {defaultMessage: 'Approved', id: 'pages.admin.AdminChoresManagement.approved'},
-  statusPending: {defaultMessage: 'Pending', id: 'pages.admin.AdminChoresManagement.pending'},
-  typeBonus: {defaultMessage: 'Bonus', id: 'pages.admin.AdminChoresManagement.bonus'},
+  statusCompleted: {
+    defaultMessage: 'Completed',
+    id: 'pages.admin.AdminChoresManagement.completed',
+  },
+  statusApproved: {
+    defaultMessage: 'Approved',
+    id: 'pages.admin.AdminChoresManagement.approved',
+  },
+  statusPending: {
+    defaultMessage: 'Pending',
+    id: 'pages.admin.AdminChoresManagement.pending',
+  },
+  typeBonus: {
+    defaultMessage: 'Bonus',
+    id: 'pages.admin.AdminChoresManagement.bonus',
+  },
 });
-
