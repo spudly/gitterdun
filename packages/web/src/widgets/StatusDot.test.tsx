@@ -10,7 +10,7 @@ describe('statusDot', () => {
     );
     rerender(<StatusDot color="gray" size={6} />);
     // no role when no label
-    expect(screen.queryByRole('img')).toBeNull();
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
   test('covers all known colors', () => {
@@ -34,6 +34,6 @@ describe('statusDot', () => {
   test('component default color path', () => {
     render(<StatusDot />);
     // assert that no labelled image exists when no label provided
-    expect(screen.queryByRole('img')).toBeNull();
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 });

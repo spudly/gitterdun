@@ -3,7 +3,7 @@ import {Badge} from './Badge.js';
 
 const BadgeDemo: FC = () => {
   return (
-    <div className="space-x-2" data-testid="BadgeDemo">
+    <div className="space-x-2">
       <Badge>Neutral</Badge>
 
       <Badge variant="success">Success</Badge>

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- not unnecessary
+// eslint-disable-next-line ts/no-unnecessary-type-parameters -- not unnecessary
 export const readJson = <TYPE>(file: string) =>
   JSON.parse(fs.readFileSync(file, 'utf8')) as TYPE;
 

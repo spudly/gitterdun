@@ -1,5 +1,5 @@
 import type {FC, ReactNode} from 'react';
-import clsx from 'clsx';
+import {clsx} from 'clsx';
 
 type FormCardProps = {
   readonly children: ReactNode;

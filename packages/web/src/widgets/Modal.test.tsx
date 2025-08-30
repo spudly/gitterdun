@@ -28,7 +28,9 @@ describe('modal', () => {
         <div>Body</div>
       </Modal>,
     );
-    expect(screen.queryByRole('button', {name: 'Close modal'})).toBeNull();
+    expect(
+      screen.queryByRole('button', {name: 'Close modal'}),
+    ).not.toBeInTheDocument();
     rerender(
       <Modal
         closeOnOverlayClick={false}

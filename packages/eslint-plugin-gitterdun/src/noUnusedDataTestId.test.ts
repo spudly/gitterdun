@@ -1,9 +1,8 @@
 import {RuleTester} from 'eslint';
-import {rules} from '../index.js';
+import {rules} from './index.js';
 import {unitFixture} from './fixtures/tests/unit/sample.fixture.js';
 import {e2eFixture} from './fixtures/tests/e2e/sample.fixture.js';
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports -- RuleTester requires CommonJS
 const tsParser = require('@typescript-eslint/parser');
 
 const ruleTester = new RuleTester({
@@ -18,15 +17,12 @@ const ruleTester = new RuleTester({
 });
 
 const testFileGlobs = [
-  // Support running from plugin cwd
-  'src/__tests__/fixtures/tests/**/*.ts',
-  'src/__tests__/fixtures/tests/**/*.tsx',
+  // Support running from plugin cwd after colocation
+  'src/fixtures/tests/**/*.{ts,tsx}',
   // Support running from workspace root
-  'packages/eslint-plugin-gitterdun/src/__tests__/fixtures/tests/**/*.ts',
-  'packages/eslint-plugin-gitterdun/src/__tests__/fixtures/tests/**/*.tsx',
+  'packages/eslint-plugin-gitterdun/src/fixtures/tests/**/*.{ts,tsx}',
 ];
 
-// eslint-disable-next-line jest/require-hook -- ESLint RuleTester manages its own runner
 ruleTester.run(
   'no-unused-data-testid',
   rules['no-unused-data-testid' as keyof typeof rules] as any,

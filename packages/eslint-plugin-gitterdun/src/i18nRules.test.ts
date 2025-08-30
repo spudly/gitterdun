@@ -1,5 +1,5 @@
 import {RuleTester} from 'eslint';
-import {rules} from '../index.js';
+import {rules} from './index.js';
 
 const ruleTester = new RuleTester({
   languageOptions: {
@@ -9,7 +9,6 @@ const ruleTester = new RuleTester({
   },
 });
 
-// eslint-disable-next-line jest/require-hook -- not following typical jest patterns
 ruleTester.run('no-missing-i18n-messages', rules['no-missing-i18n-messages'], {
   valid: [
     {
@@ -21,7 +20,6 @@ ruleTester.run('no-missing-i18n-messages', rules['no-missing-i18n-messages'], {
   invalid: [],
 });
 
-// eslint-disable-next-line jest/require-hook -- not following typical jest patterns
 ruleTester.run('no-extra-i18n-messages', rules['no-extra-i18n-messages'], {
   valid: [
     {
@@ -33,7 +31,6 @@ ruleTester.run('no-extra-i18n-messages', rules['no-extra-i18n-messages'], {
   invalid: [],
 });
 
-// eslint-disable-next-line jest/require-hook -- not following typical jest patterns
 ruleTester.run('require-i18n-formatting', rules['require-i18n-formatting'], {
   valid: [
     {

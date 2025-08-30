@@ -25,7 +25,6 @@ export const useI18n = (): I18nContextValue => {
 type I18nProviderProps = {readonly children: ReactNode};
 
 export const I18nProvider: FC<I18nProviderProps> = ({children}) => {
-  // eslint-disable-next-line react/hook-use-state -- false positive
   const [locale, setLocaleState] = useState<SupportedLocale>(() => {
     const initial =
       typeof window !== 'undefined'

@@ -28,12 +28,12 @@ describe('localeSelector', () => {
 
     render(<TestHost />, {wrapper: Wrapper});
     // Closed initially
-    expect(screen.queryByRole('menu')).toBeNull();
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', {name: /language/i}));
     // The menu should be visible now that it's open
     expect(screen.getByRole('menu')).toBeVisible();
     await user.click(screen.getByRole('menuitemradio', {name: /pirate/i}));
-    expect(screen.getByTestId('LocaleSelector.locale').textContent).toBe(
+    expect(screen.getByTestId('LocaleSelector.locale')).toHaveTextContent(
       'pirate',
     );
   });

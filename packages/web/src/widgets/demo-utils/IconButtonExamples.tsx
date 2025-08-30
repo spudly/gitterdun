@@ -1,4 +1,3 @@
-/* eslint-disable react/no-multi-comp -- Demo file with multiple related icon button examples */
 import type {FC} from 'react';
 import {IconButton} from '../IconButton.js';
 import {CheckIcon, XIcon, TrashIcon, SettingsIcon} from './IconButtonIcons.js';
@@ -32,4 +31,3 @@ export const StatesExample: FC = () => {
     </div>
   );
 };
-/* eslint-enable react/no-multi-comp */

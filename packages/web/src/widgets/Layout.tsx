@@ -1,5 +1,5 @@
 import type {FC, ReactNode} from 'react';
-import clsx from 'clsx';
+import {clsx} from 'clsx';
 import {Link, useLocation} from 'react-router-dom';
 import {FormattedMessage, useIntl} from 'react-intl';
 import type {MessageDescriptor} from 'react-intl';

@@ -1,6 +1,6 @@
 import type {FC, ReactNode} from 'react';
 import {FormattedMessage} from 'react-intl';
-import clsx from 'clsx';
+import {clsx} from 'clsx';
 import {GOLD_RANK, SILVER_RANK, BRONZE_RANK, RANKS} from '../constants';
 
 export type PodiumItem = {

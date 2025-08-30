@@ -41,3 +41,5 @@
       <FormattedMessage /> or intl.formatMessage()
 - [x] eslint rule (or something else) to forbid use of CSS margins
 - [ ] eslint rule to check for unused data-test-id attributes
+- [ ] create a new way to define eslint rules
+- [ ] add cursor ignore file?

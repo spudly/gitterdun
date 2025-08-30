@@ -3,10 +3,7 @@ import {StatCard} from './StatCard.js';
 
 const StatCardDemo: FC = () => {
   return (
-    <div
-      className="grid grid-cols-1 gap-6 md:grid-cols-4"
-      data-testid="StatCardDemo"
-    >
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
       <StatCard
         color="green"
         icon={<span>✓</span>}

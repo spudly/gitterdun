@@ -10,6 +10,8 @@ Always use `*.test.*` extension for test files instead of `*.spec.*`.
 
 3. **Consistency**: This convention should be followed across all packages in the monorepo (web, api, shared, eslint-plugin-gitterdun).
 
+4. **Test Location**: Create test files next to the file they test (co-located). Do not create or use `__tests__` directories.
+
 ## Examples
 
 ✅ **Correct naming:**
@@ -18,11 +20,19 @@ Always use `*.test.*` extension for test files instead of `*.spec.*`.
 - `utils.test.js`
 - `integration.test.ts`
 
+✅ **Correct placement (co-located):**
+- `src/components/Button.tsx` and `src/components/Button.test.tsx`
+- `packages/api/src/utils/date.ts` and `packages/api/src/utils/date.test.ts`
+
 ❌ **Avoid these patterns:**
 - `Button.spec.tsx`
 - `api.spec.ts`
 - `utils.spec.js`
 - `integration.spec.ts`
+
+❌ **Avoid these placements:**
+- `src/components/__tests__/Button.test.tsx`
+- `packages/api/src/__tests__/utils/date.test.ts`
 
 ## Note
 

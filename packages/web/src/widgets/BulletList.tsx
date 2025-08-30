@@ -1,5 +1,5 @@
 import type {FC, ReactNode} from 'react';
-import clsx from 'clsx';
+import {clsx} from 'clsx';
 
 type Indent = 'sm' | 'md' | 'lg';
 type Density = 'tight' | 'normal';

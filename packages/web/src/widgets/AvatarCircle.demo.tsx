@@ -3,7 +3,7 @@ import {AvatarCircle} from './AvatarCircle.js';
 
 const AvatarCircleDemo: FC = () => {
   return (
-    <div className="flex items-center gap-3" data-testid="AvatarCircleDemo">
+    <div className="flex items-center gap-3">
       <AvatarCircle label="John Doe" />
 
       <AvatarCircle label="Jane Smith" size="lg" />

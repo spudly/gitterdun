@@ -1,4 +1,3 @@
-/* eslint-disable react/no-multi-comp -- Demo file with multiple related form card examples */
 import type {FC} from 'react';
 import {FormCard} from '../FormCard.js';
 import {Button} from '../Button.js';
@@ -81,4 +80,3 @@ export const LargeFormExample: FC = () => {
     </FormCard>
   );
 };
-/* eslint-enable react/no-multi-comp */

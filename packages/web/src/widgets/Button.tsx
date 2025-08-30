@@ -1,5 +1,5 @@
 import type {ButtonHTMLAttributes, FC, ReactNode} from 'react';
-import clsx from 'clsx';
+import {clsx} from 'clsx';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
 type ButtonSize = 'sm' | 'md' | 'lg';

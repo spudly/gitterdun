@@ -12,7 +12,10 @@ const config: KnipConfig = {
     },
 
     'packages/web': {
-      entry: ['src/main.tsx'], // Single entry point for Vite React app
+      entry: [
+        'src/main.tsx', // entry point for Vite React app
+        'src/index.tsx', // entry point for use as a library
+      ],
 
       // Include all TS/TSX files but exclude demo and test files from analysis
       project: ['src/**/*.{ts,tsx}'],

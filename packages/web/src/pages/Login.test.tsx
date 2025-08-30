@@ -77,8 +77,8 @@ describe('login page', () => {
     await userEvent.type(screen.getByLabelText(/password/iu), 'validpassword');
     await userEvent.click(screen.getByRole('button', {name: 'Login'}));
     // Test successful submission by verifying no error messages appear
-    expect(screen.queryByText(/Login failed/i)).toBeNull();
-    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.queryByText(/Login failed/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
 
     // has link to register
     expect(screen.getByRole('link', {name: /register/i})).toHaveAttribute(
@@ -145,7 +145,7 @@ describe('login page', () => {
     await userEvent.type(screen.getByLabelText(/password/iu), 'pw');
     await userEvent.click(screen.getByRole('button', {name: 'Login'}));
     await waitFor(() => {
-      expect(screen.getByTestId('Login.location').textContent).toBe('/');
+      expect(screen.getByTestId('Login.location')).toHaveTextContent('/');
     });
   });
 });
