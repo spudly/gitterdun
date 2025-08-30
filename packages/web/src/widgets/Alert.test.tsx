@@ -14,18 +14,18 @@ describe('alert', () => {
       </Alert>,
       {wrapper: Wrapper},
     );
-    expect(screen.getByText('T')).toBeInTheDocument();
-    expect(screen.getByText('Body')).toBeInTheDocument();
+    expect(screen.getByText('T')).toHaveTextContent('T');
+    expect(screen.getByText('Body')).toHaveTextContent('Body');
     await userEvent.click(screen.getByRole('button', {name: /dismiss/i}));
     expect(onDismiss).toHaveBeenCalledWith();
     rerender(<Alert type="success">S</Alert>);
-    expect(screen.getByText('S')).toBeInTheDocument();
+    expect(screen.getByText('S')).toHaveTextContent('S');
     rerender(<Alert type="error">E</Alert>);
-    expect(screen.getByText('E')).toBeInTheDocument();
+    expect(screen.getByText('E')).toHaveTextContent('E');
     rerender(<Alert type="warning">W</Alert>);
-    expect(screen.getByText('W')).toBeInTheDocument();
+    expect(screen.getByText('W')).toHaveTextContent('W');
     rerender(<Alert type="info">I</Alert>);
-    expect(screen.getByText('I')).toBeInTheDocument();
+    expect(screen.getByText('I')).toHaveTextContent('I');
   });
 
   test('defaults type to info when omitted', () => {

@@ -166,7 +166,7 @@ describe('goals routes', () => {
       );
 
       expect(response.status).toBe(200);
-      // eslint-disable-next-line @typescript-eslint/unbound-method -- not being called
+
       expect(mockPreparedStatement.all).toHaveBeenCalledWith(
         1,
         'active',
@@ -238,7 +238,6 @@ describe('goals routes', () => {
         message: 'Goal created successfully',
       });
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method -- not being called
       expect(mockPreparedStatement.get).toHaveBeenCalledWith(
         'New Goal',
         'Test goal',
@@ -456,7 +455,6 @@ describe('goals routes', () => {
         message: 'Goal deleted successfully',
       });
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method -- not being called
       expect(mockDeleteStatement.run).toHaveBeenCalledWith(1);
     });
 

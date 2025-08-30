@@ -142,4 +142,11 @@ export default {
   'pages.Register.username': '𐐏𐐭𐑅𐐯𐑋𐐨𐐲𐑌𐐨',
   'pages.Register.email': '𐐇𐐣𐐰𐐮𐐮𐐢',
   'pages.Register.password': '𐐑𐐰𐐝𐐶𐐲𐐡𐐼',
+  // Icon titles (Deseret script transliterations)
+  'icons.checkCircle.title': '𐐗𐐯𐐿 𐐝𐐮𐐡𐐿𐐲𐐮 𐐆𐐿𐐬𐐤',
+  'icons.clock.title': '𐐗𐐮𐐮𐐿 𐐆𐐿𐐬𐐤',
+  'icons.doc.title': '𐐔𐐬𐐽 𐐆𐐿𐐬𐐤',
+  'icons.infoCircle.title': '𐐆𐐤𐐧𐐬 𐐝𐐮𐐡𐐿𐐲𐐮 𐐆𐐿𐐬𐐤',
+  'icons.sparkles.title': '𐐝𐐹𐐪𐐡𐐿𐐮𐑊𐑅 𐐆𐐿𐐬𐐤',
+  'icons.trophy.title': '𐐓𐐬𐐹𐐨 𐐆𐐿𐐬𐐤',
 };

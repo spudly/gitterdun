@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, jest, test} from '@jest/globals';
-import {render, screen, act, waitFor} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {useLocation} from 'react-router-dom';
 import Login from './Login';
@@ -56,7 +56,7 @@ describe('login page (top-level)', () => {
       );
     const Wrapper = createWrapper({i18n: true, router: true});
     render(wrap(<Login />), {wrapper: Wrapper});
-    expect(screen.getByText('Bad creds')).toBeInTheDocument();
+    expect(screen.getByText('Bad creds')).toHaveTextContent('Bad creds');
     // no restore needed when using mockReturnValueOnce
   });
 });
@@ -72,12 +72,10 @@ describe('login page', () => {
     // Use default working mock that allows successful login
     const Wrapper2 = createWrapper({i18n: true, router: true});
     render(wrap(<Login />), {wrapper: Wrapper2});
-    expect(screen.getAllByText('Login')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('Login')[0]).toHaveTextContent('Login');
     await userEvent.type(screen.getByLabelText(/email/iu), 'user@example.com');
     await userEvent.type(screen.getByLabelText(/password/iu), 'validpassword');
-    await act(async () => {
-      await userEvent.click(screen.getByRole('button', {name: 'Login'}));
-    });
+    await userEvent.click(screen.getByRole('button', {name: 'Login'}));
     // Test successful submission by verifying no error messages appear
     expect(screen.queryByText(/Login failed/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
@@ -98,11 +96,9 @@ describe('login page', () => {
     render(wrap(<Login />), {wrapper: Wrapper3});
     await userEvent.type(screen.getByLabelText(/email/iu), 'user@example.com');
     await userEvent.type(screen.getByLabelText(/password/iu), 'validpassword');
-    await act(async () => {
-      await userEvent.click(screen.getByRole('button', {name: 'Login'}));
-    });
+    await userEvent.click(screen.getByRole('button', {name: 'Login'}));
     // For this test, we just verify the form submission completes without throwing
-    expect(screen.getByRole('button', {name: 'Login'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Login'})).toBeEnabled();
   });
 
   test('shows loading state when isLoggingIn is true', () => {
@@ -111,7 +107,9 @@ describe('login page', () => {
       .mockReturnValueOnce(createUseUserMock({isLoggingIn: true}));
     const Wrapper4 = createWrapper({i18n: true, router: true});
     render(wrap(<Login />), {wrapper: Wrapper4});
-    expect(screen.getByText('Logging in...')).toBeInTheDocument();
+    expect(screen.getByText('Logging in...')).toHaveTextContent(
+      'Logging in...',
+    );
     // no restore needed when using mockReturnValueOnce
   });
 
@@ -123,14 +121,14 @@ describe('login page', () => {
       );
     const Wrapper5 = createWrapper({i18n: true, router: true});
     render(wrap(<Login />), {wrapper: Wrapper5});
-    expect(screen.getByText('Inline Error')).toBeInTheDocument();
+    expect(screen.getByText('Inline Error')).toHaveTextContent('Inline Error');
     // no restore needed when using mockReturnValueOnce
   });
 
   test('navigates to root on successful submit', async () => {
     const LocationProbe = () => {
       const loc = useLocation();
-      return <div data-testid="loc">{loc.pathname}</div>;
+      return <div data-testid="Login.location">{loc.pathname}</div>;
     };
     const Wrapper = createWrapper({
       i18n: true,
@@ -145,11 +143,9 @@ describe('login page', () => {
     );
     await userEvent.type(screen.getByLabelText(/email/iu), 'user@example.com');
     await userEvent.type(screen.getByLabelText(/password/iu), 'pw');
-    await act(async () => {
-      await userEvent.click(screen.getByRole('button', {name: 'Login'}));
-    });
+    await userEvent.click(screen.getByRole('button', {name: 'Login'}));
     await waitFor(() => {
-      expect(screen.getByTestId('loc').textContent).toBe('/');
+      expect(screen.getByTestId('Login.location')).toHaveTextContent('/');
     });
   });
 });

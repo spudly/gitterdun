@@ -10,6 +10,6 @@ describe('textLink', () => {
         <TextLink to="/x">Link</TextLink>
       </MemoryRouter>,
     );
-    expect(screen.getByText('Link')).toBeInTheDocument();
+    expect(screen.getByText('Link')).toHaveTextContent('Link');
   });
 });

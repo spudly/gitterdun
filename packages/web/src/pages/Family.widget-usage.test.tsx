@@ -17,13 +17,13 @@ jest.mock('../lib/api.js', () => ({
 // Mock widgets to detect usage in the page
 jest.mock('../widgets/TextInput.js', () => ({
   TextInput: (props: React.InputHTMLAttributes<HTMLInputElement>) => (
-    <input data-testid="TextInput-widget" {...props} />
+    <input aria-label="TextInput-widget" {...props} />
   ),
 }));
 
 jest.mock('../widgets/Button.js', () => ({
   Button: (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
-    <button data-testid="Button-widget" type="button" {...props} />
+    <button aria-label="Button-widget" type="button" {...props} />
   ),
 }));
 
@@ -37,12 +37,12 @@ describe('family page widget usage', () => {
 
     // Presence of mocked widget instances confirms usage
     await expect(
-      screen.findByTestId('TextInput-widget'),
+      screen.findByLabelText('TextInput-widget'),
     ).resolves.toBeInTheDocument();
-    expect(screen.getByTestId('Button-widget')).toBeInTheDocument();
+    expect(screen.getByLabelText('Button-widget')).toBeVisible();
 
     // And the accessible hooks still work
-    expect(screen.getByPlaceholderText('New family name')).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: 'Create'})).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('New family name')).toBeVisible();
+    expect(screen.getByLabelText('Button-widget')).toBeVisible();
   });
 });

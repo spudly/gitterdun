@@ -1,5 +1,5 @@
 import type {FC, ReactNode, ButtonHTMLAttributes} from 'react';
-import clsx from 'clsx';
+import {clsx} from 'clsx';
 
 type IconButtonProps = Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,

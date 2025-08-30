@@ -22,7 +22,7 @@ describe('textInput', () => {
         value=""
       />,
     );
-    expect(screen.getByText('err')).toBeInTheDocument();
+    expect(screen.getByText('err')).toHaveTextContent('err');
   });
 
   test('works with FormField', () => {
@@ -31,8 +31,8 @@ describe('textInput', () => {
         <TextInput id="f" />
       </FormField>,
     );
-    expect(screen.getByLabelText(/l/iu)).toBeInTheDocument();
-    expect(screen.getByText('H')).toBeInTheDocument();
-    expect(screen.getByText('E')).toBeInTheDocument();
+    expect(screen.getByLabelText(/l/iu)).toBeVisible();
+    expect(screen.getByText('H')).toHaveTextContent('H');
+    expect(screen.getByText('E')).toHaveTextContent('E');
   });
 });

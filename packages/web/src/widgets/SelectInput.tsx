@@ -1,5 +1,5 @@
 import type {ChangeEvent, FC, SelectHTMLAttributes} from 'react';
-import clsx from 'clsx';
+import {clsx} from 'clsx';
 
 type SelectInputProps = Omit<
   SelectHTMLAttributes<HTMLSelectElement>,

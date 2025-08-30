@@ -15,9 +15,9 @@ describe('section', () => {
       const header = screen.getByRole('heading', {level: 2});
       const content = screen.getByText('Child content');
 
-      expect(section).toBeInTheDocument();
+      expect(section).toHaveAccessibleName('Test Section');
       expect(header).toHaveTextContent('Test Section');
-      expect(content).toBeInTheDocument();
+      expect(content).toHaveTextContent('Child content');
     });
 
     test('renders with default header level 2 when no context', () => {
@@ -28,7 +28,7 @@ describe('section', () => {
       );
 
       const header = screen.getByRole('heading', {level: 2});
-      expect(header).toBeInTheDocument();
+      expect(header).toHaveTextContent('Default Level');
     });
 
     test('accepts multiple children', () => {
@@ -40,9 +40,11 @@ describe('section', () => {
         </Section>,
       );
 
-      expect(screen.getByText('First child')).toBeInTheDocument();
-      expect(screen.getByText('Second child')).toBeInTheDocument();
-      expect(screen.getByText('Third child')).toBeInTheDocument();
+      expect(screen.getByText('First child')).toHaveTextContent('First child');
+      expect(screen.getByText('Second child')).toHaveTextContent(
+        'Second child',
+      );
+      expect(screen.getByText('Third child')).toHaveTextContent('Third child');
     });
   });
 
@@ -212,12 +214,18 @@ describe('section', () => {
       expect(subHeader).toHaveTextContent('Subsection');
       expect(subSubHeader).toHaveTextContent('Sub-subsection');
 
-      expect(screen.getByText('Some paragraph content')).toBeInTheDocument();
-      expect(screen.getByText('Nested content')).toBeInTheDocument();
-      expect(screen.getByText('Deep content')).toBeInTheDocument();
+      expect(screen.getByText('Some paragraph content')).toHaveTextContent(
+        'Some paragraph content',
+      );
+      expect(screen.getByText('Nested content')).toHaveTextContent(
+        'Nested content',
+      );
+      expect(screen.getByText('Deep content')).toHaveTextContent(
+        'Deep content',
+      );
       expect(
         screen.getByText('More content after nested sections'),
-      ).toBeInTheDocument();
+      ).toHaveTextContent('More content after nested sections');
     });
   });
 
@@ -269,7 +277,7 @@ describe('section', () => {
       const section = screen.getByRole('region');
       const header = screen.getByRole('heading', {level: 2});
 
-      expect(section).toBeInTheDocument();
+      expect(section).toHaveAccessibleName('Empty Section');
       expect(header).toHaveTextContent('Empty Section');
     });
 
@@ -282,7 +290,9 @@ describe('section', () => {
         </Section>,
       );
 
-      expect(screen.getByText('Valid content')).toBeInTheDocument();
+      expect(screen.getByText('Valid content')).toHaveTextContent(
+        'Valid content',
+      );
       expect(screen.getByRole('heading')).toHaveTextContent(
         'Conditional Content',
       );

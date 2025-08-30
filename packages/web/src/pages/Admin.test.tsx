@@ -50,7 +50,9 @@ describe('admin page', () => {
     });
     render(<Admin />, {wrapper: Wrapper});
 
-    await expect(screen.findByText('Admin Panel')).resolves.toBeInTheDocument();
+    await expect(screen.findByText('Admin Panel')).resolves.toHaveTextContent(
+      'Admin Panel',
+    );
 
     // Shows stats section
     expect(screen.getByText('Total Chores')).toBeInTheDocument();
@@ -66,7 +68,6 @@ describe('admin page', () => {
   });
 
   test('denies access for non-admin users', () => {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- wrong
     const mocked = jest.requireMock('../hooks/useUser') as {useUser: any};
     const useUserMock: any = mocked.useUser;
     useUserMock.mockReturnValueOnce({
@@ -101,14 +102,15 @@ describe('admin page', () => {
     });
     render(<Admin />, {wrapper: Wrapper});
 
-    expect(screen.getByText('Access Denied')).toBeInTheDocument();
+    expect(screen.getByText('Access Denied')).toHaveTextContent(
+      'Access Denied',
+    );
     expect(
       screen.getByText('You need admin privileges to view this page.'),
-    ).toBeInTheDocument();
+    ).toHaveTextContent('You need admin privileges to view this page.');
   });
 
   test('denies access for unauthenticated users', () => {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- wrong
     const mocked = jest.requireMock('../hooks/useUser') as {useUser: any};
     const useUserMock: any = mocked.useUser;
     useUserMock.mockReturnValueOnce({
@@ -134,9 +136,11 @@ describe('admin page', () => {
     });
     render(<Admin />, {wrapper: Wrapper});
 
-    expect(screen.getByText('Access Denied')).toBeInTheDocument();
+    expect(screen.getByText('Access Denied')).toHaveTextContent(
+      'Access Denied',
+    );
     expect(
       screen.getByText('You need admin privileges to view this page.'),
-    ).toBeInTheDocument();
+    ).toHaveTextContent('You need admin privileges to view this page.');
   });
 });

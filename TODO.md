@@ -39,6 +39,7 @@
       https://docs.gitguardian.com/ggshield-docs/integrations/git-hooks/pre-commit
 - [x] write an eslint rule to ensure i18n messages are not used without
       <FormattedMessage /> or intl.formatMessage()
-- [ ] eslint rule (or something else) to forbid use of CSS margins
+- [x] eslint rule (or something else) to forbid use of CSS margins
 - [ ] eslint rule to check for unused data-test-id attributes
-- [ ]
+- [ ] create a new way to define eslint rules
+- [ ] add cursor ignore file?

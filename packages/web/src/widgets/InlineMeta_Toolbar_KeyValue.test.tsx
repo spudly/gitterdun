@@ -19,9 +19,9 @@ describe('inlineMeta/Toolbar/KeyValue', () => {
         <KeyValue label="K" value="V" />
       </div>,
     );
-    expect(screen.getByText('A')).toBeInTheDocument();
-    expect(screen.getByText('B')).toBeInTheDocument();
-    expect(screen.getByText('K')).toBeInTheDocument();
-    expect(screen.getByText('V')).toBeInTheDocument();
+    expect(screen.getByText('A')).toHaveTextContent('A');
+    expect(screen.getByText('B')).toHaveTextContent('B');
+    expect(screen.getByText('K')).toHaveTextContent('K');
+    expect(screen.getByText('V')).toHaveTextContent('V');
   });
 });

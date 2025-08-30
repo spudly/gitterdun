@@ -4,7 +4,7 @@ import {Button} from './Button.js';
 
 const PageHeaderDemo: FC = () => {
   return (
-    <div className="space-y-6" data-testid="PageHeaderDemo">
+    <div className="space-y-6">
       <PageHeader title="Simple Page" />
 
       <PageHeader

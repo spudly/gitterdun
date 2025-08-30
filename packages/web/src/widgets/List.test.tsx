@@ -10,8 +10,8 @@ describe('list & ListRow', () => {
         <ListRow description="Desc" right={<span>R</span>} title="Row" />
       </List>,
     );
-    expect(screen.getByText('Row')).toBeInTheDocument();
-    expect(screen.getByText('Desc')).toBeInTheDocument();
-    expect(screen.getByText('R')).toBeInTheDocument();
+    expect(screen.getByText('Row')).toHaveTextContent('Row');
+    expect(screen.getByText('Desc')).toHaveTextContent('Desc');
+    expect(screen.getByText('R')).toHaveTextContent('R');
   });
 });

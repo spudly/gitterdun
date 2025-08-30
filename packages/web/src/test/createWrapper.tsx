@@ -57,7 +57,7 @@ export const createWrapper: CreateWrapper = (options = {}) => {
         }
         return content;
       },
-      // eslint-disable-next-line react/jsx-no-useless-fragment -- typescript expects a ReactElement, not a ReactNode
+
       <>{children}</>,
     );
   return Wrapper;

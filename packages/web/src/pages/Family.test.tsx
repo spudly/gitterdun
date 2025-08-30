@@ -1,5 +1,5 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen, act} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Family from './Family';
@@ -50,7 +50,7 @@ describe('family page', () => {
     render(wrap(<Family />), {wrapper: Wrapper});
     expect(
       screen.getByText('Please log in to manage your family.'),
-    ).toBeInTheDocument();
+    ).toHaveTextContent('Please log in to manage your family.');
   });
 
   test('serves as the primary family management interface for authenticated users', async () => {
@@ -58,13 +58,13 @@ describe('family page', () => {
     render(wrap(<Family />), {wrapper: Wrapper});
 
     // Should provide all core family management features
-    await expect(screen.findByText('Your Family')).resolves.toBeInTheDocument();
+    await expect(screen.findByText('Your Family')).resolves.toHaveTextContent(
+      'Your Family',
+    );
 
     // Should allow family creation
-    expect(screen.getByPlaceholderText('New family name')).toBeInTheDocument();
-    expect(
-      screen.getAllByRole('button', {name: 'Create'})[0],
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('New family name')).toBeVisible();
+    expect(screen.getAllByRole('button', {name: 'Create'})[0]).toBeEnabled();
 
     // No selector now; create-only when no family
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
@@ -80,11 +80,9 @@ describe('family page', () => {
   });
 
   test('renders section title', async () => {
-    await act(async () => {
-      const Wrapper = createWrapper({i18n: true, queryClient: true});
-      render(wrap(<Family />), {wrapper: Wrapper});
-    });
-    expect(screen.getByText('Your Family')).toBeInTheDocument();
+    const Wrapper = createWrapper({i18n: true, queryClient: true});
+    render(wrap(<Family />), {wrapper: Wrapper});
+    await expect(screen.findByText('Your Family')).resolves.toBeInTheDocument();
   });
 
   test('allows creating a new family and child & inviting a member', async () => {
@@ -124,18 +122,12 @@ describe('family page', () => {
       screen.getAllByPlaceholderText('Password')[0]!,
       'pw12',
     );
-    await act(async () => {
-      await userEvent.click(
-        screen.getAllByRole('button', {name: 'Create'})[0]!,
-      );
-    });
+    await userEvent.click(screen.getAllByRole('button', {name: 'Create'})[0]!);
 
     // Invite
     const inviteEmailInput = screen.getAllByPlaceholderText('Email')[1]!;
     await userEvent.type(inviteEmailInput, 'm@ex.com');
-    await act(async () => {
-      await userEvent.click(screen.getByRole('button', {name: 'Send'}));
-    });
+    await userEvent.click(screen.getByRole('button', {name: 'Send'}));
     expect(familiesApi.createChild).toHaveBeenCalledWith(1, {
       username: 'kid',
       email: 'kid@ex.com',
@@ -158,6 +150,6 @@ describe('family page', () => {
     // Invite with empty email should no-op (exercise path only)
     await userEvent.click(screen.getByRole('button', {name: 'Send'}));
     // Nothing to assert on API; ensure page is still rendered
-    expect(screen.getByText('Your Family')).toBeInTheDocument();
+    expect(screen.getByText('Your Family')).toHaveTextContent('Your Family');
   });
 });

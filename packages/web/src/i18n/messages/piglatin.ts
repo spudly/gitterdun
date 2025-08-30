@@ -149,4 +149,11 @@ export default {
   'pages.family.InviteMemberForm.parent': 'Arent-pay',
   'pages.family.InviteMemberForm.child': 'Ild-chay',
   'pages.family.InviteMemberForm.send': 'End-say',
+  // Icon titles
+  'icons.checkCircle.title': 'Eck-chay Ircle-cay Icon-way',
+  'icons.clock.title': 'Ock-clay Icon-way',
+  'icons.doc.title': 'Oc-day Icon-way',
+  'icons.infoCircle.title': 'Info-way Ircle-cay Icon-way',
+  'icons.sparkles.title': 'Arkles-spay Icon-way',
+  'icons.trophy.title': 'Ophy-tray Icon-way',
 };

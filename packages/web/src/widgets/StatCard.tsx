@@ -1,5 +1,5 @@
 import type {FC, ReactNode} from 'react';
-import clsx from 'clsx';
+import {clsx} from 'clsx';
 import {Text} from './Text.js';
 
 type StatColor = 'blue' | 'yellow' | 'green' | 'red' | 'purple' | 'gray';

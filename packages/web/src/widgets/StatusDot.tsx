@@ -1,5 +1,5 @@
 import type {FC} from 'react';
-import clsx from 'clsx';
+import {clsx} from 'clsx';
 
 type StatusColor = 'green' | 'blue' | 'yellow' | 'red' | 'gray';
 

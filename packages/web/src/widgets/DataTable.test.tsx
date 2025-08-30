@@ -24,9 +24,11 @@ describe('dataTable', () => {
       0, // index parameter
     );
     rerender(<DataTable columns={columns} data={[]} loading />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('Loading...')).toHaveTextContent('Loading...');
     rerender(<DataTable columns={columns} data={[]} />);
-    expect(screen.getByText('No data available')).toBeInTheDocument();
+    expect(screen.getByText('No data available')).toHaveTextContent(
+      'No data available',
+    );
   });
 
   test('uses row-index key path when items have no id', () => {
@@ -35,7 +37,7 @@ describe('dataTable', () => {
     const columns: Array<Column<Row>> = [{key: 'name', header: 'Name'}];
     const Wrapper = createWrapper({i18n: true});
     render(<DataTable columns={columns} data={data} />, {wrapper: Wrapper});
-    expect(screen.getByText('X')).toBeInTheDocument();
+    expect(screen.getByText('X')).toHaveTextContent('X');
   });
 
   test('uses custom column render when provided', () => {
@@ -50,7 +52,7 @@ describe('dataTable', () => {
     ];
     const Wrapper = createWrapper({i18n: true});
     render(<DataTable columns={columns} data={data} />, {wrapper: Wrapper});
-    expect(screen.getByText('R-X-0')).toBeInTheDocument();
-    expect(screen.getByText('R-Y-1')).toBeInTheDocument();
+    expect(screen.getByText('R-X-0')).toHaveTextContent('R-X-0');
+    expect(screen.getByText('R-Y-1')).toHaveTextContent('R-Y-1');
   });
 });

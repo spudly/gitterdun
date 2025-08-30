@@ -65,7 +65,6 @@ describe('initializeDatabase', () => {
 
     await initializeDatabase();
 
-    // eslint-disable-next-line @typescript-eslint/unbound-method -- Mocked function context is not relevant
     expect(mockedPath.join).toHaveBeenCalledWith(
       process.cwd(),
       'src/lib/schema.sqlite.sql',
@@ -74,7 +73,7 @@ describe('initializeDatabase', () => {
       '/mock/schema/path.sql',
       'utf8',
     );
-    // eslint-disable-next-line @typescript-eslint/unbound-method -- Mocked function context is not relevant
+
     expect(mockedDb.exec).toHaveBeenCalledWith(mockSchemaContent);
     expect(mockedLogger.info).toHaveBeenCalledWith(
       'Database initialized successfully',
@@ -93,7 +92,7 @@ describe('initializeDatabase', () => {
 
     // The dynamic import will succeed, but we can still test the behavior
     // by verifying the admin user was created with the expected data
-    // eslint-disable-next-line @typescript-eslint/unbound-method -- Mocked function context is not relevant
+
     expect(mockPreparedStatement.run).toHaveBeenCalledWith(
       'admin',
       'admin@gitterdun.com',
@@ -117,7 +116,6 @@ describe('initializeDatabase', () => {
 
     await initializeDatabase();
 
-    // eslint-disable-next-line @typescript-eslint/unbound-method -- Mocked function context is not relevant
     expect(mockPreparedStatement.run).not.toHaveBeenCalled();
     expect(mockedLogger.info).toHaveBeenCalledWith(
       'Database initialized successfully',

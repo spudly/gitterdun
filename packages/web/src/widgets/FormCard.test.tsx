@@ -9,7 +9,7 @@ describe('formCard', () => {
         <div>child</div>
       </FormCard>,
     );
-    expect(screen.getByText('T')).toBeInTheDocument();
-    expect(screen.getByText('child')).toBeInTheDocument();
+    expect(screen.getByText('T')).toHaveTextContent('T');
+    expect(screen.getByText('child')).toHaveTextContent('child');
   });
 });

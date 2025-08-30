@@ -13,5 +13,5 @@ export default defineConfig({
     }),
   ],
   server: {port: 8001, strictPort: true},
-  build: {rollupOptions: {input: {main: 'index.html'}}},
+  build: {outDir: 'bundle', rollupOptions: {input: {main: 'index.html'}}},
 });

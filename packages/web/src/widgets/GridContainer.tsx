@@ -1,9 +1,8 @@
 import type {FC, ReactNode} from 'react';
-import clsx from 'clsx';
+import {clsx} from 'clsx';
 
 type GridContainerProps = {
   readonly children: ReactNode;
-  // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- type definition
   readonly cols?: 1 | 2 | 3 | 4 | 5 | 6;
   readonly gap?: 'sm' | 'md' | 'lg' | 'xl';
 };

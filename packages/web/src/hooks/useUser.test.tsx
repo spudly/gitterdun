@@ -82,6 +82,8 @@ describe('useUser', () => {
     const {result} = renderHook(() => useUser(), {wrapper});
     await waitFor(() => {
       expect(result.current.user).toBeUndefined();
+    });
+    await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
     });
   });

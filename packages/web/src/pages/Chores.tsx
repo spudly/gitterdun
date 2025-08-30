@@ -26,7 +26,6 @@ const Chores: FC = () => {
     queryKey: ['chores', user?.id],
     queryFn: async () =>
       choresApi.getAll({
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- will never be called if user is null/undefined
         user_id: user!.id,
         sort_by: 'start_date',
         order: 'asc',

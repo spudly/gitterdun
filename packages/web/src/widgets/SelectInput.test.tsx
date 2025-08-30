@@ -15,7 +15,7 @@ describe('selectInput', () => {
     );
     await userEvent.selectOptions(screen.getByRole('combobox'), 'a');
     expect(onChange).toHaveBeenCalledWith('a', expect.any(Object));
-    expect(screen.getByText('bad')).toBeInTheDocument();
+    expect(screen.getByText('bad')).toHaveTextContent('bad');
     const select = screen.getByRole('combobox');
     expect(select).toHaveClass('border-red-500');
   });

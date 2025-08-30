@@ -1,5 +1,5 @@
 import type {FC} from 'react';
-import clsx from 'clsx';
+import {clsx} from 'clsx';
 import {AVATAR_INITIALS_LENGTH} from '../constants';
 
 type AvatarSize = 'sm' | 'md' | 'lg';

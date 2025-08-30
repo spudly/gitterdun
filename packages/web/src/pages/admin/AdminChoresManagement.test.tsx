@@ -54,22 +54,24 @@ describe('<AdminChoresManagement />', () => {
 
     renderWithProviders(<AdminChoresManagement chores={chores} />);
 
-    expect(screen.getByText('Chores Management')).toBeInTheDocument();
+    expect(screen.getByText('Chores Management')).toHaveTextContent(
+      'Chores Management',
+    );
 
     // Meta labels
-    expect(screen.getByText('Points: 5')).toBeInTheDocument();
-    expect(screen.getByText('Bonus: +1')).toBeInTheDocument();
-    expect(screen.getByText('Penalty: -2')).toBeInTheDocument();
-    expect(screen.getByText(/Due:/u)).toBeInTheDocument();
+    expect(screen.getByText('Points: 5')).toHaveTextContent('Points: 5');
+    expect(screen.getByText('Bonus: +1')).toHaveTextContent('Bonus: +1');
+    expect(screen.getByText('Penalty: -2')).toHaveTextContent('Penalty: -2');
+    expect(screen.getByText(/Due:/u)).toHaveTextContent(/Due:/u);
 
     // Status labels
-    expect(screen.getByText(/Completed/i)).toBeInTheDocument();
-    expect(screen.getByText(/Approved/i)).toBeInTheDocument();
-    expect(screen.getByText(/Pending/i)).toBeInTheDocument();
+    expect(screen.getByText(/Completed/i)).toHaveTextContent(/Completed/i);
+    expect(screen.getByText(/Approved/i)).toHaveTextContent(/Approved/i);
+    expect(screen.getByText(/Pending/i)).toHaveTextContent(/Pending/i);
 
     // Action buttons
-    expect(screen.getByRole('button', {name: 'Approve'})).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: 'Reject'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Approve'})).toBeEnabled();
+    expect(screen.getByRole('button', {name: 'Reject'})).toBeEnabled();
     expect(
       screen.getAllByRole('button', {name: 'Edit'}).length,
     ).toBeGreaterThanOrEqual(1);

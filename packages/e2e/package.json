@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "pretest": "node ./scripts/ensure-ports-free.mjs",
+    "pretest": "node --experimental-strip-types ./scripts/ensure-ports-free.ts",
     "test": "playwright test",
     "test:debug": "playwright test --debug",
     "test:ui": "PLAYWRIGHT_SKIP_WEBSERVER=1 playwright test --ui",

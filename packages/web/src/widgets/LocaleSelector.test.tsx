@@ -15,7 +15,7 @@ describe('localeSelector', () => {
       const {locale, setLocale} = useI18n();
       return (
         <div>
-          <span data-testid="locale">{locale}</span>
+          <span data-testid="LocaleSelector.locale">{locale}</span>
           <LocaleSelector
             onChange={next => {
               setLocale(next);
@@ -30,8 +30,11 @@ describe('localeSelector', () => {
     // Closed initially
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', {name: /language/i}));
-    expect(screen.getByRole('menu')).toBeInTheDocument();
+    // The menu should be visible now that it's open
+    expect(screen.getByRole('menu')).toBeVisible();
     await user.click(screen.getByRole('menuitemradio', {name: /pirate/i}));
-    expect(screen.getByTestId('locale').textContent).toBe('pirate');
+    expect(screen.getByTestId('LocaleSelector.locale')).toHaveTextContent(
+      'pirate',
+    );
   });
 });

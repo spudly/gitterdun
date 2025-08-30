@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, jest, test} from '@jest/globals';
-import {render, screen, act} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {createWrapper} from '../test/createWrapper';
 import * as useUserModule from '../hooks/useUser';
@@ -43,15 +43,13 @@ describe('register page', () => {
     const Wrapper = createWrapper({i18n: true, router: true, toast: true});
     render(<Register />, {wrapper: Wrapper});
 
-    expect(
-      screen.getByRole('heading', {name: /register/i}),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', {name: /register/i})).toHaveTextContent(
+      /register/i,
+    );
     await userEvent.type(screen.getByLabelText(/username/i), 'newuser');
     await userEvent.type(screen.getByLabelText(/email/i), 'new@user.com');
     await userEvent.type(screen.getByLabelText(/password/i), 'password1');
-    await act(async () => {
-      await userEvent.click(screen.getByRole('button', {name: /register/i}));
-    });
+    await userEvent.click(screen.getByRole('button', {name: /register/i}));
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
@@ -68,9 +66,7 @@ describe('register page', () => {
     await userEvent.type(screen.getByLabelText(/username/i), 'newuser');
     // do not type email
     await userEvent.type(screen.getByLabelText(/password/i), 'password1');
-    await act(async () => {
-      await userEvent.click(screen.getByRole('button', {name: /register/i}));
-    });
+    await userEvent.click(screen.getByRole('button', {name: /register/i}));
 
     expect(registerSpy).toHaveBeenCalledTimes(1);
     const arg = jest.mocked(registerSpy).mock.calls[0]![0] as Record<

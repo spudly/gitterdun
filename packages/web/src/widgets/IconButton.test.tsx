@@ -9,7 +9,7 @@ describe('iconButton', () => {
   });
 
   test('supports variants and sizes when enabled', () => {
-    const {rerender, getByRole} = render(
+    const {rerender} = render(
       <IconButton
         icon={<span>i</span>}
         label="icon"
@@ -17,7 +17,7 @@ describe('iconButton', () => {
         variant="secondary"
       />,
     );
-    expect(getByRole('button')).toBeEnabled();
+    expect(screen.getByRole('button')).toBeEnabled();
     rerender(
       <IconButton
         icon={<span>i</span>}
@@ -26,7 +26,7 @@ describe('iconButton', () => {
         variant="danger"
       />,
     );
-    expect(getByRole('button')).toBeEnabled();
+    expect(screen.getByRole('button')).toBeEnabled();
     rerender(
       <IconButton
         icon={<span>i</span>}
@@ -35,6 +35,6 @@ describe('iconButton', () => {
         variant="ghost"
       />,
     );
-    expect(getByRole('button')).toBeEnabled();
+    expect(screen.getByRole('button')).toBeEnabled();
   });
 });

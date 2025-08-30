@@ -6,10 +6,7 @@ import {Button} from './Button.js';
 
 const ListRowDemo: FC = () => {
   return (
-    <div
-      className="divide-y divide-gray-200 rounded bg-white shadow"
-      data-testid="ListRowDemo"
-    >
+    <div className="divide-y divide-gray-200 rounded bg-white shadow">
       <ListRow
         description="Load and start"
         left={<StatusDot color="green" />}

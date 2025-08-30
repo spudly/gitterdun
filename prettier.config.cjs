@@ -18,6 +18,14 @@ module.exports = {
   experimentalOperatorPosition: 'start',
   objectWrap: 'collapse',
   proseWrap: 'always',
+  quoteProps: 'consistent',
+  jsxSingleQuote: false,
+  requirePragma: false,
+  insertPragma: false,
+  htmlWhitespaceSensitivity: 'css',
+  vueIndentScriptAndStyle: false,
+  embeddedLanguageFormatting: 'auto',
+  singleAttributePerLine: false,
 
   // prettier-plugin-embed:
   embeddedSqlTags: ['sql'],

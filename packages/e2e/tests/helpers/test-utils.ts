@@ -26,9 +26,14 @@ export const registerAndLogin = async (
   const password = 'testpassword123';
 
   await page.goto('/register');
-  await page.getByRole('textbox', {name: 'Username'}).fill(username);
-  await page.getByRole('textbox', {name: 'Password'}).fill(password);
-  await page.click('button[type="submit"]');
+  const usernameInput = page.getByRole('textbox', {name: 'Username'});
+  const passwordInput = page.getByRole('textbox', {name: 'Password'});
+  const submitButton = page.getByRole('button', {name: 'Register'});
+
+  await usernameInput.fill(username);
+  await passwordInput.fill(password);
+  await expect(submitButton).toBeEnabled();
+  await submitButton.click();
   await expect(page).toHaveURL('/');
 
   return {username, password};
@@ -44,9 +49,14 @@ export const loginAs = async (
 ): Promise<void> => {
   await page.context().clearCookies();
   await page.goto('/login');
-  await page.getByRole('textbox', {name: 'Username or Email'}).fill(username);
-  await page.getByRole('textbox', {name: 'Password'}).fill(password);
-  await page.click('button[type="submit"]');
+  const usernameInput = page.getByRole('textbox', {name: 'Username or Email'});
+  const passwordInput = page.getByRole('textbox', {name: 'Password'});
+  const submitButton = page.getByRole('button', {name: 'Login'});
+
+  await usernameInput.fill(username);
+  await passwordInput.fill(password);
+  await expect(submitButton).toBeEnabled();
+  await submitButton.click();
   await expect(page).toHaveURL('/');
 };
 
@@ -54,7 +64,7 @@ export const loginAs = async (
  * Ensure admin user has a family and wait for create child form to be visible
  */
 const ensureFamilyExists = async (page: Page): Promise<void> => {
-  const createFamilyButton = page.getByRole('button', {name: 'Create'}).first();
+  const createFamilyButton = page.getByRole('button', {name: 'Create'});
   const createFamilyInput = page.getByPlaceholder('New family name');
 
   // If there's no family, create one
@@ -87,9 +97,14 @@ export const setupFamily = async (page: Page) => {
 
   // Login as admin user (which already exists)
   await page.goto('/login');
-  await page.getByRole('textbox', {name: 'Username or Email'}).fill('admin');
-  await page.getByRole('textbox', {name: 'Password'}).fill('admin123');
-  await page.click('button[type="submit"]');
+  const usernameInput = page.getByRole('textbox', {name: 'Username or Email'});
+  const passwordInput = page.getByRole('textbox', {name: 'Password'});
+  const submitButton = page.getByRole('button', {name: 'Login'});
+
+  await usernameInput.fill('admin');
+  await passwordInput.fill('admin123');
+  await expect(submitButton).toBeEnabled();
+  await submitButton.click();
   await expect(page).toHaveURL('/');
 
   // Navigate to family page and ensure family exists
@@ -142,12 +157,11 @@ export const setupFamilyWithChildren = async (page: Page) => {
 
   // Create family
   await page.goto('/family');
+  await expect(page.getByRole('heading', {name: 'Your Family'})).toBeVisible();
   const familyName = `Test Family ${id}`;
-  await page.fill('input[placeholder*="New family name"]', familyName);
-  await page.click('button:has-text("Create")');
-  await expect(page.locator('text=Members')).toBeVisible();
-
-  // Add children
+  await page.getByPlaceholder('New family name').fill(familyName);
+  await page.getByRole('button', {name: 'Create'}).click();
+  await expect(page.getByRole('heading', {name: 'Members'})).toBeVisible();
   const child1Username = `c1_${id}`;
   const child2Username = `c2_${id}`;
   const childPassword = 'childpassword123';

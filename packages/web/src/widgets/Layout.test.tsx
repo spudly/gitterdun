@@ -46,8 +46,8 @@ describe('layout', () => {
       </Layout>,
       {wrapper: Wrapper},
     );
-    expect(screen.getByText('Child')).toBeInTheDocument();
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+    expect(screen.getByText('Child')).toHaveTextContent('Child');
+    expect(screen.getByText('Dashboard')).toHaveTextContent('Dashboard');
   });
 
   test('shows a language selector control in the header', () => {
@@ -61,7 +61,7 @@ describe('layout', () => {
       </Layout>,
       {wrapper: Wrapper},
     );
-    expect(screen.getByRole('button', {name: /language/i})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /language/i})).toBeEnabled();
   });
 
   test('shows login when no user and hides admin link', () => {
@@ -72,7 +72,7 @@ describe('layout', () => {
       </Layout>,
       {wrapper: createWrapper({i18n: true, router: {initialEntries: ['/']}})},
     );
-    expect(screen.getByText('Login')).toBeInTheDocument();
+    expect(screen.getByText('Login')).toHaveTextContent('Login');
   });
 
   test('calls logout when clicking Logout button', async () => {

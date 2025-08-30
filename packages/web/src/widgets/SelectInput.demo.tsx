@@ -6,10 +6,9 @@ import {FormField} from './FormField.js';
 const SelectInputDemo: FC = () => {
   const [value, setValue] = useState('');
   return (
-    <div className="space-y-4" data-testid="SelectInputDemo">
+    <div className="space-y-4">
       <FormField htmlFor="role" label="Role">
         <SelectInput
-          data-testid="roleSelect"
           id="role"
           onChange={val => {
             setValue(val);

@@ -1,9 +1,9 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import * as familyOps from '../familyOperations.js';
-import * as invitationOps from '../invitationOperations.js';
-import * as dbModule from '../../lib/db.js';
+import * as familyOps from './familyOperations.js';
+import * as invitationOps from './invitationOperations.js';
+import * as dbModule from '../lib/db.js';
 
-jest.mock('../../lib/db.js', () => {
+jest.mock('../lib/db.js', () => {
   const run = jest.fn();
   const get = jest.fn(() => ({
     id: 1,

@@ -92,3 +92,5 @@ export const RANKS = [GOLD_RANK, SILVER_RANK, BRONZE_RANK];
 
 /** Number of characters to display in avatar initials */
 export const AVATAR_INITIALS_LENGTH = 2;
+
+export const DEFAULT_PORT = 8001;

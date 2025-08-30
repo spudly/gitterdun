@@ -1,10 +1,12 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
+import {createWrapper} from '../test/createWrapper';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Goals from './Goals';
 import * as apiModule from '../lib/api';
 
-jest.mock('../hooks/useUser', () => ({useUser: () => ({user: {id: 1}})}));
+const mockUseUser = jest.fn(() => ({user: {id: 1}}));
+jest.mock('../hooks/useUser', () => ({useUser: () => mockUseUser()}));
 
 jest.mock('../lib/api', () => ({
   goalsApi: {
@@ -37,14 +39,21 @@ jest.mock('../lib/api', () => ({
   },
 }));
 
-const wrap = (ui: React.ReactElement) => (
-  <QueryClientProvider client={new QueryClient()}>{ui}</QueryClientProvider>
-);
+const wrap = (ui: React.ReactElement) => {
+  const Wrapper = createWrapper({i18n: true});
+  return (
+    <QueryClientProvider client={new QueryClient()}>
+      <Wrapper>{ui}</Wrapper>
+    </QueryClientProvider>
+  );
+};
 
 describe('goals page', () => {
   test('renders header', async () => {
     render(wrap(<Goals />));
-    await expect(screen.findByText('Goals')).resolves.toBeInTheDocument();
+    await expect(screen.findByText('Goals')).resolves.toHaveTextContent(
+      'Goals',
+    );
   });
 
   test('covers completed, abandoned, and in_progress variants and empty state', async () => {
@@ -77,41 +86,24 @@ describe('goals page', () => {
       ],
     });
     render(wrap(<Goals />));
-    await expect(screen.findByText('A')).resolves.toBeInTheDocument();
-    expect(screen.getByText('B')).toBeInTheDocument();
+    await expect(screen.findByText('A')).resolves.toHaveTextContent('A');
+    expect(screen.getByText('B')).toHaveTextContent('B');
 
     // Empty state when no goals
     goalsApi.getAll.mockResolvedValueOnce({success: true, data: []});
     render(wrap(<Goals />));
-    await expect(
-      screen.findByText('No goals yet'),
-    ).resolves.toBeInTheDocument();
+    await expect(screen.findByText('No goals yet')).resolves.toHaveTextContent(
+      'No goals yet',
+    );
   });
 
   test('uses fallback empty data when user is null (covers queryFn else branch)', async () => {
-    await jest.isolateModulesAsync(async () => {
-      jest.doMock('../hooks/useUser', () => ({useUser: () => ({user: null})}));
-      jest.doMock('@tanstack/react-query', () => {
-        const actual = jest.requireActual<
-          typeof import('@tanstack/react-query')
-        >('@tanstack/react-query');
-        type UseQueryOpts<T> = {queryFn?: () => T};
-        type QueryResult = {data: {data: Array<unknown>}; isLoading: false};
-        return {
-          ...actual,
-          useQuery: (opts: UseQueryOpts<unknown>): QueryResult => {
-            // Execute the queryFn so the else branch in Goals.tsx runs
-            opts.queryFn?.();
-            return {data: {data: []}, isLoading: false};
-          },
-        };
-      });
-      const mod = await import('./Goals');
-      render(wrap(<mod.default />));
-    });
-    await expect(
-      screen.findByText('No goals yet'),
-    ).resolves.toBeInTheDocument();
-    expect(screen.getByText('No goals yet')).toBeInTheDocument();
+    // @ts-expect-error: Testing null user fallback, type is intentionally invalid for test coverage
+    mockUseUser.mockReturnValue({user: null});
+    render(wrap(<Goals />));
+    await expect(screen.findByText('No goals yet')).resolves.toHaveTextContent(
+      'No goals yet',
+    );
+    expect(screen.getByText('No goals yet')).toHaveTextContent('No goals yet');
   });
 });
