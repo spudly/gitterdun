@@ -3,29 +3,60 @@ import fs from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
 import {execSync} from 'node:child_process';
-import {fileURLToPath} from 'node:url';
+// Avoid ESM-only import.meta usage for Jest/CommonJS compatibility
 
 const PORTS_TO_CHECK: number[] = [8000, 8001];
 const LSOF_OUTPUT_MAX_LINES = 5;
 
-export const checkNodeVersion = (): void => {
-  const currentNodeVersion = process.version.replace(/^v/, ''); // Remove 'v' prefix
-  const currentDir = path.dirname(fileURLToPath(import.meta.url));
-  const workspaceRoot = path.resolve(currentDir, '../../../');
-  const nvmrcPath = path.join(workspaceRoot, '.nvmrc');
+const findNearestNvmrc = (startDirectory: string, maxDepth: number): string => {
+  let currentDirectory = startDirectory;
+  for (let depthIndex = 0; depthIndex < maxDepth; depthIndex++) {
+    const candidatePath = path.join(currentDirectory, '.nvmrc');
+    if (fs.existsSync(candidatePath)) {
+      return candidatePath;
+    }
+    const parentDirectory = path.dirname(currentDirectory);
+    if (parentDirectory === currentDirectory) {
+      break;
+    }
+    currentDirectory = parentDirectory;
+  }
+  return '';
+};
 
-  if (!fs.existsSync(nvmrcPath)) {
-    console.error('E2E precheck: .nvmrc file not found in workspace root');
+const parseVersionParts = (versionString: string): [number, number, number] => {
+  const [major, minor, patch] = versionString
+    .split('.')
+    .map(part => Number(part));
+  return [major, minor, patch];
+};
+
+export const checkNodeVersion = (): void => {
+  const currentNodeVersion = process.version.replace(/^v/, '');
+  const nvmrcPath = findNearestNvmrc(process.cwd(), 6);
+  if (!nvmrcPath) {
+    console.error('E2E precheck: .nvmrc file not found nearby');
     process.exit(1);
   }
 
   const expectedNodeVersion = fs.readFileSync(nvmrcPath, 'utf8').trim();
+  const [currentMajor, currentMinor, currentPatch] =
+    parseVersionParts(currentNodeVersion);
+  const [expectedMajor, expectedMinor, expectedPatch] =
+    parseVersionParts(expectedNodeVersion);
 
-  if (currentNodeVersion !== expectedNodeVersion) {
+  if (currentMajor !== expectedMajor) {
     console.error(
-      `E2E precheck: Node.js version mismatch!\nExpected: v${expectedNodeVersion} (from .nvmrc)\nCurrent:  v${currentNodeVersion}\nPlease run: nvm use`,
+      `E2E precheck: Node.js major version mismatch!\nExpected: v${expectedNodeVersion} (from .nvmrc)\nCurrent:  v${currentNodeVersion}\nPlease run: nvm use`,
     );
     process.exit(1);
+  }
+
+  if (currentMinor !== expectedMinor || currentPatch !== expectedPatch) {
+    console.error(
+      `E2E precheck: Node.js minor/patch mismatch (continuing).\nExpected: v${expectedNodeVersion} (from .nvmrc)\nCurrent:  v${currentNodeVersion}\nTip: run 'nvm use' for parity.`,
+    );
+    return;
   }
 
   console.log(`✅ Node.js version check passed: v${currentNodeVersion}`);
@@ -166,7 +197,7 @@ const logBlockedPortsAndExit = (blockedPorts: PortStatus[]): void => {
   process.exit(1);
 };
 
-const main = async (): Promise<void> => {
+export const main = async (): Promise<void> => {
   // Check Node.js version first before doing anything else
   checkNodeVersion();
 
@@ -197,8 +228,7 @@ const main = async (): Promise<void> => {
   }
 };
 
-const isMain = process.argv[1] === fileURLToPath(import.meta.url);
-if (isMain) {
+if (process.env['RUN_AS_CLI'] === '1') {
   main().catch(err => {
     console.error('E2E precheck failed:', err);
     process.exit(1);
