@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "pretest": "node --experimental-strip-types ./scripts/ensure-ports-free.ts",
+    "pretest": "RUN_AS_CLI=1 node --experimental-strip-types ./scripts/ensure-ports-free.ts",
     "test": "playwright test",
     "test:debug": "playwright test --debug",
     "test:ui": "PLAYWRIGHT_SKIP_WEBSERVER=1 playwright test --ui",
@@ -13,6 +13,7 @@
     "install:browsers": "playwright install"
   },
   "devDependencies": {
+    "@jest/globals": "^30.0.5",
     "@playwright/test": "^1.47.0",
     "@types/node": "^22.10.7",
     "typescript": "^5.9.2"

@@ -7,7 +7,8 @@
     "PORT",
     "LOG_LEVEL",
     "CI",
-    "PLAYWRIGHT_SKIP_WEBSERVER"
+    "PLAYWRIGHT_SKIP_WEBSERVER",
+    "RUN_AS_CLI"
   ],
   "tasks": {
     "build": {

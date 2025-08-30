@@ -50,6 +50,7 @@ const config: KnipConfig = {
     '**/dist/**', // Build output
     '**/.turbo/**', // Turbo cache
     'types/**', // TypeScript ambient declaration files
+    'packages/e2e/debug-cookie.test.ts', // e2e debug helper test not part of CI
   ],
 };
 
