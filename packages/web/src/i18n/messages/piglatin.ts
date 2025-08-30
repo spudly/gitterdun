@@ -57,6 +57,10 @@ export default {
   'pages.Admin.access-denied': 'Access-way Enied-day',
   'pages.Admin.you-need-admin-privileges-to-v':
     'Ou-yay eed-nay admin-way ivileges-pray to iew-vay is-thay age-pay.',
+  'pages.Admin.create-chore': 'Eate-cray Ore-chay',
+  'pages.Admin.create': 'Eate-cray',
+  'pages.Admin.title': 'Itle-tay',
+  'pages.Admin.bonus': 'Onus-bay',
   'pages.Chores.loading-chores': 'Oading-lay ores-chay...',
 
   'pages.Chores.complete': 'Omplete-cay',
@@ -115,6 +119,11 @@ export default {
   'pages.admin.AdminChoresManagement.approved': 'Approved-way',
   'pages.admin.AdminChoresManagement.pending': 'Ending-pay',
   'pages.admin.AdminChoresManagement.bonus': 'Onus-bay',
+  'pages.admin.AdminChoresManagement.assign': 'Assign-way',
+  'pages.admin.AdminChoresManagement.assign-chore': 'Assign-way Ore-chay',
+  'pages.admin.AdminChoresManagement.assigned-to':
+    'Assigned-way to: {username}',
+  'pages.admin.AdminChoresManagement.assignee': 'Assignee-way',
   // AdminFamilyCreation (obsolete - removed)
   // AdminInvitations (obsolete - removed)
 

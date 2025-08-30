@@ -5,7 +5,7 @@ import {createWrapper} from '../../test/createWrapper';
 import {AdminChoresManagement} from './AdminChoresManagement';
 
 const renderWithProviders = (ui: React.ReactElement) =>
-  render(ui, {wrapper: createWrapper({i18n: true})});
+  render(ui, {wrapper: createWrapper({i18n: true, queryClient: true})});
 
 describe('<AdminChoresManagement />', () => {
   test('renders header and i18n labels for meta and actions', async () => {

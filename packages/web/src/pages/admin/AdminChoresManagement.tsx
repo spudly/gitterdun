@@ -1,5 +1,5 @@
 import type {FC} from 'react';
-import {FormattedMessage, defineMessages, useIntl} from 'react-intl';
+import {FormattedMessage, useIntl} from 'react-intl';
 import type {ChoreWithUsername} from '@gitterdun/shared';
 import {Card} from '../../widgets/Card.js';
 import {List} from '../../widgets/List.js';
@@ -11,6 +11,11 @@ import {Button} from '../../widgets/Button.js';
 import {Text} from '../../widgets/Text.js';
 import {Toolbar} from '../../widgets/Toolbar.js';
 import {InlineMeta} from '../../widgets/InlineMeta.js';
+import {useMutation, useQueryClient} from '@tanstack/react-query';
+import {choresApi} from '../../lib/api.js';
+import {useState} from 'react';
+import {AdminAssignControls} from './AdminAssignControls.js';
+import {adminChoresMessages as messages} from './AdminChoresMessages.js';
 
 type AdminChoresManagementProps = {readonly chores: Array<ChoreWithUsername>};
 
@@ -18,57 +23,30 @@ export const AdminChoresManagement: FC<AdminChoresManagementProps> = ({
   chores,
 }) => {
   const intl = useIntl();
+  const queryClient = useQueryClient();
+  // retained state for future inline assignment UX; currently unused
+  const [assignedToMap, setAssignedToMap] = useState<Record<number, string>>(
+    {},
+  );
 
-  const messages = defineMessages({
-    header: {
-      defaultMessage: 'Chores Management',
-      id: 'pages.admin.AdminChoresManagement.chores-management',
-    },
-    pointsWithValue: {
-      defaultMessage: 'Points: {points}',
-      id: 'pages.admin.AdminChoresManagement.points-points',
-    },
-    bonusWithPoints: {
-      defaultMessage: 'Bonus: +{points}',
-      id: 'pages.admin.AdminChoresManagement.bonus-points',
-    },
-    penaltyWithPoints: {
-      defaultMessage: 'Penalty: -{points}',
-      id: 'pages.admin.AdminChoresManagement.penalty-points',
-    },
-    dueWithDate: {
-      defaultMessage: 'Due: {date}',
-      id: 'pages.admin.AdminChoresManagement.due-date',
-    },
-    approve: {
-      defaultMessage: 'Approve',
-      id: 'pages.admin.AdminChoresManagement.approve',
-    },
-    reject: {
-      defaultMessage: 'Reject',
-      id: 'pages.admin.AdminChoresManagement.reject',
-    },
-    edit: {
-      defaultMessage: 'Edit',
-      id: 'pages.admin.AdminChoresManagement.edit',
-    },
-    statusCompleted: {
-      defaultMessage: 'Completed',
-      id: 'pages.admin.AdminChoresManagement.completed',
-    },
-    statusApproved: {
-      defaultMessage: 'Approved',
-      id: 'pages.admin.AdminChoresManagement.approved',
-    },
-    statusPending: {
-      defaultMessage: 'Pending',
-      id: 'pages.admin.AdminChoresManagement.pending',
-    },
-    typeBonus: {
-      defaultMessage: 'Bonus',
-      id: 'pages.admin.AdminChoresManagement.bonus',
+  // assignment queries are handled in AdminAssignControls
+  const approveMutation = useMutation({
+    mutationFn: async (id: number) => choresApi.approve(id, {approvedBy: 1}),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({queryKey: ['chores', 'admin']});
     },
   });
+  const rejectMutation = useMutation({
+    mutationFn: async (id: number) => choresApi.reject(id),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({queryKey: ['chores', 'admin']});
+    },
+  });
+  const handleAssigned = (choreId: number, username: string) => {
+    setAssignedToMap(prev => ({...prev, [choreId]: username}));
+  };
+
+  // messages imported
 
   return (
     <Card
@@ -127,17 +105,45 @@ export const AdminChoresManagement: FC<AdminChoresManagementProps> = ({
                     })}
                   </span>
                 ) : null}
+
+                {assignedToMap[chore.id] !== undefined ? (
+                  <span>
+                    <FormattedMessage
+                      defaultMessage="Assigned to: {username}"
+                      id="pages.admin.AdminChoresManagement.assigned-to"
+                      values={{username: assignedToMap[chore.id]}}
+                    />
+                  </span>
+                ) : null}
               </InlineMeta>
             }
             right={
               <Toolbar>
+                <AdminAssignControls
+                  choreId={chore.id}
+                  onAssigned={username => {
+                    handleAssigned(chore.id, username);
+                  }}
+                />
                 {chore.status === 'completed' && (
                   <>
-                    <Button size="sm" variant="primary">
+                    <Button
+                      onClick={() => {
+                        approveMutation.mutate(chore.id);
+                      }}
+                      size="sm"
+                      variant="primary"
+                    >
                       <FormattedMessage {...messages.approve} />
                     </Button>
 
-                    <Button size="sm" variant="danger">
+                    <Button
+                      onClick={() => {
+                        rejectMutation.mutate(chore.id);
+                      }}
+                      size="sm"
+                      variant="danger"
+                    >
                       <FormattedMessage {...messages.reject} />
                     </Button>
                   </>

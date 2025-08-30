@@ -59,6 +59,10 @@ export default {
   'pages.Admin.access-denied': 'Accès refusé',
   'pages.Admin.you-need-admin-privileges-to-v':
     'Vous avez besoin des droits administrateur pour voir cette page.',
+  'pages.Admin.create-chore': 'Créer une corvée',
+  'pages.Admin.create': 'Créer',
+  'pages.Admin.title': 'Titre',
+  'pages.Admin.bonus': 'Bonus',
 
   'pages.Chores.loading-chores': 'Chargement des corvées…',
   'pages.Chores.complete': 'Terminer',
@@ -123,6 +127,10 @@ export default {
   'pages.admin.AdminChoresManagement.approved': 'Approuvé',
   'pages.admin.AdminChoresManagement.pending': 'En attente',
   'pages.admin.AdminChoresManagement.bonus': 'Bonus',
+  'pages.admin.AdminChoresManagement.assign': 'Assigner',
+  'pages.admin.AdminChoresManagement.assign-chore': 'Assigner la corvée',
+  'pages.admin.AdminChoresManagement.assigned-to': 'Assigné à : {username}',
+  'pages.admin.AdminChoresManagement.assignee': 'Assigné',
 
   // AdminFamilyCreation (obsolete - removed)
 

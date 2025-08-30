@@ -14,7 +14,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: 3,
   /* Opt out of parallel tests on CI. */
-  workers: isCI ? 1 : 4,
+  workers: isCI ? 2 : 4,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['html', {open: 'never'}],
@@ -47,7 +47,7 @@ export default defineConfig({
     },
     {
       command:
-        'npm run dev --workspace=packages/web -- --debug --clearScreen=false',
+        'npm run dev --workspace=packages/web -- --logLevel error --clearScreen=false',
       url: 'http://localhost:8001',
       cwd: '../..',
       env: {NODE_ENV: 'test'},

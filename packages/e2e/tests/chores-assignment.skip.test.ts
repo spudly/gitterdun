@@ -2,7 +2,7 @@ import {test, expect} from '@playwright/test';
 import {setupFamily} from './helpers/test-utils';
 
 test.describe('chores Assignment - Skipped Tests', () => {
-  test.skip('should assign chore to child', async ({page}) => {
+  test('should assign chore to child', async ({page}) => {
     const {child} = await setupFamily(page);
     await page.goto('/admin');
     const choreTitle = `Assigned Chore ${Date.now()}`;
