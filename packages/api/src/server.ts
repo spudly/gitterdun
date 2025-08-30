@@ -114,7 +114,7 @@ const setupAllMiddleware = (app: express.Express): void => {
   setupErrorHandling(app);
 };
 
-const createServer = async (): Promise<void> => {
+export const createServer = async (): Promise<void> => {
   try {
     const app = await initializeApp();
     setupAllMiddleware(app);
@@ -134,5 +134,4 @@ if (require.main === module) {
   });
 }
 
-// Export for testing
-export {createServer};
+export * from './constants';

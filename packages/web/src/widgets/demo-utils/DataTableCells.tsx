@@ -1,4 +1,3 @@
-/* eslint-disable react/no-multi-comp -- Demo file with multiple related cell components */
 import type {FC} from 'react';
 import {StatusBadge} from '../StatusBadge.js';
 import {Button} from '../Button.js';
@@ -68,4 +67,3 @@ export const UserActionsCell: FC<UserCellProps> = ({user: _user}) => {
     </div>
   );
 };
-/* eslint-enable react/no-multi-comp */

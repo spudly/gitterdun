@@ -69,7 +69,6 @@ describe('admin page', () => {
   });
 
   test('denies access for non-admin users', () => {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- wrong
     const mocked = jest.requireMock('../hooks/useUser') as {useUser: any};
     const useUserMock: any = mocked.useUser;
     useUserMock.mockReturnValueOnce({
@@ -113,7 +112,6 @@ describe('admin page', () => {
   });
 
   test('denies access for unauthenticated users', () => {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- wrong
     const mocked = jest.requireMock('../hooks/useUser') as {useUser: any};
     const useUserMock: any = mocked.useUser;
     useUserMock.mockReturnValueOnce({

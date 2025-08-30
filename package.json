@@ -25,7 +25,7 @@
     "prettier:check": "node --experimental-strip-types node_modules/prettier/bin/prettier.cjs --check .",
     "lint-staged": "NODE_OPTIONS='--experimental-strip-types' lint-staged",
     "type-check": "turbo run type-check --output-logs=errors-only",
-    "find-unused-eslint-rules": "NODE_OPTIONS='--experimental-strip-types' eslint-find-rules --unused eslint.config.ts --flatConfig --ext .js --ext .jsx --ext .ts --ext .tsx --ext .cjs --ext .mjs --ext .mts --ext .cts",
+    "validate-eslint-config": "node --experimental-strip-types ./scripts/validate-eslint-config.ts",
     "knip": "knip",
     "lint:changed": "(git diff --name-only HEAD --diff-filter=AM && git ls-files --others --exclude-standard) | grep -E \"\\.(ts|tsx|js|jsx)$\" | sort -u | xargs -r eslint",
     "ci:check": "turbo run ci:check --output-logs=errors-only",
@@ -41,7 +41,6 @@
     "@typescript-eslint/eslint-plugin": "^8.40.0",
     "@typescript-eslint/parser": "^8.40.0",
     "eslint": "^9.33.0",
-    "eslint-find-rules": "^5.0.0",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-import": "^2.32.0",
@@ -65,6 +64,7 @@
     "prettier-plugin-tailwindcss": "^0.6.14",
     "ts-jest": "^29.4.1",
     "turbo": "^2.5.6",
+    "type-fest": "^4.41.0",
     "typescript": "^5.9.2"
   },
   "lint-staged": {

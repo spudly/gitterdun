@@ -133,7 +133,6 @@ describe('leaderboard routes', () => {
         },
       });
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method -- not being called
       expect(mockPreparedStatement.all).toHaveBeenCalledWith(10);
       expect(mockLogger.info).toHaveBeenCalledWith(
         {sortBy: 'points', limit: 10, totalUsers: 2},
@@ -178,7 +177,7 @@ describe('leaderboard routes', () => {
 
       expect(response.status).toBe(200);
       expect(body.data.sortBy).toBe('streak');
-      // eslint-disable-next-line @typescript-eslint/unbound-method -- not being called
+
       expect(mockPreparedStatement.all).toHaveBeenCalledWith(5);
     });
 

@@ -16,5 +16,9 @@
     "@playwright/test": "^1.47.0",
     "@types/node": "^22.10.7",
     "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "@gitterdun/api": "file:../api",
+    "@gitterdun/web": "file:../web"
   }
 }

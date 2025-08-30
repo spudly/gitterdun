@@ -6,7 +6,7 @@ import {FormField} from './FormField.js';
 const TextInputDemo: FC = () => {
   const [value, setValue] = useState('');
   return (
-    <div className="space-y-4" data-testid="TextInputDemo">
+    <div className="space-y-4">
       <FormField
         helpText="We'll never share your email."
         htmlFor="email"

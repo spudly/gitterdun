@@ -1,5 +1,5 @@
 import type {FC, ReactNode} from 'react';
-import clsx from 'clsx';
+import {clsx} from 'clsx';
 
 type AllowedAs = 'p' | 'span' | 'h1' | 'h2' | 'h3';
 type TextSize = '3xl' | '2xl' | 'xl' | 'lg' | 'md' | 'sm';
@@ -8,10 +8,10 @@ type TextWeight = 'normal' | 'medium' | 'semibold' | 'bold';
 const SIZE: Record<TextSize, string> = {
   '3xl': 'text-3xl',
   '2xl': 'text-2xl',
-  xl: 'text-xl',
-  lg: 'text-lg',
-  md: 'text-base',
-  sm: 'text-sm',
+  'xl': 'text-xl',
+  'lg': 'text-lg',
+  'md': 'text-base',
+  'sm': 'text-sm',
 };
 
 const WEIGHT: Record<TextWeight, string> = {
@@ -42,7 +42,6 @@ export const Text: FC<TextProps> = ({
 }) => {
   return (
     <Element
-      // eslint-disable-next-line react/forbid-component-props -- this is a native element, so className is OK
       className={clsx(
         SIZE[size],
         WEIGHT[weight],

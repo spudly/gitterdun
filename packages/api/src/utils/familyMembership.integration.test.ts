@@ -1,10 +1,10 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import * as familyOps from '../familyOperations.js';
-import * as invitationOps from '../invitationOperations.js';
-import * as membershipUtil from '../familyMembership.js';
+import * as familyOps from './familyOperations.js';
+import * as invitationOps from './invitationOperations.js';
+import * as membershipUtil from './familyMembership.js';
 
-jest.mock('../familyMembership.js');
-jest.mock('../../lib/db.js', () => {
+jest.mock('./familyMembership.js');
+jest.mock('../lib/db.js', () => {
   const run = jest.fn();
   const get = jest.fn(() => ({
     id: 1,

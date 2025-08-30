@@ -1,4 +1,3 @@
-/* eslint-disable react/no-multi-comp -- Demo file with multiple related input group examples */
 import type {FC} from 'react';
 import {InputGroup} from '../InputGroup.js';
 import {TextInput} from '../TextInput.js';
@@ -116,4 +115,3 @@ export const ErrorStatesExample: FC = () => {
     </div>
   );
 };
-/* eslint-enable react/no-multi-comp */

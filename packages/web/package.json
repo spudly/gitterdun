@@ -2,6 +2,7 @@
   "name": "@gitterdun/web",
   "version": "0.1.0",
   "private": true,
+  "main": "dist/index.js",
   "scripts": {
     "dev": "vite",
     "prebuild": "rm -rf dist; rm -f tsconfig.build.tsbuildinfo; npm run i18n:extract",

@@ -5,7 +5,7 @@ type PostcssConfig = {
 } & Partial<ProcessOptions>;
 
 const config: PostcssConfig = {
-  plugins: {'@tailwindcss/postcss': {}, autoprefixer: {}},
+  plugins: {'@tailwindcss/postcss': {}, 'autoprefixer': {}},
 };
 
 export default config;

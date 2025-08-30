@@ -11,7 +11,7 @@ const nav: Array<NavigationItem> = [
 
 const LayoutDemo: FC = () => {
   return (
-    <div data-testid="LayoutDemo">
+    <div>
       <Layout navigation={nav}>
         <div className="space-y-2">
           <h2 className="text-xl font-semibold">Demo Content</h2>

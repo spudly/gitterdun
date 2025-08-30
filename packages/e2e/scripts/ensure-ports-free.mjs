@@ -4,8 +4,11 @@ import net from 'node:net';
 import path from 'node:path';
 import {execSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
+import {DEFAULT_PORT as API_DEFAULT_PORT} from '@gitterdun/api';
+import {DEFAULT_PORT as WEB_DEFAULT_PORT} from '@gitterdun/web';
 
-const portsToCheck = [8000, 8001];
+const PORTS_TO_CHECK = [WEB_DEFAULT_PORT, API_DEFAULT_PORT];
+const LSOF_OUTPUT_MAX_LINES = 5;
 
 export const checkNodeVersion = () => {
   const currentNodeVersion = process.version.replace(/^v/, ''); // Remove 'v' prefix
@@ -146,7 +149,7 @@ const logBlockedPortsAndExit = blockedPorts => {
     console.error(`\nPort ${port} details (macOS):`);
     const out = listPortDetails(port);
     if (out) {
-      console.error(out.split('\n').slice(0, 5).join('\n'));
+      console.error(out.split('\n').slice(0, LSOF_OUTPUT_MAX_LINES).join('\n'));
     } else {
       console.error('(unable to retrieve details)');
     }
@@ -162,7 +165,7 @@ const main = async () => {
   // Check Node.js version first before doing anything else
   checkNodeVersion();
 
-  let results = await Promise.all(portsToCheck.map(checkPort));
+  let results = await Promise.all(PORTS_TO_CHECK.map(checkPort));
   let blocked = results.filter(portStatus => !portStatus.available);
   if (blocked.length === 0) {
     return;
@@ -171,7 +174,7 @@ const main = async () => {
   await attemptAutoKillCursorOwnedPorts(blocked);
 
   // Re-check after attempting to free Cursor-owned ports
-  results = await Promise.all(portsToCheck.map(checkPort));
+  results = await Promise.all(PORTS_TO_CHECK.map(checkPort));
   blocked = results.filter(portStatus => !portStatus.available);
   if (blocked.length === 0) {
     return;
@@ -180,7 +183,7 @@ const main = async () => {
   await attemptAutoKillNodeOwnedPorts(blocked);
 
   // Re-check after attempting to free node-owned ports
-  results = await Promise.all(portsToCheck.map(checkPort));
+  results = await Promise.all(PORTS_TO_CHECK.map(checkPort));
   blocked = results.filter(portStatus => !portStatus.available);
   if (blocked.length > 0) {
     logBlockedPortsAndExit(blocked);

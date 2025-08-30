@@ -1,69 +1,25 @@
-/* eslint-disable max-lines -- Complex ESLint rule with extensive comments and type safety */
 import type {Rule} from 'eslint';
+import type {LiteralNode} from './utils/astTypes';
+import {isObjectRecord} from './utils/isObjectRecord';
+import {isLiteralNode} from './utils/isLiteralNode';
+import {isJSXExpressionContainerNode} from './utils/isJSXExpressionContainerNode';
+import {isTemplateLiteralNode} from './utils/isTemplateLiteralNode';
+import {hasTailwindMarginClasses} from './utils/hasTailwindMarginClasses';
 
-// Using simple types for AST node types to avoid external dependencies
-type LiteralNode = {
-  type: 'Literal';
-  value: string | number | boolean | RegExp | null;
-};
-
-type JSXAttributeNode = {
-  type: 'JSXAttribute';
-  name?: {type: 'JSXIdentifier'; name: string};
-  value?: {
-    type: 'Literal' | 'JSXExpressionContainer';
-    value?: string | number | boolean | RegExp | null;
-    expression?: {type: string; quasis?: Array<{value: {raw: string}}>};
-  };
-};
-
-/**
- * Detects if a string contains Tailwind CSS margin classes
- */
-const hasTailwindMarginClasses = (classNameValue: string): Array<string> => {
-  const marginPrefixes = [
-    'm-',
-    'mt-',
-    'mr-',
-    'mb-',
-    'ml-',
-    'mx-',
-    'my-',
-    '-m-',
-    '-mt-',
-    '-mr-',
-    '-mb-',
-    '-ml-',
-    '-mx-',
-    '-my-',
-  ];
-
-  const classes = classNameValue.split(/\s+/).filter(Boolean);
-  const violatingClasses: Array<string> = [];
-
-  for (const className of classes) {
-    for (const prefix of marginPrefixes) {
-      if (className.startsWith(prefix)) {
-        violatingClasses.push(className);
-        break;
-      }
-    }
-  }
-
-  return violatingClasses;
-};
+// margin class detection is implemented in utils/hasTailwindMarginClasses
 
 /**
  * Reports margin class violations to the ESLint context
  */
 const reportViolatingClasses = (
   context: Rule.RuleContext,
-  node: JSXAttributeNode | LiteralNode,
+  node: unknown,
   violatingClasses: Array<string>,
 ): void => {
   if (violatingClasses.length > 0) {
     context.report({
-      node,
+      // Casting only for the ESLint API call; we avoid `any` elsewhere
+      node: node as never,
       messageId:
         violatingClasses.length === 1
           ? 'noMarginClasses'
@@ -81,7 +37,7 @@ const reportViolatingClasses = (
  */
 const handleLiteralValue = (
   context: Rule.RuleContext,
-  node: JSXAttributeNode,
+  node: unknown,
   literal: LiteralNode,
 ): void => {
   if (typeof literal.value === 'string') {
@@ -95,25 +51,18 @@ const handleLiteralValue = (
  */
 const handleTemplateLiteral = (
   context: Rule.RuleContext,
-  node: JSXAttributeNode,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ESLint AST nodes require any type
-  expression: any,
+  node: unknown,
+  expression: unknown,
 ): void => {
-  if (
-    Boolean(expression)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- ESLint AST property access
-    && expression.type === 'TemplateLiteral'
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- ESLint AST property access
-    && Boolean(expression.quasis)
-  ) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- ESLint AST property access
-    for (const quasi of expression.quasis) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, no-extra-boolean-cast -- ESLint AST property access requires explicit boolean
-      if (Boolean(quasi.value.raw)) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument -- ESLint AST property access
-        const violatingClasses = hasTailwindMarginClasses(quasi.value.raw);
-        reportViolatingClasses(context, node, violatingClasses);
-      }
+  if (!isTemplateLiteralNode(expression)) {
+    return;
+  }
+
+  for (const quasi of expression.quasis) {
+    // eslint-disable-next-line no-extra-boolean-cast -- ESLint AST property access requires explicit boolean
+    if (Boolean(quasi.value.raw)) {
+      const violatingClasses = hasTailwindMarginClasses(quasi.value.raw);
+      reportViolatingClasses(context, node, violatingClasses);
     }
   }
 };
@@ -135,67 +84,49 @@ export const noTailwindMargins: Rule.RuleModule = {
     },
   },
 
-  create(context) {
+  create(context): Rule.RuleListener {
     // Track literal nodes that are part of JSX attributes to avoid double-reporting
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ESLint AST nodes require any type
-    const processedLiterals = new Set<any>();
+    const processedLiterals = new Set<LiteralNode>();
 
     return {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ESLint AST nodes require any type
-      JSXAttribute(node: any) {
+      JSXAttribute(node: unknown) {
         // Only check className and class attributes
-        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/no-unsafe-member-access -- ESLint AST property access
-        if (!node.name) {
+        if (!isObjectRecord(node)) {
           return;
         }
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- ESLint AST property access
-        const {name: attributeName} = node.name;
+        const nameNode = node['name'];
+        let attributeName: string | undefined;
+        if (isObjectRecord(nameNode) && typeof nameNode['name'] === 'string') {
+          attributeName = nameNode['name'];
+        }
         if (attributeName !== 'className' && attributeName !== 'class') {
           return;
         }
-
-        // Handle string literal values
-        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/no-unsafe-member-access -- ESLint AST property access
-        if (node.value && node.value.type === 'Literal') {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- ESLint AST property access
-          const literal = node.value as LiteralNode;
-          processedLiterals.add(literal); // Mark this literal as processed
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- ESLint AST node argument
-          handleLiteralValue(context, node, literal);
+        const valueNode = node['value'];
+        if (isLiteralNode(valueNode)) {
+          processedLiterals.add(valueNode);
+          handleLiteralValue(context, node, valueNode);
         }
-
-        // Handle template literal expressions (e.g., className={`flex ${someVar}`})
-        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/no-unsafe-member-access -- ESLint AST property access
-        if (node.value && node.value.type === 'JSXExpressionContainer') {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- ESLint AST property access
-          const {expression} = node.value;
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- ESLint AST node argument
+        if (isJSXExpressionContainerNode(valueNode)) {
+          const {expression} = valueNode;
           handleTemplateLiteral(context, node, expression);
         }
       },
 
       // Also check regular string literals for non-JSX contexts
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ESLint AST nodes require any type
-      Literal(node: any) {
+
+      Literal(node: unknown) {
         // Skip literals that have already been processed by JSXAttribute
-        if (processedLiterals.has(node)) {
+        if (isLiteralNode(node) && processedLiterals.has(node)) {
           return;
         }
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- ESLint AST property access
-        if (typeof node.value === 'string') {
+        if (isLiteralNode(node) && typeof node.value === 'string') {
           // Simple heuristic: if it looks like CSS classes (contains common Tailwind patterns)
-
           const {value} = node;
           const hasTailwindPattern =
             /\b(?:flex|grid|text-|bg-|border-|p-|space-)/;
-
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- ESLint AST property access
           if (hasTailwindPattern.test(value)) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- ESLint AST property access
             const violatingClasses = hasTailwindMarginClasses(value);
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- ESLint AST node argument
             reportViolatingClasses(context, node, violatingClasses);
           }
         }
@@ -203,4 +134,3 @@ export const noTailwindMargins: Rule.RuleModule = {
     };
   },
 };
-/* eslint-enable max-lines */

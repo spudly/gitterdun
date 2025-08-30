@@ -25,6 +25,6 @@
     "useUnknownInCatchVariables": true,
     "exactOptionalPropertyTypes": true
   },
-  "include": ["**/*.tsx", "**/*.ts", "types/**/*.ts"],
+  "include": ["**/*.tsx", "**/*.ts", "types/**/*.d.ts"],
   "exclude": ["node_modules", "**/dist", "**/build"]
 }

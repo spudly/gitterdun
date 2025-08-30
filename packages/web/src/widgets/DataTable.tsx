@@ -1,6 +1,6 @@
 import type {ReactNode} from 'react';
 import {FormattedMessage} from 'react-intl';
-import clsx from 'clsx';
+import {clsx} from 'clsx';
 import {isReactNode} from '../utils/isReactNode';
 
 export type Column<T> = {
@@ -25,7 +25,7 @@ const get = <OBJ extends object, PROP extends string | number | symbol>(
 ): PROP extends keyof OBJ ? OBJ[PROP] : undefined => {
   if (prop in obj) {
     // @ts-expect-error: prop may not be a key of obj, so we allow undefined
-    return obj[prop]; // eslint-disable-line @typescript-eslint/no-unsafe-return -- not unsafe
+    return obj[prop];
   }
 
   // @ts-expect-error: ts just isn't smart enough to understand my syntax, or I'm not smart enough to write it correctly, lol

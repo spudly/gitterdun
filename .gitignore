@@ -29,3 +29,4 @@ Thumbs.db
 yarn-debug.log*
 yarn-error.log*
 temp
+bundle

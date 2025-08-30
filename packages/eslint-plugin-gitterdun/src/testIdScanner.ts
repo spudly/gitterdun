@@ -1,20 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {Minimatch} from 'minimatch';
 
 const toPosix = (filePath: string): string =>
   filePath.split(path.sep).join('/');
-const escapeRegex = (input: string): string =>
-  // Intentionally do NOT escape * or ?; they are handled after this call
-  input.replace(/[.+^${}()|[\]\\]/g, '\\$&');
-const globToRegExp = (globPattern: string): RegExp => {
-  const posixGlob = toPosix(globPattern);
-  let pattern = posixGlob.replace(/\*\*/g, '§§DOUBLESTAR§§');
-  pattern = escapeRegex(pattern)
-    .replace(/§§DOUBLESTAR§§/g, '.*')
-    .replace(/\*/g, '[^/]*')
-    .replace(/\?/g, '[^/]');
-  return new RegExp(`^${pattern}$`);
-};
+// Use minimatch for robust glob matching (supports braces, extglob, **, etc.)
 
 const defaultIgnoreDirs = new Set([
   'node_modules',
@@ -57,11 +47,19 @@ const filterByGlobs = (
   allFiles: Array<string>,
   globs: Array<string>,
 ): Array<string> => {
-  const regs = globs.map(globToRegExp);
-  return allFiles
-    .map(absPath => toPosix(path.relative(process.cwd(), absPath)))
-    .filter(relPath => regs.some(reg => reg.test(relPath)))
-    .map(relPath => path.resolve(process.cwd(), relPath));
+  const matchers = globs.map(
+    pattern =>
+      new Minimatch(toPosix(pattern), {
+        dot: true,
+        nocomment: false,
+        nocase: false,
+        nobrace: false,
+      }),
+  );
+  return allFiles.filter(absPath => {
+    const relPosix = toPosix(path.relative(process.cwd(), absPath));
+    return matchers.some(matcher => matcher.match(relPosix));
+  });
 };
 
 const ID_PATTERNS: Array<RegExp> = [

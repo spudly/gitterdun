@@ -1,8 +1,7 @@
-/* eslint-disable gitterdun/no-tailwind-margins, no-template-curly-in-string -- test file contains margin classes and template strings as test data */
+/* eslint-disable no-template-curly-in-string -- test file contains margin classes and template strings as test data */
 import {RuleTester} from 'eslint';
-import {noTailwindMargins} from '../noTailwindMargins.js';
+import {noTailwindMargins} from './noTailwindMargins.js';
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports -- ESLint RuleTester requires CommonJS import
 const tsParser = require('@typescript-eslint/parser');
 
 const ruleTester = new RuleTester({
@@ -16,7 +15,6 @@ const ruleTester = new RuleTester({
   },
 });
 
-// eslint-disable-next-line jest/require-hook -- ESLint RuleTester runs its own test framework
 ruleTester.run('no-tailwind-margins', noTailwindMargins, {
   valid: [
     // Valid className without margin classes
@@ -177,4 +175,4 @@ ruleTester.run('no-tailwind-margins', noTailwindMargins, {
     },
   ],
 });
-/* eslint-enable gitterdun/no-tailwind-margins, no-template-curly-in-string */
+/* eslint-enable no-template-curly-in-string */
