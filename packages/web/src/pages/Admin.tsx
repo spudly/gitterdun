@@ -11,9 +11,9 @@ import {Card} from '../widgets/Card.js';
 import {FormattedMessage, defineMessages, useIntl} from 'react-intl';
 import {AdminStats} from './admin/AdminStats.js';
 import {AdminUsers} from './admin/AdminUsers.js';
-import {AdminChoresManagement} from './admin/AdminChoresManagement.js';
 import {TextInput} from '../widgets/TextInput.js';
 import {Button} from '../widgets/Button.js';
+import {useToast} from '../widgets/ToastProvider.js';
 import {useState} from 'react';
 
 const useAdminSetup = () => {
@@ -46,6 +46,8 @@ const Admin: FC = () => {
   const [title, setTitle] = useState('');
   const [points, setPoints] = useState(0);
   const [bonus, setBonus] = useState<number | ''>('');
+
+  const {safeAsync} = useToast();
 
   const createMutation = useMutation({
     mutationFn: async () =>
@@ -159,12 +161,9 @@ const Admin: FC = () => {
               />
               <Button
                 disabled={title.trim() === ''}
-                onClick={() => {
-                  const run = async () => {
-                    await createMutation.mutateAsync();
-                  };
-                  run().catch(() => {});
-                }}
+                onClick={safeAsync(async () => {
+                  await createMutation.mutateAsync();
+                }, 'Unable to create chore')}
               >
                 <FormattedMessage {...messages.create} />
               </Button>
@@ -176,7 +175,6 @@ const Admin: FC = () => {
       <Stack gap="lg">
         <AdminStats chores={chores} />
         <AdminUsers />
-        <AdminChoresManagement chores={chores} />
       </Stack>
     </PageContainer>
   );

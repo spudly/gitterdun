@@ -3,6 +3,9 @@ import {StatusCodes} from 'http-status-codes';
 import {CreateChoreSchema} from '@gitterdun/shared';
 import db from '../lib/db';
 import {logger} from '../utils/logger';
+import {requireUserId} from '../utils/auth';
+import {getUserFamily} from '../utils/familyOperations';
+import {validateParentMembership} from '../utils/familyAuthUtils';
 import {
   parseUpdateChoreRequest,
   parseDeleteChoreRequest,
@@ -24,10 +27,6 @@ import {
 } from '../utils/choreCrud';
 import {processChoreUpdate} from '../utils/choreUpdates';
 import {executeChoreCompletionTransaction} from '../utils/choreCompletion';
-import {
-  assignChoreToSingleUser,
-  approveChoreAssignment,
-} from '../utils/choreModeration';
 
 // POST /api/chores - Create a new chore
 export const handleCreateChore = async (
@@ -35,6 +34,15 @@ export const handleCreateChore = async (
   res: express.Response,
 ) => {
   try {
+    const userId = requireUserId(req);
+    const family = getUserFamily(userId);
+    if (family === null) {
+      return res
+        .status(StatusCodes.FORBIDDEN)
+        .json({success: false, error: 'Forbidden'});
+    }
+    validateParentMembership(userId, family.id);
+
     const {
       title,
       description = '',
@@ -59,7 +67,7 @@ export const handleCreateChore = async (
         dueDate,
         recurrenceRule,
         choreType,
-        createdBy: 1,
+        createdBy: userId,
       });
       assignChoreToUsers(chore.id, assignedUsers);
       return chore;
@@ -84,6 +92,14 @@ export const handleUpdateChore = async (
   res: express.Response,
 ) => {
   try {
+    const userId = requireUserId(req);
+    const family = getUserFamily(userId);
+    if (family === null) {
+      return res
+        .status(StatusCodes.FORBIDDEN)
+        .json({success: false, error: 'Forbidden'});
+    }
+    validateParentMembership(userId, family.id);
     const {choreId, validatedBody} = parseUpdateChoreRequest(req);
     validateUpdateChoreInput(choreId);
     const validatedChore = processChoreUpdate(choreId, validatedBody);
@@ -103,6 +119,14 @@ export const handleDeleteChore = async (
   res: express.Response,
 ) => {
   try {
+    const userId = requireUserId(req);
+    const family = getUserFamily(userId);
+    if (family === null) {
+      return res
+        .status(StatusCodes.FORBIDDEN)
+        .json({success: false, error: 'Forbidden'});
+    }
+    validateParentMembership(userId, family.id);
     const {choreId} = parseDeleteChoreRequest(req);
     validateDeleteChoreInput(choreId);
     processChoreDelete(choreId);
@@ -134,56 +158,4 @@ export const handleCompleteChore = async (
   }
 };
 
-// POST /api/chores/:id/assign - Assign a chore to a user
-export const handleAssignChore = async (
-  req: express.Request,
-  res: express.Response,
-) => {
-  try {
-    const choreId = Number((req.params as Record<string, string>)['id']);
-    const {userId} = req.body as {userId?: number};
-    if (
-      !Number.isInteger(choreId)
-      || typeof userId !== 'number'
-      || !Number.isInteger(userId)
-    ) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({success: false, error: 'Invalid chore or user id'});
-    }
-    assignChoreToSingleUser(choreId, userId);
-    return res.json({success: true});
-  } catch (error) {
-    return res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({success: false, error: (error as Error).message});
-  }
-};
-
-// POST /api/chores/:id/approve - Approve a completed chore
-export const handleApproveChore = async (
-  req: express.Request,
-  res: express.Response,
-) => {
-  try {
-    const choreId = Number((req.params as Record<string, string>)['id']);
-    const {approvedBy} = req.body as {approvedBy?: number};
-    if (
-      !Number.isInteger(choreId)
-      || typeof approvedBy !== 'number'
-      || !Number.isInteger(approvedBy)
-    ) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({success: false, error: 'Invalid chore id or approver id'});
-    }
-    approveChoreAssignment(choreId, approvedBy);
-    return res.json({success: true});
-  } catch (error) {
-    return res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({success: false, error: (error as Error).message});
-  }
-};
-
-// POST /api/chores/:id/reject - moved to separate handler to keep file size small
+// assign/approve moved to choreModerationHandlers.ts

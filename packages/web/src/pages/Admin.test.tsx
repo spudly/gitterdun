@@ -1,5 +1,5 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen} from '@testing-library/react';
+import {render, screen, fireEvent} from '@testing-library/react';
 import {createWrapper} from '../test/createWrapper';
 import Admin from './Admin';
 
@@ -42,7 +42,7 @@ jest.mock('../lib/api', () => ({
 }));
 
 describe('admin page', () => {
-  test('renders admin panel with stats, users, and chores management', async () => {
+  test('renders admin panel with stats and users, but not chores management', async () => {
     const Wrapper = createWrapper({
       i18n: true,
       queryClient: true,
@@ -63,8 +63,8 @@ describe('admin page', () => {
     // Shows users section
     expect(screen.getByRole('region', {name: 'Users'})).toBeInTheDocument();
 
-    // Shows chores management section
-    expect(screen.getByText('Chores Management')).toBeInTheDocument();
+    // Does not show chores management section
+    expect(screen.queryByText('Chores Management')).not.toBeInTheDocument();
   });
 
   test('denies access for non-admin users', () => {

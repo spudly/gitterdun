@@ -12,7 +12,7 @@ import {useToast} from '../widgets/ToastProvider.js';
 import {TextLink} from '../widgets/TextLink.js';
 import {FormattedMessage, defineMessages, useIntl} from 'react-intl';
 
-const messages = defineMessages({
+export const messages = defineMessages({
   title: {defaultMessage: 'Login', id: 'pages.Login.login'},
   failed: {defaultMessage: 'Login failed', id: 'pages.Login.login-failed'},
   email: {defaultMessage: 'Username or Email', id: 'pages.Login.email'},

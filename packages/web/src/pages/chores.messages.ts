@@ -6,37 +6,26 @@ export const choresMessages = defineMessages({
     id: 'pages.Chores.loading-chores',
   },
   header: {defaultMessage: 'Chores', id: 'pages.Chores.chores'},
-  statusCompleted: {
-    defaultMessage: 'Completed',
-    id: 'pages.admin.AdminChoresManagement.completed',
-  },
-  statusApproved: {
-    defaultMessage: 'Approved',
-    id: 'pages.admin.AdminChoresManagement.approved',
-  },
-  statusPending: {
-    defaultMessage: 'Pending',
-    id: 'pages.admin.AdminChoresManagement.pending',
-  },
+  statusCompleted: {defaultMessage: 'Completed', id: 'pages.Chores.completed'},
+  statusApproved: {defaultMessage: 'Approved', id: 'pages.Chores.approved'},
+  statusPending: {defaultMessage: 'Pending', id: 'pages.Chores.pending'},
   pointsWithValue: {
     defaultMessage: 'Points: {points}',
-    id: 'pages.admin.AdminChoresManagement.points-points',
+    id: 'pages.Chores.points-points',
   },
   bonusWithPoints: {
     defaultMessage: 'Bonus: +{points}',
-    id: 'pages.admin.AdminChoresManagement.bonus-points',
+    id: 'pages.Chores.bonus-points',
   },
   penaltyWithPoints: {
     defaultMessage: 'Penalty: -{points}',
-    id: 'pages.admin.AdminChoresManagement.penalty-points',
+    id: 'pages.Chores.penalty-points',
   },
-  dueWithDate: {
-    defaultMessage: 'Due: {date}',
-    id: 'pages.admin.AdminChoresManagement.due-date',
-  },
+  dueWithDate: {defaultMessage: 'Due: {date}', id: 'pages.Chores.due-date'},
   complete: {defaultMessage: 'Complete', id: 'pages.Chores.complete'},
-  typeBonus: {
-    defaultMessage: 'Bonus',
-    id: 'pages.admin.AdminChoresManagement.bonus',
+  completeError: {
+    defaultMessage: 'Unable to complete chore',
+    id: 'pages.Chores.complete-error',
   },
+  typeBonus: {defaultMessage: 'Bonus', id: 'pages.Chores.bonus'},
 });

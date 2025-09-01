@@ -13,7 +13,7 @@
     "format:check": "prettier --check .",
     "pretest": "rm -rf coverage",
     "test": "jest",
-    "i18n:extract:raw": "formatjs extract 'src/**/*.{ts,tsx}' --extract-source-location --out-file src/i18n/extracted/_raw.json",
+    "i18n:extract:raw": "formatjs extract 'src/**/*.{ts,tsx}' --ignore 'src/**/*.d.ts' --extract-source-location --out-file src/i18n/extracted/_raw.json",
     "i18n:postprocess": "node scripts/i18n-postprocess.mjs src/i18n/extracted/_raw.json src/i18n/extracted/en.json",
     "i18n:extract": "npm run i18n:extract:raw && npm run i18n:postprocess",
     "test:dev": "jest --watch"

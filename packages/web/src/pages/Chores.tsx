@@ -14,11 +14,13 @@ import {Button} from '../widgets/Button.js';
 import {PageLoading} from '../widgets/PageLoading.js';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {choresMessages as messages} from './chores.messages.js';
+import {useToast} from '../widgets/ToastProvider.js';
 
 // messages imported
 
 const Chores: FC = () => {
   const {user} = useUser();
+  const {safeAsync} = useToast();
   const intl = useIntl();
   const queryClient = useQueryClient();
 
@@ -123,15 +125,12 @@ const Chores: FC = () => {
               right={
                 chore.status === 'pending' ? (
                   <Button
-                    onClick={() => {
-                      const run = async () => {
-                        await choresApi.complete(chore.id, {userId: user!.id});
-                        await queryClient.invalidateQueries({
-                          queryKey: ['chores', user?.id],
-                        });
-                      };
-                      run().catch(() => {});
-                    }}
+                    onClick={safeAsync(async () => {
+                      await choresApi.complete(chore.id, {userId: user!.id});
+                      await queryClient.invalidateQueries({
+                        queryKey: ['chores', user?.id],
+                      });
+                    }, intl.formatMessage(messages.completeError))}
                     size="sm"
                     variant="primary"
                   >
@@ -142,13 +141,13 @@ const Chores: FC = () => {
                     <Button size="sm" variant="primary">
                       <FormattedMessage
                         defaultMessage="Approve"
-                        id="pages.admin.AdminChoresManagement.approve"
+                        id="pages.Chores.approve"
                       />
                     </Button>
                     <Button size="sm" variant="danger">
                       <FormattedMessage
                         defaultMessage="Reject"
-                        id="pages.admin.AdminChoresManagement.reject"
+                        id="pages.Chores.reject"
                       />
                     </Button>
                   </>
