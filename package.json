@@ -6,9 +6,9 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "turbo run dev",
-    "dev:api": "npm run dev --workspace=packages/api",
-    "dev:web": "npm run dev --workspace=packages/web",
+    "start:dev": "turbo run start:dev --log-prefix=none",
+    "start:dev:api": "npm run start:dev --workspace=packages/api",
+    "start:dev:web": "npm run start:dev --workspace=packages/web",
     "build": "turbo run build --output-logs=errors-only",
     "build:api": "npm run build --workspace=packages/api",
     "build:web": "npm run build --workspace=packages/web",

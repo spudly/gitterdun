@@ -38,21 +38,23 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: [
     {
-      command: 'npm run dev --workspace=packages/api',
+      command: 'LOG_LEVEL=warn npm run start:dev --workspace=packages/api',
       url: 'http://localhost:8000/api/health',
       cwd: '../..',
       env: {NODE_ENV: 'test', LOG_LEVEL: 'info'},
       stderr: 'pipe',
       stdout: 'pipe',
+      reuseExistingServer: true,
     },
     {
       command:
-        'npm run dev --workspace=packages/web -- --logLevel error --clearScreen=false',
+        'npm run start:dev --workspace=packages/web -- --mode test --logLevel error --clearScreen=false',
       url: 'http://localhost:8001',
       cwd: '../..',
       env: {NODE_ENV: 'test'},
       stderr: 'pipe',
       stdout: 'pipe',
+      reuseExistingServer: true,
     },
   ],
 });

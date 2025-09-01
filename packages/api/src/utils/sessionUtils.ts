@@ -85,6 +85,8 @@ const getUserById = (userId: number): User | null => {
         role,
         points,
         streak_count,
+        display_name,
+        avatar_url,
         created_at,
         updated_at
       FROM

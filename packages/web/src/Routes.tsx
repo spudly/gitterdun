@@ -6,8 +6,9 @@ import {ProtectedRoute} from './ProtectedRoute.js';
 
 const Dashboard = lazy(async () => import('./pages/Dashboard'));
 const Chores = lazy(async () => import('./pages/Chores'));
-const Goals = lazy(async () => import('./pages/Goals'));
+const Settings = lazy(async () => import('./pages/Settings'));
 const Leaderboard = lazy(async () => import('./pages/Leaderboard'));
+const Profile = lazy(async () => import('./pages/Profile'));
 const Admin = lazy(async () => import('./pages/Admin'));
 const Login = lazy(async () => import('./pages/Login'));
 const ForgotPassword = lazy(async () => import('./pages/ForgotPassword'));
@@ -45,10 +46,10 @@ export const Routes: FC = () => {
         <Route
           element={
             <ProtectedRoute>
-              <Goals />
+              <Settings />
             </ProtectedRoute>
           }
-          path="/goals"
+          path="/settings"
         />
 
         <Route
@@ -58,6 +59,15 @@ export const Routes: FC = () => {
             </ProtectedRoute>
           }
           path="/leaderboard"
+        />
+
+        <Route
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+          path="/profile"
         />
 
         <Route

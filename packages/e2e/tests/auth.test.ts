@@ -1,4 +1,4 @@
-import {test, expect} from '@playwright/test';
+import {test, expect} from './fixtures';
 
 test.describe('authentication Flow', () => {
   test('should register a new user and redirect to dashboard', async ({

@@ -1,5 +1,5 @@
 import {beforeAll, describe, expect, jest, test} from '@jest/globals';
-import {render, screen} from '@testing-library/react';
+import {render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {createWrapper} from '../test/createWrapper';
 
@@ -47,7 +47,48 @@ describe('layout', () => {
       {wrapper: Wrapper},
     );
     expect(screen.getByText('Child')).toHaveTextContent('Child');
-    expect(screen.getByText('Dashboard')).toHaveTextContent('Dashboard');
+    expect(screen.getAllByText('Dashboard')[0]).toHaveTextContent('Dashboard');
+  });
+
+  test('renders bottom nav on small screens', async () => {
+    const Wrapper = createWrapper({
+      i18n: true,
+      router: {initialEntries: ['/']},
+    });
+    render(
+      <Layout
+        navigation={[
+          {
+            message: {defaultMessage: 'Dashboard', id: 'layout.dashboard'},
+            path: '/',
+            icon: '🏠',
+          },
+          {
+            message: {defaultMessage: 'Chores', id: 'layout.chores'},
+            path: '/chores',
+            icon: '🧹',
+          },
+          {
+            message: {defaultMessage: 'Goals', id: 'layout.goals'},
+            path: '/goals',
+            icon: '🎯',
+          },
+          {
+            message: {defaultMessage: 'Leaderboard', id: 'layout.leaderboard'},
+            path: '/leaderboard',
+            icon: '🏆',
+          },
+        ]}
+      >
+        <div>Child</div>
+      </Layout>,
+      {wrapper: Wrapper},
+    );
+
+    const bottomNav = screen.getByRole('navigation', {name: /menu/i});
+    expect(bottomNav).toBeInTheDocument();
+    const {getByRole} = within(bottomNav);
+    expect(getByRole('link', {name: /dashboard/i})).toBeInTheDocument();
   });
 
   test('shows a language selector control in the header', () => {
@@ -61,10 +102,13 @@ describe('layout', () => {
       </Layout>,
       {wrapper: Wrapper},
     );
-    expect(screen.getByRole('button', {name: /language/i})).toBeEnabled();
+    // Locale selector moved to Settings page
+    expect(
+      screen.queryByRole('button', {name: /language/i}),
+    ).not.toBeInTheDocument();
   });
 
-  test('shows login when no user and hides admin link', () => {
+  test('shows login when no user and hides admin link', async () => {
     mockUserState = null;
     render(
       <Layout navigation={[]}>
@@ -72,7 +116,12 @@ describe('layout', () => {
       </Layout>,
       {wrapper: createWrapper({i18n: true, router: {initialEntries: ['/']}})},
     );
-    expect(screen.getByText('Login')).toHaveTextContent('Login');
+    // Login is now inside the user menu drawer
+    await userEvent.click(screen.getByRole('button', {name: /user menu/i}));
+    const dialog = screen.getByRole('dialog', {name: /user menu/i});
+    expect(
+      within(dialog).getByRole('link', {name: /login/i}),
+    ).toBeInTheDocument();
   });
 
   test('calls logout when clicking Logout button', async () => {
@@ -84,7 +133,63 @@ describe('layout', () => {
       </Layout>,
       {wrapper: createWrapper({i18n: true, router: {initialEntries: ['/']}})},
     );
-    await userEvent.click(screen.getByRole('button', {name: /logout/i}));
+    await userEvent.click(screen.getByRole('button', {name: /user menu/i}));
+    const dialog = screen.getByRole('dialog', {name: /user menu/i});
+    await userEvent.click(
+      within(dialog).getByRole('button', {name: /logout/i}),
+    );
     expect(mockLogout).toHaveBeenCalledWith();
+  });
+
+  test('renders a user menu button', () => {
+    mockUserState = mockUser;
+    const Wrapper = createWrapper({
+      i18n: true,
+      router: {initialEntries: ['/']},
+    });
+    render(
+      <Layout
+        navigation={[
+          {
+            message: {defaultMessage: 'Dashboard', id: 'layout.dashboard'},
+            path: '/',
+            icon: '🏠',
+          },
+        ]}
+      >
+        <div>Child</div>
+      </Layout>,
+      {wrapper: Wrapper},
+    );
+    expect(
+      screen.getByRole('button', {name: /user menu/i}),
+    ).toBeInTheDocument();
+  });
+
+  // drawer behavior removed
+  test('opens user menu drawer and shows identity and settings', async () => {
+    mockUserState = mockUser;
+    const Wrapper = createWrapper({
+      i18n: true,
+      router: {initialEntries: ['/']},
+    });
+    render(
+      <Layout navigation={[]}>
+        <div>Child</div>
+      </Layout>,
+      {wrapper: Wrapper},
+    );
+
+    await userEvent.click(screen.getByRole('button', {name: /user menu/i}));
+    const dialog = screen.getByRole('dialog', {name: /user menu/i});
+    expect(dialog).toBeInTheDocument();
+    expect(within(dialog).getByText(/signed in as/i)).toBeInTheDocument();
+    expect(within(dialog).getByText(/^user$/i)).toBeInTheDocument();
+    expect(
+      within(dialog).getByRole('link', {name: /settings/i}),
+    ).toBeInTheDocument();
+    expect(
+      within(dialog).getByRole('button', {name: /logout/i}),
+    ).toBeInTheDocument();
   });
 });

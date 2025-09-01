@@ -12,6 +12,8 @@ export const UserSchema = z.object({
   role: z.enum(['admin', 'user']),
   points: z.number().int().min(0),
   streak_count: z.number().int().min(0),
+  display_name: z.string().max(MAX_NAME_LENGTH).optional().nullable(),
+  avatar_url: z.url().optional().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
 });
@@ -28,6 +30,8 @@ export const UpdateUserSchema = z.object({
   email: z.email().max(MAX_NAME_LENGTH).optional(),
   points: z.number().int().min(0).optional(),
   streak_count: z.number().int().min(0).optional(),
+  display_name: z.string().max(MAX_NAME_LENGTH).optional().nullable(),
+  avatar_url: z.url().optional().nullable(),
 });
 
 export type User = z.infer<typeof UserSchema>;

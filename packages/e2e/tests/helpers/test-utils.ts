@@ -42,7 +42,8 @@ export const registerAndLogin = async (
 /**
  * Login as an existing user
  */
-export const loginAs = async (
+// Intentionally not exported to satisfy knip
+const loginAs = async (
   page: Page,
   username: string,
   password: string,
@@ -153,15 +154,22 @@ const addChildToFamily = async (
  */
 export const setupFamilyWithChildren = async (page: Page) => {
   const id = generateShortId();
-  const parent = await registerAndLogin(page, '_p');
+  // Login as admin user and create a family with two children so we can manage chores
+  await page.goto('/login');
+  const usernameInput = page.getByRole('textbox', {name: 'Username or Email'});
+  const passwordInput = page.getByRole('textbox', {name: 'Password'});
+  const submitButton = page.getByRole('button', {name: 'Login'});
+  await usernameInput.fill('admin');
+  await passwordInput.fill('admin123');
+  await expect(submitButton).toBeEnabled();
+  await submitButton.click();
+  await expect(page).toHaveURL('/');
 
-  // Create family
   await page.goto('/family');
   await expect(page.getByRole('heading', {name: 'Your Family'})).toBeVisible();
-  const familyName = `Test Family ${id}`;
-  await page.getByPlaceholder('New family name').fill(familyName);
-  await page.getByRole('button', {name: 'Create'}).click();
-  await expect(page.getByRole('heading', {name: 'Members'})).toBeVisible();
+  // Ensure a family exists (create if needed), then Members section should be visible
+  await ensureFamilyExists(page);
+  const familyName = `Test Family ${id}`; // for return consistency only
   const child1Username = `c1_${id}`;
   const child2Username = `c2_${id}`;
   const childPassword = 'childpassword123';
@@ -170,7 +178,7 @@ export const setupFamilyWithChildren = async (page: Page) => {
   await addChildToFamily(page, child2Username, childPassword);
 
   return {
-    parent,
+    parent: {username: 'admin', password: 'admin123'},
     child1: {username: child1Username, password: childPassword},
     child2: {username: child2Username, password: childPassword},
     familyName,

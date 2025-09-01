@@ -4,9 +4,9 @@ export const ChoreAssignmentSchema = z.object({
   id: z.number(),
   chore_id: z.number(),
   user_id: z.number(),
-  assigned_at: z.iso.datetime(),
-  completed_at: z.iso.datetime().optional(),
-  approved_at: z.iso.datetime().optional(),
+  assigned_at: z.number().int(),
+  completed_at: z.number().int().optional(),
+  approved_at: z.number().int().optional(),
   approved_by: z.number().optional(),
   points_earned: z.number().int().min(0).default(0),
   bonus_points_earned: z.number().int().min(0).default(0),
@@ -15,8 +15,8 @@ export const ChoreAssignmentSchema = z.object({
 });
 
 export const UpdateChoreAssignmentSchema = z.object({
-  completed_at: z.iso.datetime().optional(),
-  approved_at: z.iso.datetime().optional(),
+  completed_at: z.number().int().optional(),
+  approved_at: z.number().int().optional(),
   approved_by: z.number().optional(),
   points_earned: z.number().int().min(0).optional(),
   bonus_points_earned: z.number().int().min(0).optional(),

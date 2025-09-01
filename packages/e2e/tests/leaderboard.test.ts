@@ -1,4 +1,4 @@
-import {test, expect} from '@playwright/test';
+import {test, expect} from './fixtures';
 import {setupFamilyWithChildren} from './helpers/test-utils';
 
 test.describe('leaderboard and Points System', () => {

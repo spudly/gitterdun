@@ -1,4 +1,4 @@
-import {test, expect} from '@playwright/test';
+import {test, expect} from './fixtures';
 import {setupFamily} from './helpers/test-utils';
 
 test.describe('chores Workflow', () => {

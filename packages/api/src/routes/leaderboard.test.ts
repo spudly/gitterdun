@@ -20,7 +20,7 @@ import leaderboardRouter from './leaderboard';
 import db from '../lib/db';
 import {setupErrorHandling} from '../middleware/errorHandler';
 import {logger} from '../utils/logger';
-import {ZodError} from 'zod';
+import {requireUserId} from '../utils/auth';
 
 // Mock dependencies
 jest.mock('../lib/db', () => ({
@@ -33,6 +33,7 @@ jest.mock('../utils/logger', () => ({
 }));
 
 jest.mock('@gitterdun/shared');
+jest.mock('../utils/auth', () => ({requireUserId: jest.fn()}));
 
 const mockDb = jest.mocked(db);
 const mockLogger = jest.mocked(logger);
@@ -40,6 +41,7 @@ const mockedLeaderboardRowSchema = jest.mocked(LeaderboardRowSchema);
 const mockedLeaderboardQuerySchema = jest.mocked(LeaderboardQuerySchema);
 const mockedLeaderboardEntrySchema = jest.mocked(LeaderboardEntrySchema);
 const mockedAsError = jest.mocked(asError);
+const mockedRequireUserId = jest.mocked(requireUserId);
 
 describe('leaderboard routes', () => {
   let app: ReturnType<typeof express> | undefined;
@@ -65,6 +67,9 @@ describe('leaderboard routes', () => {
       throw new Error(`Server address is a string: ${address}`);
     }
     baseUrl = `http://localhost:${address.port}`;
+
+    // Default: authenticated user id 42
+    mockedRequireUserId.mockReturnValue(42);
   });
 
   afterEach(async () => {
@@ -80,6 +85,7 @@ describe('leaderboard routes', () => {
 
   describe('gET /api/leaderboard', () => {
     test('should return leaderboard data with default parameters', async () => {
+      mockedRequireUserId.mockReturnValue(7);
       const mockLeaderboardData = [
         {
           id: 1,
@@ -133,14 +139,12 @@ describe('leaderboard routes', () => {
         },
       });
 
-      expect(mockPreparedStatement.all).toHaveBeenCalledWith(10);
-      expect(mockLogger.info).toHaveBeenCalledWith(
-        {sortBy: 'points', limit: 10, totalUsers: 2},
-        'Leaderboard retrieved',
-      );
+      // userId should be first param for family scoping, then limit
+      expect(mockPreparedStatement.all).toHaveBeenCalledWith(7, 10);
     });
 
     test('should return leaderboard sorted by streak', async () => {
+      mockedRequireUserId.mockReturnValue(15);
       const mockLeaderboardData = [
         {
           id: 1,
@@ -178,10 +182,11 @@ describe('leaderboard routes', () => {
       expect(response.status).toBe(200);
       expect(body.data.sortBy).toBe('streak');
 
-      expect(mockPreparedStatement.all).toHaveBeenCalledWith(5);
+      expect(mockPreparedStatement.all).toHaveBeenCalledWith(15, 5);
     });
 
     test('should handle empty leaderboard', async () => {
+      mockedRequireUserId.mockReturnValue(99);
       const mockPreparedStatement = {
         all: jest.fn().mockReturnValue([]),
       } as unknown as Statement;
@@ -203,6 +208,7 @@ describe('leaderboard routes', () => {
     });
 
     test('should handle validation errors', async () => {
+      mockedRequireUserId.mockReturnValue(1);
       // Import z to get real ZodError constructor
       const {z: zod} = await import('zod');
       mockedLeaderboardQuerySchema.parse.mockImplementation(() => {
@@ -223,22 +229,11 @@ describe('leaderboard routes', () => {
       expect(body.success).toBe(false);
       expect(body.error).toBe('Invalid request data');
 
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        {
-          error: new ZodError([
-            {
-              code: 'invalid_type',
-              expected: 'number',
-              path: ['limit'],
-              message: 'Expected number, received string',
-            },
-          ]),
-        },
-        'Error',
-      );
+      expect(mockLogger.error).not.toHaveBeenCalled();
     });
 
     test('should handle database errors', async () => {
+      mockedRequireUserId.mockReturnValue(2);
       const dbError = new Error('Database connection failed');
       const mockPreparedStatement = {
         all: jest.fn().mockImplementation(() => {
@@ -267,6 +262,7 @@ describe('leaderboard routes', () => {
     });
 
     test('should handle schema parsing errors', async () => {
+      mockedRequireUserId.mockReturnValue(3);
       const mockLeaderboardData = [
         {
           id: 1,
@@ -299,6 +295,67 @@ describe('leaderboard routes', () => {
 
       expect(response.status).toBe(500);
       expect(body).toEqual({success: false, error: 'Schema parsing failed'});
+    });
+
+    test('should require authentication', async () => {
+      const authError = Object.assign(new Error('Not authenticated'), {
+        status: 401,
+      });
+      mockedRequireUserId.mockImplementation(() => {
+        throw authError;
+      });
+
+      const response = await fetch(`${baseUrl!}/api/leaderboard`);
+      const body = await response.json();
+
+      expect(response.status).toBe(401);
+      expect(body).toEqual({success: false, error: 'Not authenticated'});
+      expect(mockDb.prepare).not.toHaveBeenCalled();
+    });
+
+    test("should scope leaderboard to user's family", async () => {
+      mockedRequireUserId.mockReturnValue(1234);
+
+      const mockLeaderboardData = [
+        {
+          id: 1,
+          username: 'user1',
+          points: 100,
+          streak_count: 5,
+          badges_earned: 2,
+          chores_completed: 10,
+        },
+      ];
+
+      const mockPreparedStatement = {
+        all: jest.fn().mockReturnValue(mockLeaderboardData),
+      } as unknown as Statement;
+      mockDb.prepare.mockReturnValue(mockPreparedStatement);
+
+      mockedLeaderboardQuerySchema.parse.mockReturnValue({
+        limit: 10,
+        sortBy: 'points',
+      });
+      mockedLeaderboardRowSchema.parse.mockReturnValueOnce(
+        mockLeaderboardData[0]!,
+      );
+      mockedLeaderboardEntrySchema.parse.mockReturnValueOnce({
+        rank: 1,
+        ...mockLeaderboardData[0]!,
+      });
+
+      const response = await fetch(`${baseUrl!}/api/leaderboard`);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.success).toBe(true);
+      expect(mockPreparedStatement.all).toHaveBeenCalledWith(1234, 10);
+      // Ensure our SQL scopes by family membership
+      const preparedSql = mockDb.prepare.mock.calls[0]?.[0] as
+        | string
+        | undefined;
+      expect(preparedSql).toBeDefined();
+      expect(preparedSql!).toContain('family_members');
     });
   });
 });

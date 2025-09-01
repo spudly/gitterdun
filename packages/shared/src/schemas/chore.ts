@@ -8,8 +8,9 @@ export const ChoreSchema = z.object({
   point_reward: z.number().int().min(0),
   bonus_points: z.number().int().min(0).default(0),
   penalty_points: z.number().int().min(0).default(0),
-  start_date: z.iso.datetime().optional(),
-  due_date: z.iso.datetime().optional(),
+  // Timestamps in ms since epoch
+  start_date: z.number().int().optional(),
+  due_date: z.number().int().optional(),
   recurrence_rule: z.string().optional(),
   chore_type: z
     .string()
@@ -22,8 +23,8 @@ export const ChoreSchema = z.object({
       message: 'status must be either "pending", "completed", or "approved"',
     }),
   created_by: z.number(),
-  created_at: z.iso.datetime(),
-  updated_at: z.iso.datetime(),
+  created_at: z.number().int(),
+  updated_at: z.number().int(),
 });
 
 export const ChoreWithUsernameSchema = ChoreSchema.extend({
@@ -36,8 +37,8 @@ export const CreateChoreSchema = z.object({
   point_reward: z.number().int().min(0),
   bonus_points: z.number().int().min(0).optional().default(0),
   penalty_points: z.number().int().min(0).optional().default(0),
-  start_date: z.iso.datetime().optional(),
-  due_date: z.iso.datetime().optional(),
+  start_date: z.number().int().optional(),
+  due_date: z.number().int().optional(),
   recurrence_rule: z.string().optional(),
   chore_type: z
     .string()

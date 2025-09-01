@@ -97,14 +97,24 @@ export const AdminChoresManagement: FC<AdminChoresManagementProps> = ({
                   </span>
                 )}
 
-                {typeof chore.due_date === 'string'
-                && chore.due_date.length > 0 ? (
-                  <span>
-                    {intl.formatMessage(messages.dueWithDate, {
-                      date: new Date(chore.due_date).toLocaleDateString(),
-                    })}
-                  </span>
-                ) : null}
+                {(() => {
+                  const dueMs =
+                    typeof chore.due_date === 'number'
+                      ? chore.due_date
+                      : typeof chore.due_date === 'string'
+                        ? Date.parse(chore.due_date)
+                        : undefined;
+                  if (typeof dueMs === 'number' && Number.isFinite(dueMs)) {
+                    return (
+                      <span>
+                        {intl.formatMessage(messages.dueWithDate, {
+                          date: new Date(dueMs).toLocaleDateString(),
+                        })}
+                      </span>
+                    );
+                  }
+                  return null;
+                })()}
 
                 {assignedToMap[chore.id] !== undefined ? (
                   <span>

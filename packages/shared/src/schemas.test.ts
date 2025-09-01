@@ -95,12 +95,12 @@ describe('chore schemas', () => {
       point_reward: 10,
       bonus_points: 0,
       penalty_points: 0,
-      start_date: '2024-01-01T09:00:00.000Z',
+      start_date: Date.parse('2024-01-01T09:00:00.000Z'),
       chore_type: 'required',
       status: 'pending',
       created_by: 1,
-      created_at: '2024-01-01T10:00:00.000Z',
-      updated_at: '2024-01-01T10:00:00.000Z',
+      created_at: Date.parse('2024-01-01T10:00:00.000Z'),
+      updated_at: Date.parse('2024-01-01T10:00:00.000Z'),
     };
 
     const result = ChoreSchema.safeParse(validChore);
@@ -117,8 +117,8 @@ describe('chore schemas', () => {
       chore_type: 'invalid-type',
       status: 'pending',
       created_by: 1,
-      created_at: '2024-01-01T10:00:00.000Z',
-      updated_at: '2024-01-01T10:00:00.000Z',
+      created_at: Date.parse('2024-01-01T10:00:00.000Z'),
+      updated_at: Date.parse('2024-01-01T10:00:00.000Z'),
     };
 
     const result = ChoreSchema.safeParse(invalidChore);
@@ -135,8 +135,8 @@ describe('chore schemas', () => {
       chore_type: 'required',
       status: 'invalid-status',
       created_by: 1,
-      created_at: '2024-01-01T10:00:00.000Z',
-      updated_at: '2024-01-01T10:00:00.000Z',
+      created_at: Date.parse('2024-01-01T10:00:00.000Z'),
+      updated_at: Date.parse('2024-01-01T10:00:00.000Z'),
     };
 
     const result = ChoreSchema.safeParse(invalidChore);
@@ -147,8 +147,8 @@ describe('chore schemas', () => {
     const validCreateChore = {
       title: 'New chore',
       point_reward: 10,
-      start_date: '2024-01-01T09:00:00.000Z',
-      due_date: '2024-01-01T17:00:00.000Z',
+      start_date: Date.parse('2024-01-01T09:00:00.000Z'),
+      due_date: Date.parse('2024-01-01T17:00:00.000Z'),
     };
 
     const result = CreateChoreSchema.safeParse(validCreateChore);

@@ -18,31 +18,31 @@ describe('stack', () => {
         <div>c</div>
       </Stack>,
     );
-    expect(getGapClass('xs')).toBe('space-y-1');
+    expect(getGapClass('xs')).toBe('gap-1');
     rerender(
       <Stack gap="sm">
         <div>c</div>
       </Stack>,
     );
-    expect(getGapClass('sm')).toBe('space-y-2');
+    expect(getGapClass('sm')).toBe('gap-2');
     rerender(
       <Stack gap="md">
         <div>c</div>
       </Stack>,
     );
-    expect(getGapClass('md')).toBe('space-y-4');
+    expect(getGapClass('md')).toBe('gap-4');
     rerender(
       <Stack gap="lg">
         <div>c</div>
       </Stack>,
     );
-    expect(getGapClass('lg')).toBe('space-y-6');
+    expect(getGapClass('lg')).toBe('gap-6');
     rerender(
       <Stack gap="xl">
         <div>c</div>
       </Stack>,
     );
-    expect(getGapClass('xl')).toBe('space-y-8');
+    expect(getGapClass('xl')).toBe('gap-8');
   });
 
   test('applies default gap=md when not provided', () => {
@@ -51,6 +51,6 @@ describe('stack', () => {
         <div>child</div>
       </Stack>,
     );
-    expect(getGapClass()).toBe('space-y-4');
+    expect(getGapClass()).toBe('gap-4');
   });
 });

@@ -26,9 +26,10 @@ export const findUserByEmail = (
         email = ?
     `)
     .get(email);
-  return userRow === null
-    ? undefined
-    : UserWithPasswordRowSchema.parse(userRow);
+  if (userRow == null) {
+    return undefined;
+  }
+  return UserWithPasswordRowSchema.parse(userRow);
 };
 
 export const findUserByUsername = (
@@ -52,7 +53,8 @@ export const findUserByUsername = (
         username = ?
     `)
     .get(username);
-  return userRow === null
-    ? undefined
-    : UserWithPasswordRowSchema.parse(userRow);
+  if (userRow == null) {
+    return undefined;
+  }
+  return UserWithPasswordRowSchema.parse(userRow);
 };

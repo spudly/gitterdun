@@ -3,14 +3,30 @@ import db from '../lib/db';
 import {logger} from './logger';
 import {sql} from './sql';
 
+const toTimestamp = (value: unknown): number | undefined => {
+  if (typeof value !== 'string' || value.length === 0) {
+    return undefined;
+  }
+  const direct = Date.parse(value);
+  if (!Number.isNaN(direct)) {
+    return direct;
+  }
+  const candidate = `${value.replace(' ', 'T')}Z`;
+  const parsedCandidate = Date.parse(candidate);
+  if (!Number.isNaN(parsedCandidate)) {
+    return parsedCandidate;
+  }
+  return undefined;
+};
+
 type CreateChoreParams = {
   title: string;
   description: string;
   pointReward: number;
   bonusPoints: number;
   penaltyPoints: number;
-  startDate: string | null;
-  dueDate: string | null;
+  startDate: number | null;
+  dueDate: number | null;
   recurrenceRule: string | null;
   choreType: string;
   createdBy: number;
@@ -46,7 +62,17 @@ export const fetchChoreById = (choreId: number) => {
     throw new Error('Chore not found');
   }
 
-  return ChoreSchema.parse(chore);
+  const base = chore as Record<string, unknown>;
+  const normalized = {
+    ...base,
+    start_date: toTimestamp(base['start_date']) ?? undefined,
+    due_date: toTimestamp(base['due_date']) ?? undefined,
+    recurrence_rule:
+      (base['recurrence_rule'] as string | null | undefined) ?? undefined,
+    created_at: toTimestamp(base['created_at']),
+    updated_at: toTimestamp(base['updated_at']),
+  };
+  return ChoreSchema.parse(normalized);
 };
 
 export const createChoreInDb = (params: CreateChoreParams) => {
@@ -78,7 +104,7 @@ export const createChoreInDb = (params: CreateChoreParams) => {
           created_by
         )
       VALUES
-        (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *
     `)
     .get(
       title,
@@ -86,14 +112,25 @@ export const createChoreInDb = (params: CreateChoreParams) => {
       pointReward,
       bonusPoints,
       penaltyPoints,
-      startDate,
-      dueDate,
+      // DB stores dates as TEXT; convert numeric timestamps to ISO
+      startDate != null ? new Date(startDate).toISOString() : null,
+      dueDate != null ? new Date(dueDate).toISOString() : null,
       recurrenceRule,
       choreType,
       createdBy,
     );
 
-  return ChoreSchema.parse(createdRow);
+  const base = createdRow as Record<string, unknown>;
+  const normalized = {
+    ...base,
+    start_date: toTimestamp(base['start_date']) ?? undefined,
+    due_date: toTimestamp(base['due_date']) ?? undefined,
+    recurrence_rule:
+      (base['recurrence_rule'] as string | null | undefined) ?? undefined,
+    created_at: toTimestamp(base['created_at']),
+    updated_at: toTimestamp(base['updated_at']),
+  };
+  return ChoreSchema.parse(normalized);
 };
 
 export const assignChoreToUsers = (

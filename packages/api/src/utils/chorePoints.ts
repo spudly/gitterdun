@@ -5,6 +5,30 @@ import {sql} from './sql';
 
 type Chore = z.infer<typeof ChoreSchema>;
 
+const toTimestamp = (value: unknown): number | undefined => {
+  if (typeof value !== 'string' || value.length === 0) {
+    return undefined;
+  }
+  const parsed = Date.parse(value);
+  if (!Number.isNaN(parsed)) {
+    return parsed;
+  }
+  const candidate = `${value.replace(' ', 'T')}Z`;
+  const parsedCandidate = Date.parse(candidate);
+  if (!Number.isNaN(parsedCandidate)) {
+    return parsedCandidate;
+  }
+  return undefined;
+};
+
+const requireTimestamp = (value: unknown, fieldName: string): number => {
+  const ts = toTimestamp(value);
+  if (ts == null) {
+    throw new Error(`Invalid or missing timestamp for ${fieldName}`);
+  }
+  return ts;
+};
+
 export const getChoreForCompletion = (choreId: number) => {
   const choreRow = db
     .prepare(sql`
@@ -33,7 +57,18 @@ export const getChoreForCompletion = (choreId: number) => {
     throw new Error('Chore not found');
   }
 
-  return ChoreSchema.parse(choreRow);
+  const base = choreRow as Record<string, unknown>;
+  const normalized = {
+    ...base,
+    start_date: toTimestamp(base['start_date']) ?? undefined,
+    due_date: toTimestamp(base['due_date']) ?? undefined,
+    recurrence_rule:
+      (base['recurrence_rule'] as string | null | undefined) ?? undefined,
+    created_at: requireTimestamp(base['created_at'], 'created_at'),
+    updated_at: requireTimestamp(base['updated_at'], 'updated_at'),
+  };
+
+  return ChoreSchema.parse(normalized);
 };
 
 export const calculateCompletionPoints = (chore: Chore) => {

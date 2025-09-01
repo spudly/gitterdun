@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS users (
   role TEXT NOT NULL DEFAULT 'user', -- 'admin' or 'user' (system-level; not family roles)
   points INTEGER DEFAULT 0,
   streak_count INTEGER DEFAULT 0,
+  display_name TEXT,
+  avatar_url TEXT,
   created_at datetime DEFAULT CURRENT_TIMESTAMP,
   updated_at datetime DEFAULT CURRENT_TIMESTAMP
 );

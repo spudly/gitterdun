@@ -5,7 +5,7 @@ import {ONE_MINUTE_MS, ONE_HOUR_MS} from '@gitterdun/shared';
 const navMessages = defineMessages({
   dashboard: {defaultMessage: 'Dashboard', id: 'pages.Dashboard.dashboard'},
   chores: {defaultMessage: 'Chores', id: 'pages.Chores.chores'},
-  goals: {defaultMessage: 'Goals', id: 'constants.goals'},
+  settings: {defaultMessage: 'Settings', id: 'pages.Settings.settings'},
   leaderboard: {
     defaultMessage: 'Leaderboard',
     id: 'pages.Leaderboard.leaderboard',
@@ -16,7 +16,6 @@ const navMessages = defineMessages({
 export const NAVIGATION_ITEMS: Array<NavigationItem> = [
   {message: navMessages.dashboard, path: '/', icon: '🏠'},
   {message: navMessages.chores, path: '/chores', icon: '📋'},
-  {message: navMessages.goals, path: '/goals', icon: '🎯'},
   {message: navMessages.leaderboard, path: '/leaderboard', icon: '🏆'},
   {message: navMessages.family, path: '/family', icon: '👪'},
 ];

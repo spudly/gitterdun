@@ -16,6 +16,37 @@ const executeSchema = (schema: string): void => {
   logger.info('Database initialized successfully');
 };
 
+const columnExists = (table: string, column: string): boolean => {
+  const row = db.prepare(sql`PRAGMA table_info (${table})`).all() as Array<{
+    name: string;
+  }>;
+  return row.some(rowItem => rowItem.name === column);
+};
+
+const ensureUsersProfileColumns = (): void => {
+  try {
+    if (!columnExists('users', 'display_name')) {
+      db.prepare(sql`
+        ALTER TABLE users
+        ADD COLUMN display_name TEXT
+      `).run();
+      logger.info("Added 'display_name' column to users table");
+    }
+    if (!columnExists('users', 'avatar_url')) {
+      db.prepare(sql`
+        ALTER TABLE users
+        ADD COLUMN avatar_url TEXT
+      `).run();
+      logger.info("Added 'avatar_url' column to users table");
+    }
+  } catch (error) {
+    logger.error(
+      {error: asError(error)},
+      'Failed ensuring users profile columns',
+    );
+  }
+};
+
 const checkAdminExists = (): boolean => {
   const adminExists = CountRowSchema.parse(
     db
@@ -60,6 +91,7 @@ export const initializeDatabase = async (): Promise<void> => {
   try {
     const schema = readSchemaFile();
     executeSchema(schema);
+    ensureUsersProfileColumns();
 
     if (!checkAdminExists()) {
       await createDefaultAdmin();

@@ -2,9 +2,11 @@ import type {LoggerOptions} from 'pino';
 import pinoLogger from 'pino';
 
 const isTest = process.env['NODE_ENV'] === 'test';
+const isProd = process.env['NODE_ENV'] === 'production';
+const isUnitTest = isTest && process.env['TEST_ENV'] === 'jest';
 
 const baseOptions: LoggerOptions = {
-  level: process.env['LOG_LEVEL'] ?? (isTest ? 'silent' : 'info'),
+  level: process.env['LOG_LEVEL'] ?? (isUnitTest ? 'silent' : 'info'),
   serializers: {
     error: (err: unknown) => {
       if (err instanceof Error) {
@@ -24,18 +26,19 @@ const baseOptions: LoggerOptions = {
   },
 };
 
-const devTransport =
-  process.env['NODE_ENV'] === 'development'
-    ? {
-        transport: {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-            translateTime: 'SYS:standard',
-            ignore: 'pid,hostname',
-          },
+const devTransport = !isProd
+  ? {
+      transport: {
+        target: 'pino-pretty',
+        options: {
+          colorize: true,
+          translateTime: 'HH:MM:ss',
+          ignore: 'pid,hostname',
         },
-      }
-    : {};
+      },
+    }
+  : {};
 
 export const logger = pinoLogger({...baseOptions, ...devTransport});
+
+logger.info(`NODE_ENV: ${process.env['NODE_ENV']}`);

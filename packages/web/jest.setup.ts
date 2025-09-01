@@ -1,7 +1,16 @@
 import '@testing-library/jest-dom';
+import {TextEncoder, TextDecoder} from 'node:util';
+
+// Ensure vite-like env for tests that reference import.meta.env.MODE
+declare global {
+  type ImportMetaEnvShim = {readonly MODE: string};
+  type ImportMetaShim = {readonly env: ImportMetaEnvShim};
+}
+// Provide a typed shim for import.meta
+// @ts-expect-error: define import.meta for Jest environment
+globalThis.import = {meta: {env: {MODE: 'test'}}} as unknown as ImportMetaShim;
 
 // Polyfill TextEncoder/TextDecoder for jsdom environment (needed by react-router v7)
-import {TextEncoder, TextDecoder} from 'node:util';
 
 // Provide a minimal WHATWG Response polyfill for tests that construct `new Response(...)`
 if (typeof (globalThis as any).Response === 'undefined') {
