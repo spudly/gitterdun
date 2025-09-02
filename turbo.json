@@ -11,7 +11,8 @@
     "JEST_WORKER_ID",
     "CI",
     "PLAYWRIGHT_SKIP_WEBSERVER",
-    "MODE"
+    "MODE",
+    "DEBUG"
   ],
   "tasks": {
     "build": {
