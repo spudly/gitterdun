@@ -9,11 +9,13 @@ export const FamilySchema = z.object({
   id: z.number(),
   name: z.string().min(1).max(MAX_NAME_LENGTH),
   owner_id: z.number(),
+  timezone: z.string().optional(),
   created_at: z.string(),
 });
 
 export const CreateFamilySchema = z.object({
   name: z.string().min(1).max(MAX_NAME_LENGTH),
+  timezone: z.string().optional(),
 });
 
 export const FamilyMemberSchema = z.object({
@@ -44,9 +46,14 @@ export const AcceptInvitationSchema = z.object({
   password: z.string().min(MIN_PASSWORD_LENGTH),
 });
 
+export const UpdateFamilyTimezoneSchema = z.object({
+  timezone: z.string().min(1),
+});
+
 export type Family = z.infer<typeof FamilySchema>;
 export type CreateFamily = z.infer<typeof CreateFamilySchema>;
 export type FamilyMember = z.infer<typeof FamilyMemberSchema>;
 export type CreateChild = z.infer<typeof CreateChildSchema>;
 export type CreateInvitation = z.infer<typeof CreateInvitationSchema>;
 export type AcceptInvitation = z.infer<typeof AcceptInvitationSchema>;
+export type UpdateFamilyTimezone = z.infer<typeof UpdateFamilyTimezoneSchema>;

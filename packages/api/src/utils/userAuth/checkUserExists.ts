@@ -1,4 +1,4 @@
-import db from '../../lib/db';
+import {get} from '../crud/db';
 import {sql} from '../sql';
 
 export const checkUserExists = (
@@ -8,8 +8,8 @@ export const checkUserExists = (
   const trimmedEmail = typeof email === 'string' ? email.trim() : undefined;
   const existingUserRow =
     trimmedEmail !== undefined && trimmedEmail !== ''
-      ? db
-          .prepare(sql`
+      ? get(
+          sql`
             SELECT
               id
             FROM
@@ -17,17 +17,20 @@ export const checkUserExists = (
             WHERE
               email = ?
               OR username = ?
-          `)
-          .get(trimmedEmail, username)
-      : db
-          .prepare(sql`
+          `,
+          trimmedEmail,
+          username,
+        )
+      : get(
+          sql`
             SELECT
               id
             FROM
               users
             WHERE
               username = ?
-          `)
-          .get(username);
+          `,
+          username,
+        );
   return existingUserRow !== null && existingUserRow !== undefined;
 };

@@ -1,6 +1,6 @@
 import {GoalSchema} from '@gitterdun/shared';
 import {z} from 'zod';
-import db from '../lib/db';
+import {get} from './crud/db';
 import {sql} from './sql';
 import type {UpdateGoalRequest} from './goalValidation';
 
@@ -53,6 +53,6 @@ export const executeGoalUpdate = (
     WHERE
       id = ? RETURNING *
   `;
-  const updatedGoal = db.prepare(updateQuery).get(...values);
+  const updatedGoal = get(updateQuery, ...values);
   return GoalSchema.parse(updatedGoal);
 };

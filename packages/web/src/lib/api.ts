@@ -10,5 +10,6 @@ export {choresApi} from './choresApi';
 export {goalsApi} from './goalsApi';
 export {leaderboardApi, familiesApi, invitationsApi} from './familiesApi';
 export {usersApi} from './usersApi';
+export {choreInstancesApi} from './choreInstancesApi';
 
 // Re-export types for convenience

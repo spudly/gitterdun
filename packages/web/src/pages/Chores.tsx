@@ -1,43 +1,51 @@
 import type {FC} from 'react';
+import {useMemo, useState} from 'react';
 import {useQuery, useQueryClient} from '@tanstack/react-query';
-import type {ChoreWithUsername} from '@gitterdun/shared';
-import {choresApi} from '../lib/api.js';
-import {useUser} from '../hooks/useUser.js';
+import {choreInstancesApi} from '../lib/api.js';
 import {PageContainer} from '../widgets/PageContainer.js';
 import {PageHeader} from '../widgets/PageHeader.js';
 import {List} from '../widgets/List.js';
 import {ListRow} from '../widgets/ListRow.js';
-import {StatusDot} from '../widgets/StatusDot.js';
-import {Badge} from '../widgets/Badge.js';
-import {InlineMeta} from '../widgets/InlineMeta.js';
+import {Checkbox} from '../widgets/Checkbox.js';
 import {Button} from '../widgets/Button.js';
 import {PageLoading} from '../widgets/PageLoading.js';
-import {FormattedMessage, useIntl} from 'react-intl';
-import {choresMessages as messages} from './chores.messages.js';
+import {FormattedMessage, defineMessages, useIntl} from 'react-intl';
 import {useToast} from '../widgets/ToastProvider.js';
 
-// messages imported
+const messages = defineMessages({
+  header: {defaultMessage: 'Chores', id: 'pages.ChoreInstances.header'},
+  loading: {
+    defaultMessage: 'Loading chores...',
+    id: 'pages.ChoreInstances.loading',
+  },
+  hideCompleted: {
+    defaultMessage: 'Hide completed',
+    id: 'pages.ChoreInstances.hide-completed',
+  },
+});
 
 const Chores: FC = () => {
-  const {user} = useUser();
-  const {safeAsync} = useToast();
   const intl = useIntl();
+  const {safeAsync} = useToast();
   const queryClient = useQueryClient();
-
-  const {data: choresResponse, isLoading} = useQuery({
-    queryKey: ['chores', user?.id],
-    queryFn: async () =>
-      choresApi.getAll({
-        user_id: user!.id,
-        sort_by: 'start_date',
-        order: 'asc',
-      }),
-    enabled: Boolean(user),
+  const [hideCompleted, setHideCompleted] = useState(true);
+  const {data: instancesResponse, isLoading} = useQuery({
+    queryKey: ['chore-instances', 'today'],
+    queryFn: async () => choreInstancesApi.listForDay({date: 'today'}),
   });
-
-  const chores = choresResponse?.data ?? [];
-
-  // keep for potential future optimistic update flows
+  const allInstances = (instancesResponse?.data ?? []) as Array<{
+    chore_id: number;
+    title: string;
+    status: 'incomplete' | 'complete';
+    approval_status: 'unapproved' | 'approved' | 'rejected';
+    notes?: string;
+  }>;
+  const visibleInstances = useMemo(() => {
+    if (!hideCompleted) {
+      return allInstances;
+    }
+    return allInstances.filter(instance => instance.status !== 'complete');
+  }, [allInstances, hideCompleted]);
 
   if (isLoading) {
     return (
@@ -47,123 +55,72 @@ const Chores: FC = () => {
     );
   }
 
-  const renderStatusDot = (status: ChoreWithUsername['status']) => {
-    if (status === 'completed') {
-      return <StatusDot color="green" />;
-    }
-    if (status === 'approved') {
-      return <StatusDot color="blue" />;
-    }
-    return <StatusDot color="yellow" />;
-  };
-
-  const renderStatusText = (status: ChoreWithUsername['status']): string => {
-    if (status === 'completed') {
-      return intl.formatMessage(messages.statusCompleted);
-    }
-    if (status === 'approved') {
-      return intl.formatMessage(messages.statusApproved);
-    }
-    return intl.formatMessage(messages.statusPending);
-  };
-
+  // Render
   return (
     <PageContainer>
       <PageHeader title={intl.formatMessage(messages.header)} />
+      <div>
+        <Checkbox
+          checked={hideCompleted}
+          label={<FormattedMessage {...messages.hideCompleted} />}
+          onChange={checked => {
+            setHideCompleted(checked);
+          }}
+        />
+      </div>
 
       <div>
         <List>
-          {chores.map((chore: ChoreWithUsername) => (
+          {visibleInstances.map(instance => (
             <ListRow
-              description={chore.description}
-              key={chore.id}
-              left={renderStatusDot(chore.status)}
-              meta={
-                <InlineMeta>
-                  <span>
-                    {intl.formatMessage(messages.pointsWithValue, {
-                      points: chore.point_reward,
-                    })}
-                  </span>
-
-                  {chore.bonus_points > 0 && (
-                    <span>
-                      {intl.formatMessage(messages.bonusWithPoints, {
-                        points: chore.bonus_points,
-                      })}
-                    </span>
-                  )}
-
-                  {chore.penalty_points > 0 && (
-                    <span>
-                      {intl.formatMessage(messages.penaltyWithPoints, {
-                        points: chore.penalty_points,
-                      })}
-                    </span>
-                  )}
-
-                  {(() => {
-                    const dueMs =
-                      typeof chore.due_date === 'number'
-                        ? chore.due_date
-                        : typeof chore.due_date === 'string'
-                          ? Date.parse(chore.due_date)
-                          : undefined;
-                    if (typeof dueMs === 'number' && Number.isFinite(dueMs)) {
-                      return (
-                        <span>
-                          {intl.formatMessage(messages.dueWithDate, {
-                            date: new Date(dueMs).toLocaleDateString(),
-                          })}
-                        </span>
-                      );
-                    }
-                    return null;
-                  })()}
-                </InlineMeta>
-              }
+              key={`${instance.chore_id}`}
+              title={instance.title}
+              description={instance.notes}
               right={
-                chore.status === 'pending' ? (
+                instance.status === 'complete' ? (
+                  <span className="text-green-700">✓</span>
+                ) : (
                   <Button
-                    onClick={safeAsync(async () => {
-                      await choresApi.complete(chore.id, {userId: user!.id});
-                      await queryClient.invalidateQueries({
-                        queryKey: ['chores', user?.id],
-                      });
-                    }, intl.formatMessage(messages.completeError))}
+                    onClick={safeAsync(
+                      async () => {
+                        const today = new Date().toISOString();
+                        const payload: {
+                          chore_id: number;
+                          date: string;
+                          status?: 'incomplete' | 'complete';
+                          approval_status?:
+                            | 'unapproved'
+                            | 'approved'
+                            | 'rejected';
+                          notes?: string;
+                        } = {
+                          chore_id: instance.chore_id,
+                          date: today,
+                          status: 'complete',
+                          approval_status: instance.approval_status,
+                        };
+                        if (typeof instance.notes === 'string') {
+                          payload.notes = instance.notes;
+                        }
+                        await choreInstancesApi.upsert(payload);
+                        queryClient.invalidateQueries({
+                          queryKey: ['chore-instances'],
+                        });
+                      },
+                      intl.formatMessage({
+                        defaultMessage: 'Failed to complete chore',
+                        id: 'pages.ChoreInstances.complete-failed',
+                      }),
+                    )}
                     size="sm"
-                    variant="primary"
+                    variant="ghost"
                   >
-                    <FormattedMessage {...messages.complete} />
+                    <FormattedMessage
+                      defaultMessage="Complete"
+                      id="pages.ChoreInstances.complete"
+                    />
                   </Button>
-                ) : chore.status === 'completed' ? (
-                  <>
-                    <Button size="sm" variant="primary">
-                      <FormattedMessage
-                        defaultMessage="Approve"
-                        id="pages.Chores.approve"
-                      />
-                    </Button>
-                    <Button size="sm" variant="danger">
-                      <FormattedMessage
-                        defaultMessage="Reject"
-                        id="pages.Chores.reject"
-                      />
-                    </Button>
-                  </>
-                ) : undefined
-              }
-              title={chore.title}
-              titleRight={
-                <>
-                  {renderStatusText(chore.status)}
-
-                  {chore.chore_type === 'bonus' && (
-                    <Badge variant="purple">
-                      <FormattedMessage {...messages.typeBonus} />
-                    </Badge>
-                  )}
-                </>
+                )
               }
             />
           ))}

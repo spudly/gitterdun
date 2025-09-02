@@ -6,7 +6,7 @@ import {
   UserPasswordHashRowSchema,
   IdRowSchema,
 } from '@gitterdun/shared';
-import db from '../lib/db';
+import {get} from './crud/db';
 import {sql} from './sql';
 import {
   BCRYPT_SALT_ROUNDS,
@@ -30,8 +30,8 @@ export const validateParentMembership = (
   userId: number,
   familyId: number,
 ): void => {
-  const membershipRow = db
-    .prepare(sql`
+  const membershipRow = get(
+    sql`
       SELECT
         role
       FROM
@@ -39,8 +39,10 @@ export const validateParentMembership = (
       WHERE
         family_id = ?
         AND user_id = ?
-    `)
-    .get(familyId, userId);
+    `,
+    familyId,
+    userId,
+  );
   const membership =
     membershipRow !== undefined
       ? RoleRowSchema.parse(membershipRow)
@@ -57,8 +59,8 @@ export const generateInvitationToken = (): InvitationToken => {
 };
 
 export const validateInvitationToken = (token: string): InvitationData => {
-  const invRow = db
-    .prepare(sql`
+  const invRow = get(
+    sql`
       SELECT
         token,
         family_id,
@@ -71,8 +73,9 @@ export const validateInvitationToken = (token: string): InvitationData => {
         family_invitations
       WHERE
         token = ?
-    `)
-    .get(token);
+    `,
+    token,
+  );
   const inv =
     invRow !== undefined ? FamilyInvitationRowSchema.parse(invRow) : undefined;
 
@@ -92,8 +95,8 @@ export const validateInvitationExpiry = (invitation: InvitationData): void => {
 };
 
 const findExistingUser = (email: string) => {
-  const existingRow = db
-    .prepare(sql`
+  const existingRow = get(
+    sql`
       SELECT
         id,
         password_hash
@@ -101,8 +104,9 @@ const findExistingUser = (email: string) => {
         users
       WHERE
         email = ?
-    `)
-    .get(email);
+    `,
+    email,
+  );
   return existingRow !== null
     ? UserPasswordHashRowSchema.parse(existingRow)
     : undefined;
@@ -125,14 +129,17 @@ const createNewUser = async (
   password: string,
 ): Promise<number> => {
   const hash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
-  const createdRow = db
-    .prepare(sql`
+  const createdRow = get(
+    sql`
       INSERT INTO
         users (username, email, password_hash, role)
       VALUES
         (?, ?, ?, 'user') RETURNING id
-    `)
-    .get(username, email, hash);
+    `,
+    username,
+    email,
+    hash,
+  );
   const created = IdRowSchema.parse(createdRow);
   return created.id;
 };

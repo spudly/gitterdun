@@ -1,6 +1,6 @@
 import {ChoreWithUsernameSchema, CountRowSchema} from '@gitterdun/shared';
 import {z} from 'zod';
-import db from '../lib/db';
+import {all, get} from './crud/db';
 import {buildChoresQuery} from './choreQueryBuilders';
 import {DEFAULT_CHORE_PAGINATION_LIMIT} from '../constants';
 
@@ -35,7 +35,7 @@ const getChoresCount = (query: string, params: Array<string | number>) => {
     /SELECT[\s\S]*?FROM/u,
     'SELECT COUNT(*) as count FROM',
   );
-  const totalRow = db.prepare(countQuery).get(...params);
+  const totalRow = get(countQuery, ...params);
   const {count: total} = CountRowSchema.parse(totalRow);
   return total;
 };
@@ -80,11 +80,13 @@ const executeChoresQuery = (
   query: string,
   params: Array<string | number>,
 ): Array<ChoreWithUsername> => {
-  const chores = db.prepare(query).all(...params);
+  const chores = all(query, ...params);
   return chores.map(raw => {
     const base = raw as Record<string, unknown>;
     const normalized = {
       ...base,
+      // status omitted; derived elsewhere if needed
+      reward_points: base['reward_points'] ?? base['point_reward'] ?? 0,
       start_date: toTimestamp(base['start_date']) ?? undefined,
       due_date: toTimestamp(base['due_date']) ?? undefined,
       recurrence_rule:

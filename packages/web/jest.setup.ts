@@ -1,6 +1,18 @@
 import '@testing-library/jest-dom';
 import {TextEncoder, TextDecoder} from 'node:util';
 
+// Provide import.meta.env for tests so code that relies on Vite env works
+Object.defineProperty(globalThis, 'import', {
+  value: {},
+  writable: true,
+  configurable: true,
+});
+Object.defineProperty(globalThis, 'import.meta', {
+  value: {env: {DEV: false, PROD: true, MODE: 'test'}},
+  writable: true,
+  configurable: true,
+});
+
 // Ensure vite-like env for tests that reference import.meta.env.MODE
 declare global {
   type ImportMetaEnvShim = {readonly MODE: string};

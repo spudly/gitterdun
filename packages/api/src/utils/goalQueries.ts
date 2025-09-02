@@ -1,6 +1,6 @@
 import {GoalQuerySchema, GoalSchema, CountRowSchema} from '@gitterdun/shared';
 import {z} from 'zod';
-import db from '../lib/db';
+import {all, get} from './crud/db';
 import {sql} from './sql';
 
 type Goal = z.infer<typeof GoalSchema>;
@@ -64,7 +64,7 @@ export const getTotalGoalsCount = (
     /SELECT[\s\S]*?FROM/,
     'SELECT COUNT(*) as total FROM',
   );
-  const totalRow = db.prepare(countQuery).get(...params);
+  const totalRow = get(countQuery, ...params);
   const {count: total} = CountRowSchema.parse(totalRow);
   return total;
 };
@@ -85,6 +85,6 @@ export const fetchAndValidateGoals = (
   query: string,
   params: Array<string | number>,
 ): Array<Goal> => {
-  const goals = db.prepare(query).all(...params);
+  const goals = all(query, ...params);
   return goals.map(goal => GoalSchema.parse(goal));
 };

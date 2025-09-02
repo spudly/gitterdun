@@ -5,9 +5,9 @@ import {
   LeaderboardQuerySchema,
   LeaderboardEntrySchema,
 } from '@gitterdun/shared';
-import db from '../lib/db';
 import {sql} from '../utils/sql';
 import {requireUserId} from '../utils/auth';
+import {getLeaderboard} from '../utils/crud/leaderboard';
 
 // eslint-disable-next-line new-cap -- not my function
 const router = express.Router();
@@ -65,7 +65,7 @@ router.get('/', async (req, res) => {
   const userId = requireUserId(req);
   const {limit, sortBy} = LeaderboardQuerySchema.parse(req.query);
   const query = buildLeaderboardQuery(sortBy);
-  const leaderboard = db.prepare(query).all(userId, limit);
+  const leaderboard = getLeaderboard(query, userId, limit);
   const validatedLeaderboard = processLeaderboardResults(leaderboard);
 
   res.json({

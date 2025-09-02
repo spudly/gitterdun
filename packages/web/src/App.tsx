@@ -7,12 +7,7 @@ import {NAVIGATION_ITEMS} from './constants.js';
 import {I18nProvider} from './i18n/I18nProvider.js';
 import {FC} from 'react';
 import {queryClient} from './utils/queryClient.js';
-
-const rootElement = document.getElementById('root');
-
-if (!rootElement) {
-  throw new Error('Root element not found');
-}
+import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
 
 export const App: FC = () => (
   <QueryClientProvider client={queryClient}>
@@ -25,5 +20,11 @@ export const App: FC = () => (
         </BrowserRouter>
       </ToastProvider>
     </I18nProvider>
+    {import.meta.env['NODE_ENV'] === 'development' ? (
+      <>
+        <style>{`.tsqd-open-btn-container{ transform: translateY(-50px); }`}</style>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </>
+    ) : null}
   </QueryClientProvider>
 );

@@ -10,6 +10,8 @@ import {UserMenuDrawer} from './UserMenuDrawer.js';
 import {BottomNav} from './BottomNav.js';
 import {useUser} from '../hooks/useUser.js';
 import {useToast} from './ToastProvider.js';
+import {useQuery} from '@tanstack/react-query';
+import {familiesApi} from '../lib/api.js';
 
 export type NavigationItem = {
   message: MessageDescriptor;
@@ -34,6 +36,49 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
     id: 'widgets.Layout.menu',
   });
   const computedNavigation: Array<NavigationItem> = [...navigation];
+  const {data: myFamily} = useQuery({
+    queryKey: ['family', 'mine', user?.id],
+    queryFn: async () => familiesApi.myFamily(),
+    enabled: Boolean(user),
+    staleTime: 60_000,
+  });
+  const familyId = (myFamily?.data as {id?: number} | null | undefined)?.id;
+  const {data: membersData} = useQuery({
+    queryKey: ['family', familyId, 'members'],
+    queryFn: async () => {
+      if (familyId == null) {
+        return {success: true, data: []} as const;
+      }
+      return familiesApi.listMembers(familyId);
+    },
+    enabled: familyId != null,
+    staleTime: 30_000,
+  });
+  const isParent = (() => {
+    if (user == null) {
+      return false;
+    }
+    const fam = myFamily?.data as {owner_id?: unknown} | null | undefined;
+    if (fam && typeof fam.owner_id === 'number' && fam.owner_id === user.id) {
+      return true;
+    }
+    const members = membersData?.data as
+      | ReadonlyArray<{user_id: number; role: string}>
+      | undefined;
+    if (!members) {
+      return false;
+    }
+    return members.some(
+      member => member.user_id === user.id && member.role === 'parent',
+    );
+  })();
+  if (isParent) {
+    computedNavigation.push({
+      message: {defaultMessage: 'Approvals', id: 'widgets.Layout.approvals'},
+      path: '/family/approvals',
+      icon: '✅',
+    });
+  }
 
   return (
     <div className="flex h-screen flex-col bg-gray-50">

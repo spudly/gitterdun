@@ -31,7 +31,8 @@
     "ci:check": "turbo run ci:check --output-logs=errors-only",
     "turbo:reset": "find . -name '.turbo' -type d -exec rm -rf {}",
     "ai:check": "turbo run ai:check --output-logs=errors-only",
-    "db:reset": "rm -f ./packages/api/data/gitterdun.db"
+    "db:reset": "npm run -w packages/api db:reset",
+    "db:reset:seed": "npm run -w packages/api db:reset -- --seed"
   },
   "devDependencies": {
     "@jest/globals": "^30.0.5",

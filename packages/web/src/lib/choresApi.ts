@@ -5,13 +5,13 @@ import {api} from './apiCore';
 
 export const choresApi = {
   getAll: async (params?: {
-    status?: string;
-    chore_type?: string;
-    user_id?: number;
-    page?: number;
-    limit?: number;
-    sort_by?: 'created_at' | 'start_date' | 'due_date';
-    order?: 'asc' | 'desc';
+    status?: string | undefined;
+    chore_type?: string | undefined;
+    user_id?: number | undefined;
+    page?: number | undefined;
+    limit?: number | undefined;
+    sort_by?: 'created_at' | 'start_date' | 'due_date' | undefined;
+    order?: 'asc' | 'desc' | undefined;
   }) => api.get('/chores', z.array(ChoreWithUsernameSchema), params),
 
   getById: async (id: number) =>
@@ -20,11 +20,10 @@ export const choresApi = {
   create: async (choreData: {
     title: string;
     description?: string;
-    point_reward: number;
-    bonus_points?: number;
+    reward_points?: number;
     penalty_points?: number;
-    start_date?: string;
-    due_date?: string;
+    start_date?: number;
+    due_date?: number;
     recurrence_rule?: string;
     chore_type: string;
     assigned_users?: Array<number>;
@@ -35,11 +34,10 @@ export const choresApi = {
     choreData: {
       title?: string;
       description?: string;
-      point_reward?: number;
-      bonus_points?: number;
+      reward_points?: number;
       penalty_points?: number;
-      start_date?: string;
-      due_date?: string;
+      start_date?: number;
+      due_date?: number;
       recurrence_rule?: string;
       chore_type?: string;
       status?: string;

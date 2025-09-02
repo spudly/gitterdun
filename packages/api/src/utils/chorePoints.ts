@@ -1,7 +1,7 @@
 import {ChoreSchema} from '@gitterdun/shared';
 import {z} from 'zod';
-import db from '../lib/db';
 import {sql} from './sql';
+import {get, run} from './crud/db';
 
 type Chore = z.infer<typeof ChoreSchema>;
 
@@ -30,19 +30,17 @@ const requireTimestamp = (value: unknown, fieldName: string): number => {
 };
 
 export const getChoreForCompletion = (choreId: number) => {
-  const choreRow = db
-    .prepare(sql`
+  const choreRow = get(
+    sql`
       SELECT
         id,
         title,
         description,
-        point_reward,
-        bonus_points,
+        reward_points,
         penalty_points,
         due_date,
         recurrence_rule,
         chore_type,
-        status,
         created_by,
         created_at,
         updated_at
@@ -50,8 +48,9 @@ export const getChoreForCompletion = (choreId: number) => {
         chores
       WHERE
         id = ?
-    `)
-    .get(choreId);
+    `,
+    choreId,
+  );
 
   if (choreRow === undefined) {
     throw new Error('Chore not found');
@@ -72,9 +71,9 @@ export const getChoreForCompletion = (choreId: number) => {
 };
 
 export const calculateCompletionPoints = (chore: Chore) => {
-  const pointsEarned = chore.point_reward;
-  const bonusPointsEarned =
-    typeof chore.bonus_points === 'number' ? chore.bonus_points : 0;
+  const pointsEarned =
+    typeof chore.reward_points === 'number' ? chore.reward_points : 0;
+  const bonusPointsEarned = 0; // merged into reward_points
   const penaltyPointsEarned = 0; // TODO: Implement penalty logic
   return {pointsEarned, bonusPointsEarned, penaltyPointsEarned};
 };
@@ -83,13 +82,17 @@ export const updateUserPointsForChore = (
   userId: number,
   totalPoints: number,
 ) => {
-  db.prepare(sql`
-    UPDATE users
-    SET
-      points = points + ?
-    WHERE
-      id = ?
-  `).run(totalPoints, userId);
+  run(
+    sql`
+      UPDATE users
+      SET
+        points = points + ?
+      WHERE
+        id = ?
+    `,
+    totalPoints,
+    userId,
+  );
 };
 
 export const createChoreCompletionNotification = (
@@ -97,12 +100,13 @@ export const createChoreCompletionNotification = (
   chore: Chore,
   choreId: number,
 ) => {
-  db.prepare(sql`
-    INSERT INTO
-      notifications (user_id, title, message, type, related_id)
-    VALUES
-      (?, ?, ?, ?, ?)
-  `).run(
+  run(
+    sql`
+      INSERT INTO
+        notifications (user_id, title, message, type, related_id)
+      VALUES
+        (?, ?, ?, ?, ?)
+    `,
     userId,
     'Chore Completed',
     `Your chore "${chore.title}" has been completed and is pending approval.`,

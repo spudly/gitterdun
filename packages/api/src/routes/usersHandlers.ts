@@ -1,10 +1,15 @@
 import type express from 'express';
 import {StatusCodes} from 'http-status-codes';
-import db from '../lib/db';
-import {sql} from '../utils/sql';
 import {logger} from '../utils/logger';
 import {UserSchema, UpdateUserSchema, asError} from '@gitterdun/shared';
 import {getUserFromSession} from '../utils/sessionUtils';
+import {
+  clearChoresCreatedBy,
+  deleteInvitationsByInviter,
+  deleteUserById,
+  getUserById,
+  updateUserProfile,
+} from '../utils/crud/users';
 
 // Admin-only handlers
 export {listUsersHandler, deleteUserHandler} from './usersHandlers.admin';
@@ -54,18 +59,12 @@ export const patchMeHandler = (
     const nextAvatarUrl = parsed.avatar_url ?? user.avatar_url ?? null;
     const nextEmail = parsed.email ?? user.email ?? null;
 
-    const info = db
-      .prepare(sql`
-        UPDATE users
-        SET
-          display_name = ?,
-          avatar_url = ?,
-          email = ?,
-          updated_at = CURRENT_TIMESTAMP
-        WHERE
-          id = ?
-      `)
-      .run(nextDisplayName, nextAvatarUrl, nextEmail, user.id);
+    const info = updateUserProfile(
+      user.id,
+      nextDisplayName,
+      nextAvatarUrl,
+      nextEmail,
+    );
 
     if (info.changes === 0) {
       res
@@ -74,25 +73,7 @@ export const patchMeHandler = (
       return;
     }
 
-    const updated = db
-      .prepare(sql`
-        SELECT
-          id,
-          username,
-          email,
-          role,
-          points,
-          streak_count,
-          display_name,
-          avatar_url,
-          created_at,
-          updated_at
-        FROM
-          users
-        WHERE
-          id = ?
-      `)
-      .get(user.id);
+    const updated = getUserById(user.id);
 
     res.json({success: true, data: UserSchema.parse(updated)});
   } catch (error) {
@@ -117,27 +98,9 @@ export const deleteMeHandler = (
     }
     const user = UserSchema.parse(sessionUser);
 
-    db.prepare(sql`
-      UPDATE chores
-      SET
-        created_by = NULL
-      WHERE
-        created_by = ?
-    `).run(user.id);
-
-    db.prepare(sql`
-      DELETE FROM family_invitations
-      WHERE
-        invited_by = ?
-    `).run(user.id);
-
-    const info = db
-      .prepare(sql`
-        DELETE FROM users
-        WHERE
-          id = ?
-      `)
-      .run(user.id);
+    clearChoresCreatedBy(user.id);
+    deleteInvitationsByInviter(user.id);
+    const info = deleteUserById(user.id);
 
     if (info.changes === 0) {
       res

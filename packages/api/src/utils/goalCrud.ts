@@ -1,5 +1,5 @@
 import {GoalSchema} from '@gitterdun/shared';
-import db from '../lib/db';
+import {get, run} from './crud/db';
 import {sql} from './sql';
 
 export const createGoalInDatabase = (
@@ -7,8 +7,8 @@ export const createGoalInDatabase = (
   description: string | undefined,
   targetPoints: number,
 ) => {
-  const result = db
-    .prepare(sql`
+  const result = get(
+    sql`
       INSERT INTO
         goals (
           title,
@@ -19,15 +19,20 @@ export const createGoalInDatabase = (
         )
       VALUES
         (?, ?, ?, ?, ?) RETURNING *
-    `)
-    .get(title, description, targetPoints, 0, 1);
+    `,
+    title,
+    description,
+    targetPoints,
+    0,
+    1,
+  );
 
   return GoalSchema.parse(result);
 };
 
 export const fetchGoalById = (goalId: number) => {
-  return db
-    .prepare(sql`
+  return get(
+    sql`
       SELECT
         id,
         user_id,
@@ -42,28 +47,33 @@ export const fetchGoalById = (goalId: number) => {
         goals
       WHERE
         id = ?
-    `)
-    .get(goalId);
+    `,
+    goalId,
+  );
 };
 
 export const checkGoalExists = (goalId: number): boolean => {
-  const existingGoal = db
-    .prepare(sql`
+  const existingGoal = get(
+    sql`
       SELECT
         id
       FROM
         goals
       WHERE
         id = ?
-    `)
-    .get(goalId);
+    `,
+    goalId,
+  );
   return existingGoal !== undefined;
 };
 
 export const deleteGoalFromDatabase = (goalId: number): void => {
-  db.prepare(sql`
-    DELETE FROM goals
-    WHERE
-      id = ?
-  `).run(goalId);
+  run(
+    sql`
+      DELETE FROM goals
+      WHERE
+        id = ?
+    `,
+    goalId,
+  );
 };

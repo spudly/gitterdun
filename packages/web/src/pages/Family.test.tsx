@@ -1,5 +1,5 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen} from '@testing-library/react';
+import {render, screen, fireEvent} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Family from './Family';
@@ -111,7 +111,10 @@ describe('family page', () => {
     await userEvent.click(screen.getByRole('button', {name: 'Create'}));
     expect(familiesApi.create).toHaveBeenCalledWith({name: 'NewFam'});
 
-    // After refetch, member sections are visible
+    // After refetch, reveal both forms
+    await userEvent.click(
+      screen.getByRole('button', {name: 'Add Family Member'}),
+    );
     const usernameInput = await screen.findByPlaceholderText('Username');
     await userEvent.type(usernameInput, 'kid');
     await userEvent.type(
@@ -145,11 +148,40 @@ describe('family page', () => {
     await screen.findByText('Your Family');
     // Click create with empty family name (guard branch)
     await userEvent.click(screen.getAllByRole('button', {name: 'Create'})[0]!);
-    // No selector now
-    // Child create with missing inputs (guard branch)
-    // Invite with empty email should no-op (exercise path only)
+    // Reveal forms; Invite with empty email should no-op
+    await userEvent.click(
+      screen.getByRole('button', {name: 'Add Family Member'}),
+    );
     await userEvent.click(screen.getByRole('button', {name: 'Send'}));
     // Nothing to assert on API; ensure page is still rendered
     expect(screen.getByText('Your Family')).toHaveTextContent('Your Family');
+  });
+});
+
+describe('Family page form toggles', () => {
+  test('hides forms by default and shows them after clicking buttons', async () => {
+    const Wrapper = createWrapper({i18n: true, queryClient: true});
+    render(wrap(<Family />), {wrapper: Wrapper});
+
+    // Forms should not be visible initially
+    expect(
+      screen.queryByRole('region', {name: 'Create Child Account'}),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('region', {name: 'Invite Member'}),
+    ).not.toBeInTheDocument();
+
+    // Click single button in FamilyMembers to show both forms
+    fireEvent.click(
+      await screen.findByRole('button', {name: 'Add Family Member'}),
+    );
+
+    // Forms should now be visible
+    expect(
+      await screen.findByRole('region', {name: 'Create Child Account'}),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole('region', {name: 'Invite Member'}),
+    ).toBeInTheDocument();
   });
 });

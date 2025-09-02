@@ -2,7 +2,7 @@ import express from 'express';
 import crypto from 'node:crypto';
 import {SessionRowSchema, UserSchema} from '@gitterdun/shared';
 import {z} from 'zod';
-import db from '../lib/db';
+import {get, run} from './crud/db';
 import {sql} from './sql';
 import {getCookie} from './cookieUtils';
 import {SECURE_TOKEN_BYTES, SESSION_EXPIRATION_MS} from '../constants';
@@ -14,19 +14,24 @@ export const createSession = (userId: number) => {
   const now = new Date();
   const expiresAt = new Date(now.getTime() + SESSION_EXPIRATION_MS);
 
-  db.prepare(sql`
-    INSERT INTO
-      sessions (id, user_id, created_at, expires_at)
-    VALUES
-      (?, ?, CURRENT_TIMESTAMP, ?)
-  `).run(sessionId, userId, expiresAt.toISOString());
+  run(
+    sql`
+      INSERT INTO
+        sessions (id, user_id, created_at, expires_at)
+      VALUES
+        (?, ?, CURRENT_TIMESTAMP, ?)
+    `,
+    sessionId,
+    userId,
+    expiresAt.toISOString(),
+  );
 
   return {sessionId, expiresAt};
 };
 
 const fetchSessionFromDb = (sessionId: string) => {
-  const sessionRow = db
-    .prepare(sql`
+  const sessionRow = get(
+    sql`
       SELECT
         s.user_id AS user_id,
         s.expires_at AS expires_at
@@ -34,8 +39,9 @@ const fetchSessionFromDb = (sessionId: string) => {
         sessions s
       WHERE
         s.id = ?
-    `)
-    .get(sessionId);
+    `,
+    sessionId,
+  );
   if (sessionRow === undefined || sessionRow === null) {
     return undefined;
   }
@@ -43,11 +49,14 @@ const fetchSessionFromDb = (sessionId: string) => {
 };
 
 const removeExpiredSession = (sessionId: string): void => {
-  db.prepare(sql`
-    DELETE FROM sessions
-    WHERE
-      id = ?
-  `).run(sessionId);
+  run(
+    sql`
+      DELETE FROM sessions
+      WHERE
+        id = ?
+    `,
+    sessionId,
+  );
 };
 
 const validateSessionExpiry = (
@@ -76,8 +85,8 @@ const validateSession = (sessionId: string) => {
 };
 
 const getUserById = (userId: number): User | null => {
-  const user = db
-    .prepare(sql`
+  const user = get(
+    sql`
       SELECT
         id,
         username,
@@ -93,8 +102,9 @@ const getUserById = (userId: number): User | null => {
         users
       WHERE
         id = ?
-    `)
-    .get(userId);
+    `,
+    userId,
+  );
   return user === undefined ? null : UserSchema.parse(user);
 };
 
@@ -113,9 +123,12 @@ export const getUserFromSession = (req: express.Request): User | null => {
 };
 
 export const deleteSession = (sessionId: string): void => {
-  db.prepare(sql`
-    DELETE FROM sessions
-    WHERE
-      id = ?
-  `).run(sessionId);
+  run(
+    sql`
+      DELETE FROM sessions
+      WHERE
+        id = ?
+    `,
+    sessionId,
+  );
 };

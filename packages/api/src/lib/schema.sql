@@ -16,14 +16,13 @@ CREATE TABLE IF NOT EXISTS chores (
   id serial PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
   description TEXT,
-  point_reward INTEGER NOT NULL DEFAULT 0,
-  bonus_points INTEGER DEFAULT 0,
+  reward_points INTEGER,
   penalty_points INTEGER DEFAULT 0,
   start_date timestamp,
   due_date timestamp,
   recurrence_rule TEXT, -- iCalendar RFC 5545 format
   chore_type VARCHAR(20) NOT NULL DEFAULT 'required', -- 'required' or 'bonus'
-  status VARCHAR(20) NOT NULL DEFAULT 'pending', -- 'pending', 'completed', 'approved'
+  family_id INTEGER NOT NULL REFERENCES families (id) ON DELETE CASCADE,
   created_by INTEGER REFERENCES users (id),
   created_at timestamp DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp DEFAULT CURRENT_TIMESTAMP
@@ -112,8 +111,6 @@ CREATE TABLE IF NOT EXISTS notifications (
 );
 
 -- Create indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_chores_status ON chores (status);
-
 CREATE INDEX IF NOT EXISTS idx_chores_due_date ON chores (due_date);
 
 CREATE INDEX IF NOT EXISTS idx_chores_start_date ON chores (start_date);
@@ -174,6 +171,7 @@ CREATE TABLE IF NOT EXISTS families (
   id serial PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   owner_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+  timezone VARCHAR(100) DEFAULT 'UTC',
   created_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -187,3 +185,22 @@ CREATE TABLE IF NOT EXISTS family_members (
 
 -- Enforce single-family per user (PostgreSQL)
 CREATE UNIQUE INDEX IF NOT EXISTS ux_family_members_user_id ON family_members (user_id);
+
+-- Chore instances table (per recurrence occurrence)
+CREATE TABLE IF NOT EXISTS chore_instances (
+  id serial PRIMARY KEY,
+  chore_id INTEGER NOT NULL REFERENCES chores (id) ON DELETE CASCADE,
+  instance_date date NOT NULL,
+  status VARCHAR(20) NOT NULL CHECK (status IN ('incomplete', 'complete')) DEFAULT 'incomplete',
+  approval_status VARCHAR(20) NOT NULL CHECK (
+    approval_status IN ('unapproved', 'approved', 'rejected')
+  ) DEFAULT 'unapproved',
+  notes TEXT,
+  created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (chore_id, instance_date)
+);
+
+CREATE INDEX IF NOT EXISTS idx_chore_instances_chore_id ON chore_instances (chore_id);
+
+CREATE INDEX IF NOT EXISTS idx_chore_instances_date ON chore_instances (instance_date);

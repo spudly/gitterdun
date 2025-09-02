@@ -22,14 +22,83 @@ jest.mock('../hooks/useUser', () => ({
   useUser: () => ({user: mockUserState, logout: mockLogout}),
 }));
 
+jest.mock('../lib/api', () => ({
+  familiesApi: {
+    myFamily: jest.fn(async () => ({
+      success: true,
+      data: {id: 1, owner_id: 1},
+    })),
+    listMembers: jest.fn(async () => ({
+      success: true,
+      data: [{user_id: 1, role: 'parent'}],
+    })),
+  },
+}));
+
 describe('layout', () => {
   beforeAll(() => {
     mockUserState = mockUser;
   });
 
+  test('shows Approvals link in bottom nav for parents', async () => {
+    mockUserState = mockUser;
+    const Wrapper = createWrapper({
+      i18n: true,
+      queryClient: true,
+      router: {initialEntries: ['/']},
+    });
+    render(
+      <Layout
+        navigation={[
+          {
+            message: {defaultMessage: 'Dashboard', id: 'layout.dashboard'},
+            path: '/',
+            icon: '🏠',
+          },
+        ]}
+      >
+        <div>Child</div>
+      </Layout>,
+      {wrapper: Wrapper},
+    );
+    const bottomNav = screen.getByRole('navigation', {name: /menu/i});
+    expect(bottomNav).toBeInTheDocument();
+    await within(bottomNav).findByRole('link', {name: /approvals/i});
+  });
+
+  test('does not show Approvals link for non-parents', async () => {
+    mockUserState = {...mockUser, id: 2};
+    const {familiesApi} = require('../lib/api');
+    familiesApi.myFamily.mockResolvedValue({
+      success: true,
+      data: {id: 1, owner_id: 1},
+    });
+    familiesApi.listMembers.mockResolvedValue({
+      success: true,
+      data: [{user_id: 2, role: 'child'}],
+    });
+    const Wrapper = createWrapper({
+      i18n: true,
+      queryClient: true,
+      router: {initialEntries: ['/']},
+    });
+    render(
+      <Layout navigation={[]}>
+        {' '}
+        <div>Child</div>{' '}
+      </Layout>,
+      {wrapper: Wrapper},
+    );
+    const bottomNav = screen.getByRole('navigation', {name: /menu/i});
+    expect(
+      within(bottomNav).queryByRole('link', {name: /approvals/i}),
+    ).not.toBeInTheDocument();
+  });
+
   test('renders nav and children', () => {
     const Wrapper = createWrapper({
       i18n: true,
+      queryClient: true,
       router: {initialEntries: ['/']},
     });
     render(
@@ -53,6 +122,7 @@ describe('layout', () => {
   test('renders bottom nav on small screens', async () => {
     const Wrapper = createWrapper({
       i18n: true,
+      queryClient: true,
       router: {initialEntries: ['/']},
     });
     render(
@@ -94,6 +164,7 @@ describe('layout', () => {
   test('shows a language selector control in the header', () => {
     const Wrapper = createWrapper({
       i18n: true,
+      queryClient: true,
       router: {initialEntries: ['/']},
     });
     render(
@@ -114,7 +185,13 @@ describe('layout', () => {
       <Layout navigation={[]}>
         <div>Child</div>
       </Layout>,
-      {wrapper: createWrapper({i18n: true, router: {initialEntries: ['/']}})},
+      {
+        wrapper: createWrapper({
+          i18n: true,
+          queryClient: true,
+          router: {initialEntries: ['/']},
+        }),
+      },
     );
     // Login is now inside the user menu drawer
     await userEvent.click(screen.getByRole('button', {name: /user menu/i}));
@@ -131,7 +208,13 @@ describe('layout', () => {
       <Layout navigation={[]}>
         <div>Child</div>
       </Layout>,
-      {wrapper: createWrapper({i18n: true, router: {initialEntries: ['/']}})},
+      {
+        wrapper: createWrapper({
+          i18n: true,
+          queryClient: true,
+          router: {initialEntries: ['/']},
+        }),
+      },
     );
     await userEvent.click(screen.getByRole('button', {name: /user menu/i}));
     const dialog = screen.getByRole('dialog', {name: /user menu/i});
@@ -145,6 +228,7 @@ describe('layout', () => {
     mockUserState = mockUser;
     const Wrapper = createWrapper({
       i18n: true,
+      queryClient: true,
       router: {initialEntries: ['/']},
     });
     render(
@@ -171,6 +255,7 @@ describe('layout', () => {
     mockUserState = mockUser;
     const Wrapper = createWrapper({
       i18n: true,
+      queryClient: true,
       router: {initialEntries: ['/']},
     });
     render(

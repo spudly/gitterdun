@@ -14,6 +14,7 @@ import leaderboardRoutes from './routes/leaderboard';
 import familyRoutes from './routes/families';
 import usersRoutes from './routes/users';
 import invitationRoutes from './routes/invitations';
+import choreInstanceRoutes from './routes/choreInstances';
 import {asError} from '@gitterdun/shared';
 import {setupErrorHandling} from './middleware/errorHandler';
 
@@ -86,6 +87,7 @@ const setupRoutes = (app: express.Express): void => {
   app.use('/api/families', familyRoutes);
   app.use('/api/invitations', invitationRoutes);
   app.use('/api/users', usersRoutes);
+  app.use('/api/chore-instances', choreInstanceRoutes);
 
   app.get('/api/health', (_req: express.Request, res: express.Response) => {
     res.json({

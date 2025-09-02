@@ -1,6 +1,6 @@
 import {UpdateChoreSchema, ChoreSchema} from '@gitterdun/shared';
 import {z} from 'zod';
-import db from '../lib/db';
+import {get} from './crud/db';
 import {logger} from './logger';
 import {sql} from './sql';
 import {checkChoreExists} from './choreCrud';
@@ -17,7 +17,6 @@ const CHORE_UPDATE_FIELD_MAPPINGS = [
   {field: 'due_date', column: 'due_date'},
   {field: 'recurrence_rule', column: 'recurrence_rule'},
   {field: 'chore_type', column: 'chore_type'},
-  {field: 'status', column: 'status'},
 ];
 
 const processChoreUpdateFields = (validatedBody: UpdateChore) => {
@@ -60,7 +59,7 @@ const executeChoreUpdate = (
     WHERE
       id = ? RETURNING *
   `;
-  const updatedChore = db.prepare(updateQuery).get(...values);
+  const updatedChore = get(updateQuery, ...values);
   return ChoreSchema.parse(updatedChore);
 };
 

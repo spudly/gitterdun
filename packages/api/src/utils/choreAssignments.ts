@@ -1,6 +1,6 @@
 import {ChoreAssignmentSchema} from '@gitterdun/shared';
-import db from '../lib/db';
 import {sql} from './sql';
+import {get, run} from './crud/db';
 
 const toTimestamp = (value: unknown): number | undefined => {
   if (typeof value !== 'string' || value.length === 0) {
@@ -27,8 +27,8 @@ const requireTimestamp = (value: unknown, fieldName: string): number => {
 };
 
 export const findChoreAssignment = (choreId: number, userId: number) => {
-  const assignmentRow = db
-    .prepare(sql`
+  const assignmentRow = get(
+    sql`
       SELECT
         id,
         chore_id,
@@ -46,8 +46,10 @@ export const findChoreAssignment = (choreId: number, userId: number) => {
       WHERE
         chore_id = ?
         AND user_id = ?
-    `)
-    .get(choreId, userId);
+    `,
+    choreId,
+    userId,
+  );
 
   if (assignmentRow === undefined) {
     throw new Error('Chore assignment not found');
@@ -87,18 +89,19 @@ export const updateChoreAssignmentCompletion = ({
   points,
   notes,
 }: ChoreCompletionParams) => {
-  db.prepare(sql`
-    UPDATE chore_assignments
-    SET
-      completed_at = CURRENT_TIMESTAMP,
-      points_earned = ?,
-      bonus_points_earned = ?,
-      penalty_points_earned = ?,
-      notes = ?
-    WHERE
-      chore_id = ?
-      AND user_id = ?
-  `).run(
+  run(
+    sql`
+      UPDATE chore_assignments
+      SET
+        completed_at = CURRENT_TIMESTAMP,
+        points_earned = ?,
+        bonus_points_earned = ?,
+        penalty_points_earned = ?,
+        notes = ?
+      WHERE
+        chore_id = ?
+        AND user_id = ?
+    `,
     points.pointsEarned,
     points.bonusPointsEarned,
     points.penaltyPointsEarned,

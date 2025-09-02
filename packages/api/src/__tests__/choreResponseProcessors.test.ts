@@ -64,4 +64,6 @@ describe('choreResponseProcessors normalization', () => {
     expect(Number.isNaN(chore.created_at)).toBe(false);
     expect(Number.isNaN(chore.updated_at)).toBe(false);
   });
+
+  // status is not part of chore definition; no defaulting behavior expected here
 });

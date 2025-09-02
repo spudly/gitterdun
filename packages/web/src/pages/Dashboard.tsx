@@ -40,10 +40,10 @@ const Dashboard: FC = () => {
         (chore: ChoreWithUsername) =>
           chore.status === 'completed' || chore.status === 'approved',
       )
-      .reduce(
-        (sum: number, chore: ChoreWithUsername) => sum + chore.point_reward,
-        0,
-      );
+      .reduce((sum: number, chore: ChoreWithUsername) => {
+        const points = (chore as any).reward_points ?? 0;
+        return sum + points;
+      }, 0);
   const getDueSoonChoresCount = () =>
     chores.filter((chore: ChoreWithUsername) => {
       if (chore.due_date === undefined) {
@@ -149,7 +149,7 @@ const Dashboard: FC = () => {
                     defaultMessage: '{points} pts',
                     id: 'pages.Leaderboard.points-pts',
                   },
-                  {points: chore.point_reward},
+                  {points: (chore as any).reward_points ?? 0},
                 )}
               </Text>
             }

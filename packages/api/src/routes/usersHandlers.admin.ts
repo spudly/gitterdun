@@ -1,11 +1,15 @@
 import type express from 'express';
 import {StatusCodes} from 'http-status-codes';
 import {z} from 'zod';
-import db from '../lib/db';
-import {sql} from '../utils/sql';
 import {logger} from '../utils/logger';
 import {UserSchema, asError} from '@gitterdun/shared';
 import {requireAdmin} from './usersAuth';
+import {
+  clearChoresCreatedBy,
+  deleteInvitationsByInviter,
+  deleteUserById,
+  listUsers,
+} from '../utils/crud/users';
 
 export const listUsersHandler = (
   req: express.Request,
@@ -15,23 +19,7 @@ export const listUsersHandler = (
     if (!requireAdmin(req, res)) {
       return;
     }
-    const rows = db
-      .prepare(sql`
-        SELECT
-          id,
-          username,
-          email,
-          role,
-          points,
-          streak_count,
-          created_at,
-          updated_at
-        FROM
-          users
-        ORDER BY
-          id ASC
-      `)
-      .all();
+    const rows = listUsers();
     const users = rows.map(row => UserSchema.parse(row));
     res.json({success: true, data: users});
   } catch (error) {
@@ -52,26 +40,9 @@ export const deleteUserHandler = (
     }
     const id = z.coerce.number().int().parse(req.params['id']);
 
-    db.prepare(sql`
-      UPDATE chores
-      SET
-        created_by = NULL
-      WHERE
-        created_by = ?
-    `).run(id);
-    db.prepare(sql`
-      DELETE FROM family_invitations
-      WHERE
-        invited_by = ?
-    `).run(id);
-
-    const info = db
-      .prepare(sql`
-        DELETE FROM users
-        WHERE
-          id = ?
-      `)
-      .run(id);
+    clearChoresCreatedBy(id);
+    deleteInvitationsByInviter(id);
+    const info = deleteUserById(id);
     if (info.changes === 0) {
       res
         .status(StatusCodes.NOT_FOUND)

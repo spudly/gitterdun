@@ -4,6 +4,7 @@ import {
   FamilySchema,
   FamilyMemberSchema,
   LeaderboardResponseSchema,
+  UpdateFamilyTimezoneSchema,
 } from '@gitterdun/shared';
 import type {LeaderboardResponse} from '@gitterdun/shared';
 import {api} from './apiCore';
@@ -21,6 +22,11 @@ export const familiesApi = {
   create: async (data: {name: string}) =>
     api.post('/families', FamilySchema, data),
   myFamily: async () => api.get('/families/mine', FamilySchema.nullable()),
+  updateTimezone: async (familyId: number, data: {timezone: string}) => {
+    // Validate request body before sending
+    const validated = UpdateFamilyTimezoneSchema.parse(data);
+    return api.put(`/families/${familyId}/timezone`, FamilySchema, validated);
+  },
   listMembers: async (familyId: number) =>
     api.get<Array<unknown>>(
       `/families/${familyId}/members`,

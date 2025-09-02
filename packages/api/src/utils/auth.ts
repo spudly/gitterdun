@@ -1,7 +1,7 @@
 import express from 'express';
 import {SessionRowSchema} from '@gitterdun/shared';
-import db from '../lib/db';
 import {sql} from './sql';
+import {get, run} from './crud/db';
 
 type SessionData = {user_id: number; expires_at: string};
 
@@ -38,8 +38,8 @@ const extractSessionId = (req: express.Request): string => {
 };
 
 const fetchSession = (sessionId: string): SessionData | undefined => {
-  const sessionRow = db
-    .prepare(sql`
+  const sessionRow = get(
+    sql`
       SELECT
         user_id,
         expires_at
@@ -47,8 +47,9 @@ const fetchSession = (sessionId: string): SessionData | undefined => {
         sessions
       WHERE
         id = ?
-    `)
-    .get(sessionId);
+    `,
+    sessionId,
+  );
   return sessionRow !== undefined
     ? SessionRowSchema.parse(sessionRow)
     : undefined;
@@ -65,11 +66,14 @@ const validateSessionExpiry: (
     throw Object.assign(new Error('Not authenticated'), {status: 401});
   }
   if (new Date(session.expires_at).getTime() < Date.now()) {
-    db.prepare(sql`
-      DELETE FROM sessions
-      WHERE
-        id = ?
-    `).run(sessionId);
+    run(
+      sql`
+        DELETE FROM sessions
+        WHERE
+          id = ?
+      `,
+      sessionId,
+    );
     throw Object.assign(new Error('Session expired'), {status: 401});
   }
 };

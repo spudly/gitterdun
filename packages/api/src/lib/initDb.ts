@@ -1,10 +1,17 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import db from './db';
-import {asError, CountRowSchema} from '@gitterdun/shared';
+import {asError} from '@gitterdun/shared';
 import {logger} from '../utils/logger';
-import {sql} from '../utils/sql';
 import {BCRYPT_SALT_ROUNDS} from '../constants';
+import {run} from '../utils/crud/db';
+import {sql} from '../utils/sql';
+import {
+  alterTableAddColumn,
+  countAdmins,
+  execSchema,
+  insertDefaultAdmin,
+  pragmaTableInfo,
+} from '../utils/crud/init';
 
 const readSchemaFile = (): string => {
   const schemaPath = path.join(process.cwd(), 'src/lib/schema.sqlite.sql');
@@ -12,31 +19,23 @@ const readSchemaFile = (): string => {
 };
 
 const executeSchema = (schema: string): void => {
-  db.exec(schema);
+  execSchema(schema);
   logger.info('Database initialized successfully');
 };
 
 const columnExists = (table: string, column: string): boolean => {
-  const row = db.prepare(sql`PRAGMA table_info (${table})`).all() as Array<{
-    name: string;
-  }>;
+  const row = pragmaTableInfo(table);
   return row.some(rowItem => rowItem.name === column);
 };
 
 const ensureUsersProfileColumns = (): void => {
   try {
     if (!columnExists('users', 'display_name')) {
-      db.prepare(sql`
-        ALTER TABLE users
-        ADD COLUMN display_name TEXT
-      `).run();
+      alterTableAddColumn('users', 'display_name TEXT');
       logger.info("Added 'display_name' column to users table");
     }
     if (!columnExists('users', 'avatar_url')) {
-      db.prepare(sql`
-        ALTER TABLE users
-        ADD COLUMN avatar_url TEXT
-      `).run();
+      alterTableAddColumn('users', 'avatar_url TEXT');
       logger.info("Added 'avatar_url' column to users table");
     }
   } catch (error) {
@@ -47,19 +46,52 @@ const ensureUsersProfileColumns = (): void => {
   }
 };
 
-const checkAdminExists = (): boolean => {
-  const adminExists = CountRowSchema.parse(
-    db
-      .prepare(sql`
-        SELECT
-          COUNT(*) AS count
-        FROM
-          users
+const ensureFamilyUpdatedAt = (): void => {
+  try {
+    if (!columnExists('families', 'updated_at')) {
+      alterTableAddColumn(
+        'families',
+        'updated_at datetime DEFAULT CURRENT_TIMESTAMP',
+      );
+      logger.info("Added 'updated_at' column to families table");
+    }
+  } catch (error) {
+    logger.error(
+      {error: asError(error)},
+      'Failed ensuring families.updated_at',
+    );
+  }
+};
+
+const ensureChoreFamilyId = (): void => {
+  try {
+    if (!columnExists('chores', 'family_id')) {
+      alterTableAddColumn('chores', 'family_id INTEGER');
+      // Backfill: set family_id for chores created by users who belong to a family
+      run(sql`
+        UPDATE chores
+        SET
+          family_id = (
+            SELECT
+              family_id
+            FROM
+              family_members
+            WHERE
+              user_id = chores.created_by
+          )
         WHERE
-          role = ?
-      `)
-      .get('admin'),
-  );
+          family_id IS NULL
+      `);
+      logger.info("Added 'family_id' column to chores table");
+    }
+    // Enforce NOT NULL at runtime by validating before inserts; schema NOT NULL may fail on old rows
+  } catch (error) {
+    logger.error({error: asError(error)}, 'Failed ensuring chores.family_id');
+  }
+};
+
+const checkAdminExists = (): boolean => {
+  const adminExists = countAdmins();
   return adminExists.count > 0;
 };
 
@@ -70,19 +102,7 @@ const createDefaultAdmin = async (): Promise<void> => {
     BCRYPT_SALT_ROUNDS,
   );
 
-  db.prepare(sql`
-    INSERT INTO
-      users (
-        username,
-        email,
-        password_hash,
-        role,
-        points,
-        streak_count
-      )
-    VALUES
-      (?, ?, ?, ?, ?, ?)
-  `).run('admin', 'admin@gitterdun.com', hashedPassword, 'admin', 0, 0);
+  insertDefaultAdmin('admin', 'admin@gitterdun.com', hashedPassword);
 
   logger.info('Default admin user created: admin@gitterdun.com / admin123');
 };
@@ -92,6 +112,8 @@ export const initializeDatabase = async (): Promise<void> => {
     const schema = readSchemaFile();
     executeSchema(schema);
     ensureUsersProfileColumns();
+    ensureFamilyUpdatedAt();
+    ensureChoreFamilyId();
 
     if (!checkAdminExists()) {
       await createDefaultAdmin();

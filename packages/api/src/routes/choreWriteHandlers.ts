@@ -25,6 +25,7 @@ import {
   assignChoreToUsers,
   processChoreDelete,
 } from '../utils/choreCrud';
+import {buildRRuleString} from '../utils/recurrence';
 import {processChoreUpdate} from '../utils/choreUpdates';
 import {executeChoreCompletionTransaction} from '../utils/choreCompletion';
 
@@ -46,28 +47,33 @@ export const handleCreateChore = async (
     const {
       title,
       description = '',
-      point_reward: pointReward,
-      bonus_points: bonusPoints = 0,
+      reward_points: rewardPoints,
       penalty_points: penaltyPoints = 0,
       start_date: startDate = null,
       due_date: dueDate = null,
-      recurrence_rule: recurrenceRule = null,
+      recurrence,
       chore_type: choreType,
       assigned_users: assignedUsers = [],
     } = CreateChoreSchema.parse(req.body);
+
+    let recurrenceRule: string | null = null;
+    if (recurrence) {
+      const rr = buildRRuleString(recurrence);
+      recurrenceRule = rr.replace(/^RRULE:/i, '');
+    }
 
     const newChore = db.transaction(() => {
       const chore = createChoreInDb({
         title,
         description,
-        pointReward,
-        bonusPoints,
+        rewardPoints: rewardPoints ?? null,
         penaltyPoints,
         startDate,
         dueDate,
         recurrenceRule,
         choreType,
         createdBy: userId,
+        familyId: family.id,
       });
       assignChoreToUsers(chore.id, assignedUsers);
       return chore;

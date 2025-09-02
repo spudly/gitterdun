@@ -45,23 +45,17 @@ const Admin: FC = () => {
   const [showCreate, setShowCreate] = useState(false);
   const [title, setTitle] = useState('');
   const [points, setPoints] = useState(0);
-  const [bonus, setBonus] = useState<number | ''>('');
 
   const {safeAsync} = useToast();
 
   const createMutation = useMutation({
     mutationFn: async () =>
-      choresApi.create({
-        title,
-        point_reward: points,
-        bonus_points: typeof bonus === 'number' ? bonus : 0,
-        chore_type: 'required',
-      }),
+      choresApi.create({title, reward_points: points, chore_type: 'required'}),
     onSuccess: async () => {
       setShowCreate(false);
       setTitle('');
       setPoints(0);
-      setBonus('');
+
       await queryClient.invalidateQueries({queryKey: ['chores', 'admin']});
     },
   });
@@ -144,21 +138,7 @@ const Admin: FC = () => {
                 type="number"
                 value={points}
               />
-              <input
-                aria-label={intl.formatMessage(messages.bonusPlaceholder)}
-                onChange={event => {
-                  const raw = event.target.value;
-                  if (raw === '') {
-                    setBonus('');
-                  } else {
-                    const next = Number(raw);
-                    setBonus(Number.isNaN(next) ? '' : next);
-                  }
-                }}
-                placeholder={intl.formatMessage(messages.bonusPlaceholder)}
-                type="number"
-                value={bonus}
-              />
+              {null}
               <Button
                 disabled={title.trim() === ''}
                 onClick={safeAsync(async () => {
