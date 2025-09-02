@@ -20,7 +20,7 @@ export const App: FC = () => (
         </BrowserRouter>
       </ToastProvider>
     </I18nProvider>
-    {import.meta.env['NODE_ENV'] === 'development' ? (
+    {__ENV__ === 'development' ? (
       <>
         <style>{`.tsqd-open-btn-container{ transform: translateY(-50px); }`}</style>
         <ReactQueryDevtools initialIsOpen={false} />

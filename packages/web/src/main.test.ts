@@ -1,6 +1,5 @@
 import {describe, expect, jest, test} from '@jest/globals';
 
-// Avoid evaluating App.tsx (which uses import.meta.env) under Jest by mocking it
 jest.mock('./App', () => ({__esModule: true, App: () => null}));
 
 jest.mock('react-dom/client', () => {

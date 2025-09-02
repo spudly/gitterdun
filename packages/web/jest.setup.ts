@@ -1,28 +1,14 @@
 import '@testing-library/jest-dom';
 import {TextEncoder, TextDecoder} from 'node:util';
 
-// Provide import.meta.env for tests so code that relies on Vite env works
-Object.defineProperty(globalThis, 'import', {
-  value: {},
-  writable: true,
-  configurable: true,
-});
-Object.defineProperty(globalThis, 'import.meta', {
-  value: {env: {DEV: false, PROD: true, MODE: 'test'}},
-  writable: true,
-  configurable: true,
-});
+jest.mock('./src/globals', () => ({}));
 
-// Ensure vite-like env for tests that reference import.meta.env.MODE
-declare global {
-  type ImportMetaEnvShim = {readonly MODE: string};
-  type ImportMetaShim = {readonly env: ImportMetaEnvShim};
-}
-// Provide a typed shim for import.meta
-// @ts-expect-error: define import.meta for Jest environment
-globalThis.import = {meta: {env: {MODE: 'test'}}} as unknown as ImportMetaShim;
-
-// Polyfill TextEncoder/TextDecoder for jsdom environment (needed by react-router v7)
+beforeEach(() => {
+  global.__TEST__ = true;
+  global.__ENV__ = 'test';
+  global.__DEV__ = false;
+  global.__PROD__ = true;
+});
 
 // Provide a minimal WHATWG Response polyfill for tests that construct `new Response(...)`
 if (typeof (globalThis as any).Response === 'undefined') {
