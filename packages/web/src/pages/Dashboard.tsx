@@ -41,7 +41,7 @@ const Dashboard: FC = () => {
           chore.status === 'completed' || chore.status === 'approved',
       )
       .reduce((sum: number, chore: ChoreWithUsername) => {
-        const points = (chore as any).reward_points ?? 0;
+        const points = chore.reward_points ?? 0;
         return sum + points;
       }, 0);
   const getDueSoonChoresCount = () =>

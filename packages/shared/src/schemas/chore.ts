@@ -53,32 +53,15 @@ export const MIN_MONTH = 1;
 export const MAX_MONTH = 12;
 
 export const RecurrenceSchema = z.object({
-  frequency: z
-    .string()
-    .refine(
-      val =>
-        [
-          'DAILY',
-          'WEEKLY',
-          'MONTHLY',
-          'YEARLY',
-          'HOURLY',
-          'MINUTELY',
-          'SECONDLY',
-        ].includes(val.toUpperCase()),
-      {
-        message:
-          'frequency must be one of DAILY, WEEKLY, MONTHLY, YEARLY, HOURLY, MINUTELY, SECONDLY',
-      },
-    ) as unknown as z.ZodType<
-    | 'DAILY'
-    | 'WEEKLY'
-    | 'MONTHLY'
-    | 'YEARLY'
-    | 'HOURLY'
-    | 'MINUTELY'
-    | 'SECONDLY'
-  >,
+  frequency: z.enum([
+    'DAILY',
+    'WEEKLY',
+    'MONTHLY',
+    'YEARLY',
+    'HOURLY',
+    'MINUTELY',
+    'SECONDLY',
+  ]),
   interval: z.number().int().min(1).optional(),
   count: z.number().int().min(1).optional(),
   until: z.number().int().optional(),

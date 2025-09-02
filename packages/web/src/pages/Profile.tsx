@@ -157,7 +157,7 @@ const Profile: FC = () => {
               type="button"
               onClick={onSave}
             >
-              <FormattedMessage defaultMessage="Save" id="pages/Profile.save" />
+              <FormattedMessage defaultMessage="Save" id="pages.Profile.save" />
             </button>
             <button
               className="rounded border border-red-600 px-3 py-1 text-red-600"

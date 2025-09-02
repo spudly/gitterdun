@@ -45,7 +45,7 @@ export const ChoresCreatePageContainer: FC<Props> = ({
         throw new Error('validation');
       }
       const payload = buildPayload(startTs ?? undefined, dueTs ?? undefined);
-      return choresApi.create(payload as any);
+      return choresApi.create(payload);
     },
     onSuccess: async () => {
       onCancel();
@@ -75,7 +75,7 @@ export const ChoresCreatePageContainer: FC<Props> = ({
       setDueError(intl.formatMessage(messages.dueAfterStartError));
       return {startTs: null, dueTs: null};
     }
-    return {startTs: startTs ?? undefined, dueTs: dueTs ?? undefined} as any;
+    return {startTs: startTs ?? null, dueTs: dueTs ?? null};
   };
 
   const buildPayload = (
@@ -88,7 +88,7 @@ export const ChoresCreatePageContainer: FC<Props> = ({
     reward_points?: number;
     start_date?: number;
     due_date?: number;
-    assigned_users?: ReadonlyArray<number>;
+    assigned_users?: Array<number>;
     recurrence_rule?: string;
   } => {
     const payload: {
@@ -98,7 +98,7 @@ export const ChoresCreatePageContainer: FC<Props> = ({
       reward_points?: number;
       start_date?: number;
       due_date?: number;
-      assigned_users?: ReadonlyArray<number>;
+      assigned_users?: Array<number>;
       recurrence_rule?: string;
     } = {title, chore_type: choreType};
     if (description.trim() !== '') {
