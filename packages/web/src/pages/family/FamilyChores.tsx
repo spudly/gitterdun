@@ -1,6 +1,5 @@
 import type {FC} from 'react';
 import {useQuery} from '@tanstack/react-query';
-import type {ChoreWithUsername} from '@gitterdun/shared';
 import {familiesApi, choresApi} from '../../lib/api.js';
 import {useUser} from '../../hooks/useUser.js';
 import {List} from '../../widgets/List.js';
@@ -70,7 +69,7 @@ export const FamilyChores: FC = () => {
     queryKey: ['chores', user?.id, 'family'],
     queryFn: async () =>
       choresApi.getAll({
-        user_id: isFamilyParent ? undefined : user!.id,
+        user_id: isFamilyParent ? undefined : user?.id,
         sort_by: 'start_date',
         order: 'asc',
       }),
@@ -81,7 +80,7 @@ export const FamilyChores: FC = () => {
     return <PageLoading message={intl.formatMessage(messages.loading)} />;
   }
 
-  const chores = (choresResponse?.data ?? []) as Array<ChoreWithUsername>;
+  const chores = choresResponse?.data ?? [];
 
   return (
     <div className="flex flex-col gap-2">
@@ -95,10 +94,10 @@ export const FamilyChores: FC = () => {
       <List>
         {chores.map(chore => (
           <ListRow
-            key={chore.id}
-            title={chore.title}
             description={chore.description}
+            key={chore.id}
             meta={<ChoreMeta chore={chore} />}
+            title={chore.title}
           />
         ))}
       </List>

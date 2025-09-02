@@ -58,6 +58,7 @@ export const createWrapper: CreateWrapper = (options = {}) => {
         return content;
       },
 
+      // eslint-disable-next-line react/jsx-no-useless-fragment -- TS doesn't accept ReactNode here
       <>{children}</>,
     );
   return Wrapper;

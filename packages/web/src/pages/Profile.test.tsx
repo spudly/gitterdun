@@ -5,7 +5,7 @@ import {createWrapper} from '../test/createWrapper';
 import Profile from './Profile';
 
 jest.mock('../lib/api', () => {
-  const actual = jest.requireActual('../lib/api');
+  const actual = jest.requireActual<typeof import('../lib/api')>('../lib/api');
   return {
     ...actual,
     usersApi: {
@@ -28,13 +28,15 @@ jest.mock('../lib/api', () => {
   };
 });
 
-describe('Profile', () => {
+describe('profile', () => {
   test('renders form and updates name', async () => {
-    const Wrapper = createWrapper({
-      i18n: true,
-      router: {initialEntries: ['/profile']},
+    render(<Profile />, {
+      wrapper: createWrapper({
+        i18n: true,
+        router: {initialEntries: ['/profile']},
+        queryClient: true,
+      }),
     });
-    render(<Profile />, {wrapper: Wrapper});
 
     const nameInput = await screen.findByRole('textbox', {name: /name/i});
     await userEvent.clear(nameInput);

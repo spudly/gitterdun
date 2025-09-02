@@ -42,6 +42,7 @@ export const Text: FC<TextProps> = ({
 }) => {
   return (
     <Element
+      // eslint-disable-next-line react/forbid-component-props -- not a Component; it's a native element
       className={clsx(
         SIZE[size],
         WEIGHT[weight],

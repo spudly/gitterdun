@@ -36,46 +36,22 @@ export const ChoresCreatePageContainer: FC<Props> = ({
   const intl = useIntl();
   const queryClient = useQueryClient();
 
-  const createMutation = useMutation({
-    mutationFn: async () => {
-      setStartError(null);
-      setDueError(null);
-      const {startTs, dueTs} = validateDates();
-      if (startTs === null || dueTs === null) {
-        throw new Error('validation');
-      }
-      const payload = buildPayload(startTs ?? undefined, dueTs ?? undefined);
-      return choresApi.create(payload);
-    },
-    onSuccess: async () => {
-      onCancel();
-      setTitle('');
-      setPoints('');
-      setDescription('');
-      setStartDate('');
-      setDueDate('');
-      setChoreType('required');
-      setAssignedUserIds([]);
-      setRecurrenceRule('');
-      setStartError(null);
-      setDueError(null);
-      await queryClient.invalidateQueries({queryKey: ['chores', userId]});
-    },
-  });
-
-  const validateDates = (): {startTs: number | null; dueTs: number | null} => {
+  const validateDates = (): {
+    startTs: number | undefined;
+    dueTs: number | undefined;
+  } => {
     const now = Date.now();
     const startTs = startDate ? Date.parse(startDate) : undefined;
     const dueTs = dueDate ? Date.parse(dueDate) : undefined;
     if (startTs !== undefined && startTs <= now) {
       setStartError(intl.formatMessage(messages.startDateFutureError));
-      return {startTs: null, dueTs: null};
+      return {startTs: undefined, dueTs: undefined};
     }
     if (startTs !== undefined && dueTs !== undefined && dueTs <= startTs) {
       setDueError(intl.formatMessage(messages.dueAfterStartError));
-      return {startTs: null, dueTs: null};
+      return {startTs: undefined, dueTs: undefined};
     }
-    return {startTs: startTs ?? null, dueTs: dueTs ?? null};
+    return {startTs, dueTs};
   };
 
   const buildPayload = (
@@ -122,26 +98,52 @@ export const ChoresCreatePageContainer: FC<Props> = ({
     return payload;
   };
 
+  const createMutation = useMutation({
+    mutationFn: async () => {
+      setStartError(null);
+      setDueError(null);
+      const {startTs, dueTs} = validateDates();
+      if (startTs === undefined || dueTs === undefined) {
+        throw new Error('validation');
+      }
+      const payload = buildPayload(startTs, dueTs);
+      return choresApi.create(payload);
+    },
+    onSuccess: async () => {
+      onCancel();
+      setTitle('');
+      setPoints('');
+      setDescription('');
+      setStartDate('');
+      setDueDate('');
+      setChoreType('required');
+      setAssignedUserIds([]);
+      setRecurrenceRule('');
+      setStartError(null);
+      setDueError(null);
+      await queryClient.invalidateQueries({queryKey: ['chores', userId]});
+    },
+  });
+
   return (
     <CreateChoreForm
+      assignedUserIds={assignedUserIds}
+      choreType={choreType}
+      description={description}
+      dueDate={dueDate}
+      dueError={dueError}
+      members={members}
       onCancel={onCancel}
+      onChoreTypeChange={setChoreType}
       onCreate={safeAsync(async () => {
         await createMutation.mutateAsync();
       }, intl.formatMessage(messages.completeError))}
-      onPointsChange={setPoints}
-      onTitleChange={setTitle}
-      description={description}
       onDescriptionChange={setDescription}
-      startDate={startDate}
-      onStartDateChange={setStartDate}
-      dueDate={dueDate}
       onDueDateChange={setDueDate}
-      choreType={choreType}
-      onChoreTypeChange={setChoreType}
-      startError={startError}
-      dueError={dueError}
-      members={members}
-      assignedUserIds={assignedUserIds}
+      onPointsChange={setPoints}
+      onRecurrenceChange={setRecurrenceRule}
+      onStartDateChange={setStartDate}
+      onTitleChange={setTitle}
       onToggleAssigned={(userToToggle, next) => {
         setAssignedUserIds(prev => {
           if (next) {
@@ -150,9 +152,10 @@ export const ChoresCreatePageContainer: FC<Props> = ({
           return prev.filter(id => id !== userToToggle);
         });
       }}
-      recurrenceRule={recurrenceRule}
-      onRecurrenceChange={setRecurrenceRule}
       points={points}
+      recurrenceRule={recurrenceRule}
+      startDate={startDate}
+      startError={startError}
       title={title}
     />
   );

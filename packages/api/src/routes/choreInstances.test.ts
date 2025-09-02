@@ -16,7 +16,7 @@ jest.mock('../utils/crud/db', () => ({
   run: jest.fn(() => undefined),
 }));
 
-describe('Chore Instances API', () => {
+describe('chore Instances API', () => {
   let app: ReturnType<typeof express> | undefined;
   let server: Server | undefined;
   let baseUrl: string | undefined;
@@ -39,12 +39,14 @@ describe('Chore Instances API', () => {
   afterAll(async () => {
     if (server) {
       await new Promise<void>(resolve => {
-        server!.close(() => resolve());
+        server!.close(() => {
+          resolve();
+        });
       });
     }
   });
 
-  test('GET returns instances shape', async () => {
+  test('gET returns instances shape', async () => {
     const response = await fetch(`${baseUrl!}/api/chore-instances?date=today`, {
       headers: {Authorization: 'Bearer test'},
     });
@@ -54,7 +56,7 @@ describe('Chore Instances API', () => {
     expect(body).toHaveProperty('data');
   });
 
-  test('POST upserts an instance', async () => {
+  test('pOST upserts an instance', async () => {
     const payload = {
       chore_id: 1,
       date: new Date().toISOString(),
@@ -75,7 +77,7 @@ describe('Chore Instances API', () => {
     expect(body).toHaveProperty('success');
   });
 
-  test('POST with approval=rejected forces status=incomplete', async () => {
+  test('pOST with approval=rejected forces status=incomplete', async () => {
     jest.mocked(get).mockReturnValueOnce(undefined as unknown as never);
     const payload = {
       chore_id: 2,
@@ -99,7 +101,7 @@ describe('Chore Instances API', () => {
     expect(call[4]).toBe('rejected');
   });
 
-  test('POST with status=complete resets approval to unapproved', async () => {
+  test('pOST with status=complete resets approval to unapproved', async () => {
     jest.mocked(get).mockReturnValueOnce(undefined as unknown as never);
     const payload = {
       chore_id: 3,
@@ -123,7 +125,7 @@ describe('Chore Instances API', () => {
     expect(call[4]).toBe('unapproved');
   });
 
-  test('POST status=complete prevails over approval=unapproved', async () => {
+  test('pOST status=complete prevails over approval=unapproved', async () => {
     jest.mocked(get).mockReturnValueOnce(undefined as unknown as never);
     const payload = {
       chore_id: 4,

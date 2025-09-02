@@ -3,6 +3,7 @@ import type {FC} from 'react';
 import {useEffect, useRef, useState} from 'react';
 import {createPortal} from 'react-dom';
 import {FormattedMessage} from 'react-intl';
+import {CloseIcon} from './icons/CloseIcon.js';
 import {Link} from 'react-router-dom';
 
 type UserMenuDrawerProps = {
@@ -80,12 +81,12 @@ export const UserMenuDrawer: FC<UserMenuDrawerProps> = ({
               onClick={handleClose}
               type="button"
             >
-              ✕
+              <CloseIcon size="sm" />
             </button>
           </div>
 
           <div className="space-y-4 p-4">
-            {username ? (
+            {username != null && username !== '' ? (
               <div>
                 <div className="text-sm text-gray-600">
                   <FormattedMessage
@@ -100,12 +101,12 @@ export const UserMenuDrawer: FC<UserMenuDrawerProps> = ({
             ) : null}
 
             <nav className="space-y-2">
-              {username ? (
+              {username != null && username !== '' ? (
                 <>
                   <Link
                     className="block rounded px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    to="/profile"
                     onClick={onClose}
+                    to="/profile"
                   >
                     <FormattedMessage
                       defaultMessage="Profile"
@@ -114,8 +115,8 @@ export const UserMenuDrawer: FC<UserMenuDrawerProps> = ({
                   </Link>
                   <Link
                     className="block rounded px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    to="/settings"
                     onClick={onClose}
+                    to="/settings"
                   >
                     <FormattedMessage
                       defaultMessage="Settings"
@@ -136,8 +137,8 @@ export const UserMenuDrawer: FC<UserMenuDrawerProps> = ({
               ) : (
                 <Link
                   className="block rounded px-3 py-2 text-sm text-indigo-600 hover:bg-indigo-50"
-                  to="/login"
                   onClick={onClose}
+                  to="/login"
                 >
                   <FormattedMessage
                     defaultMessage="Login"

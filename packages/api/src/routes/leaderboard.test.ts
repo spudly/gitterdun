@@ -351,9 +351,7 @@ describe('leaderboard routes', () => {
       expect(body.success).toBe(true);
       expect(mockPreparedStatement.all).toHaveBeenCalledWith(1234, 10);
       // Ensure our SQL scopes by family membership
-      const preparedSql = mockDb.prepare.mock.calls[0]?.[0] as
-        | string
-        | undefined;
+      const preparedSql = mockDb.prepare.mock.calls[0]?.[0];
       expect(preparedSql).toBeDefined();
       expect(preparedSql!).toContain('family_members');
     });

@@ -7,80 +7,79 @@ import {PageHeader} from '../widgets/PageHeader.js';
 import {Section} from '../widgets/Section.js';
 import {useToast} from '../widgets/ToastProvider.js';
 import {ProfileAvatarPicker} from './ProfileAvatarPicker.js';
+import {useUser} from '../hooks/useUser.js';
 
 const DEFAULT_AVATARS = ['😀', '🦄', '🐱', '🐶', '🐼', '🐧', '🐸', '🦊'];
 
 const Profile: FC = () => {
   const intl = useIntl();
   const {safeAsync} = useToast();
+  const {user: me, isLoading, error} = useUser();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [avatar, setAvatar] = useState<string>('');
-  const initializedRef = useRef(false);
   const userEditedNameRef = useRef(false);
-  const [namePlaceholder, setNamePlaceholder] = useState('');
 
   useEffect(() => {
-    (async () => {
-      const me = await usersApi.getMe();
-      const {success, data} = me;
-      if (!success || data == null) {
-        return;
-      }
-      if (initializedRef.current) {
-        return;
-      }
-      // use `data` from destructuring above
-      // Preload as placeholder so we never clobber user input
-      if (namePlaceholder === '') {
-        const {display_name: displayName, username} = data;
-        setNamePlaceholder(displayName ?? username);
-      }
-      if (email === '') {
-        const serverEmail =
-          (data as {email: string | null | undefined}).email ?? '';
-        setEmail(serverEmail);
-      }
-      if (avatar === '') {
-        const avatarUrl = (data as {avatar_url?: string | null}).avatar_url;
-        setAvatar(typeof avatarUrl === 'string' ? avatarUrl : '');
-      }
-      initializedRef.current = true;
-    })();
-    // run only once on mount (hydrate from server)
-  }, []);
+    if (!me) {
+      return;
+    }
+    if (!name && me.display_name != null) {
+      setName(me.display_name ?? me.username);
+    }
+    if (!email && me.email != null) {
+      setEmail(me.email);
+    }
+    if (!avatar && me.avatar_url != null) {
+      setAvatar(me.avatar_url);
+    }
+  }, [avatar, email, me, name]);
 
-  const onUpload = async (file: File) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      setAvatar(typeof reader.result === 'string' ? reader.result : '');
-    };
-    reader.readAsDataURL(file);
+  const onUpload = safeAsync(
+    async (file: File) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setAvatar(typeof reader.result === 'string' ? reader.result : '');
+      };
+      reader.readAsDataURL(file);
+    },
+    intl.formatMessage({
+      defaultMessage: 'Unable to upload avatar',
+      id: 'pages.Profile.upload-error',
+    }),
+  );
+
+  const onSave = () => {
+    safeAsync(
+      async () => {
+        await usersApi.updateProfile({
+          display_name: name,
+          avatar_url: avatar === '' ? null : avatar,
+          email,
+        });
+      },
+      intl.formatMessage({
+        defaultMessage: 'Unable to save profile',
+        id: 'pages.Profile.save-error',
+      }),
+    )();
   };
 
-  const onSave = safeAsync(
-    async () => {
-      await usersApi.updateProfile({
-        display_name: name,
-        avatar_url: avatar === '' ? null : avatar,
-        email,
-      });
-    },
-    intl.formatMessage({
-      defaultMessage: 'Unable to save profile',
-      id: 'pages.Profile.save-error',
-    }),
-  );
+  const onDelete = () => {
+    safeAsync(
+      async () => {
+        await usersApi.deleteMe();
+      },
+      intl.formatMessage({
+        defaultMessage: 'Unable to delete account',
+        id: 'pages.Profile.delete-error',
+      }),
+    )();
+  };
 
-  const onDelete = safeAsync(
-    async () => {
-      await usersApi.deleteMe();
-    },
-    intl.formatMessage({
-      defaultMessage: 'Unable to delete account',
-      id: 'pages.Profile.delete-error',
-    }),
-  );
+  if (isLoading || error) {
+    return null; // TODO: loading spinner? error message? suspense maybe?
+  }
 
   return (
     <PageContainer>
@@ -103,22 +102,21 @@ const Profile: FC = () => {
               <FormattedMessage defaultMessage="Name" id="pages.Profile.name" />
             </span>
             <input
-              id="profile-name"
               aria-label={intl.formatMessage({
                 defaultMessage: 'Name',
                 id: 'pages.Profile.name',
               })}
               className="rounded border px-2 py-1"
-              type="text"
-              value={name}
-              placeholder={namePlaceholder}
-              onFocus={() => {
-                userEditedNameRef.current = true;
-              }}
+              id="profile-name"
               onChange={event => {
                 userEditedNameRef.current = true;
                 setName(event.target.value);
               }}
+              onFocus={() => {
+                userEditedNameRef.current = true;
+              }}
+              type="text"
+              value={name}
             />
           </label>
 
@@ -130,23 +128,25 @@ const Profile: FC = () => {
               />
             </span>
             <input
-              id="profile-email"
               aria-label={intl.formatMessage({
                 defaultMessage: 'Email',
                 id: 'pages.Profile.email',
               })}
               className="rounded border px-2 py-1"
-              type="email"
-              value={email}
+              id="profile-email"
               onChange={event => {
                 setEmail(event.target.value);
               }}
+              type="email"
+              value={email}
             />
           </label>
 
           <ProfileAvatarPicker
             avatar={avatar}
-            onChoose={setAvatar}
+            onChoose={val => {
+              setAvatar(val);
+            }}
             onUpload={onUpload}
             options={DEFAULT_AVATARS}
           />
@@ -154,15 +154,19 @@ const Profile: FC = () => {
           <div className="flex gap-2 pt-2">
             <button
               className="rounded bg-indigo-600 px-3 py-1 text-white"
+              onClick={() => {
+                onSave();
+              }}
               type="button"
-              onClick={onSave}
             >
               <FormattedMessage defaultMessage="Save" id="pages.Profile.save" />
             </button>
             <button
               className="rounded border border-red-600 px-3 py-1 text-red-600"
+              onClick={() => {
+                onDelete();
+              }}
               type="button"
-              onClick={onDelete}
             >
               <FormattedMessage
                 defaultMessage="Delete Account"

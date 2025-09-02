@@ -1,5 +1,6 @@
 import type {NavigationItem} from './widgets/Layout';
 import {defineMessages} from 'react-intl';
+import type {MessageDescriptor} from 'react-intl';
 import {ONE_MINUTE_MS, ONE_HOUR_MS} from '@gitterdun/shared';
 
 const navMessages = defineMessages({
@@ -85,11 +86,38 @@ export const BRONZE_RANK = 3;
 /** Array of all podium ranks in order */
 export const RANKS = [GOLD_RANK, SILVER_RANK, BRONZE_RANK];
 
-/**
- * Grid and layout constants
- */
-
-/** Number of characters to display in avatar initials */
 export const AVATAR_INITIALS_LENGTH = 2;
 
-export const DEFAULT_PORT = 8001;
+const LOCALE_NAME_MESSAGES = defineMessages({
+  en: {defaultMessage: 'English', id: 'locale.name.english'},
+  pirate: {defaultMessage: 'Pirate', id: 'locale.name.pirate'},
+  piglatin: {defaultMessage: 'Pig Latin', id: 'locale.name.piglatin'},
+  fr: {defaultMessage: 'French', id: 'locale.name.french'},
+  deseret: {defaultMessage: 'Deseret', id: 'locale.name.deseret'},
+});
+
+export const SETTINGS_LANGUAGES: ReadonlyArray<{
+  readonly id: string;
+  readonly nativeName: string;
+  readonly i18nMessage: MessageDescriptor;
+}> = [
+  {id: 'en', nativeName: 'English', i18nMessage: LOCALE_NAME_MESSAGES.en},
+  {
+    id: 'pirate',
+    nativeName: 'Pirate',
+    i18nMessage: LOCALE_NAME_MESSAGES.pirate,
+  },
+  {
+    id: 'piglatin',
+    nativeName: 'Igpay Atinlay',
+    i18nMessage: LOCALE_NAME_MESSAGES.piglatin,
+  },
+  {id: 'fr', nativeName: 'Français', i18nMessage: LOCALE_NAME_MESSAGES.fr},
+  {
+    id: 'deseret',
+    nativeName: '𐐔𐐯𐑅𐐯𐑉𐐯𐐻',
+    i18nMessage: LOCALE_NAME_MESSAGES.deseret,
+  },
+];
+
+export const EMPTY_ARRAY = [] as const;

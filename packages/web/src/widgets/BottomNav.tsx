@@ -27,7 +27,7 @@ export const BottomNav: FC<BottomNavProps> = ({
         {items.map(item => {
           const isActive = currentPath === item.path;
           return (
-            <div key={item.path} className="flex min-w-0 flex-1">
+            <div className="flex min-w-0 flex-1" key={item.path}>
               <Link
                 className={clsx(
                   'flex w-full min-w-0 flex-col items-center justify-center gap-1 px-2 py-1.5 text-xs font-medium leading-none',

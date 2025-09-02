@@ -25,7 +25,7 @@ export const useI18n = (): I18nContextValue => {
 type I18nProviderProps = {readonly children: ReactNode};
 
 export const I18nProvider: FC<I18nProviderProps> = ({children}) => {
-  const [locale, setLocaleState] = useState<SupportedLocale>(() => {
+  const [locale, setLocale] = useState<SupportedLocale>(() => {
     const initial =
       typeof window !== 'undefined'
         ? window.localStorage.getItem('locale')
@@ -36,16 +36,21 @@ export const I18nProvider: FC<I18nProviderProps> = ({children}) => {
     return 'en';
   });
 
-  const setLocale = (next: string) => {
+  const setLocaleAndPersist: I18nContextValue['setLocale'] = (
+    next: SupportedLocale,
+  ) => {
     const resolved = isSupportedLocale(next) ? next : 'en';
-    setLocaleState(resolved);
+    setLocale(resolved);
     if (typeof window !== 'undefined') {
       window.localStorage.setItem('locale', resolved);
     }
   };
 
   const messages = useMemo(() => getMessagesForLocale(locale), [locale]);
-  const ctx: I18nContextValue = useMemo(() => ({locale, setLocale}), [locale]);
+  const ctx: I18nContextValue = useMemo(
+    () => ({locale, setLocale: setLocaleAndPersist}),
+    [locale],
+  );
 
   return (
     <I18nContext.Provider value={ctx}>

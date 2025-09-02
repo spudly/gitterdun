@@ -101,7 +101,7 @@ if (looksLikeThisScript && !isTestEnv) {
       );
       process.exit(0);
     })
-    .catch(error => {
+    .catch((error: unknown) => {
       logger.error({error}, 'DB reset failed');
       process.exit(1);
     });

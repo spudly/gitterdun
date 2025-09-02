@@ -12,6 +12,14 @@ const mockDb = jest.mocked(db);
 describe('choreResponseProcessors normalization', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    const mockAll = jest.fn().mockReturnValue([]);
+    const mockGet = jest.fn().mockReturnValue({count: 0});
+    mockDb.prepare.mockImplementation(((query: string) => {
+      if (query.includes('COUNT(*)')) {
+        return {get: mockGet} as unknown as ReturnType<typeof db.prepare>;
+      }
+      return {all: mockAll} as unknown as ReturnType<typeof db.prepare>;
+    }) as typeof mockDb.prepare);
   });
 
   test('coerces nulls to undefined and returns numeric timestamps', () => {
@@ -37,32 +45,34 @@ describe('choreResponseProcessors normalization', () => {
 
     const mockAll = jest.fn().mockReturnValue(rows);
     const mockGet = jest.fn().mockReturnValue({count: 1});
-    mockDb.prepare.mockImplementation((query: string) => {
+    mockDb.prepare.mockImplementation(((query: string) => {
+      // eslint-disable-next-line jest/no-conditional-in-test -- this conditional is in a mock implementation
       if (query.includes('COUNT(*)')) {
         return {get: mockGet} as unknown as ReturnType<typeof db.prepare>;
       }
       return {all: mockAll} as unknown as ReturnType<typeof db.prepare>;
-    });
+    }) as typeof mockDb.prepare);
 
     const result = processChoresRequest({});
     expect(result.success).toBe(true);
     expect(result.data).toHaveLength(1);
-    const chore = result.data[0]!;
+    const [chore] = result.data;
+    expect(chore).toBeDefined();
 
     // Nulls coerced to undefined
-    expect('start_date' in chore).toBe(true);
-    expect(chore.start_date).toBeUndefined();
-    expect('due_date' in chore).toBe(true);
-    expect(chore.due_date).toBeUndefined();
-    expect('recurrence_rule' in chore).toBe(true);
-    expect(chore.recurrence_rule).toBeUndefined();
+    expect(chore).toHaveProperty('start_date');
+    expect(chore?.start_date).toBeUndefined();
+    expect(chore).toHaveProperty('due_date');
+    expect(chore?.due_date).toBeUndefined();
+    expect(chore).toHaveProperty('recurrence_rule');
+    expect(chore?.recurrence_rule).toBeUndefined();
 
     // Numeric timestamps
-    expect(typeof chore.created_at).toBe('number');
-    expect(typeof chore.updated_at).toBe('number');
+    expect(typeof chore?.created_at).toBe('number');
+    expect(typeof chore?.updated_at).toBe('number');
     // And valid dates
-    expect(Number.isNaN(chore.created_at)).toBe(false);
-    expect(Number.isNaN(chore.updated_at)).toBe(false);
+    expect(Number.isNaN(chore?.created_at)).toBe(false);
+    expect(Number.isNaN(chore?.updated_at)).toBe(false);
   });
 
   // status is not part of chore definition; no defaulting behavior expected here

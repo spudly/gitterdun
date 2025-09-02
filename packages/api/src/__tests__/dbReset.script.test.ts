@@ -45,6 +45,8 @@ describe('dbReset script', () => {
     // Run with seed
     jest.mocked(createChoreInDb).mockClear();
     await resetDb({seed: true});
-    expect(jest.mocked(createChoreInDb)).toHaveBeenCalled();
+    expect(jest.mocked(createChoreInDb)).toHaveBeenCalledWith(
+      expect.objectContaining({title: expect.any(String)}),
+    );
   });
 });

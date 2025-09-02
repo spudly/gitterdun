@@ -184,7 +184,7 @@ jobs:
         run: npm ci
 
       - name: Prettier Check
-        run: npm run prettier:check
+        run: npm run check:prettier
 
   knip:
     name: Knip

@@ -60,7 +60,10 @@ const FamilyApprovals: FC = () => {
     );
   }
 
-  const handleSetApproval = (choreId: number, next: 'approved' | 'rejected') =>
+  const handleSetApproval = (
+    choreId: number,
+    next: 'approved' | 'rejected',
+  ) => {
     safeAsync(async () => {
       const today = new Date().toISOString();
       await choreInstancesApi.upsert({
@@ -69,8 +72,9 @@ const FamilyApprovals: FC = () => {
         approval_status: next,
       });
       await refetch();
-      queryClient.invalidateQueries({queryKey: ['chore-instances']});
+      await queryClient.invalidateQueries({queryKey: ['chore-instances']});
     }, intl.formatMessage(messages.approveFailed))();
+  };
 
   return (
     <PageContainer>
@@ -78,30 +82,30 @@ const FamilyApprovals: FC = () => {
       <List>
         {instances.map(instance => (
           <ListRow
-            key={instance.chore_id}
-            title={instance.title}
             description={instance.notes}
+            key={instance.chore_id}
             right={
               <div className="flex gap-2">
                 <Button
+                  onClick={safeAsync(async () => {
+                    handleSetApproval(instance.chore_id, 'approved');
+                  }, intl.formatMessage(messages.approveFailed))}
                   size="sm"
-                  onClick={() =>
-                    handleSetApproval(instance.chore_id, 'approved')
-                  }
                 >
                   <FormattedMessage {...messages.approve} />
                 </Button>
                 <Button
+                  onClick={safeAsync(async () => {
+                    handleSetApproval(instance.chore_id, 'rejected');
+                  }, intl.formatMessage(messages.approveFailed))}
                   size="sm"
                   variant="ghost"
-                  onClick={() =>
-                    handleSetApproval(instance.chore_id, 'rejected')
-                  }
                 >
                   <FormattedMessage {...messages.reject} />
                 </Button>
               </div>
             }
+            title={instance.title}
           />
         ))}
       </List>

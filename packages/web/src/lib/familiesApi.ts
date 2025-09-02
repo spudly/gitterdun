@@ -6,7 +6,7 @@ import {
   LeaderboardResponseSchema,
   UpdateFamilyTimezoneSchema,
 } from '@gitterdun/shared';
-import type {LeaderboardResponse} from '@gitterdun/shared';
+import type {LeaderboardResponse, FamilyMember} from '@gitterdun/shared';
 import {api} from './apiCore';
 
 export const leaderboardApi = {
@@ -28,7 +28,7 @@ export const familiesApi = {
     return api.put(`/families/${familyId}/timezone`, FamilySchema, validated);
   },
   listMembers: async (familyId: number) =>
-    api.get<Array<unknown>>(
+    api.get<Array<FamilyMember>>(
       `/families/${familyId}/members`,
       z.array(FamilyMemberSchema),
     ),

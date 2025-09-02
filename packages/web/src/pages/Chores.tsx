@@ -8,6 +8,7 @@ import {List} from '../widgets/List.js';
 import {ListRow} from '../widgets/ListRow.js';
 import {Checkbox} from '../widgets/Checkbox.js';
 import {Button} from '../widgets/Button.js';
+import {CheckCircleIcon} from '../widgets/icons/CheckCircleIcon.js';
 import {PageLoading} from '../widgets/PageLoading.js';
 import {FormattedMessage, defineMessages, useIntl} from 'react-intl';
 import {useToast} from '../widgets/ToastProvider.js';
@@ -33,19 +34,19 @@ const Chores: FC = () => {
     queryKey: ['chore-instances', 'today'],
     queryFn: async () => choreInstancesApi.listForDay({date: 'today'}),
   });
-  const allInstances = (instancesResponse?.data ?? []) as Array<{
-    chore_id: number;
-    title: string;
-    status: 'incomplete' | 'complete';
-    approval_status: 'unapproved' | 'approved' | 'rejected';
-    notes?: string;
-  }>;
   const visibleInstances = useMemo(() => {
+    const instances = (instancesResponse?.data ?? []) as Array<{
+      chore_id: number;
+      title: string;
+      status: 'incomplete' | 'complete';
+      approval_status: 'unapproved' | 'approved' | 'rejected';
+      notes?: string;
+    }>;
     if (!hideCompleted) {
-      return allInstances;
+      return instances;
     }
-    return allInstances.filter(instance => instance.status !== 'complete');
-  }, [allInstances, hideCompleted]);
+    return instances.filter(instance => instance.status !== 'complete');
+  }, [hideCompleted, instancesResponse?.data]);
 
   if (isLoading) {
     return (
@@ -73,12 +74,19 @@ const Chores: FC = () => {
         <List>
           {visibleInstances.map(instance => (
             <ListRow
-              key={`${instance.chore_id}`}
-              title={instance.title}
               description={instance.notes}
+              key={`${instance.chore_id}`}
               right={
                 instance.status === 'complete' ? (
-                  <span className="text-green-700">✓</span>
+                  <span
+                    aria-label={intl.formatMessage({
+                      defaultMessage: 'Completed',
+                      id: 'pages.ChoreInstances.completed',
+                    })}
+                    className="text-green-700"
+                  >
+                    <CheckCircleIcon size="sm" />
+                  </span>
                 ) : (
                   <Button
                     onClick={safeAsync(
@@ -103,7 +111,7 @@ const Chores: FC = () => {
                           payload.notes = instance.notes;
                         }
                         await choreInstancesApi.upsert(payload);
-                        queryClient.invalidateQueries({
+                        await queryClient.invalidateQueries({
                           queryKey: ['chore-instances'],
                         });
                       },
@@ -122,6 +130,7 @@ const Chores: FC = () => {
                   </Button>
                 )
               }
+              title={instance.title}
             />
           ))}
         </List>

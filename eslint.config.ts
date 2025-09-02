@@ -20,7 +20,7 @@ import testingLibraryPlugin from 'eslint-plugin-testing-library';
 import jestDomPlugin from 'eslint-plugin-jest-dom';
 import {Linter, ESLint} from 'eslint';
 import type {SetRequired} from 'type-fest';
-// eslint-disable-next-line import/no-extraneous-dependencies, import/no-namespace -- false positive
+// eslint-disable-next-line import/no-namespace -- this is the way
 import * as reactCompilerPlugin from 'eslint-plugin-react-compiler';
 
 const WORKSPACE_ROOT_DIR = dirname(fileURLToPath(import.meta.url));
@@ -130,11 +130,20 @@ const GROUPS = {
       '**/e2e/{test,tests,__test__,__tests__}/**/*',
     ],
   },
+  javascript: {files: [`**/*.${extensionsGlob(JAVASCRIPT_EXTENSIONS)}`]},
   react: {
     files: [`**/*.${extensionsGlob(REACT_EXTENSIONS)}`],
     settings: {react: {pragma: 'React', version: 'detect'}},
   },
   scripts: {files: [`**/scripts/**`]},
+  tests: {
+    files: [
+      `**/*.{test,spec}.${extensionsGlob()}`, // test files
+      '**/{test,tests,__test__,__tests__}/**', // files in test folders
+      '**/jest.*', // jest config files
+    ],
+    ignores: ['**/e2e/**'],
+  },
   translations: {
     files: [`**/messages/*.${extensionsGlob()}`],
     ignores: [`**/messages/index.${extensionsGlob()}`],
@@ -159,14 +168,6 @@ const GROUPS = {
         typescript: {project: ['./tsconfig.base.json']},
       },
     },
-  },
-  unitTests: {
-    files: [
-      `**/*.{test,spec}.${extensionsGlob()}`, // unit test files
-      '**/{test,tests,__test__,__tests__}/**', // files in unit test folders
-      '**/jest.*', // jest config files
-    ],
-    ignores: ['**/e2e/**'],
   },
 } as const satisfies Record<string, Group>;
 
@@ -257,6 +258,7 @@ const resolveConfigs = (rules: MyRules): Array<Linter.Config> =>
       ([groupName, group]) => {
         return {
           files: group.files,
+          ignores: group.ignores ?? [],
           languageOptions: group.languageOptions ?? {},
           plugins: resolveGroupPlugins(rules),
           rules: resolveGroupRules(rules, groupName, type),
@@ -299,16 +301,16 @@ export const RULES: MyRules = {
   'func-style': 'error',
   'getter-return': 'off',
   'gitterdun/no-extra-i18n-messages': [
-    composeSeverity(errorFor('all'), errorFor('translations')),
+    composeSeverity(errorFor('translations'), offFor('tests')),
     {enPath: 'packages/web/src/i18n/extracted/en.json'},
   ],
   'gitterdun/no-missing-i18n-messages': [
-    composeSeverity(errorFor('all'), errorFor('translations')),
+    composeSeverity(errorFor('translations'), offFor('tests')),
     {enPath: 'packages/web/src/i18n/extracted/en.json'},
   ],
   'gitterdun/no-tailwind-margins': composeSeverity(
     errorFor('all'),
-    offFor('unitTests'),
+    offFor('tests'),
   ),
   'gitterdun/no-unused-data-testid': [
     'error',
@@ -384,7 +386,7 @@ export const RULES: MyRules = {
   'import/no-named-as-default-member': 'off',
   'import/no-named-default': 'error',
   'import/no-named-export': 'off',
-  'import/no-namespace': composeSeverity(errorFor('all'), offFor('unitTests')),
+  'import/no-namespace': composeSeverity(errorFor('all'), offFor('tests')),
   'import/no-nodejs-modules': 'off', // needed for scripts
   'import/no-relative-packages': 'error',
   'import/no-relative-parent-imports': 'off',
@@ -411,34 +413,34 @@ export const RULES: MyRules = {
   'jest-dom/prefer-to-have-text-content': 'error',
   'jest-dom/prefer-to-have-value': 'error',
   'jest/consistent-test-it': [
-    errorFor('unitTests'),
+    errorFor('tests'),
     {fn: 'test', withinDescribe: 'test'},
   ],
-  'jest/expect-expect': errorFor('unitTests'),
+  'jest/expect-expect': errorFor('tests'),
   'jest/max-expects': 'off', // more expects is fine by me
-  'jest/max-nested-describe': errorFor('unitTests'),
-  'jest/no-alias-methods': errorFor('unitTests'),
-  'jest/no-commented-out-tests': errorFor('unitTests'),
-  'jest/no-conditional-expect': errorFor('unitTests'),
-  'jest/no-conditional-in-test': errorFor('unitTests'),
-  'jest/no-confusing-set-timeout': errorFor('unitTests'),
-  'jest/no-deprecated-functions': errorFor('unitTests'),
-  'jest/no-disabled-tests': errorFor('unitTests'),
-  'jest/no-done-callback': errorFor('unitTests'),
-  'jest/no-duplicate-hooks': errorFor('unitTests'),
-  'jest/no-export': errorFor('unitTests'),
-  'jest/no-focused-tests': errorFor('unitTests'),
+  'jest/max-nested-describe': errorFor('tests'),
+  'jest/no-alias-methods': errorFor('tests'),
+  'jest/no-commented-out-tests': errorFor('tests'),
+  'jest/no-conditional-expect': errorFor('tests'),
+  'jest/no-conditional-in-test': errorFor('tests'),
+  'jest/no-confusing-set-timeout': errorFor('tests'),
+  'jest/no-deprecated-functions': errorFor('tests'),
+  'jest/no-disabled-tests': errorFor('tests'),
+  'jest/no-done-callback': errorFor('tests'),
+  'jest/no-duplicate-hooks': errorFor('tests'),
+  'jest/no-export': errorFor('tests'),
+  'jest/no-focused-tests': errorFor('tests'),
   'jest/no-hooks': 'off', // no hooks? but why?
-  'jest/no-identical-title': errorFor('unitTests'),
-  'jest/no-interpolation-in-snapshots': errorFor('unitTests'),
-  'jest/no-jasmine-globals': errorFor('unitTests'),
-  'jest/no-large-snapshots': errorFor('unitTests'),
-  'jest/no-mocks-import': errorFor('unitTests'),
-  'jest/no-restricted-jest-methods': errorFor('unitTests'),
-  'jest/no-restricted-matchers': errorFor('unitTests'),
-  'jest/no-standalone-expect': errorFor('unitTests'),
-  'jest/no-test-prefixes': errorFor('unitTests'),
-  'jest/no-test-return-statement': errorFor('unitTests'),
+  'jest/no-identical-title': errorFor('tests'),
+  'jest/no-interpolation-in-snapshots': errorFor('tests'),
+  'jest/no-jasmine-globals': errorFor('tests'),
+  'jest/no-large-snapshots': errorFor('tests'),
+  'jest/no-mocks-import': errorFor('tests'),
+  'jest/no-restricted-jest-methods': errorFor('tests'),
+  'jest/no-restricted-matchers': errorFor('tests'),
+  'jest/no-standalone-expect': errorFor('tests'),
+  'jest/no-test-prefixes': errorFor('tests'),
+  'jest/no-test-return-statement': errorFor('tests'),
   'jest/no-untyped-mock-factory': 'off', // we can be more loose in unit tests
   'jest/padding-around-after-all-blocks': 'off', // use Prettier for styling
   'jest/padding-around-after-each-blocks': 'off', // use Prettier for styling
@@ -448,34 +450,37 @@ export const RULES: MyRules = {
   'jest/padding-around-describe-blocks': 'off', // use Prettier for styling
   'jest/padding-around-expect-groups': 'off', // use Prettier for styling
   'jest/padding-around-test-blocks': 'off', // use Prettier for styling
-  'jest/prefer-called-with': errorFor('unitTests'),
-  'jest/prefer-comparison-matcher': errorFor('unitTests'),
-  'jest/prefer-each': errorFor('unitTests'),
+  'jest/prefer-called-with': errorFor('tests'),
+  'jest/prefer-comparison-matcher': errorFor('tests'),
+  'jest/prefer-each': errorFor('tests'),
   'jest/prefer-ending-with-an-expect': 'off', // false positive when expect is in a loop
-  'jest/prefer-equality-matcher': errorFor('unitTests'),
+  'jest/prefer-equality-matcher': errorFor('tests'),
   'jest/prefer-expect-assertions': 'off', // annoying
-  'jest/prefer-expect-resolves': errorFor('unitTests'),
-  'jest/prefer-hooks-in-order': errorFor('unitTests'),
-  'jest/prefer-hooks-on-top': errorFor('unitTests'),
-  'jest/prefer-importing-jest-globals': errorFor('unitTests'),
-  'jest/prefer-jest-mocked': errorFor('unitTests'),
-  'jest/prefer-lowercase-title': errorFor('unitTests'),
-  'jest/prefer-mock-promise-shorthand': errorFor('unitTests'),
-  'jest/prefer-snapshot-hint': errorFor('unitTests'),
-  'jest/prefer-spy-on': errorFor('unitTests'),
+  'jest/prefer-expect-resolves': errorFor('tests'),
+  'jest/prefer-hooks-in-order': errorFor('tests'),
+  'jest/prefer-hooks-on-top': errorFor('tests'),
+  'jest/prefer-importing-jest-globals': errorFor('tests'),
+  'jest/prefer-jest-mocked': errorFor('tests'),
+  'jest/prefer-lowercase-title': errorFor('tests'),
+  'jest/prefer-mock-promise-shorthand': errorFor('tests'),
+  'jest/prefer-snapshot-hint': errorFor('tests'),
+  'jest/prefer-spy-on': errorFor('tests'),
   'jest/prefer-strict-equal': 'off', // i like this idea, but toStrictEqual has issues with arrays being created from inside a jest worker, resulting in false positive errors
-  'jest/prefer-to-be': errorFor('unitTests'),
-  'jest/prefer-to-contain': errorFor('unitTests'),
-  'jest/prefer-to-have-length': errorFor('unitTests'),
-  'jest/prefer-todo': errorFor('unitTests'),
-  'jest/require-hook': errorFor('unitTests'),
-  'jest/require-to-throw-message': errorFor('unitTests'),
+  'jest/prefer-to-be': errorFor('tests'),
+  'jest/prefer-to-contain': errorFor('tests'),
+  'jest/prefer-to-have-length': errorFor('tests'),
+  'jest/prefer-todo': errorFor('tests'),
+  'jest/require-hook': composeSeverity(errorFor('tests'), offFor('e2eTests')),
+  'jest/require-to-throw-message': errorFor('tests'),
   'jest/require-top-level-describe': 'off', // why enforce extra boilerplate?
-  'jest/unbound-method': errorFor('unitTests'),
-  'jest/valid-describe-callback': errorFor('unitTests'),
-  'jest/valid-expect': errorFor('unitTests'),
-  'jest/valid-expect-in-promise': errorFor('unitTests'),
-  'jest/valid-title': errorFor('unitTests'),
+  'jest/unbound-method': composeSeverity(
+    errorFor('tests'),
+    offFor('javascript'),
+  ),
+  'jest/valid-describe-callback': errorFor('tests'),
+  'jest/valid-expect': errorFor('tests'),
+  'jest/valid-expect-in-promise': errorFor('tests'),
+  'jest/valid-title': errorFor('tests'),
   'jsx-a11y/alt-text': [
     errorFor('react'),
     {
@@ -632,7 +637,7 @@ export const RULES: MyRules = {
   'max-lines': [
     composeSeverity(
       errorFor('all'),
-      offFor('configs', 'unitTests', 'e2eTests', 'scripts'),
+      offFor('configs', 'tests', 'e2eTests', 'scripts'),
     ),
     200,
   ],
@@ -640,10 +645,7 @@ export const RULES: MyRules = {
   'max-nested-callbacks': 'error',
   'max-params': ['error', {max: 5}],
   'max-statements': [
-    composeSeverity(
-      errorFor('all'),
-      offFor('configs', 'unitTests', 'e2eTests'),
-    ),
+    composeSeverity(errorFor('all'), offFor('configs', 'tests', 'e2eTests')),
     {max: 20},
   ],
   'new-cap': 'error',
@@ -717,7 +719,7 @@ export const RULES: MyRules = {
   'no-magic-numbers': [
     composeSeverity(
       errorFor('all'),
-      offFor('typescript', 'unitTests', 'configs', 'scripts'),
+      offFor('typescript', 'tests', 'configs', 'scripts'),
     ),
     {
       detectObjects: false,
@@ -936,10 +938,7 @@ export const RULES: MyRules = {
   'react/jsx-no-duplicate-props': errorFor('react'),
   'react/jsx-no-leaked-render': errorFor('react'),
   'react/jsx-no-literals': [
-    composeSeverity(
-      errorFor('react'),
-      offFor('unitTests', 'e2eTests', 'demos'),
-    ),
+    composeSeverity(errorFor('react'), offFor('tests', 'e2eTests', 'demos')),
     {allowedStrings: ['*', '%'], ignoreProps: true, noStrings: true},
   ],
   'react/jsx-no-script-url': errorFor('react'),
@@ -972,7 +971,7 @@ export const RULES: MyRules = {
   'react/no-is-mounted': errorFor('react'),
   'react/no-multi-comp': composeSeverity(
     errorFor('react'),
-    offFor('unitTests', 'e2eTests'),
+    offFor('tests', 'demos', 'e2eTests'),
   ),
   'react/no-namespace': errorFor('react'),
   'react/no-object-type-as-default-prop': errorFor('react'),
@@ -1028,7 +1027,7 @@ export const RULES: MyRules = {
   'testing-library/await-async-queries': 'off', // handled by ts/no-floating-promises
   'testing-library/await-async-utils': 'off', // handled by ts/no-floating-promises
   'testing-library/consistent-data-testid': [
-    errorFor('unitTests'),
+    composeSeverity(errorFor('tests'), offFor('e2eTests')),
     {
       testIdAttribute: 'data-testid',
       testIdPattern: '^{fileName}(\\.[a-z0-9]+)*$',
@@ -1036,26 +1035,71 @@ export const RULES: MyRules = {
   ],
   'testing-library/no-await-sync-events': 'off', // handled by ts/await-thenable
   'testing-library/no-await-sync-queries': 'off', // handled by ts/await-thenable
-  'testing-library/no-container': errorFor('unitTests'),
-  'testing-library/no-debugging-utils': errorFor('unitTests'),
-  'testing-library/no-dom-import': [errorFor('unitTests'), 'react'],
-  'testing-library/no-global-regexp-flag-in-query': errorFor('unitTests'),
-  'testing-library/no-manual-cleanup': errorFor('unitTests'),
-  'testing-library/no-node-access': errorFor('unitTests'),
-  'testing-library/no-promise-in-fire-event': errorFor('unitTests'),
-  'testing-library/no-render-in-lifecycle': errorFor('unitTests'),
+  'testing-library/no-container': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/no-debugging-utils': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/no-dom-import': [
+    composeSeverity(errorFor('tests'), offFor('e2eTests')),
+    'react',
+  ],
+  'testing-library/no-global-regexp-flag-in-query': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/no-manual-cleanup': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/no-node-access': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/no-promise-in-fire-event': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/no-render-in-lifecycle': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
   'testing-library/no-test-id-queries': 'off', // sometimes data-testid is necessary
-  'testing-library/no-unnecessary-act': errorFor('unitTests'),
-  'testing-library/no-wait-for-multiple-assertions': errorFor('unitTests'),
-  'testing-library/no-wait-for-side-effects': errorFor('unitTests'),
-  'testing-library/no-wait-for-snapshot': errorFor('unitTests'),
+  'testing-library/no-unnecessary-act': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/no-wait-for-multiple-assertions': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/no-wait-for-side-effects': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/no-wait-for-snapshot': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
   'testing-library/prefer-explicit-assert': 'off', // handled by jest/expect-expect
-  'testing-library/prefer-find-by': errorFor('unitTests'),
-  'testing-library/prefer-implicit-assert': errorFor('unitTests'),
-  'testing-library/prefer-presence-queries': errorFor('unitTests'),
-  'testing-library/prefer-query-by-disappearance': errorFor('unitTests'),
+  'testing-library/prefer-find-by': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/prefer-implicit-assert': 'off', // getBy*().toBeInTheDocument() is best practice
+  'testing-library/prefer-presence-queries': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/prefer-query-by-disappearance': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
   'testing-library/prefer-query-matchers': [
-    errorFor('unitTests'),
+    composeSeverity(errorFor('tests'), offFor('e2eTests')),
     {
       validEntries: [
         {matcher: 'toBeVisible', query: 'get'},
@@ -1070,9 +1114,18 @@ export const RULES: MyRules = {
       ],
     },
   ],
-  'testing-library/prefer-screen-queries': errorFor('unitTests'),
-  'testing-library/prefer-user-event': errorFor('unitTests'),
-  'testing-library/render-result-naming-convention': errorFor('unitTests'),
+  'testing-library/prefer-screen-queries': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/prefer-user-event': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/render-result-naming-convention': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
   'ts/adjacent-overload-signatures': errorFor('typescript'),
   'ts/array-type': [
     errorFor('typescript'),
@@ -1122,7 +1175,7 @@ export const RULES: MyRules = {
   'ts/no-empty-object-type': errorFor('typescript'),
   'ts/no-explicit-any': composeSeverity(
     errorFor('typescript'),
-    offFor('unitTests', 'configs'),
+    offFor('tests', 'configs'),
   ),
   'ts/no-extra-non-null-assertion': errorFor('typescript'),
   'ts/no-extraneous-class': errorFor('typescript'),
@@ -1137,7 +1190,7 @@ export const RULES: MyRules = {
   'ts/no-magic-numbers': [
     composeSeverity(
       errorFor('typescript'),
-      offFor('unitTests', 'configs', 'scripts'),
+      offFor('tests', 'configs', 'scripts'),
     ),
     {
       detectObjects: false,
@@ -1162,7 +1215,7 @@ export const RULES: MyRules = {
   'ts/no-non-null-asserted-optional-chain': errorFor('typescript'),
   'ts/no-non-null-assertion': composeSeverity(
     errorFor('typescript'),
-    offFor('unitTests'),
+    offFor('tests'),
   ),
   'ts/no-redeclare': errorFor('typescript'),
   'ts/no-redundant-type-constituents': errorFor('typescript'),
@@ -1182,8 +1235,8 @@ export const RULES: MyRules = {
   'ts/no-unnecessary-type-conversion': errorFor('typescript'),
   'ts/no-unnecessary-type-parameters': errorFor('typescript'),
   'ts/no-unsafe-argument': composeSeverity(
-    composeSeverity(errorFor('typescript'), offFor('unitTests')),
-    offFor('unitTests'),
+    composeSeverity(errorFor('typescript'), offFor('tests')),
+    offFor('tests'),
   ),
   'ts/no-unsafe-assignment': 'off', // fixing these errors usually makes the code worse
   'ts/no-unsafe-call': 'off', // fixing these errors usually makes the code worse
@@ -1192,9 +1245,9 @@ export const RULES: MyRules = {
   'ts/no-unsafe-function-type': errorFor('typescript'),
   'ts/no-unsafe-member-access': composeSeverity(
     errorFor('typescript'),
-    offFor('unitTests'),
+    offFor('tests'),
   ),
-  'ts/no-unsafe-return': errorFor('typescript'),
+  'ts/no-unsafe-return': 'off', // fixing these errors usually makes the code worse
   'ts/no-unsafe-type-assertion': 'off', // fixing these errors usually makes the code worse
   'ts/no-unsafe-unary-minus': errorFor('typescript'),
   'ts/no-unused-expressions': [
@@ -1255,7 +1308,7 @@ export const RULES: MyRules = {
   'ts/strict-boolean-expressions': errorFor('typescript'),
   'ts/switch-exhaustiveness-check': errorFor('typescript'),
   'ts/triple-slash-reference': errorFor('typescript'),
-  'ts/unbound-method': errorFor('typescript'),
+  'ts/unbound-method': composeSeverity(errorFor('typescript'), offFor('tests')),
   'ts/unified-signatures': errorFor('typescript'),
   'ts/use-unknown-in-catch-callback-variable': errorFor('typescript'),
   'turbo/no-undeclared-env-vars': 'error',

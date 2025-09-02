@@ -1,11 +1,14 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {createWrapper} from '../test/createWrapper';
 import FamilyApprovals from './FamilyApprovals';
 
 const mockInvalidate = jest.fn();
 jest.mock('@tanstack/react-query', () => {
-  const actual = jest.requireActual('@tanstack/react-query');
+  const actual = jest.requireActual<typeof import('@tanstack/react-query')>(
+    '@tanstack/react-query',
+  );
   return {
     ...actual,
     useQueryClient: () => ({invalidateQueries: mockInvalidate}),
@@ -40,7 +43,7 @@ jest.mock('../lib/api', () => {
   return {choreInstancesApi: {listForDay, upsert}};
 });
 
-describe('FamilyApprovals page', () => {
+describe('familyApprovals page', () => {
   test('shows only completed unapproved instances with Approve/Reject', async () => {
     render(<FamilyApprovals />, {
       wrapper: createWrapper({i18n: true, queryClient: true, router: true}),
@@ -65,10 +68,11 @@ describe('FamilyApprovals page', () => {
     render(<FamilyApprovals />, {
       wrapper: createWrapper({i18n: true, queryClient: true, router: true}),
     });
+    const user = userEvent.setup();
     await screen.findByText('Approve completed chores');
     const approveBtn = await screen.findByRole('button', {name: 'Approve'});
-    fireEvent.click(approveBtn);
-    const {choreInstancesApi} = require('../lib/api');
+    await user.click(approveBtn);
+    const {choreInstancesApi} = jest.mocked(await import('../lib/api'));
     expect(choreInstancesApi.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         chore_id: 1,
@@ -82,10 +86,11 @@ describe('FamilyApprovals page', () => {
     render(<FamilyApprovals />, {
       wrapper: createWrapper({i18n: true, queryClient: true, router: true}),
     });
+    const user = userEvent.setup();
     await screen.findByText('Approve completed chores');
     const rejectBtn = await screen.findByRole('button', {name: 'Reject'});
-    fireEvent.click(rejectBtn);
-    const {choreInstancesApi} = require('../lib/api');
+    await user.click(rejectBtn);
+    const {choreInstancesApi} = jest.mocked(await import('../lib/api'));
     expect(choreInstancesApi.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         chore_id: 1,
@@ -99,8 +104,12 @@ describe('FamilyApprovals page', () => {
     render(<FamilyApprovals />, {
       wrapper: createWrapper({i18n: true, queryClient: true, router: true}),
     });
+    const user = userEvent.setup();
     await screen.findByText('Approve completed chores');
-    fireEvent.click(await screen.findByRole('button', {name: 'Approve'}));
-    expect(mockInvalidate).toHaveBeenCalled();
+    mockInvalidate.mockClear();
+    await user.click(await screen.findByRole('button', {name: 'Approve'}));
+    expect(mockInvalidate).toHaveBeenCalledWith({
+      queryKey: ['chore-instances'],
+    });
   });
 });

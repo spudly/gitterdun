@@ -6,7 +6,7 @@ type Props = {
   readonly avatar: string;
   readonly onChoose: (value: string) => void;
   readonly onUpload: (file: File) => void;
-  readonly options: readonly string[];
+  readonly options: ReadonlyArray<string>;
 };
 
 export const ProfileAvatarPicker: FC<Props> = ({
@@ -26,14 +26,16 @@ export const ProfileAvatarPicker: FC<Props> = ({
       <div className="flex flex-wrap gap-2">
         {options.map(icon => (
           <button
-            key={icon}
             className={
               icon === avatar
                 ? 'rounded border-2 border-indigo-600 px-2 py-1'
                 : 'rounded border px-2 py-1'
             }
+            key={icon}
+            onClick={() => {
+              onChoose(icon);
+            }}
             type="button"
-            onClick={() => onChoose(icon)}
           >
             <span aria-hidden>{icon}</span>
           </button>
@@ -49,15 +51,15 @@ export const ProfileAvatarPicker: FC<Props> = ({
             <GearIcon size="sm" />
           </span>
           <input
-            id="avatar-upload"
-            type="file"
             accept="image/*"
+            id="avatar-upload"
             onChange={event => {
               const file = event.target.files?.[0];
               if (file) {
                 onUpload(file);
               }
             }}
+            type="file"
           />
         </label>
       </div>

@@ -9,6 +9,7 @@ const ruleTester = new RuleTester({
   },
 });
 
+// eslint-disable-next-line jest/require-hook -- RuleTester must declare tests at top-level
 ruleTester.run('no-missing-i18n-messages', rules['no-missing-i18n-messages'], {
   valid: [
     {
@@ -20,6 +21,7 @@ ruleTester.run('no-missing-i18n-messages', rules['no-missing-i18n-messages'], {
   invalid: [],
 });
 
+// eslint-disable-next-line jest/require-hook -- RuleTester must declare tests at top-level
 ruleTester.run('no-extra-i18n-messages', rules['no-extra-i18n-messages'], {
   valid: [
     {
@@ -31,6 +33,7 @@ ruleTester.run('no-extra-i18n-messages', rules['no-extra-i18n-messages'], {
   invalid: [],
 });
 
+// eslint-disable-next-line jest/require-hook -- RuleTester must declare tests at top-level
 ruleTester.run('require-i18n-formatting', rules['require-i18n-formatting'], {
   valid: [
     {

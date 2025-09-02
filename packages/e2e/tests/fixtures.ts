@@ -1,7 +1,10 @@
 import type {ConsoleMessage, Response} from '@playwright/test';
 import {test as base, expect} from '@playwright/test';
 
-type FailureCollector = {consoleFailures: string[]; responseFailures: string[]};
+type FailureCollector = {
+  consoleFailures: Array<string>;
+  responseFailures: Array<string>;
+};
 
 const createFailureCollector = (): FailureCollector => ({
   consoleFailures: [],
@@ -28,7 +31,8 @@ export const test = base.extend({
 
     const onResponse = (resp: Response) => {
       const status = resp.status();
-      if (status >= 500) {
+      const HTTP_5XX_MIN = 500;
+      if (status >= HTTP_5XX_MIN) {
         failures.responseFailures.push(`${status} ${resp.url()}`);
       }
     };
@@ -45,7 +49,7 @@ export const test = base.extend({
       failures.consoleFailures.length > 0
       || failures.responseFailures.length > 0
     ) {
-      const parts: string[] = [];
+      const parts: Array<string> = [];
       if (failures.consoleFailures.length > 0) {
         parts.push(
           `Console warnings/errors (count=${failures.consoleFailures.length}):\n${failures.consoleFailures.join('\n')}`,

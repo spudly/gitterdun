@@ -2,9 +2,10 @@
 import {RuleTester} from 'eslint';
 import {noTailwindMargins} from './noTailwindMargins.js';
 
-const tsParser = require('@typescript-eslint/parser');
+import tsParser from '@typescript-eslint/parser';
 
-const ruleTester = new RuleTester({
+// eslint-disable-next-line jest/require-hook -- RuleTester must declare tests at top-level
+new RuleTester({
   languageOptions: {
     parser: tsParser,
     parserOptions: {
@@ -13,9 +14,7 @@ const ruleTester = new RuleTester({
       ecmaFeatures: {jsx: true},
     },
   },
-});
-
-ruleTester.run('no-tailwind-margins', noTailwindMargins, {
+}).run('no-tailwind-margins', noTailwindMargins, {
   valid: [
     // Valid className without margin classes
     {code: '<div className="flex p-4 bg-blue-500 text-white" />'},

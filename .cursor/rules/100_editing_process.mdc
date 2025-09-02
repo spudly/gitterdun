@@ -10,7 +10,7 @@ alwaysApply: true
    1. For the web package, any user-facing text or dates should be internationalized.
    2. Adhere to the configured eslint rules. ESLint errors and warnings should not simply be ignored.
 4. Run the new unit tests again to verify that the tests are now passing. If they are not, make changes to the new code or new tests as needed until the code is fully implemented according to the request and tests are passing with 100% code coverage across all lines, branches, functions, and statements.
-5. Check the new code with `npm run ai:check` to ensure that you didn't introduce any new issues. If any issues are reported, you should continue iterating on the code and it's associated tests until this script reports no errors or warnings.
+5. Check the new code with `npm run check:ai` to ensure that you didn't introduce any new issues. If any issues are reported, you should continue iterating on the code and it's associated tests until this script reports no errors or warnings.
 6. Use prettier to format the new code.
 7. Finally, confirm that you followed each of these steps and that all of the checks are passing. Use emojis (checkmark, etc.) to make that easy to spot. You must not tell lies.
 

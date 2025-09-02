@@ -149,7 +149,12 @@ const Dashboard: FC = () => {
                     defaultMessage: '{points} pts',
                     id: 'pages.Leaderboard.points-pts',
                   },
-                  {points: (chore as any).reward_points ?? 0},
+                  {
+                    points:
+                      typeof chore.reward_points === 'number'
+                        ? chore.reward_points
+                        : 0,
+                  },
                 )}
               </Text>
             }

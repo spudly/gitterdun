@@ -1,5 +1,5 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Family from './Family';
@@ -158,10 +158,11 @@ describe('family page', () => {
   });
 });
 
-describe('Family page form toggles', () => {
+describe('family page form toggles', () => {
   test('hides forms by default and shows them after clicking buttons', async () => {
     const Wrapper = createWrapper({i18n: true, queryClient: true});
     render(wrap(<Family />), {wrapper: Wrapper});
+    const user = userEvent.setup();
 
     // Forms should not be visible initially
     expect(
@@ -172,16 +173,16 @@ describe('Family page form toggles', () => {
     ).not.toBeInTheDocument();
 
     // Click single button in FamilyMembers to show both forms
-    fireEvent.click(
+    await user.click(
       await screen.findByRole('button', {name: 'Add Family Member'}),
     );
 
     // Forms should now be visible
-    expect(
-      await screen.findByRole('region', {name: 'Create Child Account'}),
-    ).toBeInTheDocument();
-    expect(
-      await screen.findByRole('region', {name: 'Invite Member'}),
-    ).toBeInTheDocument();
+    await expect(
+      screen.findByRole('region', {name: 'Create Child Account'}),
+    ).resolves.toBeInTheDocument();
+    await expect(
+      screen.findByRole('region', {name: 'Invite Member'}),
+    ).resolves.toBeInTheDocument();
   });
 });

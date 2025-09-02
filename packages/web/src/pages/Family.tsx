@@ -44,7 +44,7 @@ const Family: FC = () => {
 
   useEffect(() => {
     const familyTz = family?.timezone;
-    if (familyTz && familyTz !== '') {
+    if (familyTz != null && familyTz !== '') {
       setSelectedTimezone(familyTz);
       return;
     }

@@ -3,7 +3,7 @@ import {act, render, screen} from '@testing-library/react';
 import {createWrapper} from '../test/createWrapper';
 import {UserMenuDrawer} from './UserMenuDrawer';
 
-describe('UserMenuDrawer animations', () => {
+describe('userMenuDrawer animations', () => {
   beforeEach(() => {
     jest.useFakeTimers();
   });
@@ -15,10 +15,10 @@ describe('UserMenuDrawer animations', () => {
     });
     const {rerender} = render(
       <UserMenuDrawer
-        open
-        username="User"
         onClose={() => {}}
         onLogout={() => {}}
+        open
+        username="User"
       />,
       {wrapper: Wrapper},
     );
@@ -29,10 +29,10 @@ describe('UserMenuDrawer animations', () => {
 
     rerender(
       <UserMenuDrawer
-        open={false}
-        username="User"
         onClose={() => {}}
         onLogout={() => {}}
+        open={false}
+        username="User"
       />,
     );
 
@@ -47,12 +47,12 @@ describe('UserMenuDrawer animations', () => {
       i18n: true,
       router: {initialEntries: ['/']},
     });
-    const {rerender} = render(
+    render(
       <UserMenuDrawer
-        open
-        username="User"
         onClose={() => {}}
         onLogout={() => {}}
+        open
+        username="User"
       />,
       {wrapper: Wrapper},
     );
@@ -70,10 +70,10 @@ describe('UserMenuDrawer animations', () => {
     });
     render(
       <UserMenuDrawer
-        open
-        username={null}
         onClose={() => {}}
         onLogout={() => {}}
+        open
+        username={null}
       />,
       {wrapper: Wrapper},
     );
@@ -90,10 +90,10 @@ describe('UserMenuDrawer animations', () => {
     });
     render(
       <UserMenuDrawer
-        open
-        username="User"
         onClose={() => {}}
         onLogout={() => {}}
+        open
+        username="User"
       />,
       {wrapper: Wrapper},
     );

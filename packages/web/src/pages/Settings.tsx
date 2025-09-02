@@ -1,10 +1,14 @@
 import type {FC} from 'react';
-import {FormattedMessage} from 'react-intl';
+import {FormattedMessage, useIntl} from 'react-intl';
+import {SETTINGS_LANGUAGES} from '../constants.js';
 import {isSupportedLocale} from '../i18n/messages/index.js';
 import {useI18n} from '../i18n/I18nProvider.js';
 
+// Message descriptors and native names moved to constants
+
 const Settings: FC = () => {
   const {locale, setLocale} = useI18n();
+  const intl = useIntl();
   return (
     <div className="w-full px-4 py-6 sm:px-6 lg:px-8">
       <h1 className="text-xl font-semibold">
@@ -35,11 +39,23 @@ const Settings: FC = () => {
                 }}
                 value={locale}
               >
-                <option value="en">English</option>
-                <option value="pirate">Pirate</option>
-                <option value="piglatin">Pig Latin</option>
-                <option value="fr">Français</option>
-                <option value="deseret">Deseret</option>
+                {SETTINGS_LANGUAGES.map(({id, nativeName, i18nMessage}) => {
+                  const intlName = intl.formatMessage(i18nMessage);
+                  return (
+                    <option key={id} value={id}>
+                      {nativeName}
+                      {nativeName !== intlName ? (
+                        <>
+                          {/* eslint-disable-next-line react/jsx-no-literals -- punctuation outside i18n */}
+                          {' ('}
+                          {intlName}
+                          {/* eslint-disable-next-line react/jsx-no-literals, react/jsx-curly-brace-presence -- punctuation outside i18n */}
+                          {')'}
+                        </>
+                      ) : null}
+                    </option>
+                  );
+                })}
               </select>
             </label>
           </div>
