@@ -1,6 +1,6 @@
 import {ChoreWithUsernameSchema, CountRowSchema} from '@gitterdun/shared';
 import {z} from 'zod';
-import db from '../lib/db';
+import {all, get} from './crud/db';
 import {buildChoresQuery} from './choreQueryBuilders';
 import {DEFAULT_CHORE_PAGINATION_LIMIT} from '../constants';
 
@@ -35,9 +35,33 @@ const getChoresCount = (query: string, params: Array<string | number>) => {
     /SELECT[\s\S]*?FROM/u,
     'SELECT COUNT(*) as count FROM',
   );
-  const totalRow = db.prepare(countQuery).get(...params);
+  const totalRow = get(countQuery, ...params);
   const {count: total} = CountRowSchema.parse(totalRow);
   return total;
+};
+
+const toTimestamp = (value: unknown): number | undefined => {
+  if (typeof value !== 'string' || value.length === 0) {
+    return undefined;
+  }
+  const parsed = Date.parse(value);
+  if (!Number.isNaN(parsed)) {
+    return parsed;
+  }
+  const candidate = `${value.replace(' ', 'T')}Z`;
+  const parsedCandidate = Date.parse(candidate);
+  if (!Number.isNaN(parsedCandidate)) {
+    return parsedCandidate;
+  }
+  return undefined;
+};
+
+const requireTimestamp = (value: unknown, fieldName: string): number => {
+  const ts = toTimestamp(value);
+  if (ts == null) {
+    throw new Error(`Invalid or missing timestamp for ${fieldName}`);
+  }
+  return ts;
 };
 
 const buildPaginatedChoresQuery = ({
@@ -56,8 +80,22 @@ const executeChoresQuery = (
   query: string,
   params: Array<string | number>,
 ): Array<ChoreWithUsername> => {
-  const chores = db.prepare(query).all(...params);
-  return chores.map(chore => ChoreWithUsernameSchema.parse(chore));
+  const chores = all(query, ...params);
+  return chores.map(raw => {
+    const base = raw as Record<string, unknown>;
+    const normalized = {
+      ...base,
+      // status omitted; derived elsewhere if needed
+      reward_points: base['reward_points'] ?? base['point_reward'] ?? 0,
+      start_date: toTimestamp(base['start_date']) ?? undefined,
+      due_date: toTimestamp(base['due_date']) ?? undefined,
+      recurrence_rule:
+        (base['recurrence_rule'] as string | null | undefined) ?? undefined,
+      created_at: requireTimestamp(base['created_at'], 'created_at'),
+      updated_at: requireTimestamp(base['updated_at'], 'updated_at'),
+    };
+    return ChoreWithUsernameSchema.parse(normalized);
+  });
 };
 
 const formatChoresResponse = ({

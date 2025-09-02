@@ -1,7 +1,14 @@
 import '@testing-library/jest-dom';
-
-// Polyfill TextEncoder/TextDecoder for jsdom environment (needed by react-router v7)
 import {TextEncoder, TextDecoder} from 'node:util';
+
+jest.mock('./src/globals', () => ({}));
+
+beforeEach(() => {
+  global.__TEST__ = true;
+  global.__ENV__ = 'test';
+  global.__DEV__ = false;
+  global.__PROD__ = true;
+});
 
 // Provide a minimal WHATWG Response polyfill for tests that construct `new Response(...)`
 if (typeof (globalThis as any).Response === 'undefined') {

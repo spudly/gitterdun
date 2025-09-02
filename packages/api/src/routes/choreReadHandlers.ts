@@ -10,6 +10,8 @@ import {
   handleGetChoreError,
 } from '../utils/choreErrorHandlers';
 import {fetchChoreById} from '../utils/choreCrud';
+import {requireUserId} from '../utils/auth';
+import {getUserFamily} from '../utils/familyOperations';
 
 // GET /api/chores - Get all chores
 export const handleGetChores = async (
@@ -19,10 +21,21 @@ export const handleGetChores = async (
   try {
     const {status, choreType, userId, page, limit} =
       parseChoresQueryRequest(req);
+    // Infer family_id from current user if available; fall back to parsed userId
+    let effectiveFamilyId: number | undefined;
+    try {
+      const currentUserId = requireUserId(req);
+      const family = getUserFamily(currentUserId);
+      if (family != null) {
+        effectiveFamilyId = family.id;
+      }
+    } catch {
+      // unauthenticated or no family; leave undefined to avoid filtering
+    }
     const response = processChoresRequest({
       status,
       choreType,
-      userId,
+      userId: effectiveFamilyId ?? userId,
       page,
       limit,
     });

@@ -57,19 +57,29 @@ export const handleErrorInstance = (
   );
 };
 
-export const handleError = (err: unknown, res: express.Response): void => {
-  logger.error({error: err}, 'Error');
+const SERVER_ERROR_MIN: number = StatusCodes.INTERNAL_SERVER_ERROR;
+const isServerErrorStatus = (code: number): boolean => code >= SERVER_ERROR_MIN;
 
+export const handleError = (err: unknown, res: express.Response): void => {
   if (err instanceof ZodError) {
+    // 400 level validation error: do not log
     sendZodErrorResponse(res, err);
     return;
   }
 
   if (err instanceof Error) {
+    const status =
+      (err as Error & {status?: number}).status
+      ?? StatusCodes.INTERNAL_SERVER_ERROR;
+    if (isServerErrorStatus(status)) {
+      logger.error({error: err}, 'Error');
+    }
     handleErrorInstance(err, res);
     return;
   }
 
+  // Unknown error: log and send 500
+  logger.error({error: err}, 'Error');
   sendErrorResponse(
     res,
     StatusCodes.INTERNAL_SERVER_ERROR,

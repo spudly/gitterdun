@@ -1,5 +1,7 @@
 import {describe, expect, jest, test} from '@jest/globals';
 
+jest.mock('./App', () => ({__esModule: true, App: () => null}));
+
 jest.mock('react-dom/client', () => {
   return {
     createRoot: jest.fn(() => ({render: jest.fn(), unmount: jest.fn()})),

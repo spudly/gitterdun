@@ -1,10 +1,13 @@
-import db from '../lib/db';
 import {sql} from './sql';
+import {run} from './crud/db';
 
 export const removeAllMembershipsForUser = (userId: number): void => {
-  db.prepare(sql`
-    DELETE FROM family_members
-    WHERE
-      user_id = ?
-  `).run(userId);
+  run(
+    sql`
+      DELETE FROM family_members
+      WHERE
+        user_id = ?
+    `,
+    userId,
+  );
 };

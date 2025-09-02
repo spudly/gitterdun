@@ -6,17 +6,20 @@ import {ProtectedRoute} from './ProtectedRoute.js';
 
 const Dashboard = lazy(async () => import('./pages/Dashboard'));
 const Chores = lazy(async () => import('./pages/Chores'));
-const Goals = lazy(async () => import('./pages/Goals'));
+const Settings = lazy(async () => import('./pages/Settings.js'));
 const Leaderboard = lazy(async () => import('./pages/Leaderboard'));
+const Profile = lazy(async () => import('./pages/Profile'));
 const Admin = lazy(async () => import('./pages/Admin'));
 const Login = lazy(async () => import('./pages/Login'));
 const ForgotPassword = lazy(async () => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(async () => import('./pages/ResetPassword'));
 const Register = lazy(async () => import('./pages/Register'));
 const Family = lazy(async () => import('./pages/Family'));
+const FamilyApprovals = lazy(async () => import('./pages/FamilyApprovals'));
 const AcceptInvitation = lazy(async () => import('./pages/AcceptInvitation'));
 const Demos = lazy(async () => import('./pages/Demos'));
 const Landing = lazy(async () => import('./pages/Landing'));
+const ChoreCreate = lazy(async () => import('./pages/ChoreCreate'));
 
 // moved to ProtectedRoute.tsx
 
@@ -45,10 +48,19 @@ export const Routes: FC = () => {
         <Route
           element={
             <ProtectedRoute>
-              <Goals />
+              <ChoreCreate />
             </ProtectedRoute>
           }
-          path="/goals"
+          path="/family/chores/new"
+        />
+
+        <Route
+          element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          }
+          path="/settings"
         />
 
         <Route
@@ -58,6 +70,15 @@ export const Routes: FC = () => {
             </ProtectedRoute>
           }
           path="/leaderboard"
+        />
+
+        <Route
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+          path="/profile"
         />
 
         <Route
@@ -84,6 +105,15 @@ export const Routes: FC = () => {
             </ProtectedRoute>
           }
           path="/family"
+        />
+
+        <Route
+          element={
+            <ProtectedRoute>
+              <FamilyApprovals />
+            </ProtectedRoute>
+          }
+          path="/family/approvals"
         />
 
         <Route element={<AcceptInvitation />} path="/accept-invitation" />

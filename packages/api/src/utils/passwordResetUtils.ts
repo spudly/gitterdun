@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import {IdRowSchema, PasswordResetRowSchema} from '@gitterdun/shared';
-import db from '../lib/db';
+import {get, run} from './crud/db';
 import {logger} from './logger';
 import {sql} from './sql';
 import {
@@ -13,26 +13,32 @@ import {
 const createPasswordResetToken = (userId: number) => {
   const token = crypto.randomBytes(SECURE_TOKEN_BYTES).toString('hex');
   const expiresAt = new Date(Date.now() + PASSWORD_RESET_EXPIRATION_MS);
-  db.prepare(sql`
-    INSERT INTO
-      password_resets (token, user_id, created_at, expires_at, used)
-    VALUES
-      (?, ?, CURRENT_TIMESTAMP, ?, 0)
-  `).run(token, userId, expiresAt.toISOString());
+  run(
+    sql`
+      INSERT INTO
+        password_resets (token, user_id, created_at, expires_at, used)
+      VALUES
+        (?, ?, CURRENT_TIMESTAMP, ?, 0)
+    `,
+    token,
+    userId,
+    expiresAt.toISOString(),
+  );
   return token;
 };
 
 export const findUserForReset = (email: string) => {
-  const row = db
-    .prepare(sql`
+  const row = get(
+    sql`
       SELECT
         id
       FROM
         users
       WHERE
         email = ?
-    `)
-    .get(email);
+    `,
+    email,
+  );
   return row === null ? undefined : IdRowSchema.parse(row);
 };
 
@@ -52,8 +58,8 @@ export const getSecuritySafeResponse = () => ({
 });
 
 const validatePasswordResetToken = (token: string) => {
-  const row = db
-    .prepare(sql`
+  const row = get(
+    sql`
       SELECT
         token,
         user_id,
@@ -63,8 +69,9 @@ const validatePasswordResetToken = (token: string) => {
         password_resets
       WHERE
         token = ?
-    `)
-    .get(token);
+    `,
+    token,
+  );
   const found = row === null ? undefined : PasswordResetRowSchema.parse(row);
 
   if (!found || found.used) {
@@ -83,20 +90,27 @@ export const resetUserPassword = async (
   token: string,
 ) => {
   const hashed = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
-  db.prepare(sql`
-    UPDATE users
-    SET
-      password_hash = ?
-    WHERE
-      id = ?
-  `).run(hashed, userId);
-  db.prepare(sql`
-    UPDATE password_resets
-    SET
-      used = 1
-    WHERE
-      token = ?
-  `).run(token);
+  run(
+    sql`
+      UPDATE users
+      SET
+        password_hash = ?
+      WHERE
+        id = ?
+    `,
+    hashed,
+    userId,
+  );
+  run(
+    sql`
+      UPDATE password_resets
+      SET
+        used = 1
+      WHERE
+        token = ?
+    `,
+    token,
+  );
 };
 
 export const validateResetToken = (token: string) => {

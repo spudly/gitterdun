@@ -92,15 +92,14 @@ describe('chore schemas', () => {
     const validChore = {
       id: 1,
       title: 'Take out trash',
-      point_reward: 10,
-      bonus_points: 0,
+      reward_points: 10,
       penalty_points: 0,
-      start_date: '2024-01-01T09:00:00.000Z',
+      start_date: Date.parse('2024-01-01T09:00:00.000Z'),
       chore_type: 'required',
-      status: 'pending',
+      // status omitted on core chore definition
       created_by: 1,
-      created_at: '2024-01-01T10:00:00.000Z',
-      updated_at: '2024-01-01T10:00:00.000Z',
+      created_at: Date.parse('2024-01-01T10:00:00.000Z'),
+      updated_at: Date.parse('2024-01-01T10:00:00.000Z'),
     };
 
     const result = ChoreSchema.safeParse(validChore);
@@ -111,44 +110,28 @@ describe('chore schemas', () => {
     const invalidChore = {
       id: 1,
       title: 'Take out trash',
-      point_reward: 10,
+      reward_points: 10,
       bonus_points: 0,
       penalty_points: 0,
       chore_type: 'invalid-type',
-      status: 'pending',
+      // status omitted on core chore definition
       created_by: 1,
-      created_at: '2024-01-01T10:00:00.000Z',
-      updated_at: '2024-01-01T10:00:00.000Z',
+      created_at: Date.parse('2024-01-01T10:00:00.000Z'),
+      updated_at: Date.parse('2024-01-01T10:00:00.000Z'),
     };
 
     const result = ChoreSchema.safeParse(invalidChore);
     expect(result.success).toBe(false);
   });
 
-  test('choreSchema should reject invalid status', () => {
-    const invalidChore = {
-      id: 1,
-      title: 'Take out trash',
-      point_reward: 10,
-      bonus_points: 0,
-      penalty_points: 0,
-      chore_type: 'required',
-      status: 'invalid-status',
-      created_by: 1,
-      created_at: '2024-01-01T10:00:00.000Z',
-      updated_at: '2024-01-01T10:00:00.000Z',
-    };
-
-    const result = ChoreSchema.safeParse(invalidChore);
-    expect(result.success).toBe(false);
-  });
+  // status is optional now; validation of invalid status is not applicable on chore definition
 
   test('createChoreSchema should apply defaults', () => {
     const validCreateChore = {
       title: 'New chore',
-      point_reward: 10,
-      start_date: '2024-01-01T09:00:00.000Z',
-      due_date: '2024-01-01T17:00:00.000Z',
+      reward_points: 10,
+      start_date: Date.parse('2024-01-01T09:00:00.000Z'),
+      due_date: Date.parse('2024-01-01T17:00:00.000Z'),
     };
 
     const result = CreateChoreSchema.safeParse(validCreateChore);
@@ -167,18 +150,13 @@ describe('chore schemas', () => {
   });
 
   test('updateChoreSchema should validate partial updates', () => {
-    const validUpdate = {title: 'Updated title', point_reward: 15};
+    const validUpdate = {title: 'Updated title', reward_points: 15};
 
     const result = UpdateChoreSchema.safeParse(validUpdate);
     expect(result.success).toBe(true);
   });
 
-  test('updateChoreSchema should reject invalid status', () => {
-    const invalidUpdate = {status: 'invalid-status'};
-
-    const result = UpdateChoreSchema.safeParse(invalidUpdate);
-    expect(result.success).toBe(false);
-  });
+  // updateChoreSchema no longer accepts status; test removed
 
   test('updateChoreSchema should reject invalid chore_type', () => {
     const invalidUpdate = {chore_type: 'invalid-type'};

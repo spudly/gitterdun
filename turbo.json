@@ -4,10 +4,14 @@
   "globalEnv": [
     "DB_PATH",
     "NODE_ENV",
+    "TEST_ENV",
     "PORT",
     "LOG_LEVEL",
+    "PINO_PRETTY",
+    "JEST_WORKER_ID",
     "CI",
-    "PLAYWRIGHT_SKIP_WEBSERVER"
+    "PLAYWRIGHT_SKIP_WEBSERVER",
+    "MODE"
   ],
   "tasks": {
     "build": {
@@ -28,7 +32,7 @@
       ],
       "outputs": ["coverage/**"]
     },
-    "dev": {"dependsOn": ["^build"], "cache": false, "persistent": true},
+    "start:dev": {"dependsOn": ["^build"], "cache": false, "persistent": true},
     "type-check": {"dependsOn": ["^build"], "cache": false},
     "//#prettier:check": {"cache": false},
     "//#knip": {

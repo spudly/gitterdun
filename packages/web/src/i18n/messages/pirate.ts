@@ -55,6 +55,10 @@ export default {
   'pages.Admin.access-denied': 'Ye Shall Not Pass',
   'pages.Admin.you-need-admin-privileges-to-v':
     'Only captains may tread these decks.',
+  'pages.Admin.create-chore': 'Forge Chore',
+  'pages.Admin.create': 'Forge',
+  'pages.Admin.title': 'Title',
+  'pages.Admin.bonus': 'Bonus',
   'pages.Chores.loading-chores': 'Swabbin’ the decks...',
 
   'pages.Chores.complete': 'Mark as Plundered',
@@ -111,6 +115,10 @@ export default {
   'pages.admin.AdminChoresManagement.approved': 'Blessed by the Captain',
   'pages.admin.AdminChoresManagement.pending': 'Awaitin’',
   'pages.admin.AdminChoresManagement.bonus': 'Bounty',
+  'pages.admin.AdminChoresManagement.assign': 'Assign',
+  'pages.admin.AdminChoresManagement.assign-chore': 'Assign Chore',
+  'pages.admin.AdminChoresManagement.assigned-to': 'Assigned to: {username}',
+  'pages.admin.AdminChoresManagement.assignee': 'Assignee',
   // AdminFamilyCreation (obsolete - removed)
   // AdminInvitations (obsolete - removed)
 

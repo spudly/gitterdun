@@ -1,7 +1,6 @@
 import type {FC} from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
-import {useEffect, useState} from 'react';
-import {useQuery} from '@tanstack/react-query';
+import {useEffect, useRef, useState} from 'react';
 import {familiesApi} from '../lib/api.js';
 import {PageContainer} from '../widgets/PageContainer.js';
 import {FormSection} from '../widgets/FormSection.js';
@@ -9,84 +8,68 @@ import {GridContainer} from '../widgets/GridContainer.js';
 import {Stack} from '../widgets/Stack.js';
 import {TextInput} from '../widgets/TextInput.js';
 import {Button} from '../widgets/Button.js';
-import {useUser} from '../hooks/useUser.js';
+import {useUser} from '../hooks/useUser';
 import {FamilyMembers} from './family/FamilyMembers.js';
-import {CreateChildForm} from './family/CreateChildForm.js';
-import {InviteMemberForm} from './family/InviteMemberForm.js';
-import {useFamilyMutations} from './family/useFamilyMutations.js';
+import {FamilyChores} from './family/FamilyChores.js';
+// forms now rendered inside FamilyMembers
+import {useFamilySetup} from './family/useFamilySetup.js';
+import {TypeaheadInput} from '../widgets/TypeaheadInput.js';
+import {FormField} from '../widgets/FormField.js';
+import {useToast} from '../widgets/ToastProvider.js';
 
-const useFamilySetup = () => {
-  const {user} = useUser();
-  const [selectedFamilyId, setSelectedFamilyId] = useState<number | null>(null);
-  const [newFamilyName, setNewFamilyName] = useState('');
-  const myFamilyQuery = useQuery({
-    queryKey: ['family', 'mine'],
-    queryFn: async () => familiesApi.myFamily(),
-    enabled: Boolean(user),
-  });
-  useEffect(() => {
-    const fam = myFamilyQuery.data?.data;
-    if (fam != null && selectedFamilyId == null) {
-      const candidate = (fam as {id?: unknown}).id;
-      if (typeof candidate === 'number') {
-        setSelectedFamilyId(candidate);
-      }
-    }
-  }, [myFamilyQuery.data?.data, selectedFamilyId]);
-  const membersQuery = useQuery({
-    queryKey: ['family', selectedFamilyId, 'members'],
-    queryFn: async () => {
-      if (selectedFamilyId == null) {
-        return {success: true, data: []};
-      }
-      return familiesApi.listMembers(selectedFamilyId);
-    },
-    enabled: selectedFamilyId != null,
-  });
-  const {createFamilyMutation, createChildMutation, inviteMutation} =
-    useFamilyMutations(myFamilyQuery, membersQuery);
-  const familyOptions = myFamilyQuery.data?.data
-    ? [myFamilyQuery.data.data]
-    : [];
-  return {
-    user,
-    selectedFamilyId,
-    newFamilyName,
-    setNewFamilyName,
-    createFamilyMutation,
-    createChildMutation,
-    inviteMutation,
-    familyOptions,
-    membersQuery,
-  };
-};
+// moved to ./family/useFamilySetup
 
 const Family: FC = () => {
   const intl = useIntl();
+  const {safeAsync} = useToast();
+  const {user} = useUser();
+  const initialUserRef = useRef(user);
+  const showLogin = initialUserRef.current == null;
+  // removed unused showLoginRef helper
+  // no messages used locally
   const {
-    user,
     selectedFamilyId,
     newFamilyName,
     setNewFamilyName,
     createFamilyMutation,
     createChildMutation,
     inviteMutation,
-    familyOptions,
+    family,
     membersQuery,
-  } = useFamilySetup();
+    myFamilyQuery,
+    tzQuery,
+  } = useFamilySetup(user ?? null);
 
-  if (!user) {
-    return (
-      <div>
-        <FormattedMessage
-          defaultMessage="Please log in to manage your family."
-          id="pages.Family.please-log-in-to-manage-your-f"
-        />
-      </div>
-    );
-  }
+  const [selectedTimezone, setSelectedTimezone] = useState<string>('UTC');
 
-  return (
+  useEffect(() => {
+    const familyTz = family?.timezone;
+    if (familyTz && familyTz !== '') {
+      setSelectedTimezone(familyTz);
+      return;
+    }
+    try {
+      const detected = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (typeof detected === 'string' && detected !== '') {
+        setSelectedTimezone(detected);
+      }
+    } catch {
+      // keep default
+    }
+  }, [family]);
+
+  // local add-member toggle moved into FamilyMembers
+
+  // user is guaranteed here
+
+  return showLogin ? (
+    <div>
+      <FormattedMessage
+        defaultMessage="Please log in to manage your family."
+        id="pages.Family.please-log-in-to-manage-your-f"
+      />
+    </div>
+  ) : (
     <PageContainer>
       <FormSection
         title={intl.formatMessage({
@@ -94,7 +77,7 @@ const Family: FC = () => {
           id: 'pages.Family.your-family',
         })}
       >
-        {familyOptions.length === 0 ? (
+        {family == null ? (
           <Stack gap="md">
             <div>
               <TextInput
@@ -124,6 +107,53 @@ const Family: FC = () => {
             </Button>
           </Stack>
         ) : null}
+        {family != null ? (
+          <Stack gap="md">
+            <div>
+              <FormField
+                htmlFor="family-timezone"
+                label={intl.formatMessage({
+                  defaultMessage: 'Timezone',
+                  id: 'pages.Family.timezone',
+                })}
+              >
+                <TypeaheadInput
+                  id="family-timezone"
+                  onChange={val => {
+                    setSelectedTimezone(val);
+                    const list = (tzQuery.data?.data ?? [
+                      'UTC',
+                    ]) as ReadonlyArray<string>;
+                    if (!list.includes(val)) {
+                      return; // don't persist until a valid option is selected
+                    }
+                    if (selectedFamilyId != null) {
+                      const run = safeAsync(
+                        async () => {
+                          await familiesApi.updateTimezone(selectedFamilyId, {
+                            timezone: val,
+                          });
+                          await myFamilyQuery.refetch();
+                        },
+                        intl.formatMessage({
+                          defaultMessage: 'Failed to update timezone',
+                          id: 'pages.Family.update-timezone-failed',
+                        }),
+                      );
+                      run();
+                    }
+                  }}
+                  options={tzQuery.data?.data ?? ['UTC']}
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Search timezone',
+                    id: 'pages.Family.search-timezone',
+                  })}
+                  value={selectedTimezone}
+                />
+              </FormField>
+            </div>
+          </Stack>
+        ) : null}
       </FormSection>
 
       {selectedFamilyId !== null ? (
@@ -134,20 +164,20 @@ const Family: FC = () => {
               id: 'pages.Family.members',
             })}
           >
-            <FamilyMembers membersData={membersQuery.data?.data} />
+            <FamilyMembers
+              handleCreateChild={createChildMutation.mutate}
+              handleInviteMember={inviteMutation.mutate}
+              membersData={membersQuery.data?.data}
+              selectedFamilyId={selectedFamilyId}
+            />
           </FormSection>
-
-          <FormSection>
-            <Stack gap="md">
-              <CreateChildForm
-                handleCreateChild={createChildMutation.mutate}
-                selectedFamilyId={selectedFamilyId}
-              />
-              <InviteMemberForm
-                handleInviteMember={inviteMutation.mutate}
-                selectedFamilyId={selectedFamilyId}
-              />
-            </Stack>
+          <FormSection
+            title={intl.formatMessage({
+              defaultMessage: 'Chores',
+              id: 'pages.Family.chores',
+            })}
+          >
+            <FamilyChores />
           </FormSection>
         </GridContainer>
       ) : null}

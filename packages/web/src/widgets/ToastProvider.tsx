@@ -122,8 +122,7 @@ export const ToastProvider: FC<{readonly children: ReactNode}> = ({
 export const useToast = (): ToastContextValue => {
   const ctx = useContext(ToastContext);
   if (!ctx) {
-    // Provide a safe no-op fallback during tests so components don't crash
-    if (process.env['NODE_ENV'] === 'test') {
+    if (__TEST__) {
       const addToast: ToastContextValue['addToast'] = () => {};
       const safeAsync: ToastContextValue['safeAsync'] = (
         fn,

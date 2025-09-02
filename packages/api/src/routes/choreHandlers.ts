@@ -6,3 +6,5 @@ export {
   handleDeleteChore,
   handleCompleteChore,
 } from './choreWriteHandlers';
+export {handleAssignChore, handleApproveChore} from './choreModerationHandlers';
+export {handleRejectChore} from './choreRejectHandler';

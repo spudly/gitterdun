@@ -3,6 +3,7 @@ import {render, screen, waitFor} from '@testing-library/react';
 import {FormattedMessage} from 'react-intl';
 
 import {I18nProvider, useI18n} from './I18nProvider';
+import {messages} from '../pages/Login';
 import en from './extracted/en.json';
 
 const TestComponent = () => {
@@ -102,17 +103,8 @@ describe('i18nProvider', () => {
 
   test('extracted en.json includes all Login page messages', () => {
     const keys = Object.keys(en);
-    const expected = [
-      'pages.Login.login',
-      'pages.Login.login-failed',
-      'pages.Login.email',
-      'pages.Login.password',
-      'pages.Login.logging-in',
-      'pages.Login.forgot-password',
-      'pages.Login.register',
-    ];
-    for (const id of expected) {
+    Object.entries(messages).forEach(([_key, {id}]) => {
       expect(keys).toContain(id);
-    }
+    });
   });
 });

@@ -4,6 +4,7 @@ import {
   CreateFamilySchema,
   CreateChildSchema,
   IdParamSchema,
+  UpdateFamilyTimezoneSchema,
 } from '@gitterdun/shared';
 import {requireUserId} from '../utils/auth';
 import {
@@ -17,6 +18,7 @@ import {
   checkUserExists,
   createChildUser,
   addChildToFamily,
+  updateFamilyTimezone,
 } from '../utils/familyOperations';
 
 // eslint-disable-next-line new-cap -- express.Router() is a factory function
@@ -27,8 +29,8 @@ const router = express.Router();
 // POST /api/families - create a family; creator becomes owner and parent member
 router.post('/', (req, res) => {
   const userId = requireUserId(req);
-  const {name} = CreateFamilySchema.parse(req.body);
-  const family = createFamily(name, userId);
+  const {name, timezone} = CreateFamilySchema.parse(req.body);
+  const family = createFamily(name, userId, timezone);
 
   res.status(StatusCodes.CREATED).json({success: true, data: family});
 });
@@ -86,3 +88,13 @@ router.get('/mine', (req, res) => {
 });
 
 export default router;
+
+// PUT /api/families/:id/timezone - update family timezone
+router.put('/:id/timezone', (req, res) => {
+  const userId = requireUserId(req);
+  const {id} = IdParamSchema.parse(req.params);
+  validateParentMembership(userId, id);
+  const {timezone} = UpdateFamilyTimezoneSchema.parse(req.body);
+  const updated = updateFamilyTimezone(id, timezone);
+  res.json({success: true, data: updated});
+});

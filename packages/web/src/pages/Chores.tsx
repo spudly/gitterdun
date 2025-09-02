@@ -1,77 +1,51 @@
 import type {FC} from 'react';
-import {useQuery} from '@tanstack/react-query';
-import type {ChoreWithUsername} from '@gitterdun/shared';
-import {choresApi} from '../lib/api.js';
-import {useUser} from '../hooks/useUser.js';
+import {useMemo, useState} from 'react';
+import {useQuery, useQueryClient} from '@tanstack/react-query';
+import {choreInstancesApi} from '../lib/api.js';
 import {PageContainer} from '../widgets/PageContainer.js';
 import {PageHeader} from '../widgets/PageHeader.js';
 import {List} from '../widgets/List.js';
 import {ListRow} from '../widgets/ListRow.js';
-import {StatusDot} from '../widgets/StatusDot.js';
-import {Badge} from '../widgets/Badge.js';
-import {InlineMeta} from '../widgets/InlineMeta.js';
+import {Checkbox} from '../widgets/Checkbox.js';
 import {Button} from '../widgets/Button.js';
 import {PageLoading} from '../widgets/PageLoading.js';
-import {defineMessages, FormattedMessage, useIntl} from 'react-intl';
+import {FormattedMessage, defineMessages, useIntl} from 'react-intl';
+import {useToast} from '../widgets/ToastProvider.js';
 
 const messages = defineMessages({
+  header: {defaultMessage: 'Chores', id: 'pages.ChoreInstances.header'},
   loading: {
     defaultMessage: 'Loading chores...',
-    id: 'pages.Chores.loading-chores',
+    id: 'pages.ChoreInstances.loading',
   },
-  header: {defaultMessage: 'Chores', id: 'pages.Chores.chores'},
-  statusCompleted: {
-    defaultMessage: 'Completed',
-    id: 'pages.admin.AdminChoresManagement.completed',
-  },
-  statusApproved: {
-    defaultMessage: 'Approved',
-    id: 'pages.admin.AdminChoresManagement.approved',
-  },
-  statusPending: {
-    defaultMessage: 'Pending',
-    id: 'pages.admin.AdminChoresManagement.pending',
-  },
-  pointsWithValue: {
-    defaultMessage: 'Points: {points}',
-    id: 'pages.admin.AdminChoresManagement.points-points',
-  },
-  bonusWithPoints: {
-    defaultMessage: 'Bonus: +{points}',
-    id: 'pages.admin.AdminChoresManagement.bonus-points',
-  },
-  penaltyWithPoints: {
-    defaultMessage: 'Penalty: -{points}',
-    id: 'pages.admin.AdminChoresManagement.penalty-points',
-  },
-  dueWithDate: {
-    defaultMessage: 'Due: {date}',
-    id: 'pages.admin.AdminChoresManagement.due-date',
-  },
-  complete: {defaultMessage: 'Complete', id: 'pages.Chores.complete'},
-  typeBonus: {
-    defaultMessage: 'Bonus',
-    id: 'pages.admin.AdminChoresManagement.bonus',
+  hideCompleted: {
+    defaultMessage: 'Hide completed',
+    id: 'pages.ChoreInstances.hide-completed',
   },
 });
 
 const Chores: FC = () => {
-  const {user} = useUser();
   const intl = useIntl();
-
-  const {data: choresResponse, isLoading} = useQuery({
-    queryKey: ['chores', user?.id],
-    queryFn: async () =>
-      choresApi.getAll({
-        user_id: user!.id,
-        status: 'pending',
-        sort_by: 'start_date',
-        order: 'asc',
-      }),
-    enabled: Boolean(user),
+  const {safeAsync} = useToast();
+  const queryClient = useQueryClient();
+  const [hideCompleted, setHideCompleted] = useState(true);
+  const {data: instancesResponse, isLoading} = useQuery({
+    queryKey: ['chore-instances', 'today'],
+    queryFn: async () => choreInstancesApi.listForDay({date: 'today'}),
   });
-
-  const chores = choresResponse?.data ?? [];
+  const allInstances = (instancesResponse?.data ?? []) as Array<{
+    chore_id: number;
+    title: string;
+    status: 'incomplete' | 'complete';
+    approval_status: 'unapproved' | 'approved' | 'rejected';
+    notes?: string;
+  }>;
+  const visibleInstances = useMemo(() => {
+    if (!hideCompleted) {
+      return allInstances;
+    }
+    return allInstances.filter(instance => instance.status !== 'complete');
+  }, [allInstances, hideCompleted]);
 
   if (isLoading) {
     return (
@@ -81,107 +55,77 @@ const Chores: FC = () => {
     );
   }
 
-  const renderStatusDot = (status: ChoreWithUsername['status']) => {
-    if (status === 'completed') {
-      return <StatusDot color="green" />;
-    }
-    if (status === 'approved') {
-      return <StatusDot color="blue" />;
-    }
-    return <StatusDot color="yellow" />;
-  };
-
-  const renderStatusText = (status: ChoreWithUsername['status']): string => {
-    if (status === 'completed') {
-      return intl.formatMessage(messages.statusCompleted);
-    }
-    if (status === 'approved') {
-      return intl.formatMessage(messages.statusApproved);
-    }
-    return intl.formatMessage(messages.statusPending);
-  };
-
+  // Render
   return (
     <PageContainer>
       <PageHeader title={intl.formatMessage(messages.header)} />
+      <div>
+        <Checkbox
+          checked={hideCompleted}
+          label={<FormattedMessage {...messages.hideCompleted} />}
+          onChange={checked => {
+            setHideCompleted(checked);
+          }}
+        />
+      </div>
 
-      <List>
-        {chores.map((chore: ChoreWithUsername) => (
-          <ListRow
-            description={chore.description}
-            key={chore.id}
-            left={renderStatusDot(chore.status)}
-            meta={
-              <InlineMeta>
-                <span>
-                  {intl.formatMessage(messages.pointsWithValue, {
-                    points: chore.point_reward,
-                  })}
-                </span>
-
-                {chore.bonus_points > 0 && (
-                  <span>
-                    {intl.formatMessage(messages.bonusWithPoints, {
-                      points: chore.bonus_points,
-                    })}
-                  </span>
-                )}
-
-                {chore.penalty_points > 0 && (
-                  <span>
-                    {intl.formatMessage(messages.penaltyWithPoints, {
-                      points: chore.penalty_points,
-                    })}
-                  </span>
-                )}
-
-                {typeof chore.due_date === 'string'
-                && chore.due_date.length > 0 ? (
-                  <span>
-                    {intl.formatMessage(messages.dueWithDate, {
-                      date: new Date(chore.due_date).toLocaleDateString(),
-                    })}
-                  </span>
-                ) : null}
-              </InlineMeta>
-            }
-            right={
-              chore.status === 'pending' ? (
-                <Button size="sm" variant="primary">
-                  <FormattedMessage {...messages.complete} />
-                </Button>
-              ) : chore.status === 'completed' ? (
-                <>
-                  <Button size="sm" variant="primary">
+      <div>
+        <List>
+          {visibleInstances.map(instance => (
+            <ListRow
+              key={`${instance.chore_id}`}
+              title={instance.title}
+              description={instance.notes}
+              right={
+                instance.status === 'complete' ? (
+                  <span className="text-green-700">✓</span>
+                ) : (
+                  <Button
+                    onClick={safeAsync(
+                      async () => {
+                        const today = new Date().toISOString();
+                        const payload: {
+                          chore_id: number;
+                          date: string;
+                          status?: 'incomplete' | 'complete';
+                          approval_status?:
+                            | 'unapproved'
+                            | 'approved'
+                            | 'rejected';
+                          notes?: string;
+                        } = {
+                          chore_id: instance.chore_id,
+                          date: today,
+                          status: 'complete',
+                          approval_status: instance.approval_status,
+                        };
+                        if (typeof instance.notes === 'string') {
+                          payload.notes = instance.notes;
+                        }
+                        await choreInstancesApi.upsert(payload);
+                        queryClient.invalidateQueries({
+                          queryKey: ['chore-instances'],
+                        });
+                      },
+                      intl.formatMessage({
+                        defaultMessage: 'Failed to complete chore',
+                        id: 'pages.ChoreInstances.complete-failed',
+                      }),
+                    )}
+                    size="sm"
+                    variant="ghost"
+                  >
                     <FormattedMessage
-                      defaultMessage="Approve"
-                      id="pages.admin.AdminChoresManagement.approve"
+                      defaultMessage="Complete"
+                      id="pages.ChoreInstances.complete"
                     />
                   </Button>
-                  <Button size="sm" variant="danger">
-                    <FormattedMessage
-                      defaultMessage="Reject"
-                      id="pages.admin.AdminChoresManagement.reject"
-                    />
-                  </Button>
-                </>
-              ) : undefined
-            }
-            title={chore.title}
-            titleRight={
-              <>
-                {renderStatusText(chore.status)}
-
-                {chore.chore_type === 'bonus' && (
-                  <Badge variant="purple">
-                    <FormattedMessage {...messages.typeBonus} />
-                  </Badge>
-                )}
-              </>
-            }
-          />
-        ))}
-      </List>
+                )
+              }
+            />
+          ))}
+        </List>
+      </div>
     </PageContainer>
   );
 };

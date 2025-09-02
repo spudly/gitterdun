@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS users (
   role TEXT NOT NULL DEFAULT 'user', -- 'admin' or 'user' (system-level; not family roles)
   points INTEGER DEFAULT 0,
   streak_count INTEGER DEFAULT 0,
+  display_name TEXT,
+  avatar_url TEXT,
   created_at datetime DEFAULT CURRENT_TIMESTAMP,
   updated_at datetime DEFAULT CURRENT_TIMESTAMP
 );
@@ -33,14 +35,13 @@ CREATE TABLE IF NOT EXISTS chores (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT NOT NULL,
   description TEXT,
-  point_reward INTEGER NOT NULL DEFAULT 0,
-  bonus_points INTEGER DEFAULT 0,
+  reward_points INTEGER,
   penalty_points INTEGER DEFAULT 0,
   start_date datetime,
   due_date datetime,
   recurrence_rule TEXT, -- iCalendar RFC 5545 format
   chore_type TEXT NOT NULL DEFAULT 'required', -- 'required' or 'bonus'
-  status TEXT NOT NULL DEFAULT 'pending', -- 'pending', 'completed', 'approved'
+  family_id INTEGER NOT NULL REFERENCES families (id) ON DELETE CASCADE,
   created_by INTEGER REFERENCES users (id),
   created_at datetime DEFAULT CURRENT_TIMESTAMP,
   updated_at datetime DEFAULT CURRENT_TIMESTAMP
@@ -129,8 +130,6 @@ CREATE TABLE IF NOT EXISTS notifications (
 );
 
 -- Create indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_chores_status ON chores (status);
-
 CREATE INDEX IF NOT EXISTS idx_chores_due_date ON chores (due_date);
 
 CREATE INDEX IF NOT EXISTS idx_chores_start_date ON chores (start_date);
@@ -150,7 +149,9 @@ CREATE TABLE IF NOT EXISTS families (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
   owner_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-  created_at datetime DEFAULT CURRENT_TIMESTAMP
+  timezone TEXT DEFAULT 'UTC',
+  created_at datetime DEFAULT CURRENT_TIMESTAMP,
+  updated_at datetime DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Membership of users within a family with family-specific roles
@@ -215,3 +216,22 @@ VALUES
     0,
     0
   );
+
+-- Chore instances table (per recurrence occurrence)
+CREATE TABLE IF NOT EXISTS chore_instances (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  chore_id INTEGER NOT NULL REFERENCES chores (id) ON DELETE CASCADE,
+  instance_date date NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('incomplete', 'complete')) DEFAULT 'incomplete',
+  approval_status TEXT NOT NULL CHECK (
+    approval_status IN ('unapproved', 'approved', 'rejected')
+  ) DEFAULT 'unapproved',
+  notes TEXT,
+  created_at datetime DEFAULT CURRENT_TIMESTAMP,
+  updated_at datetime DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (chore_id, instance_date)
+);
+
+CREATE INDEX IF NOT EXISTS idx_chore_instances_chore_id ON chore_instances (chore_id);
+
+CREATE INDEX IF NOT EXISTS idx_chore_instances_date ON chore_instances (instance_date);

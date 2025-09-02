@@ -13,19 +13,7 @@ type FilterResult = {queryAddition: string; param?: string | number};
 const getBaseChoresQuery = () => {
   return sql`
     SELECT
-      c.id,
-      c.title,
-      c.description,
-      c.point_reward,
-      c.bonus_points,
-      c.penalty_points,
-      c.due_date,
-      c.recurrence_rule,
-      c.chore_type,
-      c.status,
-      c.created_by,
-      c.created_at,
-      c.updated_at,
+      c.*,
       u.username AS created_by_username
     FROM
       chores c
@@ -35,10 +23,9 @@ const getBaseChoresQuery = () => {
   `;
 };
 
-const getStatusFilter = (status?: string): FilterResult => {
-  return status != null
-    ? {queryAddition: ' AND c.status = ?', param: status}
-    : {queryAddition: ''};
+// Status is no longer persisted on chores; compute from assignments when needed.
+const getStatusFilter = (_status?: string): FilterResult => {
+  return {queryAddition: ''};
 };
 
 const getChoreTypeFilter = (choreType?: string): FilterResult => {
@@ -47,13 +34,13 @@ const getChoreTypeFilter = (choreType?: string): FilterResult => {
     : {queryAddition: ''};
 };
 
-const getUserIdFilter = (userId?: number): FilterResult => {
-  return userId != null
-    ? {
-        queryAddition:
-          ' AND c.id IN (SELECT chore_id FROM chore_assignments WHERE user_id = ?)',
-        param: userId,
-      }
+const getUserIdFilter = (_userId?: number): FilterResult => ({
+  queryAddition: '',
+});
+
+const getFamilyFilter = (familyId?: number): FilterResult => {
+  return familyId != null
+    ? {queryAddition: ' AND c.family_id = ?', param: familyId}
     : {queryAddition: ''};
 };
 
@@ -64,12 +51,15 @@ const applyChoreFilters = (
   const statusFilter = getStatusFilter(status);
   const choreTypeFilter = getChoreTypeFilter(choreType);
   const userIdFilter = getUserIdFilter(userId);
+  // Interpret userId as the family id to filter chores by family
+  const familyFilter = getFamilyFilter(userId);
 
   let query =
     baseQuery
     + statusFilter.queryAddition
     + choreTypeFilter.queryAddition
-    + userIdFilter.queryAddition;
+    + userIdFilter.queryAddition
+    + familyFilter.queryAddition;
 
   if (sortBy) {
     const direction = order?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
@@ -81,6 +71,7 @@ const applyChoreFilters = (
     statusFilter.param,
     choreTypeFilter.param,
     userIdFilter.param,
+    familyFilter.param,
   ].filter(param => param !== undefined);
 
   return {query, params};

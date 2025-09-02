@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import db from '../../lib/db';
+import {get} from '../crud/db';
 import {sql} from '../sql';
 import {UserSchema} from '@gitterdun/shared';
 import {BCRYPT_SALT_ROUNDS} from '../../constants';
@@ -19,8 +19,8 @@ export const createNewUser = async ({
 }: CreateUserParams) => {
   const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
 
-  const result = db
-    .prepare(sql`
+  const result = get(
+    sql`
       INSERT INTO
         users (username, email, password_hash, role)
       VALUES
@@ -32,8 +32,12 @@ export const createNewUser = async ({
         streak_count,
         created_at,
         updated_at
-    `)
-    .get(username, email ?? null, passwordHash, role);
+    `,
+    username,
+    email ?? null,
+    passwordHash,
+    role,
+  );
 
   return UserSchema.parse(result);
 };

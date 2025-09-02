@@ -1,151 +1,94 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen} from '@testing-library/react';
+import {render, screen, fireEvent} from '@testing-library/react';
 import Chores from './Chores';
-import * as apiModule from '../lib/api';
 import {createWrapper} from '../test/createWrapper';
 
-jest.mock('../hooks/useUser', () => ({useUser: () => ({user: {id: 1}})}));
+const mockInvalidate = jest.fn();
+jest.mock('@tanstack/react-query', () => {
+  const actual = jest.requireActual('@tanstack/react-query');
+  return {
+    ...actual,
+    useQueryClient: () => ({invalidateQueries: mockInvalidate}),
+  };
+});
 
-jest.mock('../lib/api', () => ({
-  choresApi: {
-    getAll: jest.fn(async () => ({
-      success: true,
-      data: [
-        {
-          id: 1,
-          title: 'A',
-          description: 'd',
-          point_reward: 1,
-          bonus_points: 0,
-          penalty_points: 0,
-          chore_type: 'bonus',
-          status: 'completed',
-          created_by: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ],
-    })),
-  },
+jest.mock('../hooks/useUser', () => ({
+  useUser: jest.fn(() => ({user: {id: 1, role: 'user'}})),
 }));
+
+jest.mock('../lib/api', () => {
+  const upsert = jest.fn(async () => ({success: true}));
+  const listForDay = jest.fn(async () => ({
+    success: true,
+    data: [
+      {
+        chore_id: 1,
+        title: 'Take out trash',
+        status: 'incomplete',
+        approval_status: 'unapproved',
+        notes: '',
+      },
+      {
+        chore_id: 2,
+        title: 'Clean room',
+        status: 'complete',
+        approval_status: 'approved',
+        notes: 'done',
+      },
+    ],
+  }));
+  return {choreInstancesApi: {listForDay, upsert}};
+});
 
 describe('chores page', () => {
   test('renders header', async () => {
     render(<Chores />, {
-      wrapper: createWrapper({i18n: true, queryClient: true}),
+      wrapper: createWrapper({i18n: true, queryClient: true, router: true}),
     });
     await expect(screen.findByText('Chores')).resolves.toBeInTheDocument();
   });
 
-  test('renders approved and pending rows; shows Complete button for pending', async () => {
-    const mocked = jest.mocked(apiModule);
-    mocked.choresApi.getAll.mockResolvedValueOnce({
-      success: true,
-      data: [
-        {
-          id: 2,
-          title: 'B',
-          description: '',
-          point_reward: 2,
-          bonus_points: 1,
-          penalty_points: 0,
-          chore_type: 'regular',
-          status: 'approved',
-          created_by: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        {
-          id: 3,
-          title: 'C',
-          description: '',
-          point_reward: 3,
-          bonus_points: 0,
-          penalty_points: 0,
-          chore_type: 'regular',
-          status: 'pending',
-          created_by: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ],
-    });
+  test('defaults to hide completed and toggles to show', async () => {
     render(<Chores />, {
-      wrapper: createWrapper({i18n: true, queryClient: true}),
+      wrapper: createWrapper({i18n: true, queryClient: true, router: true}),
     });
+
     await expect(screen.findByText('Chores')).resolves.toBeInTheDocument();
-    // Approved row text
-    await expect(screen.findByText('Approved')).resolves.toBeInTheDocument();
-    // Pending row should show Complete button
-    await expect(
-      screen.findByRole('button', {name: 'Complete'}),
-    ).resolves.toBeInTheDocument();
-    // Meta shows points and bonus
-    await expect(screen.findByText('Points: 2')).resolves.toBeInTheDocument();
-    await expect(screen.findByText('Bonus: +1')).resolves.toBeInTheDocument();
+    expect(screen.getByText('Take out trash')).toBeInTheDocument();
+    expect(screen.queryByText('Clean room')).not.toBeInTheDocument();
+
+    const toggle = await screen.findByLabelText('Hide completed');
+    fireEvent.click(toggle);
+    await expect(screen.findByText('Clean room')).resolves.toBeInTheDocument();
   });
 
-  test('shows Approve/Reject for completed chores (user-level)', async () => {
-    const mocked = jest.mocked(apiModule);
-    mocked.choresApi.getAll.mockResolvedValueOnce({
-      success: true,
-      data: [
-        {
-          id: 5,
-          title: 'Completed Chore',
-          description: '',
-          point_reward: 5,
-          bonus_points: 1,
-          penalty_points: 0,
-          chore_type: 'bonus',
-          status: 'completed',
-          created_by: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ],
-    });
+  test('shows Complete button and calls upsert on click', async () => {
     render(<Chores />, {
-      wrapper: createWrapper({i18n: true, queryClient: true}),
+      wrapper: createWrapper({i18n: true, queryClient: true, router: true}),
     });
-
     await expect(screen.findByText('Chores')).resolves.toBeInTheDocument();
-    await expect(
-      screen.findByRole('button', {name: 'Approve'}),
-    ).resolves.toBeInTheDocument();
-    await expect(
-      screen.findByRole('button', {name: 'Reject'}),
-    ).resolves.toBeInTheDocument();
-    await expect(screen.findByText('Bonus: +1')).resolves.toBeInTheDocument();
+    const completeBtn = await screen.findByRole('button', {name: 'Complete'});
+    fireEvent.click(completeBtn);
+    const {choreInstancesApi} = require('../lib/api');
+    expect(choreInstancesApi.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        chore_id: 1,
+        status: 'complete',
+        date: expect.any(String),
+      }),
+    );
   });
 
-  test('renders penalty and due date meta when present', async () => {
-    const mocked = jest.mocked(apiModule);
-    mocked.choresApi.getAll.mockResolvedValueOnce({
-      success: true,
-      data: [
-        {
-          id: 4,
-          title: 'D',
-          description: '',
-          point_reward: 4,
-          bonus_points: 0,
-          penalty_points: 2,
-          chore_type: 'regular',
-          status: 'approved',
-          due_date: new Date().toISOString(),
-          created_by: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ],
-    });
+  test('invalidates chore-instances queries after completion', async () => {
     render(<Chores />, {
-      wrapper: createWrapper({i18n: true, queryClient: true}),
+      wrapper: createWrapper({i18n: true, queryClient: true, router: true}),
     });
-    await expect(screen.findByText('Chores')).resolves.toBeInTheDocument();
-    await expect(screen.findByText('Penalty: -2')).resolves.toBeInTheDocument();
-    // We don't assert the exact date string; just ensure the label appears
-    await expect(screen.findByText(/Due:/)).resolves.toBeInTheDocument();
+    const completeBtn = await screen.findByRole('button', {name: 'Complete'});
+    fireEvent.click(completeBtn);
+    // Wait a tick for async
+    await screen.findByText('Chores');
+    expect(mockInvalidate).toHaveBeenCalledWith({
+      queryKey: ['chore-instances'],
+    });
   });
 });

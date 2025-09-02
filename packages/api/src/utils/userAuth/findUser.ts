@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import db from '../../lib/db';
+import {get} from '../crud/db';
 import {sql} from '../sql';
 import {UserWithPasswordRowSchema} from '@gitterdun/shared';
 
@@ -8,8 +8,8 @@ type UserWithPasswordRow = z.infer<typeof UserWithPasswordRowSchema>;
 export const findUserByEmail = (
   email: string,
 ): UserWithPasswordRow | undefined => {
-  const userRow = db
-    .prepare(sql`
+  const userRow = get(
+    sql`
       SELECT
         id,
         username,
@@ -24,18 +24,20 @@ export const findUserByEmail = (
         users
       WHERE
         email = ?
-    `)
-    .get(email);
-  return userRow === null
-    ? undefined
-    : UserWithPasswordRowSchema.parse(userRow);
+    `,
+    email,
+  );
+  if (userRow == null) {
+    return undefined;
+  }
+  return UserWithPasswordRowSchema.parse(userRow);
 };
 
 export const findUserByUsername = (
   username: string,
 ): UserWithPasswordRow | undefined => {
-  const userRow = db
-    .prepare(sql`
+  const userRow = get(
+    sql`
       SELECT
         id,
         username,
@@ -50,9 +52,11 @@ export const findUserByUsername = (
         users
       WHERE
         username = ?
-    `)
-    .get(username);
-  return userRow === null
-    ? undefined
-    : UserWithPasswordRowSchema.parse(userRow);
+    `,
+    username,
+  );
+  if (userRow == null) {
+    return undefined;
+  }
+  return UserWithPasswordRowSchema.parse(userRow);
 };

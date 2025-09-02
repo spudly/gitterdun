@@ -24,5 +24,6 @@ module.exports = {
     '<rootDir>/src/**/*.(spec|test).(ts|tsx|js|jsx)',
   ],
   detectOpenHandles: true,
-  setupFilesAfterEnv: [path.join(__dirname, 'jest.setup.ts')],
+  setupFilesAfterEnv: [path.join(__dirname, 'jest.setup.afterEnv.ts')],
+  setupFiles: [path.join(__dirname, 'jest.setup.ts')],
 };

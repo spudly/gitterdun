@@ -10,13 +10,7 @@ jest.mock('../lib/api', () => {
     authApi: {
       me: jest.fn(async () => ({
         success: true,
-        data: {
-          id: 1,
-          username: 'u',
-          role: 'parent',
-          points: 0,
-          streak_count: 0,
-        },
+        data: {id: 1, username: 'u', role: 'user', points: 0, streak_count: 0},
       })),
       login: jest.fn(async () => ({
         success: true,
@@ -141,10 +135,10 @@ describe('useUser', () => {
         username: 'u',
         email: 'e@x.com',
         password: 'p',
-        role: 'parent',
+        role: 'user',
       });
     });
-    expect(spy).toHaveBeenCalledWith(expect.objectContaining({role: 'parent'}));
+    expect(spy).toHaveBeenCalledWith(expect.objectContaining({role: 'user'}));
     spy.mockRestore();
     expect(result.current.isRegistering).toBe(false);
   });

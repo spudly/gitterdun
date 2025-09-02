@@ -199,6 +199,51 @@ describe('errorHandler', () => {
         error: 'Internal server error',
       });
     });
+
+    test('should not log for ZodError (400)', () => {
+      const {logger} = jest.requireMock('../utils/logger') as {
+        logger: {error: jest.Mock};
+      };
+      const schema = z.object({name: z.string()});
+      let zodError: ZodError;
+      try {
+        schema.parse({name: 123});
+      } catch (error) {
+        zodError = error as ZodError;
+      }
+
+      handleError(zodError!, res as express.Response);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(statusMock).toHaveBeenCalledWith(400);
+    });
+
+    test('should not log for expected 401 errors', () => {
+      const {logger} = jest.requireMock('../utils/logger') as {
+        logger: {error: jest.Mock};
+      };
+      const error = new Error('Invalid credentials') as Error & {
+        status: number;
+      };
+      error.status = 401;
+
+      handleError(error, res as express.Response);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(statusMock).toHaveBeenCalledWith(401);
+    });
+
+    test('should log for 5xx errors', () => {
+      const {logger} = jest.requireMock('../utils/logger') as {
+        logger: {error: jest.Mock};
+      };
+      const error = new Error('Boom');
+
+      handleError(error, res as express.Response);
+
+      expect(logger.error).toHaveBeenCalledTimes(1);
+      expect(statusMock).toHaveBeenCalledWith(500);
+    });
   });
 
   describe('notFoundHandler', () => {

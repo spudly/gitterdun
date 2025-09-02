@@ -56,6 +56,17 @@ describe('leaderboard page', () => {
     expect(screen.getAllByText('U2').length).toBeGreaterThan(0);
   });
 
+  test('exposes test ids for e2e: leaderboard and members', async () => {
+    const Wrapper = createWrapper({i18n: true, queryClient: true});
+    render(wrap(<Leaderboard />), {wrapper: Wrapper});
+
+    const board = await screen.findByTestId('leaderboard');
+    expect(board).toBeInTheDocument();
+
+    const members = await screen.findAllByTestId('leaderboard-member');
+    expect(members.length).toBeGreaterThan(0);
+  });
+
   test('shows streak-based subtitle when sortBy is streak_count', async () => {
     const {leaderboardApi} = jest.mocked(apiModule);
     leaderboardApi.get.mockResolvedValueOnce({

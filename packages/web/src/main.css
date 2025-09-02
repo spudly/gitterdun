@@ -1,1 +1,9 @@
 @import 'tailwindcss';
+
+/* Prevent page-level scrolling; Layout provides the internal scroll area */
+html,
+body,
+#root {
+  height: 100vh;
+  overflow: hidden;
+}

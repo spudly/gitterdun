@@ -1,13 +1,17 @@
 import type {FC, ReactNode} from 'react';
-import {clsx} from 'clsx';
-import {Link, useLocation} from 'react-router-dom';
-import {FormattedMessage, useIntl} from 'react-intl';
+import {useState} from 'react';
+// no local state needed
+import {useLocation} from 'react-router-dom';
+import {useIntl} from 'react-intl';
 import type {MessageDescriptor} from 'react-intl';
-import {useI18n} from '../i18n/I18nProvider.js';
-import {FlameIcon, GearIcon, UserIcon} from './icons/index.js';
-import {LocaleSelector} from './LocaleSelector.js';
+import {UserIcon} from './icons/index.js';
+import {IconButton} from './IconButton.js';
+import {UserMenuDrawer} from './UserMenuDrawer.js';
+import {BottomNav} from './BottomNav.js';
 import {useUser} from '../hooks/useUser.js';
 import {useToast} from './ToastProvider.js';
+import {useQuery} from '@tanstack/react-query';
+import {familiesApi} from '../lib/api.js';
 
 export type NavigationItem = {
   message: MessageDescriptor;
@@ -23,156 +27,101 @@ type LayoutProps = {
 const Layout: FC<LayoutProps> = ({children, navigation}) => {
   const location = useLocation();
   const intl = useIntl();
-  const {locale, setLocale} = useI18n();
+  // locale controls moved to Settings page
   const {user, logout} = useUser();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const {safeAsync} = useToast();
-  const computedNavigation: Array<NavigationItem> = [
-    ...navigation,
-    ...(user?.role === 'admin'
-      ? [
-          {
-            message: {defaultMessage: 'Admin', id: 'layout.nav.admin'},
-            path: '/admin',
-            icon: <GearIcon size="sm" />,
-          },
-        ]
-      : []),
-  ];
+  const menuLabel = intl.formatMessage({
+    defaultMessage: 'Menu',
+    id: 'widgets.Layout.menu',
+  });
+  const computedNavigation: Array<NavigationItem> = [...navigation];
+  const {data: myFamily} = useQuery({
+    queryKey: ['family', 'mine', user?.id],
+    queryFn: async () => familiesApi.myFamily(),
+    enabled: Boolean(user),
+    staleTime: 60_000,
+  });
+  const familyId = (myFamily?.data as {id?: number} | null | undefined)?.id;
+  const {data: membersData} = useQuery({
+    queryKey: ['family', familyId, 'members'],
+    queryFn: async () => {
+      if (familyId == null) {
+        return {success: true, data: []} as const;
+      }
+      return familiesApi.listMembers(familyId);
+    },
+    enabled: familyId != null,
+    staleTime: 30_000,
+  });
+  const isParent = (() => {
+    if (user == null) {
+      return false;
+    }
+    const fam = myFamily?.data as {owner_id?: unknown} | null | undefined;
+    if (fam && typeof fam.owner_id === 'number' && fam.owner_id === user.id) {
+      return true;
+    }
+    const members = membersData?.data as
+      | ReadonlyArray<{user_id: number; role: string}>
+      | undefined;
+    if (!members) {
+      return false;
+    }
+    return members.some(
+      member => member.user_id === user.id && member.role === 'parent',
+    );
+  })();
+  if (isParent) {
+    computedNavigation.push({
+      message: {defaultMessage: 'Approvals', id: 'widgets.Layout.approvals'},
+      path: '/family/approvals',
+      icon: '✅',
+    });
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex h-screen flex-col bg-gray-50">
       {/* Header */}
-      <header className="flex justify-center border-b bg-white shadow-sm">
-        <div className="max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-indigo-600">
-                <FormattedMessage
-                  defaultMessage="Gitterdun"
-                  id="widgets.Layout.gitterdun"
-                />
-              </h1>
-
-              <span className="text-sm text-gray-500">
-                <FormattedMessage
-                  defaultMessage="Chore Wrangler"
-                  id="widgets.Layout.chore-wrangler"
-                />
-              </span>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">
-                  {intl.formatMessage({
-                    defaultMessage: 'Points',
-                    id: 'widgets.Layout.points',
-                  })}
-                </span>
-
-                <span className="font-semibold text-indigo-600">
-                  {user?.points ?? 0}
-                </span>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">
-                  {intl.formatMessage({
-                    defaultMessage: 'Streak',
-                    id: 'widgets.Layout.streak',
-                  })}
-                </span>
-
-                <span className="flex flex-nowrap items-center gap-2 font-semibold text-orange-500">
-                  {user?.streak_count ?? 0} <FlameIcon size="sm" />
-                </span>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <span aria-hidden className="text-sm text-gray-400">
-                  <UserIcon size="sm" />
-                </span>
-
-                <span className="text-sm font-medium text-gray-700">
-                  {user?.username
-                    ?? intl.formatMessage({
-                      defaultMessage: 'User',
-                      id: 'widgets.Layout.user',
-                    })}
-                </span>
-              </div>
-
-              <div className="flex items-center">
-                <LocaleSelector
-                  onChange={value => {
-                    setLocale(value);
-                  }}
-                  value={locale}
-                />
-              </div>
-
-              {user ? (
-                <button
-                  className="rounded border px-2 py-1 text-sm text-red-600"
-                  // TODO: handle promise rejection
-                  onClick={safeAsync(async () => {
-                    await logout();
-                  }, 'Unable to log out. Please try again.')}
-                  type="button"
-                >
-                  <FormattedMessage
-                    defaultMessage="Logout"
-                    id="widgets.Layout.logout"
-                  />
-                </button>
-              ) : (
-                <Link className="text-sm text-indigo-600" to="/login">
-                  <FormattedMessage
-                    defaultMessage="Login"
-                    id="widgets.Layout.login"
-                  />
-                </Link>
-              )}
-            </div>
-          </div>
-        </div>
+      <header className="flex items-center justify-end border-b bg-white px-4 py-3 shadow-sm">
+        <IconButton
+          aria-label={intl.formatMessage({
+            defaultMessage: 'User Menu',
+            id: 'widgets.Layout.userMenu',
+          })}
+          icon={<UserIcon size="sm" />}
+          label={intl.formatMessage({
+            defaultMessage: 'User Menu',
+            id: 'widgets.Layout.userMenu',
+          })}
+          onClick={() => {
+            setUserMenuOpen(true);
+          }}
+          variant="ghost"
+        >
+          User
+        </IconButton>
+        <UserMenuDrawer
+          onClose={() => {
+            setUserMenuOpen(false);
+          }}
+          onLogout={safeAsync(async () => {
+            await logout();
+          }, 'Unable to log out. Please try again.')}
+          open={userMenuOpen}
+          username={user?.username}
+        />
       </header>
 
-      <div className="flex justify-center">
-        <div className="max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <div className="flex space-x-8">
-            {/* Sidebar Navigation */}
-            <div className="w-64 shrink-0">
-              <nav className="space-y-1">
-                {computedNavigation.map(item => {
-                  const isActive = location.pathname === item.path;
-                  return (
-                    <Link
-                      className={clsx(
-                        'group flex w-full items-center gap-3 border-l-4 px-3 py-2 text-sm font-medium transition-colors duration-200',
-                        isActive
-                          ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                          : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                      )}
-                      key={item.path}
-                      to={item.path}
-                    >
-                      <span className="shrink-0 text-lg">{item.icon}</span>
+      <main className="flex-1 overflow-auto">{children}</main>
 
-                      <span>
-                        <FormattedMessage {...item.message} />
-                      </span>
-                    </Link>
-                  );
-                })}
-              </nav>
-            </div>
-
-            {/* Main Content */}
-            <div className="flex-1">{children}</div>
-          </div>
-        </div>
-      </div>
+      <footer>
+        <BottomNav
+          ariaLabel={menuLabel}
+          currentPath={location.pathname}
+          items={computedNavigation}
+        />
+      </footer>
     </div>
   );
 };

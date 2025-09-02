@@ -6,7 +6,24 @@ import {
   afterEach,
   jest,
 } from '@jest/globals';
-import {withProperties} from '@gitterdun/shared';
+
+// Local minimal withProperties helper for env mutations
+const withProperties = async (
+  obj: Record<string, unknown>,
+  props: Record<string, unknown>,
+  fn: () => Promise<void> | void,
+): Promise<void> => {
+  const original: Record<string, unknown> = {};
+  for (const key of Object.keys(props)) {
+    original[key] = obj[key];
+  }
+  Object.assign(obj, props);
+  try {
+    await fn();
+  } finally {
+    Object.assign(obj, original);
+  }
+};
 
 // Mock pino before importing
 const mockPino = jest.fn();
@@ -18,6 +35,7 @@ describe('logger module', () => {
     jest.resetModules();
     delete process.env['LOG_LEVEL'];
     delete process.env['NODE_ENV'];
+    delete process.env['TEST_ENV'];
   });
 
   afterEach(() => {
@@ -49,22 +67,25 @@ describe('logger module', () => {
     expect.hasAssertions();
   });
 
-  test('should add pretty transport in development', async () => {
-    await withProperties(process.env, {NODE_ENV: 'development'}, async () => {
-      const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
-      mockPino.mockReturnValue(mockLoggerInstance);
+  test.each(['development', 'test'])(
+    'should add pretty transport when NODE_ENV is %s',
+    async nodeEnv => {
+      await withProperties(process.env, {NODE_ENV: nodeEnv}, async () => {
+        const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
+        mockPino.mockReturnValue(mockLoggerInstance);
 
-      await import('./logger');
+        await import('./logger');
 
-      expect(mockPino).toHaveBeenCalledWith(
-        expect.objectContaining({
-          level: 'info',
-          transport: expect.objectContaining({target: 'pino-pretty'}),
-        }),
-      );
-    });
-    expect.hasAssertions();
-  });
+        expect(mockPino).toHaveBeenCalledWith(
+          expect.objectContaining({
+            level: 'info',
+            transport: expect.objectContaining({target: 'pino-pretty'}),
+          }),
+        );
+      });
+      expect.hasAssertions();
+    },
+  );
 
   test('should not add transport in production', async () => {
     await withProperties(process.env, {NODE_ENV: 'production'}, async () => {
@@ -80,7 +101,7 @@ describe('logger module', () => {
     expect.hasAssertions();
   });
 
-  test('should not add transport when NODE_ENV is undefined', async () => {
+  test('should add transport when NODE_ENV is undefined (non-production)', async () => {
     // NODE_ENV is already deleted in beforeEach
     const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
     mockPino.mockReturnValue(mockLoggerInstance);
@@ -88,7 +109,10 @@ describe('logger module', () => {
     await import('./logger');
 
     expect(mockPino).toHaveBeenCalledWith(
-      expect.objectContaining({level: 'info'}),
+      expect.objectContaining({
+        level: 'info',
+        transport: expect.objectContaining({target: 'pino-pretty'}),
+      }),
     );
   });
 
@@ -101,7 +125,53 @@ describe('logger module', () => {
     expect(logger).toBe(mockLoggerInstance);
   });
 
-  test('ensures tests end with an expectation (placeholder)', () => {
-    expect(true).toBe(true);
+  test('uses silent level when TEST_ENV=jest', async () => {
+    await withProperties(
+      process.env,
+      {NODE_ENV: 'test', TEST_ENV: 'jest'},
+      async () => {
+        const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
+        mockPino.mockReturnValue(mockLoggerInstance);
+
+        await import('./logger');
+
+        expect(mockPino).toHaveBeenCalledWith(
+          expect.objectContaining({level: 'silent'}),
+        );
+      },
+    );
+    expect.hasAssertions();
+  });
+
+  test('does not use silent level under Playwright tests env (NODE_ENV=test only)', async () => {
+    await withProperties(process.env, {NODE_ENV: 'test'}, async () => {
+      const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
+      mockPino.mockReturnValue(mockLoggerInstance);
+
+      await import('./logger');
+
+      expect(mockPino).toHaveBeenCalledWith(
+        expect.objectContaining({level: 'info'}),
+      );
+    });
+    expect.hasAssertions();
+  });
+
+  test('pretty transport uses concise translateTime', async () => {
+    await withProperties(process.env, {NODE_ENV: 'development'}, async () => {
+      const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
+      mockPino.mockReturnValue(mockLoggerInstance);
+
+      await import('./logger');
+
+      expect(mockPino).toHaveBeenCalledWith(
+        expect.objectContaining({
+          transport: expect.objectContaining({
+            options: expect.objectContaining({translateTime: 'HH:MM:ss'}),
+          }),
+        }),
+      );
+    });
+    expect.hasAssertions();
   });
 });
