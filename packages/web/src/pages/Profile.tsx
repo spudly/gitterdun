@@ -65,17 +65,15 @@ const Profile: FC = () => {
     )();
   };
 
-  const onDelete = () => {
-    safeAsync(
-      async () => {
-        await usersApi.deleteMe();
-      },
-      intl.formatMessage({
-        defaultMessage: 'Unable to delete account',
-        id: 'pages.Profile.delete-error',
-      }),
-    )();
-  };
+  const onDelete = safeAsync(
+    async () => {
+      await usersApi.deleteMe();
+    },
+    intl.formatMessage({
+      defaultMessage: 'Unable to delete account',
+      id: 'pages.Profile.delete-error',
+    }),
+  );
 
   if (isLoading || error) {
     return null; // TODO: loading spinner? error message? suspense maybe?

@@ -103,9 +103,6 @@ export const ChoresCreatePageContainer: FC<Props> = ({
       setStartError(null);
       setDueError(null);
       const {startTs, dueTs} = validateDates();
-      if (startTs === undefined || dueTs === undefined) {
-        throw new Error('validation');
-      }
       const payload = buildPayload(startTs, dueTs);
       return choresApi.create(payload);
     },
