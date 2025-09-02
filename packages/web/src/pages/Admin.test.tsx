@@ -1,5 +1,5 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import {createWrapper} from '../test/createWrapper';
 import Admin from './Admin';
 
@@ -68,7 +68,7 @@ describe('admin page', () => {
   });
 
   test('denies access for non-admin users', () => {
-    const mocked = jest.requireMock('../hooks/useUser') as {useUser: any};
+    const mocked = jest.requireMock('../hooks/useUser');
     const useUserMock: any = mocked.useUser;
     useUserMock.mockReturnValueOnce({
       user: {
@@ -111,7 +111,7 @@ describe('admin page', () => {
   });
 
   test('denies access for unauthenticated users', () => {
-    const mocked = jest.requireMock('../hooks/useUser') as {useUser: any};
+    const mocked = jest.requireMock('../hooks/useUser');
     const useUserMock: any = mocked.useUser;
     useUserMock.mockReturnValueOnce({
       user: null,

@@ -3,7 +3,6 @@ import {QueryClient} from '@tanstack/react-query';
 import {render, screen} from '@testing-library/react';
 import {createWrapper} from '../../test/createWrapper';
 import Family from '../Family';
-import * as apiModule from '../../lib/api';
 
 jest.mock('../../hooks/useUser', () => ({
   useUser: jest.fn(() => ({user: {id: 1, role: 'user'}})),
@@ -45,7 +44,7 @@ jest.mock('../../lib/api', () => {
   };
 });
 
-describe('Family page chores management', () => {
+describe('family page chores management', () => {
   test('shows a Chores section with Add Chore link for family owner', async () => {
     const client = new QueryClient();
     client.setQueryData(['family', 'mine', 1], {

@@ -1,4 +1,4 @@
-import {describe, expect, jest, test} from '@jest/globals';
+import {beforeEach, describe, expect, jest, test} from '@jest/globals';
 import db from '../../../lib/db';
 import {findUserByEmail, findUserByUsername} from '../findUser';
 

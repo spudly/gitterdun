@@ -2,9 +2,10 @@ import {beforeAll, describe, expect, jest, test} from '@jest/globals';
 import {render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {createWrapper} from '../test/createWrapper';
+import {z as zod} from 'zod';
 
 import Layout from './Layout';
-import type {User} from '@gitterdun/shared';
+import type {FamilyMember, FamilySchema, User} from '@gitterdun/shared';
 
 const mockUser: User = {
   id: 1,
@@ -68,14 +69,14 @@ describe('layout', () => {
 
   test('does not show Approvals link for non-parents', async () => {
     mockUserState = {...mockUser, id: 2};
-    const {familiesApi} = require('../lib/api');
+    const {familiesApi} = jest.mocked(await import('../lib/api'));
     familiesApi.myFamily.mockResolvedValue({
       success: true,
-      data: {id: 1, owner_id: 1},
+      data: {id: 1, owner_id: 1} as zod.infer<typeof FamilySchema>,
     });
     familiesApi.listMembers.mockResolvedValue({
       success: true,
-      data: [{user_id: 2, role: 'child'}],
+      data: [{user_id: 2, role: 'child'} as FamilyMember],
     });
     const Wrapper = createWrapper({
       i18n: true,
@@ -157,8 +158,9 @@ describe('layout', () => {
 
     const bottomNav = screen.getByRole('navigation', {name: /menu/i});
     expect(bottomNav).toBeInTheDocument();
-    const {getByRole} = within(bottomNav);
-    expect(getByRole('link', {name: /dashboard/i})).toBeInTheDocument();
+    expect(
+      within(bottomNav).getByRole('link', {name: /dashboard/i}),
+    ).toBeInTheDocument();
   });
 
   test('shows a language selector control in the header', () => {

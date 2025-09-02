@@ -6,9 +6,11 @@ import {PageContainer} from '../widgets/PageContainer.js';
 import {PageHeader} from '../widgets/PageHeader.js';
 import {ChoresCreatePageContainer} from './chores/ChoresCreatePageContainer.js';
 import {useNavigate} from 'react-router-dom';
+import {useToast} from '../widgets/ToastProvider.js';
 
 const ChoreCreate: FC = () => {
   const {user} = useUser();
+  const {safeAsync} = useToast();
   const navigate = useNavigate();
   const {data: myFamily} = useQuery({
     queryKey: ['family', 'mine', user?.id],
@@ -41,9 +43,18 @@ const ChoreCreate: FC = () => {
       <PageHeader title="Add Chore" />
       <div className="rounded bg-white p-4 shadow">
         <ChoresCreatePageContainer
-          onCancel={() => navigate('/family')}
-          members={(membersData?.data as any) ?? []}
-          userId={user!.id}
+          members={
+            Array.isArray(membersData?.data)
+              ? membersData.data.map(member => ({
+                  user_id: member.user_id,
+                  username: member.username,
+                }))
+              : []
+          }
+          onCancel={safeAsync(async () => {
+            await navigate('/family');
+          }, 'Unable to navigate')}
+          userId={typeof user?.id === 'number' ? user.id : 0}
         />
       </div>
     </PageContainer>

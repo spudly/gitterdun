@@ -11,9 +11,9 @@ const collectConfiguredRuleNames = (ruleConfigs: typeof RULES) => {
   return Object.keys(ruleConfigs).sort();
 };
 
-const isDeprecated = (name: string, rule: Rule): boolean => {
+const isDeprecated = (_name: string, rule: Rule): boolean => {
   const isObjectOrFunction =
-    (typeof rule === 'object' || typeof rule === 'function') && rule !== null;
+    typeof rule === 'object' || typeof rule === 'function';
   if (!isObjectOrFunction) {
     return false;
   }
@@ -21,7 +21,7 @@ const isDeprecated = (name: string, rule: Rule): boolean => {
     return false;
   }
   const {meta} = rule as {meta?: {deprecated?: boolean}};
-  return Boolean(meta?.deprecated) === true;
+  return Boolean(meta?.deprecated);
 };
 
 const collectAvailableRules = (plugins: Record<string, ESLint.Plugin>) => {
@@ -44,7 +44,7 @@ const collectAvailableRules = (plugins: Record<string, ESLint.Plugin>) => {
 const collectCoreRules = () => {
   const available = new Set<string>();
   const deprecated = new Set<string>();
-  // eslint-disable-next-line import/no-deprecated -- no alternative
+  // eslint-disable-next-line import/no-deprecated, ts/no-deprecated -- no alternative
   for (const [name, ruleObj] of builtinRules.entries()) {
     if (isDeprecated(name, ruleObj)) {
       deprecated.add(name);

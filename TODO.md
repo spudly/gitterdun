@@ -50,3 +50,5 @@
 - [ ] Feature: disallow late chores
 - [ ] Feature: late penalty
 - [ ] add date-fns
+- [ ] remove build step from api package
+- [ ] fix eslint config issue where rules get disabled inadvertently

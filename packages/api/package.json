@@ -7,7 +7,7 @@
     "start:dev": "NODE_ENV=development nodemon --exec tsx src/server.ts",
     "start:test": "NODE_ENV=test TEST_ENV=playwright nodemon --exec tsx src/server.ts",
     "prebuild": "rm -rf dist; rm -f tsconfig.build.tsbuildinfo",
-    "type-check": "tsc",
+    "check:types": "tsc",
     "build": "tsc -p tsconfig.build.json",
     "start": "NODE_ENV=production node dist/server.js",
     "test": "jest",

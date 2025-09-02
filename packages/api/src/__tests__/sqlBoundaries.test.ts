@@ -6,7 +6,7 @@ const SRC_DIR = __dirname.replace(/\/__tests__$/u, '');
 
 const shouldIgnore = (filePath: string) => {
   // Allow SQL only in utils/crud files, and ignore test files
-  return /\/utils\/crud\//.test(filePath) || /\/__tests__\//.test(filePath);
+  return filePath.includes('/utils/crud/') || filePath.includes('/__tests__/');
 };
 
 const getAllSourceFiles = (dir: string): Array<string> => {
@@ -30,7 +30,7 @@ describe('sql-boundaries', () => {
   });
 });
 
-describe('SQL boundary enforcement', () => {
+describe('sQL boundary enforcement', () => {
   test('no db.prepare calls outside utils/crud', () => {
     const files = getAllSourceFiles(SRC_DIR);
     const offenders = files

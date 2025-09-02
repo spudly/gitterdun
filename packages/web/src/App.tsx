@@ -22,6 +22,7 @@ export const App: FC = () => (
     </I18nProvider>
     {__ENV__ === 'development' ? (
       <>
+        {/* eslint-disable-next-line react/jsx-no-literals -- devtools styles */}
         <style>{`.tsqd-open-btn-container{ transform: translateY(-50px); }`}</style>
         <ReactQueryDevtools initialIsOpen={false} />
       </>

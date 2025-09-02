@@ -2,7 +2,7 @@ import type {FC, ReactNode} from 'react';
 import {useState} from 'react';
 // no local state needed
 import {useLocation} from 'react-router-dom';
-import {useIntl} from 'react-intl';
+import {FormattedMessage, useIntl} from 'react-intl';
 import type {MessageDescriptor} from 'react-intl';
 import {UserIcon} from './icons/index.js';
 import {IconButton} from './IconButton.js';
@@ -94,17 +94,19 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
             defaultMessage: 'User Menu',
             id: 'widgets.Layout.userMenu',
           })}
-          onClick={() => {
+          onClick={safeAsync(async () => {
             setUserMenuOpen(true);
-          }}
+          }, 'Unable to open menu')}
           variant="ghost"
         >
-          User
+          <span>
+            <FormattedMessage defaultMessage="User" id="widgets.Layout.user" />
+          </span>
         </IconButton>
         <UserMenuDrawer
-          onClose={() => {
+          onClose={safeAsync(async () => {
             setUserMenuOpen(false);
-          }}
+          }, 'Unable to close menu')}
           onLogout={safeAsync(async () => {
             await logout();
           }, 'Unable to log out. Please try again.')}

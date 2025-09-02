@@ -1,7 +1,7 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {createWrapper} from '../test/createWrapper';
-import * as apiModule from '../lib/api';
 
 jest.mock('../hooks/useUser', () => ({
   useUser: jest.fn(() => ({user: {id: 1, role: 'user'}})),
@@ -36,6 +36,7 @@ jest.mock('../lib/api', () => {
 describe('/chores page - chore instances list', () => {
   test('defaults to hide completed and can toggle to show', async () => {
     const Page = (await import('./Chores')).default; // will render instances list now
+    const user = userEvent.setup();
     render(<Page />, {
       wrapper: createWrapper({i18n: true, queryClient: true, router: true}),
     });
@@ -49,8 +50,8 @@ describe('/chores page - chore instances list', () => {
 
     // Toggle to show completed
     const toggle = screen.getByLabelText('Hide completed');
-    fireEvent.click(toggle);
+    await user.click(toggle);
 
-    expect(await screen.findByText('Clean room')).toBeInTheDocument();
+    await expect(screen.findByText('Clean room')).resolves.toBeInTheDocument();
   });
 });

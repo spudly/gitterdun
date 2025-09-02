@@ -2,11 +2,10 @@
   "name": "@gitterdun/web",
   "version": "0.1.0",
   "private": true,
-  "main": "dist/index.js",
   "scripts": {
     "start:dev": "vite",
     "prebuild": "rm -rf dist; rm -f tsconfig.build.tsbuildinfo; npm run i18n:extract",
-    "type-check": "tsc",
+    "check:types": "tsc",
     "build": "tsc -p tsconfig.build.json && vite build",
     "preview": "vite preview",
     "format": "prettier --write .",

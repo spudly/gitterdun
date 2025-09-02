@@ -21,6 +21,8 @@ export const TypeaheadInput: FC<TypeaheadInputProps> = ({
   error,
   onChange,
 }) => {
+  const MAX_SUGGESTIONS_WHEN_EMPTY = 20;
+  const MAX_SUGGESTIONS_WHEN_FILTERED = 50;
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState(value);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -39,18 +41,20 @@ export const TypeaheadInput: FC<TypeaheadInputProps> = ({
       }
     };
     window.addEventListener('click', handleClick);
-    return () => window.removeEventListener('click', handleClick);
+    return () => {
+      window.removeEventListener('click', handleClick);
+    };
   }, []);
 
   const filtered = useMemo(() => {
     const search = query.trim().toLowerCase();
     if (search === '') {
       // Limit the initial list to avoid giant popover
-      return options.slice(0, 20);
+      return options.slice(0, MAX_SUGGESTIONS_WHEN_EMPTY);
     }
     return options
       .filter(option => option.toLowerCase().includes(search))
-      .slice(0, 50);
+      .slice(0, MAX_SUGGESTIONS_WHEN_FILTERED);
   }, [options, query]);
 
   const baseInput =
@@ -62,21 +66,23 @@ export const TypeaheadInput: FC<TypeaheadInputProps> = ({
   );
 
   return (
-    <div ref={containerRef} className="relative">
+    <div className="relative" ref={containerRef}>
       <input
-        id={id}
         aria-autocomplete="list"
+        aria-controls={id != null && id !== '' ? `${id}-listbox` : undefined}
         aria-expanded={isOpen}
-        aria-controls={id ? `${id}-listbox` : undefined}
         className={inputCls}
         disabled={disabled}
+        id={id}
         onChange={(evt: ChangeEvent<HTMLInputElement>) => {
           const next = evt.target.value;
           setQuery(next);
           setIsOpen(true);
           onChange?.(next);
         }}
-        onFocus={() => setIsOpen(true)}
+        onFocus={() => {
+          setIsOpen(true);
+        }}
         placeholder={placeholder}
         role="combobox"
         type="text"
@@ -85,8 +91,8 @@ export const TypeaheadInput: FC<TypeaheadInputProps> = ({
 
       {isOpen && filtered.length > 0 ? (
         <ul
-          id={id ? `${id}-listbox` : undefined}
           className="absolute z-10 max-h-60 w-full overflow-auto rounded border border-gray-200 bg-white pt-1 shadow"
+          id={id != null && id !== '' ? `${id}-listbox` : undefined}
         >
           {filtered.map(opt => (
             <li key={opt}>

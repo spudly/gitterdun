@@ -6,6 +6,7 @@ import {FormattedMessage, useIntl} from 'react-intl';
 import {choresMessages as messages} from '../chores.messages.js';
 import {Checkbox} from '../../widgets/Checkbox.js';
 import {SelectInput} from '../../widgets/SelectInput.js';
+import {EMPTY_ARRAY} from '../../constants.js';
 
 type CreateChoreFormProps = {
   readonly title: string;
@@ -46,7 +47,7 @@ export const CreateChoreForm: FC<CreateChoreFormProps> = ({
   onChoreTypeChange,
   onCancel,
   onCreate,
-  members = [],
+  members = EMPTY_ARRAY,
   assignedUserIds,
   onToggleAssigned,
   recurrenceRule,
@@ -56,7 +57,9 @@ export const CreateChoreForm: FC<CreateChoreFormProps> = ({
 }) => {
   const intl = useIntl();
   const toLocalInputValue = (date: Date): string => {
-    const padTwo = (value: number) => String(value).padStart(2, '0');
+    const TWO_DIGIT_PAD = 2;
+    const padTwo = (value: number) =>
+      String(value).padStart(TWO_DIGIT_PAD, '0');
     const yyyy = date.getFullYear();
     const mm = padTwo(date.getMonth() + 1);
     const dd = padTwo(date.getDate());
@@ -96,28 +99,28 @@ export const CreateChoreForm: FC<CreateChoreFormProps> = ({
         <label className="grid gap-1 text-sm" htmlFor="start-date-input">
           {intl.formatMessage(messages.startDateLabel)}
           <TextInput
-            id="start-date-input"
             aria-label={intl.formatMessage(messages.startDateLabel)}
-            type="datetime-local"
+            id="start-date-input"
             min={nowMin}
-            value={startDate}
             onChange={onStartDateChange}
+            type="datetime-local"
+            value={startDate}
           />
-          {startError ? (
+          {startError != null && startError !== '' ? (
             <div className="text-xs text-red-600">{startError}</div>
           ) : null}
         </label>
         <label className="grid gap-1 text-sm" htmlFor="due-date-input">
           {intl.formatMessage(messages.dueDateLabel)}
           <TextInput
-            id="due-date-input"
             aria-label={intl.formatMessage(messages.dueDateLabel)}
-            type="datetime-local"
+            id="due-date-input"
             min={startDate || nowMin}
-            value={dueDate}
             onChange={onDueDateChange}
+            type="datetime-local"
+            value={dueDate}
           />
-          {dueError ? (
+          {dueError != null && dueError !== '' ? (
             <div className="text-xs text-red-600">{dueError}</div>
           ) : null}
         </label>
@@ -127,8 +130,10 @@ export const CreateChoreForm: FC<CreateChoreFormProps> = ({
           <FormattedMessage {...messages.recurrenceLabel} />
           <SelectInput
             id="recurrence-select"
+            onChange={value => {
+              onRecurrenceChange(value);
+            }}
             value={recurrenceRule}
-            onChange={value => onRecurrenceChange(value)}
           >
             <option value="">
               {intl.formatMessage(messages.recurrenceNone)}
@@ -147,11 +152,11 @@ export const CreateChoreForm: FC<CreateChoreFormProps> = ({
 
         {/* Bonus Chore */}
         <Checkbox
-          label={intl.formatMessage(messages.bonusChoreLabel)}
           checked={choreType === 'bonus'}
-          onChange={checked =>
-            onChoreTypeChange(checked ? 'bonus' : 'required')
-          }
+          label={intl.formatMessage(messages.bonusChoreLabel)}
+          onChange={checked => {
+            onChoreTypeChange(checked ? 'bonus' : 'required');
+          }}
         />
 
         {/* Assignees */}
@@ -164,12 +169,12 @@ export const CreateChoreForm: FC<CreateChoreFormProps> = ({
               const isChecked = assignedUserIds.includes(member.user_id);
               return (
                 <Checkbox
+                  checked={isChecked}
                   key={member.user_id}
                   label={member.username}
-                  checked={isChecked}
-                  onChange={checked =>
-                    onToggleAssigned(member.user_id, checked)
-                  }
+                  onChange={checked => {
+                    onToggleAssigned(member.user_id, checked);
+                  }}
                 />
               );
             })}

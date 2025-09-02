@@ -9,8 +9,16 @@ type ChoreMetaProps = {readonly chore: ChoreWithUsername};
 export const ChoreMeta: FC<ChoreMetaProps> = ({chore}) => {
   const intl = useIntl();
   const rewardPoints =
-    (chore as any).reward_points ?? (chore as any).point_reward ?? 0;
-  const penaltyPoints = (chore as any).penalty_points ?? 0;
+    typeof chore.reward_points === 'number'
+      ? chore.reward_points
+      : // Some legacy records may use `point_reward`
+        ((): number => {
+          const candidate = (chore as unknown as {point_reward?: unknown})
+            .point_reward;
+          return typeof candidate === 'number' ? candidate : 0;
+        })();
+  const penaltyPoints =
+    typeof chore.penalty_points === 'number' ? chore.penalty_points : 0;
   const dueMs =
     typeof chore.due_date === 'number'
       ? chore.due_date

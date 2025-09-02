@@ -3,11 +3,6 @@ const {execSync} = require('node:child_process');
 
 const jestConfigDir = __dirname;
 
-// Touch the packages base path to document intent without retaining a variable
-(() => {
-  // no-op usage to avoid unused var while keeping clarity
-  path.join(jestConfigDir, 'packages');
-})();
 const findCmd = "find packages -maxdepth 2 -name 'jest.config.cjs' -type f";
 const stdout = execSync(findCmd, {
   encoding: 'utf-8',

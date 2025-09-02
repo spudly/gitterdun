@@ -30,7 +30,8 @@ export const ProgressBar: FC<ProgressBarProps> = ({
   showPercentage = false,
   padded = false,
 }) => {
-  const percentage = Math.min((value / max) * 100, 100);
+  const PERCENT_MAX = 100;
+  const percentage = Math.min((value / max) * PERCENT_MAX, PERCENT_MAX);
 
   return (
     <div className={clsx('space-y-2', padded ? 'p-4' : null)}>

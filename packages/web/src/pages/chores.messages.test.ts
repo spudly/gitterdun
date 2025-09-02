@@ -6,7 +6,7 @@ describe('chores.messages ids', () => {
     const ids = Object.values(messages).map(msg => msg.id);
     for (const id of ids) {
       expect(id.startsWith('pages.Chores.')).toBe(true);
-      expect(id.includes('AdminChoresManagement')).toBe(false);
+      expect(id).not.toContain('AdminChoresManagement');
     }
   });
 });

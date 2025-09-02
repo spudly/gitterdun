@@ -1,7 +1,8 @@
 /* eslint sort-keys: "error" -- normally this is disabled but for eslint rules we need to be able to find stuff */
 import {dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import importPlugin from 'eslint-plugin-import';
+// eslint-disable-next-line import/no-namespace -- this is the way
+import * as importPlugin from 'eslint-plugin-import';
 import reactPlugin from 'eslint-plugin-react';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
@@ -19,10 +20,12 @@ import testingLibraryPlugin from 'eslint-plugin-testing-library';
 import jestDomPlugin from 'eslint-plugin-jest-dom';
 import {Linter, ESLint} from 'eslint';
 import type {SetRequired} from 'type-fest';
+// eslint-disable-next-line import/no-namespace -- this is the way
+import * as reactCompilerPlugin from 'eslint-plugin-react-compiler';
 
 const WORKSPACE_ROOT_DIR = dirname(fileURLToPath(import.meta.url));
 
-type SeverityFn = (groupName: GroupName) => Linter.RuleSeverity;
+type SeverityFn = (groupName: GroupName) => Linter.RuleSeverity | null;
 
 type MyRuleSeverity = Linter.RuleSeverity | SeverityFn;
 
@@ -35,43 +38,32 @@ type MyRuleEntry<Options extends Array<any> = Array<any>> =
   | MyRuleSeverity
   | MyRuleSeverityAndOptions<Options>;
 
-const enableFor =
+const severityFor =
+  (severity: Linter.RuleSeverity) =>
   (...groupNames: Array<GroupName>): SeverityFn =>
   groupName =>
-    groupNames.includes(groupName) ? 'error' : 'off';
+    groupNames.includes(groupName) ? severity : null;
 
-const disableFor =
-  (...groupNames: Array<GroupName>): SeverityFn =>
-  groupName =>
-    groupNames.includes(groupName) ? 'off' : 'error';
+const errorFor = severityFor('error');
+// @ts-expect-error -- will use later
+const warnFor = severityFor('warn'); // eslint-disable-line ts/no-unused-vars -- will use later
+const offFor = severityFor('off');
 
-const OFF = 0;
-const WARN = 1;
-const ERROR = 2;
-
-const toNumericSeverity = (severity: Linter.RuleSeverity) => {
-  if (typeof severity === 'number') {
-    return severity;
-  }
-  switch (severity) {
-    case 'off':
-      return OFF;
-    case 'warn':
-      return WARN;
-    case 'error':
-      return ERROR;
-    default:
-      throw new Error(`Invalid severity: ${String(severity)}`);
-  }
-};
-
-const compose =
+const composeSeverity =
   (includeFn: SeverityFn, excludeFn: SeverityFn): SeverityFn =>
-  groupName =>
-    Math.min(
-      toNumericSeverity(includeFn(groupName)),
-      toNumericSeverity(excludeFn(groupName)),
-    ) as Linter.RuleSeverity;
+  groupName => {
+    // TODO: this is confusing. we need to handle upgrading severity (off => warn => error)
+    const isExcluded = excludeFn(groupName);
+    if (isExcluded != null) {
+      return isExcluded;
+    }
+    // TODO: this is confusing. we need to handle downgrading severity (error => warn => off)
+    const isIncluded = includeFn(groupName);
+    if (isIncluded != null) {
+      return isIncluded;
+    }
+    return null;
+  };
 
 type MyRules = Record<string, MyRuleEntry>;
 
@@ -84,6 +76,7 @@ export const PLUGINS = {
   'jsx-a11y': jsxA11yPlugin,
   'playwright': playwrightPlugin,
   'react': reactPlugin,
+  'react-compiler': reactCompilerPlugin,
   'react-hooks': reactHooks,
   'tailwindcss': tailwindcssPlugin,
   'testing-library': testingLibraryPlugin,
@@ -137,11 +130,20 @@ const GROUPS = {
       '**/e2e/{test,tests,__test__,__tests__}/**/*',
     ],
   },
+  javascript: {files: [`**/*.${extensionsGlob(JAVASCRIPT_EXTENSIONS)}`]},
   react: {
     files: [`**/*.${extensionsGlob(REACT_EXTENSIONS)}`],
     settings: {react: {pragma: 'React', version: 'detect'}},
   },
   scripts: {files: [`**/scripts/**`]},
+  tests: {
+    files: [
+      `**/*.{test,spec}.${extensionsGlob()}`, // test files
+      '**/{test,tests,__test__,__tests__}/**', // files in test folders
+      '**/jest.*', // jest config files
+    ],
+    ignores: ['**/e2e/**'],
+  },
   translations: {
     files: [`**/messages/*.${extensionsGlob()}`],
     ignores: [`**/messages/index.${extensionsGlob()}`],
@@ -166,14 +168,6 @@ const GROUPS = {
         typescript: {project: ['./tsconfig.base.json']},
       },
     },
-  },
-  unitTests: {
-    files: [
-      `**/*.{test,spec}.${extensionsGlob()}`, // unit test files
-      '**/{test,tests,__test__,__tests__}/**', // files in unit test folders
-      '**/jest.*', // jest config files
-    ],
-    ignores: ['**/e2e/**'],
   },
 } as const satisfies Record<string, Group>;
 
@@ -206,7 +200,7 @@ const resolveGroupPlugins = (
 const resolveEntrySeverity = (
   entry: MyRuleEntry,
   groupName: GroupName,
-): Linter.RuleSeverity => {
+): Linter.RuleSeverity | null => {
   if (typeof entry === 'function') {
     return entry(groupName);
   }
@@ -224,8 +218,12 @@ const resolveEntrySeverity = (
 const resolveEntry = (
   entry: MyRuleEntry,
   groupName: GroupName,
-): Linter.RuleEntry => {
+): Linter.RuleEntry | null => {
   const resolvedSeverity = resolveEntrySeverity(entry, groupName);
+
+  if (resolvedSeverity == null) {
+    return null;
+  }
 
   if (Array.isArray(entry)) {
     return [resolvedSeverity, ...entry.slice(1)];
@@ -234,75 +232,41 @@ const resolveEntry = (
   return resolvedSeverity;
 };
 
-const isSeverityOff = (severity: Linter.RuleSeverity) =>
-  severity === 'off' || severity === 0;
-
 const resolveGroupRules = (
   rules: MyRules,
   groupName: GroupName,
-  type: 'off' | 'on',
+  severityPredicate: 'off' | 'warn' | 'error',
 ) =>
   Object.entries(rules).reduce<Record<string, Linter.RuleEntry>>(
     (acc, [ruleName, ruleEntry]) => {
       const resolvedEntry = resolveEntry(ruleEntry, groupName);
-      const foundType = isSeverityOff(
-        resolveEntrySeverity(resolvedEntry, groupName),
-      )
-        ? 'off'
-        : 'on';
-
-      if (foundType === type) {
-        return {...acc, [ruleName]: resolvedEntry};
+      if (resolvedEntry == null) {
+        return acc;
       }
-
-      return acc;
+      const severity = resolveEntrySeverity(resolvedEntry, groupName);
+      if (severity !== severityPredicate) {
+        return acc;
+      }
+      return {...acc, [ruleName]: resolvedEntry};
     },
     {},
   );
 
-const resolveConfigs = (rules: MyRules): Array<Linter.Config> => {
-  // Precompute which rules are enabled ("on") for each group
-  const onRulesByGroup = (Object.keys(GROUPS) as Array<GroupName>).reduce(
-    (acc, groupName) => {
-      const onForGroup = resolveGroupRules(rules, groupName, 'on');
-      acc[groupName] = new Set(Object.keys(onForGroup));
-      return acc;
-    },
-    {} as Record<GroupName, Set<string>>,
-  );
-
-  return (['on', 'off'] as const).flatMap(type =>
+const resolveConfigs = (rules: MyRules): Array<Linter.Config> =>
+  (['error', 'warn', 'off'] as const).flatMap(type =>
     (Object.entries(GROUPS) as Array<[GroupName, Group]>).map(
       ([groupName, group]) => {
-        let resolvedRules = resolveGroupRules(rules, groupName, type);
-
-        // Do not emit "off" entries for the "all" group when the same rule
-        // is enabled in any other group. This prevents broad "all/off" entries
-        // from overriding more specific group enables.
-        if (type === 'off' && groupName === 'all') {
-          const enabledElsewhere = new Set<string>(
-            (Object.keys(GROUPS) as Array<GroupName>)
-              .filter(name => name !== 'all')
-              .flatMap(name => Array.from(onRulesByGroup[name])),
-          );
-          resolvedRules = Object.fromEntries(
-            Object.entries(resolvedRules).filter(
-              ([ruleName]) => !enabledElsewhere.has(ruleName),
-            ),
-          );
-        }
-
         return {
           files: group.files,
+          ignores: group.ignores ?? [],
           languageOptions: group.languageOptions ?? {},
           plugins: resolveGroupPlugins(rules),
-          rules: resolvedRules,
+          rules: resolveGroupRules(rules, groupName, type),
           settings: group.settings ?? {},
         };
       },
     ),
   );
-};
 
 export const RULES: MyRules = {
   'accessor-pairs': 'error',
@@ -328,8 +292,8 @@ export const RULES: MyRules = {
   'curly': ['error', 'all'],
   'default-case': 'error',
   'default-case-last': 'error',
-  'default-param-last': disableFor('typescript'),
-  'dot-notation': disableFor('typescript'),
+  'default-param-last': composeSeverity(errorFor('all'), offFor('typescript')),
+  'dot-notation': composeSeverity(errorFor('all'), offFor('typescript')),
   'eqeqeq': ['error', 'always', {null: 'ignore'}],
   'for-direction': 'error',
   'func-name-matching': 'error',
@@ -337,14 +301,17 @@ export const RULES: MyRules = {
   'func-style': 'error',
   'getter-return': 'off',
   'gitterdun/no-extra-i18n-messages': [
-    enableFor('translations'),
+    composeSeverity(errorFor('translations'), offFor('tests')),
     {enPath: 'packages/web/src/i18n/extracted/en.json'},
   ],
   'gitterdun/no-missing-i18n-messages': [
-    enableFor('translations'),
+    composeSeverity(errorFor('translations'), offFor('tests')),
     {enPath: 'packages/web/src/i18n/extracted/en.json'},
   ],
-  'gitterdun/no-tailwind-margins': disableFor('unitTests'),
+  'gitterdun/no-tailwind-margins': composeSeverity(
+    errorFor('all'),
+    offFor('tests'),
+  ),
   'gitterdun/no-unused-data-testid': [
     'error',
     {
@@ -356,7 +323,7 @@ export const RULES: MyRules = {
       ],
     },
   ],
-  'gitterdun/require-i18n-formatting': enableFor('react'),
+  'gitterdun/require-i18n-formatting': errorFor('react'),
   'grouped-accessor-pairs': 'error',
   'guard-for-in': 'error',
   'id-denylist': 'error',
@@ -372,7 +339,7 @@ export const RULES: MyRules = {
   'import/export': 'error',
   'import/exports-last': 'off',
   'import/extensions': [
-    disableFor('scripts', 'configs'),
+    composeSeverity(errorFor('all'), offFor('scripts', 'configs')),
     'ignorePackages',
     EXTENSIONS.reduce<Record<string, 'never'>>((acc, ext) => {
       return {...acc, [ext]: 'never'};
@@ -386,7 +353,10 @@ export const RULES: MyRules = {
   'import/newline-after-import': 'off', // using Prettier for styling
   'import/no-absolute-path': 'error',
   'import/no-amd': 'error',
-  'import/no-anonymous-default-export': disableFor('translations'),
+  'import/no-anonymous-default-export': composeSeverity(
+    errorFor('all'),
+    offFor('translations'),
+  ),
   'import/no-commonjs': 'off',
   'import/no-cycle': ['error', {maxDepth: '∞'}],
   'import/no-default-export': 'off',
@@ -416,7 +386,7 @@ export const RULES: MyRules = {
   'import/no-named-as-default-member': 'off',
   'import/no-named-default': 'error',
   'import/no-named-export': 'off',
-  'import/no-namespace': disableFor('unitTests'),
+  'import/no-namespace': composeSeverity(errorFor('all'), offFor('tests')),
   'import/no-nodejs-modules': 'off', // needed for scripts
   'import/no-relative-packages': 'error',
   'import/no-relative-parent-imports': 'off',
@@ -443,34 +413,34 @@ export const RULES: MyRules = {
   'jest-dom/prefer-to-have-text-content': 'error',
   'jest-dom/prefer-to-have-value': 'error',
   'jest/consistent-test-it': [
-    enableFor('unitTests'),
+    errorFor('tests'),
     {fn: 'test', withinDescribe: 'test'},
   ],
-  'jest/expect-expect': enableFor('unitTests'),
+  'jest/expect-expect': errorFor('tests'),
   'jest/max-expects': 'off', // more expects is fine by me
-  'jest/max-nested-describe': enableFor('unitTests'),
-  'jest/no-alias-methods': enableFor('unitTests'),
-  'jest/no-commented-out-tests': enableFor('unitTests'),
-  'jest/no-conditional-expect': enableFor('unitTests'),
-  'jest/no-conditional-in-test': enableFor('unitTests'),
-  'jest/no-confusing-set-timeout': enableFor('unitTests'),
-  'jest/no-deprecated-functions': enableFor('unitTests'),
-  'jest/no-disabled-tests': enableFor('unitTests'),
-  'jest/no-done-callback': enableFor('unitTests'),
-  'jest/no-duplicate-hooks': enableFor('unitTests'),
-  'jest/no-export': enableFor('unitTests'),
-  'jest/no-focused-tests': enableFor('unitTests'),
+  'jest/max-nested-describe': errorFor('tests'),
+  'jest/no-alias-methods': errorFor('tests'),
+  'jest/no-commented-out-tests': errorFor('tests'),
+  'jest/no-conditional-expect': errorFor('tests'),
+  'jest/no-conditional-in-test': errorFor('tests'),
+  'jest/no-confusing-set-timeout': errorFor('tests'),
+  'jest/no-deprecated-functions': errorFor('tests'),
+  'jest/no-disabled-tests': errorFor('tests'),
+  'jest/no-done-callback': errorFor('tests'),
+  'jest/no-duplicate-hooks': errorFor('tests'),
+  'jest/no-export': errorFor('tests'),
+  'jest/no-focused-tests': errorFor('tests'),
   'jest/no-hooks': 'off', // no hooks? but why?
-  'jest/no-identical-title': enableFor('unitTests'),
-  'jest/no-interpolation-in-snapshots': enableFor('unitTests'),
-  'jest/no-jasmine-globals': enableFor('unitTests'),
-  'jest/no-large-snapshots': enableFor('unitTests'),
-  'jest/no-mocks-import': enableFor('unitTests'),
-  'jest/no-restricted-jest-methods': enableFor('unitTests'),
-  'jest/no-restricted-matchers': enableFor('unitTests'),
-  'jest/no-standalone-expect': enableFor('unitTests'),
-  'jest/no-test-prefixes': enableFor('unitTests'),
-  'jest/no-test-return-statement': enableFor('unitTests'),
+  'jest/no-identical-title': errorFor('tests'),
+  'jest/no-interpolation-in-snapshots': errorFor('tests'),
+  'jest/no-jasmine-globals': errorFor('tests'),
+  'jest/no-large-snapshots': errorFor('tests'),
+  'jest/no-mocks-import': errorFor('tests'),
+  'jest/no-restricted-jest-methods': errorFor('tests'),
+  'jest/no-restricted-matchers': errorFor('tests'),
+  'jest/no-standalone-expect': errorFor('tests'),
+  'jest/no-test-prefixes': errorFor('tests'),
+  'jest/no-test-return-statement': errorFor('tests'),
   'jest/no-untyped-mock-factory': 'off', // we can be more loose in unit tests
   'jest/padding-around-after-all-blocks': 'off', // use Prettier for styling
   'jest/padding-around-after-each-blocks': 'off', // use Prettier for styling
@@ -480,36 +450,39 @@ export const RULES: MyRules = {
   'jest/padding-around-describe-blocks': 'off', // use Prettier for styling
   'jest/padding-around-expect-groups': 'off', // use Prettier for styling
   'jest/padding-around-test-blocks': 'off', // use Prettier for styling
-  'jest/prefer-called-with': enableFor('unitTests'),
-  'jest/prefer-comparison-matcher': enableFor('unitTests'),
-  'jest/prefer-each': enableFor('unitTests'),
+  'jest/prefer-called-with': errorFor('tests'),
+  'jest/prefer-comparison-matcher': errorFor('tests'),
+  'jest/prefer-each': errorFor('tests'),
   'jest/prefer-ending-with-an-expect': 'off', // false positive when expect is in a loop
-  'jest/prefer-equality-matcher': enableFor('unitTests'),
+  'jest/prefer-equality-matcher': errorFor('tests'),
   'jest/prefer-expect-assertions': 'off', // annoying
-  'jest/prefer-expect-resolves': enableFor('unitTests'),
-  'jest/prefer-hooks-in-order': enableFor('unitTests'),
-  'jest/prefer-hooks-on-top': enableFor('unitTests'),
-  'jest/prefer-importing-jest-globals': enableFor('unitTests'),
-  'jest/prefer-jest-mocked': enableFor('unitTests'),
-  'jest/prefer-lowercase-title': enableFor('unitTests'),
-  'jest/prefer-mock-promise-shorthand': enableFor('unitTests'),
-  'jest/prefer-snapshot-hint': enableFor('unitTests'),
-  'jest/prefer-spy-on': enableFor('unitTests'),
+  'jest/prefer-expect-resolves': errorFor('tests'),
+  'jest/prefer-hooks-in-order': errorFor('tests'),
+  'jest/prefer-hooks-on-top': errorFor('tests'),
+  'jest/prefer-importing-jest-globals': errorFor('tests'),
+  'jest/prefer-jest-mocked': errorFor('tests'),
+  'jest/prefer-lowercase-title': errorFor('tests'),
+  'jest/prefer-mock-promise-shorthand': errorFor('tests'),
+  'jest/prefer-snapshot-hint': errorFor('tests'),
+  'jest/prefer-spy-on': errorFor('tests'),
   'jest/prefer-strict-equal': 'off', // i like this idea, but toStrictEqual has issues with arrays being created from inside a jest worker, resulting in false positive errors
-  'jest/prefer-to-be': enableFor('unitTests'),
-  'jest/prefer-to-contain': enableFor('unitTests'),
-  'jest/prefer-to-have-length': enableFor('unitTests'),
-  'jest/prefer-todo': enableFor('unitTests'),
-  'jest/require-hook': enableFor('unitTests'),
-  'jest/require-to-throw-message': enableFor('unitTests'),
+  'jest/prefer-to-be': errorFor('tests'),
+  'jest/prefer-to-contain': errorFor('tests'),
+  'jest/prefer-to-have-length': errorFor('tests'),
+  'jest/prefer-todo': errorFor('tests'),
+  'jest/require-hook': composeSeverity(errorFor('tests'), offFor('e2eTests')),
+  'jest/require-to-throw-message': errorFor('tests'),
   'jest/require-top-level-describe': 'off', // why enforce extra boilerplate?
-  'jest/unbound-method': enableFor('unitTests'),
-  'jest/valid-describe-callback': enableFor('unitTests'),
-  'jest/valid-expect': enableFor('unitTests'),
-  'jest/valid-expect-in-promise': enableFor('unitTests'),
-  'jest/valid-title': enableFor('unitTests'),
+  'jest/unbound-method': composeSeverity(
+    errorFor('tests'),
+    offFor('javascript'),
+  ),
+  'jest/valid-describe-callback': errorFor('tests'),
+  'jest/valid-expect': errorFor('tests'),
+  'jest/valid-expect-in-promise': errorFor('tests'),
+  'jest/valid-title': errorFor('tests'),
   'jsx-a11y/alt-text': [
-    enableFor('react'),
+    errorFor('react'),
     {
       'area': [],
       'elements': ['img', 'object', 'area', 'input[type="image"]'],
@@ -518,25 +491,25 @@ export const RULES: MyRules = {
       'object': [],
     },
   ],
-  'jsx-a11y/anchor-ambiguous-text': 'error',
-  'jsx-a11y/anchor-has-content': [enableFor('react'), {components: []}],
+  'jsx-a11y/anchor-ambiguous-text': errorFor('react'),
+  'jsx-a11y/anchor-has-content': [errorFor('react'), {components: []}],
   'jsx-a11y/anchor-is-valid': [
-    enableFor('react'),
+    errorFor('react'),
     {
       aspects: ['noHref', 'invalidHref', 'preferButton'],
       components: ['Link'],
       specialLink: ['to'],
     },
   ],
-  'jsx-a11y/aria-activedescendant-has-tabindex': enableFor('react'),
-  'jsx-a11y/aria-props': enableFor('react'),
-  'jsx-a11y/aria-proptypes': enableFor('react'),
-  'jsx-a11y/aria-role': [enableFor('react'), {ignoreNonDOM: false}],
-  'jsx-a11y/aria-unsupported-elements': enableFor('react'),
+  'jsx-a11y/aria-activedescendant-has-tabindex': errorFor('react'),
+  'jsx-a11y/aria-props': errorFor('react'),
+  'jsx-a11y/aria-proptypes': errorFor('react'),
+  'jsx-a11y/aria-role': [errorFor('react'), {ignoreNonDOM: false}],
+  'jsx-a11y/aria-unsupported-elements': errorFor('react'),
   'jsx-a11y/autocomplete-valid': ['off', {inputComponents: []}],
-  'jsx-a11y/click-events-have-key-events': enableFor('react'),
+  'jsx-a11y/click-events-have-key-events': errorFor('react'),
   'jsx-a11y/control-has-associated-label': [
-    enableFor('react'),
+    errorFor('react'),
     {
       controlComponents: [],
       depth: 5,
@@ -564,13 +537,13 @@ export const RULES: MyRules = {
       labelAttributes: ['label'],
     },
   ],
-  'jsx-a11y/heading-has-content': ['error', {components: ['']}],
-  'jsx-a11y/html-has-lang': 'error',
-  'jsx-a11y/iframe-has-title': 'error',
-  'jsx-a11y/img-redundant-alt': 'error',
-  'jsx-a11y/interactive-supports-focus': 'error',
+  'jsx-a11y/heading-has-content': [errorFor('react'), {components: ['']}],
+  'jsx-a11y/html-has-lang': errorFor('react'),
+  'jsx-a11y/iframe-has-title': errorFor('react'),
+  'jsx-a11y/img-redundant-alt': errorFor('react'),
+  'jsx-a11y/interactive-supports-focus': errorFor('react'),
   'jsx-a11y/label-has-associated-control': [
-    'error',
+    errorFor('react'),
     {
       assert: 'both',
       controlComponents: ['TextInput', 'SelectInput'],
@@ -579,22 +552,25 @@ export const RULES: MyRules = {
       labelComponents: ['Label'],
     },
   ],
-  'jsx-a11y/lang': 'error',
-  'jsx-a11y/media-has-caption': ['error', {audio: [], track: [], video: []}],
-  'jsx-a11y/mouse-events-have-key-events': 'error',
-  'jsx-a11y/no-access-key': 'error',
-  'jsx-a11y/no-aria-hidden-on-focusable': 'error',
-  'jsx-a11y/no-autofocus': ['error', {ignoreNonDOM: true}],
+  'jsx-a11y/lang': errorFor('react'),
+  'jsx-a11y/media-has-caption': [
+    errorFor('react'),
+    {audio: [], track: [], video: []},
+  ],
+  'jsx-a11y/mouse-events-have-key-events': errorFor('react'),
+  'jsx-a11y/no-access-key': errorFor('react'),
+  'jsx-a11y/no-aria-hidden-on-focusable': errorFor('react'),
+  'jsx-a11y/no-autofocus': [errorFor('react'), {ignoreNonDOM: true}],
   'jsx-a11y/no-distracting-elements': [
-    'error',
+    errorFor('react'),
     {elements: ['marquee', 'blink']},
   ],
   'jsx-a11y/no-interactive-element-to-noninteractive-role': [
-    'error',
+    errorFor('react'),
     {tr: ['none', 'presentation']},
   ],
   'jsx-a11y/no-noninteractive-element-interactions': [
-    'error',
+    errorFor('react'),
     {
       handlers: [
         'onClick',
@@ -607,7 +583,7 @@ export const RULES: MyRules = {
     },
   ],
   'jsx-a11y/no-noninteractive-element-to-interactive-role': [
-    'error',
+    errorFor('react'),
     {
       li: ['menuitem', 'option', 'row', 'tab', 'treeitem'],
       ol: [
@@ -633,12 +609,12 @@ export const RULES: MyRules = {
     },
   ],
   'jsx-a11y/no-noninteractive-tabindex': [
-    'error',
+    errorFor('react'),
     {roles: ['tabpanel'], tags: []},
   ],
-  'jsx-a11y/no-redundant-roles': 'error',
+  'jsx-a11y/no-redundant-roles': errorFor('react'),
   'jsx-a11y/no-static-element-interactions': [
-    'error',
+    errorFor('react'),
     {
       handlers: [
         'onClick',
@@ -650,22 +626,34 @@ export const RULES: MyRules = {
       ],
     },
   ],
-  'jsx-a11y/prefer-tag-over-role': 'error',
-  'jsx-a11y/role-has-required-aria-props': 'error',
-  'jsx-a11y/role-supports-aria-props': 'error',
-  'jsx-a11y/scope': 'error',
-  'jsx-a11y/tabindex-no-positive': 'error',
+  'jsx-a11y/prefer-tag-over-role': errorFor('react'),
+  'jsx-a11y/role-has-required-aria-props': errorFor('react'),
+  'jsx-a11y/role-supports-aria-props': errorFor('react'),
+  'jsx-a11y/scope': errorFor('react'),
+  'jsx-a11y/tabindex-no-positive': errorFor('react'),
   'logical-assignment-operators': 'error',
   'max-classes-per-file': 'error',
   'max-depth': 'error',
-  'max-lines': [disableFor('configs', 'unitTests', 'e2eTests', 'scripts'), 200],
+  'max-lines': [
+    composeSeverity(
+      errorFor('all'),
+      offFor('configs', 'tests', 'e2eTests', 'scripts'),
+    ),
+    200,
+  ],
   'max-lines-per-function': 'off', // ['error', {max: 20, skipBlankLines: true, skipComments: true, IIFEs: true},], // TODO: re-enable
   'max-nested-callbacks': 'error',
   'max-params': ['error', {max: 5}],
-  'max-statements': [disableFor('configs', 'unitTests', 'e2eTests'), {max: 20}],
+  'max-statements': [
+    composeSeverity(errorFor('all'), offFor('configs', 'tests', 'e2eTests')),
+    {max: 20},
+  ],
   'new-cap': 'error',
   'no-alert': 'error',
-  'no-array-constructor': disableFor('typescript'),
+  'no-array-constructor': composeSeverity(
+    errorFor('all'),
+    offFor('typescript'),
+  ),
   'no-async-promise-executor': 'error',
   'no-await-in-loop': 'error',
   'no-bitwise': 'error',
@@ -674,7 +662,7 @@ export const RULES: MyRules = {
   'no-class-assign': 'error',
   'no-compare-neg-zero': 'error',
   'no-cond-assign': 'error',
-  'no-console': disableFor('scripts'),
+  'no-console': composeSeverity(errorFor('all'), offFor('scripts', 'configs')),
   'no-const-assign': 'off',
   'no-constant-binary-expression': 'error',
   'no-constant-condition': 'error',
@@ -685,7 +673,10 @@ export const RULES: MyRules = {
   'no-delete-var': 'error',
   'no-div-regex': 'error',
   'no-dupe-args': 'off',
-  'no-dupe-class-members': disableFor('typescript'),
+  'no-dupe-class-members': composeSeverity(
+    errorFor('all'),
+    offFor('typescript'),
+  ),
   'no-dupe-else-if': 'error',
   'no-dupe-keys': 'off',
   'no-duplicate-case': 'error',
@@ -693,7 +684,7 @@ export const RULES: MyRules = {
   'no-else-return': 'error',
   'no-empty': 'error',
   'no-empty-character-class': 'error',
-  'no-empty-function': disableFor('typescript'),
+  'no-empty-function': composeSeverity(errorFor('all'), offFor('typescript')),
   'no-empty-pattern': 'error',
   'no-empty-static-block': 'error',
   'no-eq-null': 'off', // allow == and != with null
@@ -708,7 +699,7 @@ export const RULES: MyRules = {
   'no-global-assign': 'error',
   'no-implicit-coercion': 'error',
   'no-implicit-globals': 'error',
-  'no-implied-eval': disableFor('typescript'),
+  'no-implied-eval': composeSeverity(errorFor('all'), offFor('typescript')),
   'no-import-assign': 'off',
   'no-inline-comments': 'off', // use Prettier for styling
   'no-inner-declarations': 'error',
@@ -720,10 +711,16 @@ export const RULES: MyRules = {
   'no-labels': 'error',
   'no-lone-blocks': 'error',
   'no-lonely-if': 'error',
-  'no-loop-func': disableFor('typescript'),
-  'no-loss-of-precision': disableFor('typescript'),
+  'no-loop-func': composeSeverity(errorFor('all'), offFor('typescript')),
+  'no-loss-of-precision': composeSeverity(
+    errorFor('all'),
+    offFor('typescript'),
+  ),
   'no-magic-numbers': [
-    disableFor('typescript', 'unitTests', 'configs', 'scripts'),
+    composeSeverity(
+      errorFor('all'),
+      offFor('typescript', 'tests', 'configs', 'scripts'),
+    ),
     {
       detectObjects: false,
       enforceConst: true,
@@ -752,7 +749,7 @@ export const RULES: MyRules = {
   'no-promise-executor-return': 'error',
   'no-proto': 'error',
   'no-prototype-builtins': 'error',
-  'no-redeclare': disableFor('typescript'),
+  'no-redeclare': composeSeverity(errorFor('all'), offFor('typescript')),
   'no-regex-spaces': 'error',
   'no-restricted-exports': 'error',
   'no-restricted-globals': 'error',
@@ -765,7 +762,7 @@ export const RULES: MyRules = {
   'no-self-compare': 'error',
   'no-sequences': 'error',
   'no-setter-return': 'off',
-  'no-shadow': disableFor('typescript'),
+  'no-shadow': composeSeverity(errorFor('all'), offFor('typescript')),
   'no-shadow-restricted-names': 'error',
   'no-sparse-arrays': 'error',
   'no-template-curly-in-string': 'error',
@@ -785,18 +782,27 @@ export const RULES: MyRules = {
   'no-unsafe-finally': 'error',
   'no-unsafe-negation': 'off',
   'no-unsafe-optional-chaining': 'error',
-  'no-unused-expressions': disableFor('typescript'),
+  'no-unused-expressions': composeSeverity(
+    errorFor('all'),
+    offFor('typescript'),
+  ),
   'no-unused-labels': 'error',
   'no-unused-private-class-members': 'error',
-  'no-unused-vars': disableFor('typescript'),
-  'no-use-before-define': disableFor('typescript'),
+  'no-unused-vars': composeSeverity(errorFor('all'), offFor('typescript')),
+  'no-use-before-define': composeSeverity(
+    errorFor('all'),
+    offFor('typescript'),
+  ),
   'no-useless-assignment': 'error',
   'no-useless-backreference': 'error',
   'no-useless-call': 'error',
   'no-useless-catch': 'error',
   'no-useless-computed-key': 'error',
   'no-useless-concat': 'error',
-  'no-useless-constructor': disableFor('typescript'),
+  'no-useless-constructor': composeSeverity(
+    errorFor('all'),
+    offFor('typescript'),
+  ),
   'no-useless-escape': 'error',
   'no-useless-rename': 'error',
   'no-useless-return': 'error',
@@ -807,57 +813,57 @@ export const RULES: MyRules = {
   'object-shorthand': 'error',
   'one-var': 'off', // use Prettier for styling
   'operator-assignment': 'error',
-  'playwright/expect-expect': enableFor('e2eTests'),
+  'playwright/expect-expect': errorFor('e2eTests'),
   'playwright/max-expects': 'off', // testing multiple things is good for e2e performance
-  'playwright/max-nested-describe': enableFor('e2eTests'),
-  'playwright/missing-playwright-await': enableFor('e2eTests'),
-  'playwright/no-commented-out-tests': enableFor('e2eTests'),
-  'playwright/no-conditional-expect': enableFor('e2eTests'),
-  'playwright/no-conditional-in-test': enableFor('e2eTests'),
-  'playwright/no-duplicate-hooks': enableFor('e2eTests'),
-  'playwright/no-element-handle': enableFor('e2eTests'),
-  'playwright/no-eval': enableFor('e2eTests'),
-  'playwright/no-focused-test': enableFor('e2eTests'),
-  'playwright/no-force-option': enableFor('e2eTests'),
-  'playwright/no-get-by-title': enableFor('e2eTests'),
-  'playwright/no-hooks': enableFor('e2eTests'),
-  'playwright/no-nested-step': enableFor('e2eTests'),
-  'playwright/no-networkidle': enableFor('e2eTests'),
-  'playwright/no-nth-methods': enableFor('e2eTests'),
-  'playwright/no-page-pause': enableFor('e2eTests'),
-  'playwright/no-raw-locators': enableFor('e2eTests'),
-  'playwright/no-restricted-matchers': enableFor('e2eTests'),
+  'playwright/max-nested-describe': errorFor('e2eTests'),
+  'playwright/missing-playwright-await': errorFor('e2eTests'),
+  'playwright/no-commented-out-tests': errorFor('e2eTests'),
+  'playwright/no-conditional-expect': errorFor('e2eTests'),
+  'playwright/no-conditional-in-test': errorFor('e2eTests'),
+  'playwright/no-duplicate-hooks': errorFor('e2eTests'),
+  'playwright/no-element-handle': errorFor('e2eTests'),
+  'playwright/no-eval': errorFor('e2eTests'),
+  'playwright/no-focused-test': errorFor('e2eTests'),
+  'playwright/no-force-option': errorFor('e2eTests'),
+  'playwright/no-get-by-title': errorFor('e2eTests'),
+  'playwright/no-hooks': errorFor('e2eTests'),
+  'playwright/no-nested-step': errorFor('e2eTests'),
+  'playwright/no-networkidle': errorFor('e2eTests'),
+  'playwright/no-nth-methods': errorFor('e2eTests'),
+  'playwright/no-page-pause': errorFor('e2eTests'),
+  'playwright/no-raw-locators': errorFor('e2eTests'),
+  'playwright/no-restricted-matchers': errorFor('e2eTests'),
   'playwright/no-skipped-test': 'warn',
-  'playwright/no-slowed-test': enableFor('e2eTests'),
-  'playwright/no-standalone-expect': enableFor('e2eTests'),
-  'playwright/no-unsafe-references': enableFor('e2eTests'),
-  'playwright/no-useless-await': enableFor('e2eTests'),
-  'playwright/no-useless-not': enableFor('e2eTests'),
-  'playwright/no-wait-for-navigation': enableFor('e2eTests'),
-  'playwright/no-wait-for-selector': enableFor('e2eTests'),
-  'playwright/no-wait-for-timeout': enableFor('e2eTests'),
-  'playwright/prefer-comparison-matcher': enableFor('e2eTests'),
-  'playwright/prefer-equality-matcher': enableFor('e2eTests'),
-  'playwright/prefer-hooks-in-order': enableFor('e2eTests'),
-  'playwright/prefer-hooks-on-top': enableFor('e2eTests'),
-  'playwright/prefer-locator': enableFor('e2eTests'),
-  'playwright/prefer-lowercase-title': enableFor('e2eTests'),
-  'playwright/prefer-native-locators': enableFor('e2eTests'),
-  'playwright/prefer-strict-equal': enableFor('e2eTests'),
-  'playwright/prefer-to-be': enableFor('e2eTests'),
-  'playwright/prefer-to-contain': enableFor('e2eTests'),
-  'playwright/prefer-to-have-count': enableFor('e2eTests'),
-  'playwright/prefer-to-have-length': enableFor('e2eTests'),
-  'playwright/prefer-web-first-assertions': enableFor('e2eTests'),
-  'playwright/require-hook': enableFor('e2eTests'),
+  'playwright/no-slowed-test': errorFor('e2eTests'),
+  'playwright/no-standalone-expect': errorFor('e2eTests'),
+  'playwright/no-unsafe-references': errorFor('e2eTests'),
+  'playwright/no-useless-await': errorFor('e2eTests'),
+  'playwright/no-useless-not': errorFor('e2eTests'),
+  'playwright/no-wait-for-navigation': errorFor('e2eTests'),
+  'playwright/no-wait-for-selector': errorFor('e2eTests'),
+  'playwright/no-wait-for-timeout': errorFor('e2eTests'),
+  'playwright/prefer-comparison-matcher': errorFor('e2eTests'),
+  'playwright/prefer-equality-matcher': errorFor('e2eTests'),
+  'playwright/prefer-hooks-in-order': errorFor('e2eTests'),
+  'playwright/prefer-hooks-on-top': errorFor('e2eTests'),
+  'playwright/prefer-locator': errorFor('e2eTests'),
+  'playwright/prefer-lowercase-title': errorFor('e2eTests'),
+  'playwright/prefer-native-locators': errorFor('e2eTests'),
+  'playwright/prefer-strict-equal': errorFor('e2eTests'),
+  'playwright/prefer-to-be': errorFor('e2eTests'),
+  'playwright/prefer-to-contain': errorFor('e2eTests'),
+  'playwright/prefer-to-have-count': errorFor('e2eTests'),
+  'playwright/prefer-to-have-length': errorFor('e2eTests'),
+  'playwright/prefer-web-first-assertions': errorFor('e2eTests'),
+  'playwright/require-hook': errorFor('e2eTests'),
   'playwright/require-soft-assertions': 'off', // probably not a good idea
-  'playwright/require-to-throw-message': enableFor('e2eTests'),
-  'playwright/require-top-level-describe': enableFor('e2eTests'),
-  'playwright/valid-describe-callback': enableFor('e2eTests'),
-  'playwright/valid-expect': enableFor('e2eTests'),
-  'playwright/valid-expect-in-promise': enableFor('e2eTests'),
-  'playwright/valid-test-tags': enableFor('e2eTests'),
-  'playwright/valid-title': enableFor('e2eTests'),
+  'playwright/require-to-throw-message': errorFor('e2eTests'),
+  'playwright/require-top-level-describe': errorFor('e2eTests'),
+  'playwright/valid-describe-callback': errorFor('e2eTests'),
+  'playwright/valid-expect': errorFor('e2eTests'),
+  'playwright/valid-expect-in-promise': errorFor('e2eTests'),
+  'playwright/valid-test-tags': errorFor('e2eTests'),
+  'playwright/valid-title': errorFor('e2eTests'),
   'prefer-arrow-callback': 'error',
   'prefer-const': 'error',
   'prefer-destructuring': 'error',
@@ -872,17 +878,18 @@ export const RULES: MyRules = {
   'prefer-spread': 'error',
   'prefer-template': 'error',
   'radix': 'error',
-  'react-hooks/exhaustive-deps': enableFor('react'),
-  'react-hooks/react-compiler': 'error',
-  'react-hooks/rules-of-hooks': 'error',
-  'react/boolean-prop-naming': enableFor('react'),
-  'react/button-has-type': enableFor('react'),
-  'react/checked-requires-onchange-or-readonly': enableFor('react'),
-  'react/default-props-match-prop-types': enableFor('react'),
-  'react/destructuring-assignment': enableFor('react'),
-  'react/display-name': enableFor('react'),
+  'react-compiler/react-compiler': errorFor('react'),
+  'react-hooks/exhaustive-deps': errorFor('react'),
+  'react-hooks/react-compiler': errorFor('react'),
+  'react-hooks/rules-of-hooks': errorFor('react'),
+  'react/boolean-prop-naming': errorFor('react'),
+  'react/button-has-type': errorFor('react'),
+  'react/checked-requires-onchange-or-readonly': errorFor('react'),
+  'react/default-props-match-prop-types': errorFor('react'),
+  'react/destructuring-assignment': errorFor('react'),
+  'react/display-name': errorFor('react'),
   'react/forbid-component-props': [
-    enableFor('react'),
+    errorFor('react'),
     {
       forbid: [
         {allowedFor: ['Link'], propName: 'className'},
@@ -893,112 +900,112 @@ export const RULES: MyRules = {
       ],
     },
   ],
-  'react/forbid-dom-props': enableFor('react'),
-  'react/forbid-elements': enableFor('react'),
-  'react/forbid-foreign-prop-types': enableFor('react'),
-  'react/forbid-prop-types': enableFor('react'),
-  'react/forward-ref-uses-ref': enableFor('react'),
+  'react/forbid-dom-props': errorFor('react'),
+  'react/forbid-elements': errorFor('react'),
+  'react/forbid-foreign-prop-types': errorFor('react'),
+  'react/forbid-prop-types': errorFor('react'),
+  'react/forward-ref-uses-ref': errorFor('react'),
   'react/function-component-definition': [
-    enableFor('react'),
+    errorFor('react'),
     {namedComponents: 'arrow-function', unnamedComponents: 'arrow-function'},
   ],
-  'react/hook-use-state': enableFor('react'),
-  'react/iframe-missing-sandbox': enableFor('react'),
-  'react/jsx-boolean-value': enableFor('react'),
-  'react/jsx-child-element-spacing': enableFor('react'),
-  'react/jsx-closing-bracket-location': enableFor('react'),
-  'react/jsx-closing-tag-location': enableFor('react'),
-  'react/jsx-curly-brace-presence': enableFor('react'),
+  'react/hook-use-state': errorFor('react'),
+  'react/iframe-missing-sandbox': errorFor('react'),
+  'react/jsx-boolean-value': errorFor('react'),
+  'react/jsx-child-element-spacing': errorFor('react'),
+  'react/jsx-closing-bracket-location': errorFor('react'),
+  'react/jsx-closing-tag-location': errorFor('react'),
+  'react/jsx-curly-brace-presence': errorFor('react'),
   'react/jsx-curly-newline': 'off', // using Prettier for styling
-  'react/jsx-curly-spacing': enableFor('react'),
-  'react/jsx-equals-spacing': enableFor('react'),
+  'react/jsx-curly-spacing': errorFor('react'),
+  'react/jsx-equals-spacing': errorFor('react'),
   'react/jsx-filename-extension': [
-    enableFor('react'),
+    errorFor('react'),
     {allow: 'as-needed', extensions: ['.tsx']},
   ],
   'react/jsx-first-prop-new-line': 'off',
-  'react/jsx-fragments': enableFor('react'),
-  'react/jsx-handler-names': enableFor('react'),
+  'react/jsx-fragments': errorFor('react'),
+  'react/jsx-handler-names': errorFor('react'),
   'react/jsx-indent': 'off',
   'react/jsx-indent-props': 'off',
-  'react/jsx-key': enableFor('react'),
-  'react/jsx-max-depth': [enableFor('react'), {max: 10}],
+  'react/jsx-key': errorFor('react'),
+  'react/jsx-max-depth': [errorFor('react'), {max: 10}],
   'react/jsx-max-props-per-line': 'off', // use Prettier for styling
   'react/jsx-newline': 'off', // use Prettier for styling
   'react/jsx-no-bind': 'off', // react-compiler handles these types of issues
-  'react/jsx-no-comment-textnodes': enableFor('react'),
-  'react/jsx-no-constructed-context-values': enableFor('react'),
-  'react/jsx-no-duplicate-props': enableFor('react'),
-  'react/jsx-no-leaked-render': enableFor('react'),
+  'react/jsx-no-comment-textnodes': errorFor('react'),
+  'react/jsx-no-constructed-context-values': errorFor('react'),
+  'react/jsx-no-duplicate-props': errorFor('react'),
+  'react/jsx-no-leaked-render': errorFor('react'),
   'react/jsx-no-literals': [
-    compose(enableFor('react'), disableFor('unitTests', 'e2eTests', 'demos')),
+    composeSeverity(errorFor('react'), offFor('tests', 'e2eTests', 'demos')),
     {allowedStrings: ['*', '%'], ignoreProps: true, noStrings: true},
   ],
-  'react/jsx-no-script-url': enableFor('react'),
-  'react/jsx-no-target-blank': enableFor('react'),
-  'react/jsx-no-undef': enableFor('react'),
-  'react/jsx-no-useless-fragment': enableFor('react'),
+  'react/jsx-no-script-url': errorFor('react'),
+  'react/jsx-no-target-blank': errorFor('react'),
+  'react/jsx-no-undef': errorFor('react'),
+  'react/jsx-no-useless-fragment': errorFor('react'),
   'react/jsx-one-expression-per-line': 'off',
-  'react/jsx-pascal-case': enableFor('react'),
-  'react/jsx-props-no-multi-spaces': enableFor('react'),
-  'react/jsx-props-no-spread-multi': enableFor('react'),
+  'react/jsx-pascal-case': errorFor('react'),
+  'react/jsx-props-no-multi-spaces': errorFor('react'),
+  'react/jsx-props-no-spread-multi': errorFor('react'),
   'react/jsx-props-no-spreading': 'off',
-  'react/jsx-sort-props': enableFor('react'),
-  'react/jsx-tag-spacing': enableFor('react'),
-  'react/jsx-uses-react': enableFor('react'),
-  'react/jsx-uses-vars': enableFor('react'),
+  'react/jsx-sort-props': errorFor('react'),
+  'react/jsx-tag-spacing': errorFor('react'),
+  'react/jsx-uses-react': errorFor('react'),
+  'react/jsx-uses-vars': errorFor('react'),
   'react/jsx-wrap-multilines': 'off',
-  'react/no-access-state-in-setstate': enableFor('react'),
-  'react/no-adjacent-inline-elements': enableFor('react'),
-  'react/no-array-index-key': enableFor('react'),
-  'react/no-arrow-function-lifecycle': enableFor('react'),
-  'react/no-children-prop': enableFor('react'),
-  'react/no-danger': enableFor('react'),
-  'react/no-danger-with-children': enableFor('react'),
-  'react/no-deprecated': enableFor('react'),
-  'react/no-did-mount-set-state': enableFor('react'),
-  'react/no-did-update-set-state': enableFor('react'),
-  'react/no-direct-mutation-state': enableFor('react'),
-  'react/no-find-dom-node': enableFor('react'),
-  'react/no-invalid-html-attribute': enableFor('react'),
-  'react/no-is-mounted': enableFor('react'),
-  'react/no-multi-comp': compose(
-    enableFor('react'),
-    disableFor('unitTests', 'e2eTests'),
+  'react/no-access-state-in-setstate': errorFor('react'),
+  'react/no-adjacent-inline-elements': errorFor('react'),
+  'react/no-array-index-key': errorFor('react'),
+  'react/no-arrow-function-lifecycle': errorFor('react'),
+  'react/no-children-prop': errorFor('react'),
+  'react/no-danger': errorFor('react'),
+  'react/no-danger-with-children': errorFor('react'),
+  'react/no-deprecated': errorFor('react'),
+  'react/no-did-mount-set-state': errorFor('react'),
+  'react/no-did-update-set-state': errorFor('react'),
+  'react/no-direct-mutation-state': errorFor('react'),
+  'react/no-find-dom-node': errorFor('react'),
+  'react/no-invalid-html-attribute': errorFor('react'),
+  'react/no-is-mounted': errorFor('react'),
+  'react/no-multi-comp': composeSeverity(
+    errorFor('react'),
+    offFor('tests', 'demos', 'e2eTests'),
   ),
-  'react/no-namespace': enableFor('react'),
-  'react/no-object-type-as-default-prop': enableFor('react'),
-  'react/no-redundant-should-component-update': enableFor('react'),
-  'react/no-render-return-value': enableFor('react'),
-  'react/no-set-state': enableFor('react'),
-  'react/no-string-refs': enableFor('react'),
-  'react/no-this-in-sfc': enableFor('react'),
-  'react/no-typos': enableFor('react'),
-  'react/no-unescaped-entities': enableFor('react'),
-  'react/no-unknown-property': enableFor('react'),
-  'react/no-unsafe': enableFor('react'),
-  'react/no-unstable-nested-components': enableFor('react'),
-  'react/no-unused-class-component-methods': enableFor('react'),
-  'react/no-unused-prop-types': enableFor('react'),
-  'react/no-unused-state': enableFor('react'),
-  'react/no-will-update-set-state': enableFor('react'),
-  'react/prefer-es6-class': enableFor('react'),
-  'react/prefer-exact-props': enableFor('react'),
+  'react/no-namespace': errorFor('react'),
+  'react/no-object-type-as-default-prop': errorFor('react'),
+  'react/no-redundant-should-component-update': errorFor('react'),
+  'react/no-render-return-value': errorFor('react'),
+  'react/no-set-state': errorFor('react'),
+  'react/no-string-refs': errorFor('react'),
+  'react/no-this-in-sfc': errorFor('react'),
+  'react/no-typos': errorFor('react'),
+  'react/no-unescaped-entities': errorFor('react'),
+  'react/no-unknown-property': errorFor('react'),
+  'react/no-unsafe': errorFor('react'),
+  'react/no-unstable-nested-components': errorFor('react'),
+  'react/no-unused-class-component-methods': errorFor('react'),
+  'react/no-unused-prop-types': errorFor('react'),
+  'react/no-unused-state': errorFor('react'),
+  'react/no-will-update-set-state': errorFor('react'),
+  'react/prefer-es6-class': errorFor('react'),
+  'react/prefer-exact-props': errorFor('react'),
   'react/prefer-read-only-props': 'off', // noisy
-  'react/prefer-stateless-function': enableFor('react'),
+  'react/prefer-stateless-function': errorFor('react'),
   'react/prop-types': 'off', // propTypes are so last decade
   'react/react-in-jsx-scope': 'off',
   'react/require-default-props': 'off',
-  'react/require-optimization': enableFor('react'),
-  'react/require-render-return': enableFor('react'),
-  'react/self-closing-comp': enableFor('react'),
-  'react/sort-comp': enableFor('react'),
-  'react/sort-default-props': enableFor('react'),
-  'react/sort-prop-types': enableFor('react'),
-  'react/state-in-constructor': enableFor('react'),
-  'react/static-property-placement': enableFor('react'),
-  'react/style-prop-object': enableFor('react'),
-  'react/void-dom-elements-no-children': enableFor('react'),
+  'react/require-optimization': errorFor('react'),
+  'react/require-render-return': errorFor('react'),
+  'react/self-closing-comp': errorFor('react'),
+  'react/sort-comp': errorFor('react'),
+  'react/sort-default-props': errorFor('react'),
+  'react/sort-prop-types': errorFor('react'),
+  'react/state-in-constructor': errorFor('react'),
+  'react/static-property-placement': errorFor('react'),
+  'react/style-prop-object': errorFor('react'),
+  'react/void-dom-elements-no-children': errorFor('react'),
   'require-atomic-updates': 'error',
   'require-await': 'off',
   'require-unicode-regexp': 'off', // almost always unnecessary
@@ -1020,7 +1027,7 @@ export const RULES: MyRules = {
   'testing-library/await-async-queries': 'off', // handled by ts/no-floating-promises
   'testing-library/await-async-utils': 'off', // handled by ts/no-floating-promises
   'testing-library/consistent-data-testid': [
-    enableFor('unitTests'),
+    composeSeverity(errorFor('tests'), offFor('e2eTests')),
     {
       testIdAttribute: 'data-testid',
       testIdPattern: '^{fileName}(\\.[a-z0-9]+)*$',
@@ -1028,26 +1035,71 @@ export const RULES: MyRules = {
   ],
   'testing-library/no-await-sync-events': 'off', // handled by ts/await-thenable
   'testing-library/no-await-sync-queries': 'off', // handled by ts/await-thenable
-  'testing-library/no-container': enableFor('unitTests'),
-  'testing-library/no-debugging-utils': enableFor('unitTests'),
-  'testing-library/no-dom-import': [enableFor('unitTests'), 'react'],
-  'testing-library/no-global-regexp-flag-in-query': enableFor('unitTests'),
-  'testing-library/no-manual-cleanup': enableFor('unitTests'),
-  'testing-library/no-node-access': enableFor('unitTests'),
-  'testing-library/no-promise-in-fire-event': enableFor('unitTests'),
-  'testing-library/no-render-in-lifecycle': enableFor('unitTests'),
+  'testing-library/no-container': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/no-debugging-utils': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/no-dom-import': [
+    composeSeverity(errorFor('tests'), offFor('e2eTests')),
+    'react',
+  ],
+  'testing-library/no-global-regexp-flag-in-query': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/no-manual-cleanup': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/no-node-access': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/no-promise-in-fire-event': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/no-render-in-lifecycle': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
   'testing-library/no-test-id-queries': 'off', // sometimes data-testid is necessary
-  'testing-library/no-unnecessary-act': enableFor('unitTests'),
-  'testing-library/no-wait-for-multiple-assertions': enableFor('unitTests'),
-  'testing-library/no-wait-for-side-effects': enableFor('unitTests'),
-  'testing-library/no-wait-for-snapshot': enableFor('unitTests'),
+  'testing-library/no-unnecessary-act': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/no-wait-for-multiple-assertions': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/no-wait-for-side-effects': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/no-wait-for-snapshot': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
   'testing-library/prefer-explicit-assert': 'off', // handled by jest/expect-expect
-  'testing-library/prefer-find-by': enableFor('unitTests'),
-  'testing-library/prefer-implicit-assert': enableFor('unitTests'),
-  'testing-library/prefer-presence-queries': enableFor('unitTests'),
-  'testing-library/prefer-query-by-disappearance': enableFor('unitTests'),
+  'testing-library/prefer-find-by': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/prefer-implicit-assert': 'off', // getBy*().toBeInTheDocument() is best practice
+  'testing-library/prefer-presence-queries': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/prefer-query-by-disappearance': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
   'testing-library/prefer-query-matchers': [
-    enableFor('unitTests'),
+    composeSeverity(errorFor('tests'), offFor('e2eTests')),
     {
       validEntries: [
         {matcher: 'toBeVisible', query: 'get'},
@@ -1062,74 +1114,83 @@ export const RULES: MyRules = {
       ],
     },
   ],
-  'testing-library/prefer-screen-queries': enableFor('unitTests'),
-  'testing-library/prefer-user-event': enableFor('unitTests'),
-  'testing-library/render-result-naming-convention': enableFor('unitTests'),
-  'ts/adjacent-overload-signatures': enableFor('typescript'),
+  'testing-library/prefer-screen-queries': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/prefer-user-event': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'testing-library/render-result-naming-convention': composeSeverity(
+    errorFor('tests'),
+    offFor('e2eTests'),
+  ),
+  'ts/adjacent-overload-signatures': errorFor('typescript'),
   'ts/array-type': [
-    enableFor('typescript'),
+    errorFor('typescript'),
     {default: 'generic', readonly: 'generic'},
   ],
-  'ts/await-thenable': enableFor('typescript'),
-  'ts/ban-ts-comment': enableFor('typescript'),
-  'ts/ban-tslint-comment': enableFor('typescript'),
-  'ts/class-literal-property-style': enableFor('typescript'),
-  'ts/class-methods-use-this': enableFor('typescript'),
-  'ts/consistent-generic-constructors': enableFor('typescript'),
-  'ts/consistent-indexed-object-style': enableFor('typescript'),
-  'ts/consistent-return': enableFor('typescript'),
-  'ts/consistent-type-assertions': enableFor('typescript'),
-  'ts/consistent-type-definitions': [enableFor('typescript'), 'type'],
-  'ts/consistent-type-exports': enableFor('typescript'),
+  'ts/await-thenable': errorFor('typescript'),
+  'ts/ban-ts-comment': errorFor('typescript'),
+  'ts/ban-tslint-comment': errorFor('typescript'),
+  'ts/class-literal-property-style': errorFor('typescript'),
+  'ts/class-methods-use-this': errorFor('typescript'),
+  'ts/consistent-generic-constructors': errorFor('typescript'),
+  'ts/consistent-indexed-object-style': errorFor('typescript'),
+  'ts/consistent-return': errorFor('typescript'),
+  'ts/consistent-type-assertions': errorFor('typescript'),
+  'ts/consistent-type-definitions': [errorFor('typescript'), 'type'],
+  'ts/consistent-type-exports': errorFor('typescript'),
   'ts/consistent-type-imports': 'off',
-  'ts/default-param-last': enableFor('typescript'),
-  'ts/dot-notation': [enableFor('typescript'), {allowKeywords: true}],
+  'ts/default-param-last': errorFor('typescript'),
+  'ts/dot-notation': [errorFor('typescript'), {allowKeywords: true}],
   'ts/explicit-function-return-type': 'off',
   'ts/explicit-member-accessibility': 'off',
   'ts/explicit-module-boundary-types': 'off',
   'ts/init-declarations': 'off',
-  'ts/max-params': [enableFor('typescript'), {max: 5}],
-  'ts/member-ordering': enableFor('typescript'),
-  'ts/method-signature-style': enableFor('typescript'),
+  'ts/max-params': [errorFor('typescript'), {max: 5}],
+  'ts/member-ordering': errorFor('typescript'),
+  'ts/method-signature-style': errorFor('typescript'),
   'ts/naming-convention': [
-    enableFor('typescript'),
+    errorFor('typescript'),
     {format: ['camelCase', 'PascalCase', 'UPPER_CASE'], selector: 'variable'},
     {format: ['camelCase', 'PascalCase'], selector: 'function'},
     {format: ['PascalCase'], selector: 'typeLike'},
   ],
-  'ts/no-array-constructor': enableFor('typescript'),
-  'ts/no-array-delete': enableFor('typescript'),
-  'ts/no-base-to-string': enableFor('typescript'),
-  'ts/no-confusing-non-null-assertion': enableFor('typescript'),
-  'ts/no-confusing-void-expression': enableFor('typescript'),
-  'ts/no-deprecated': enableFor('typescript'),
-  'ts/no-dupe-class-members': enableFor('typescript'),
-  'ts/no-duplicate-enum-values': enableFor('typescript'),
-  'ts/no-duplicate-type-constituents': enableFor('typescript'),
-  'ts/no-dynamic-delete': enableFor('typescript'),
+  'ts/no-array-constructor': errorFor('typescript'),
+  'ts/no-array-delete': errorFor('typescript'),
+  'ts/no-base-to-string': errorFor('typescript'),
+  'ts/no-confusing-non-null-assertion': errorFor('typescript'),
+  'ts/no-confusing-void-expression': errorFor('typescript'),
+  'ts/no-deprecated': errorFor('typescript'),
+  'ts/no-dupe-class-members': errorFor('typescript'),
+  'ts/no-duplicate-enum-values': errorFor('typescript'),
+  'ts/no-duplicate-type-constituents': errorFor('typescript'),
+  'ts/no-dynamic-delete': errorFor('typescript'),
   'ts/no-empty-function': [
-    enableFor('typescript'),
+    errorFor('typescript'),
     {allow: ['arrowFunctions', 'functions', 'methods']},
   ],
-  'ts/no-empty-object-type': enableFor('typescript'),
-  'ts/no-explicit-any': compose(
-    enableFor('typescript'),
-    disableFor('unitTests', 'configs'),
+  'ts/no-empty-object-type': errorFor('typescript'),
+  'ts/no-explicit-any': composeSeverity(
+    errorFor('typescript'),
+    offFor('tests', 'configs'),
   ),
-  'ts/no-extra-non-null-assertion': enableFor('typescript'),
-  'ts/no-extraneous-class': enableFor('typescript'),
-  'ts/no-floating-promises': enableFor('typescript'),
-  'ts/no-for-in-array': enableFor('typescript'),
-  'ts/no-implied-eval': enableFor('typescript'),
-  'ts/no-import-type-side-effects': enableFor('typescript'),
-  'ts/no-inferrable-types': enableFor('typescript'),
-  'ts/no-invalid-this': enableFor('typescript'),
-  'ts/no-invalid-void-type': enableFor('typescript'),
-  'ts/no-loop-func': [enableFor('typescript')],
+  'ts/no-extra-non-null-assertion': errorFor('typescript'),
+  'ts/no-extraneous-class': errorFor('typescript'),
+  'ts/no-floating-promises': errorFor('typescript'),
+  'ts/no-for-in-array': errorFor('typescript'),
+  'ts/no-implied-eval': errorFor('typescript'),
+  'ts/no-import-type-side-effects': errorFor('typescript'),
+  'ts/no-inferrable-types': errorFor('typescript'),
+  'ts/no-invalid-this': errorFor('typescript'),
+  'ts/no-invalid-void-type': errorFor('typescript'),
+  'ts/no-loop-func': [errorFor('typescript')],
   'ts/no-magic-numbers': [
-    compose(
-      enableFor('typescript'),
-      disableFor('unitTests', 'configs', 'scripts'),
+    composeSeverity(
+      errorFor('typescript'),
+      offFor('tests', 'configs', 'scripts'),
     ),
     {
       detectObjects: false,
@@ -1144,53 +1205,53 @@ export const RULES: MyRules = {
       ignoreTypeIndexes: true,
     },
   ],
-  'ts/no-meaningless-void-operator': enableFor('typescript'),
-  'ts/no-misused-new': enableFor('typescript'),
-  'ts/no-misused-promises': enableFor('typescript'),
-  'ts/no-misused-spread': enableFor('typescript'),
-  'ts/no-mixed-enums': enableFor('typescript'),
-  'ts/no-namespace': enableFor('typescript'),
-  'ts/no-non-null-asserted-nullish-coalescing': enableFor('typescript'),
-  'ts/no-non-null-asserted-optional-chain': enableFor('typescript'),
-  'ts/no-non-null-assertion': compose(
-    enableFor('typescript'),
-    disableFor('unitTests'),
+  'ts/no-meaningless-void-operator': errorFor('typescript'),
+  'ts/no-misused-new': errorFor('typescript'),
+  'ts/no-misused-promises': errorFor('typescript'),
+  'ts/no-misused-spread': errorFor('typescript'),
+  'ts/no-mixed-enums': errorFor('typescript'),
+  'ts/no-namespace': errorFor('typescript'),
+  'ts/no-non-null-asserted-nullish-coalescing': errorFor('typescript'),
+  'ts/no-non-null-asserted-optional-chain': errorFor('typescript'),
+  'ts/no-non-null-assertion': composeSeverity(
+    errorFor('typescript'),
+    offFor('tests'),
   ),
-  'ts/no-redeclare': enableFor('typescript'),
-  'ts/no-redundant-type-constituents': enableFor('typescript'),
-  'ts/no-require-imports': enableFor('typescript'),
-  'ts/no-restricted-imports': enableFor('typescript'),
-  'ts/no-restricted-types': enableFor('typescript'),
-  'ts/no-shadow': enableFor('typescript'),
-  'ts/no-this-alias': enableFor('typescript'),
-  'ts/no-unnecessary-boolean-literal-compare': enableFor('typescript'),
-  'ts/no-unnecessary-condition': enableFor('typescript'),
-  'ts/no-unnecessary-parameter-property-assignment': enableFor('typescript'),
-  'ts/no-unnecessary-qualifier': enableFor('typescript'),
-  'ts/no-unnecessary-template-expression': enableFor('typescript'),
-  'ts/no-unnecessary-type-arguments': enableFor('typescript'),
-  'ts/no-unnecessary-type-assertion': enableFor('typescript'),
-  'ts/no-unnecessary-type-constraint': enableFor('typescript'),
-  'ts/no-unnecessary-type-conversion': enableFor('typescript'),
-  'ts/no-unnecessary-type-parameters': enableFor('typescript'),
-  'ts/no-unsafe-argument': compose(
-    compose(enableFor('typescript'), disableFor('unitTests')),
-    disableFor('unitTests'),
+  'ts/no-redeclare': errorFor('typescript'),
+  'ts/no-redundant-type-constituents': errorFor('typescript'),
+  'ts/no-require-imports': errorFor('typescript'),
+  'ts/no-restricted-imports': errorFor('typescript'),
+  'ts/no-restricted-types': errorFor('typescript'),
+  'ts/no-shadow': errorFor('typescript'),
+  'ts/no-this-alias': errorFor('typescript'),
+  'ts/no-unnecessary-boolean-literal-compare': errorFor('typescript'),
+  'ts/no-unnecessary-condition': errorFor('typescript'),
+  'ts/no-unnecessary-parameter-property-assignment': errorFor('typescript'),
+  'ts/no-unnecessary-qualifier': errorFor('typescript'),
+  'ts/no-unnecessary-template-expression': errorFor('typescript'),
+  'ts/no-unnecessary-type-arguments': errorFor('typescript'),
+  'ts/no-unnecessary-type-assertion': errorFor('typescript'),
+  'ts/no-unnecessary-type-constraint': errorFor('typescript'),
+  'ts/no-unnecessary-type-conversion': errorFor('typescript'),
+  'ts/no-unnecessary-type-parameters': errorFor('typescript'),
+  'ts/no-unsafe-argument': composeSeverity(
+    composeSeverity(errorFor('typescript'), offFor('tests')),
+    offFor('tests'),
   ),
   'ts/no-unsafe-assignment': 'off', // fixing these errors usually makes the code worse
   'ts/no-unsafe-call': 'off', // fixing these errors usually makes the code worse
-  'ts/no-unsafe-declaration-merging': enableFor('typescript'),
-  'ts/no-unsafe-enum-comparison': enableFor('typescript'),
-  'ts/no-unsafe-function-type': enableFor('typescript'),
-  'ts/no-unsafe-member-access': compose(
-    enableFor('typescript'),
-    disableFor('unitTests'),
+  'ts/no-unsafe-declaration-merging': errorFor('typescript'),
+  'ts/no-unsafe-enum-comparison': errorFor('typescript'),
+  'ts/no-unsafe-function-type': errorFor('typescript'),
+  'ts/no-unsafe-member-access': composeSeverity(
+    errorFor('typescript'),
+    offFor('tests'),
   ),
-  'ts/no-unsafe-return': enableFor('typescript'),
+  'ts/no-unsafe-return': 'off', // fixing these errors usually makes the code worse
   'ts/no-unsafe-type-assertion': 'off', // fixing these errors usually makes the code worse
-  'ts/no-unsafe-unary-minus': enableFor('typescript'),
+  'ts/no-unsafe-unary-minus': errorFor('typescript'),
   'ts/no-unused-expressions': [
-    enableFor('typescript'),
+    errorFor('typescript'),
     {
       allowShortCircuit: false,
       allowTaggedTemplates: false,
@@ -1198,7 +1259,7 @@ export const RULES: MyRules = {
     },
   ],
   'ts/no-unused-vars': [
-    enableFor('typescript'),
+    errorFor('typescript'),
     {
       args: 'after-used',
       argsIgnorePattern: '^_',
@@ -1210,64 +1271,64 @@ export const RULES: MyRules = {
     },
   ],
   'ts/no-use-before-define': [
-    enableFor('typescript'),
+    errorFor('typescript'),
     {enums: true, ignoreTypeReferences: true, typedefs: true},
   ],
-  'ts/no-useless-constructor': enableFor('typescript'),
-  'ts/no-useless-empty-export': enableFor('typescript'),
-  'ts/no-wrapper-object-types': enableFor('typescript'),
-  'ts/non-nullable-type-assertion-style': enableFor('typescript'),
-  'ts/only-throw-error': enableFor('typescript'),
-  'ts/parameter-properties': enableFor('typescript'),
-  'ts/prefer-as-const': enableFor('typescript'),
-  'ts/prefer-destructuring': enableFor('typescript'),
-  'ts/prefer-enum-initializers': enableFor('typescript'),
-  'ts/prefer-find': enableFor('typescript'),
-  'ts/prefer-for-of': enableFor('typescript'),
-  'ts/prefer-function-type': enableFor('typescript'),
-  'ts/prefer-includes': enableFor('typescript'),
-  'ts/prefer-literal-enum-member': enableFor('typescript'),
-  'ts/prefer-namespace-keyword': enableFor('typescript'),
-  'ts/prefer-nullish-coalescing': enableFor('typescript'),
-  'ts/prefer-optional-chain': enableFor('typescript'),
-  'ts/prefer-promise-reject-errors': enableFor('typescript'),
-  'ts/prefer-readonly': enableFor('typescript'),
+  'ts/no-useless-constructor': errorFor('typescript'),
+  'ts/no-useless-empty-export': errorFor('typescript'),
+  'ts/no-wrapper-object-types': errorFor('typescript'),
+  'ts/non-nullable-type-assertion-style': errorFor('typescript'),
+  'ts/only-throw-error': errorFor('typescript'),
+  'ts/parameter-properties': errorFor('typescript'),
+  'ts/prefer-as-const': errorFor('typescript'),
+  'ts/prefer-destructuring': errorFor('typescript'),
+  'ts/prefer-enum-initializers': errorFor('typescript'),
+  'ts/prefer-find': errorFor('typescript'),
+  'ts/prefer-for-of': errorFor('typescript'),
+  'ts/prefer-function-type': errorFor('typescript'),
+  'ts/prefer-includes': errorFor('typescript'),
+  'ts/prefer-literal-enum-member': errorFor('typescript'),
+  'ts/prefer-namespace-keyword': errorFor('typescript'),
+  'ts/prefer-nullish-coalescing': errorFor('typescript'),
+  'ts/prefer-optional-chain': errorFor('typescript'),
+  'ts/prefer-promise-reject-errors': errorFor('typescript'),
+  'ts/prefer-readonly': errorFor('typescript'),
   'ts/prefer-readonly-parameter-types': 'off',
-  'ts/prefer-reduce-type-parameter': enableFor('typescript'),
-  'ts/prefer-regexp-exec': enableFor('typescript'),
-  'ts/prefer-return-this-type': enableFor('typescript'),
-  'ts/prefer-string-starts-ends-with': enableFor('typescript'),
-  'ts/promise-function-async': enableFor('typescript'),
-  'ts/related-getter-setter-pairs': enableFor('typescript'),
-  'ts/require-array-sort-compare': enableFor('typescript'),
+  'ts/prefer-reduce-type-parameter': errorFor('typescript'),
+  'ts/prefer-regexp-exec': errorFor('typescript'),
+  'ts/prefer-return-this-type': errorFor('typescript'),
+  'ts/prefer-string-starts-ends-with': errorFor('typescript'),
+  'ts/promise-function-async': errorFor('typescript'),
+  'ts/related-getter-setter-pairs': errorFor('typescript'),
+  'ts/require-array-sort-compare': errorFor('typescript'),
   'ts/require-await': 'off',
-  'ts/restrict-plus-operands': enableFor('typescript'),
-  'ts/restrict-template-expressions': enableFor('typescript'),
+  'ts/restrict-plus-operands': errorFor('typescript'),
+  'ts/restrict-template-expressions': errorFor('typescript'),
   'ts/return-await': 'off',
-  'ts/strict-boolean-expressions': enableFor('typescript'),
-  'ts/switch-exhaustiveness-check': enableFor('typescript'),
-  'ts/triple-slash-reference': enableFor('typescript'),
-  'ts/unbound-method': enableFor('typescript'),
-  'ts/unified-signatures': enableFor('typescript'),
-  'ts/use-unknown-in-catch-callback-variable': enableFor('typescript'),
+  'ts/strict-boolean-expressions': errorFor('typescript'),
+  'ts/switch-exhaustiveness-check': errorFor('typescript'),
+  'ts/triple-slash-reference': errorFor('typescript'),
+  'ts/unbound-method': composeSeverity(errorFor('typescript'), offFor('tests')),
+  'ts/unified-signatures': errorFor('typescript'),
+  'ts/use-unknown-in-catch-callback-variable': errorFor('typescript'),
   'turbo/no-undeclared-env-vars': 'error',
-  'ui-testing/missing-assertion-in-test': enableFor('e2eTests'),
-  'ui-testing/no-absolute-url': [enableFor('e2eTests'), 'playwright'],
-  'ui-testing/no-assertions-in-hooks': enableFor('e2eTests'),
+  'ui-testing/missing-assertion-in-test': errorFor('e2eTests'),
+  'ui-testing/no-absolute-url': [errorFor('e2eTests'), 'playwright'],
+  'ui-testing/no-assertions-in-hooks': errorFor('e2eTests'),
   'ui-testing/no-browser-commands-in-tests': 'off', // not sure I like the idea of requiring an abstraction layer per page like it suggests
   'ui-testing/no-css-page-layout-selector': [
-    enableFor('e2eTests'),
+    errorFor('e2eTests'),
     'playwright',
   ],
   'ui-testing/no-disabled-tests': 'off', // handled by playwright/no-skipped-test
-  'ui-testing/no-focused-tests': enableFor('e2eTests'),
-  'ui-testing/no-hard-wait': [enableFor('e2eTests'), 'playwright'],
-  'ui-testing/no-implicit-wait': enableFor('e2eTests'),
-  'ui-testing/no-link-text-selector': enableFor('e2eTests'),
-  'ui-testing/no-tag-name-selector': enableFor('e2eTests'),
-  'ui-testing/no-wait-in-tests': [enableFor('e2eTests'), 'playwright'],
-  'ui-testing/no-xpath-page-layout-selector': enableFor('e2eTests'),
-  'ui-testing/no-xpath-selector': enableFor('e2eTests'),
+  'ui-testing/no-focused-tests': errorFor('e2eTests'),
+  'ui-testing/no-hard-wait': [errorFor('e2eTests'), 'playwright'],
+  'ui-testing/no-implicit-wait': errorFor('e2eTests'),
+  'ui-testing/no-link-text-selector': errorFor('e2eTests'),
+  'ui-testing/no-tag-name-selector': errorFor('e2eTests'),
+  'ui-testing/no-wait-in-tests': [errorFor('e2eTests'), 'playwright'],
+  'ui-testing/no-xpath-page-layout-selector': errorFor('e2eTests'),
+  'ui-testing/no-xpath-selector': errorFor('e2eTests'),
   'unicode-bom': 'error',
   'use-isnan': 'error',
   'valid-typeof': 'off',
@@ -1289,5 +1350,20 @@ const eslintConfig: Array<Linter.Config> = [
   },
   ...resolveConfigs(RULES),
 ];
+
+if (process.env['DEBUG'] != null) {
+  console.log(
+    JSON.stringify(
+      eslintConfig,
+      (key: string, value: unknown) => {
+        if (key === 'plugins') {
+          return undefined;
+        }
+        return value;
+      },
+      2,
+    ),
+  );
+}
 
 export default eslintConfig;

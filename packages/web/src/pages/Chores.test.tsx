@@ -1,5 +1,6 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import Chores from './Chores';
 import {createWrapper} from '../test/createWrapper';
 
@@ -49,6 +50,7 @@ describe('chores page', () => {
   });
 
   test('defaults to hide completed and toggles to show', async () => {
+    const user = userEvent.setup();
     render(<Chores />, {
       wrapper: createWrapper({i18n: true, queryClient: true, router: true}),
     });
@@ -58,18 +60,19 @@ describe('chores page', () => {
     expect(screen.queryByText('Clean room')).not.toBeInTheDocument();
 
     const toggle = await screen.findByLabelText('Hide completed');
-    fireEvent.click(toggle);
+    await user.click(toggle);
     await expect(screen.findByText('Clean room')).resolves.toBeInTheDocument();
   });
 
   test('shows Complete button and calls upsert on click', async () => {
+    const user = userEvent.setup();
     render(<Chores />, {
       wrapper: createWrapper({i18n: true, queryClient: true, router: true}),
     });
     await expect(screen.findByText('Chores')).resolves.toBeInTheDocument();
     const completeBtn = await screen.findByRole('button', {name: 'Complete'});
-    fireEvent.click(completeBtn);
-    const {choreInstancesApi} = require('../lib/api');
+    await user.click(completeBtn);
+    const {choreInstancesApi} = jest.mocked(await import('../lib/api'));
     expect(choreInstancesApi.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         chore_id: 1,
@@ -80,11 +83,12 @@ describe('chores page', () => {
   });
 
   test('invalidates chore-instances queries after completion', async () => {
+    const user = userEvent.setup();
     render(<Chores />, {
       wrapper: createWrapper({i18n: true, queryClient: true, router: true}),
     });
     const completeBtn = await screen.findByRole('button', {name: 'Complete'});
-    fireEvent.click(completeBtn);
+    await user.click(completeBtn);
     // Wait a tick for async
     await screen.findByText('Chores');
     expect(mockInvalidate).toHaveBeenCalledWith({

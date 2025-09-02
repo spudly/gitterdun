@@ -3,7 +3,7 @@ import {rules} from './index.js';
 import {unitFixture} from './fixtures/tests/unit/sample.fixture.js';
 import {e2eFixture} from './fixtures/tests/e2e/sample.fixture.js';
 
-const tsParser = require('@typescript-eslint/parser');
+import tsParser from '@typescript-eslint/parser';
 
 const ruleTester = new RuleTester({
   languageOptions: {
@@ -23,6 +23,7 @@ const testFileGlobs = [
   'packages/eslint-plugin-gitterdun/src/fixtures/tests/**/*.{ts,tsx}',
 ];
 
+// eslint-disable-next-line jest/require-hook -- RuleTester must declare tests at top-level
 ruleTester.run(
   'no-unused-data-testid',
   rules['no-unused-data-testid' as keyof typeof rules] as any,

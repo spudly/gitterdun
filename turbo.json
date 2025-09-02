@@ -11,7 +11,8 @@
     "JEST_WORKER_ID",
     "CI",
     "PLAYWRIGHT_SKIP_WEBSERVER",
-    "MODE"
+    "MODE",
+    "DEBUG"
   ],
   "tasks": {
     "build": {
@@ -33,8 +34,8 @@
       "outputs": ["coverage/**"]
     },
     "start:dev": {"dependsOn": ["^build"], "cache": false, "persistent": true},
-    "type-check": {"dependsOn": ["^build"], "cache": false},
-    "//#prettier:check": {"cache": false},
+    "check:types": {"dependsOn": ["^build"], "cache": false},
+    "//#check:prettier": {"cache": false},
     "//#knip": {
       "inputs": [
         "src/**/*.{ts,tsx,js,jsx,json,css}",
@@ -44,6 +45,14 @@
       ]
     },
     "//#lint-staged": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "**/*.{ts,tsx,js,jsx,json,css}",
+        "**/dist/**",
+        "$TURBO_ROOT$/eslint.config.ts"
+      ]
+    },
+    "//#lint": {
       "dependsOn": ["^build"],
       "inputs": [
         "**/*.{ts,tsx,js,jsx,json,css}",
@@ -69,16 +78,16 @@
         "$TURBO_ROOT$/packages/*/package.json"
       ]
     },
-    "ci:check": {
-      "dependsOn": ["//#knip", "build", "test", "lint", "//#prettier:check"]
+    "check:all": {
+      "dependsOn": ["//#knip", "build", "test", "//#lint", "//#check:prettier"]
     },
-    "ai:check": {
+    "check:ai": {
       "dependsOn": [
         "//#knip",
         "build",
         "//#test:changed",
         "//#lint:changed",
-        "//#prettier:check"
+        "//#check:prettier"
       ]
     }
   }
