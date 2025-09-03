@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "start:dev": "vite",
-    "prebuild": "rm -rf dist; rm -f tsconfig.build.tsbuildinfo; npm run i18n:extract",
     "check:types": "tsc",
-    "build": "tsc -p tsconfig.build.json && vite build",
+    "prebuild": "npm run i18n:extract",
+    "build": "vite build",
     "preview": "vite preview",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

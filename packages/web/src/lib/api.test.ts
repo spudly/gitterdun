@@ -102,7 +102,7 @@ describe('api utils', () => {
     await choresApi.getById(1);
     await choresApi.create({
       title: 't',
-      point_reward: 1,
+      reward_points: 1,
       chore_type: 'regular',
     });
     await choresApi.update(1, {title: 'n'});

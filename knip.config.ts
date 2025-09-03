@@ -14,7 +14,6 @@ const config: KnipConfig = {
     'packages/web': {
       entry: [
         'src/main.tsx', // entry point for Vite React app
-        'src/index.tsx', // entry point for use as a library
       ],
 
       // Include all TS/TSX files but exclude demo and test files from analysis
@@ -26,8 +25,6 @@ const config: KnipConfig = {
     },
 
     'packages/api': {
-      entry: ['src/server.ts'], // Server entry point
-
       // Include all TS files except tests
       project: ['src/**/*.{ts,tsx}'],
 

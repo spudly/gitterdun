@@ -8,6 +8,12 @@
     "sourceMap": true,
     "allowImportingTsExtensions": true
   },
-  "include": ["**/*.tsx", "**/*.ts", "**/*.d.ts", "jest.setup.ts"],
+  "include": [
+    "**/*.tsx",
+    "**/*.ts",
+    "**/*.d.ts",
+    "jest.setup.ts",
+    "jest.setupAfterEnv.ts"
+  ],
   "exclude": ["node_modules", "**/dist", "**/build"]
 }
