@@ -5,6 +5,7 @@
   "scripts": {
     "start:dev": "vite",
     "check:types": "tsc",
+    "prebuild": "npm run i18n:extract",
     "build": "vite build",
     "preview": "vite preview",
     "format": "prettier --write .",
