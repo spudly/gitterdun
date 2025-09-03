@@ -2,12 +2,12 @@
   "name": "@gitterdun/api",
   "version": "0.1.0",
   "private": true,
-  "main": "src/server.js",
+  "main": "src/server.ts",
   "scripts": {
     "start:dev": "NODE_ENV=development nodemon --exec tsx src/server.ts",
     "start:test": "NODE_ENV=test TEST_ENV=playwright nodemon --exec tsx src/server.ts",
     "check:types": "tsc",
-    "start": "NODE_ENV=production tsx src/server.js",
+    "start": "NODE_ENV=production tsx src/server.ts",
     "test": "jest",
     "db:reset": "tsx src/scripts/dbReset.ts",
     "test:dev": "jest --watch"

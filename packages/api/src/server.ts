@@ -18,6 +18,8 @@ import choreInstanceRoutes from './routes/choreInstances';
 import {asError} from '@gitterdun/shared';
 import {setupErrorHandling} from './middleware/errorHandler';
 
+Error.stackTraceLimit = 100;
+
 // Load environment variables
 dotenv.config();
 
@@ -75,7 +77,29 @@ const setupBasicMiddleware = (app: express.Express): void => {
 
 const setupStaticServing = (app: express.Express): void => {
   if (isProduction) {
-    app.use(express.static(path.join(appRootDir, 'dist/client')));
+    const staticDir = path.join(appRootDir, '..', 'web', 'dist');
+    app.use(express.static(staticDir));
+  }
+};
+
+const setupSpaFallback = (app: express.Express): void => {
+  if (isProduction) {
+    const staticDir = path.join(appRootDir, '..', 'web', 'dist');
+    const indexHtmlPath = path.join(staticDir, 'index.html');
+    app.get(
+      '*path',
+      (
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction,
+      ) => {
+        if (req.path.startsWith('/api')) {
+          next();
+          return;
+        }
+        res.sendFile(indexHtmlPath);
+      },
+    );
   }
 };
 
@@ -113,6 +137,7 @@ const setupAllMiddleware = (app: express.Express): void => {
   setupBasicMiddleware(app);
   setupStaticServing(app);
   setupRoutes(app);
+  setupSpaFallback(app);
   setupErrorHandling(app);
 };
 

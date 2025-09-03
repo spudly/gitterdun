@@ -52,3 +52,4 @@
 - [ ] add date-fns
 - [ ] remove build step from api package
 - [ ] fix eslint config issue where rules get disabled inadvertently
+- [ ] esm all the packages

@@ -19,9 +19,10 @@ module.exports = {
       },
     ],
   },
+  setupFiles: [...baseCfg.setupFiles, '<rootDir>/jest.setup.ts'],
   setupFilesAfterEnv: [
     ...baseCfg.setupFilesAfterEnv,
-    '<rootDir>/jest.setup.ts',
+    '<rootDir>/jest.setupAfterEnv.ts',
   ],
   displayName: 'web',
 };
