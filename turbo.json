@@ -96,6 +96,15 @@
         "//#lint:changed",
         "//#check:prettier"
       ]
+    },
+    "ts:coverage": {
+      "dependsOn": ["^ts:coverage"],
+      "inputs": [
+        "src/**/*.{ts,tsx}",
+        "$TURBO_ROOT$/packages/*/tsconfig.json",
+        "$TURBO_ROOT$/package.json"
+      ],
+      "outputs": ["coverage-ts/**"]
     }
   }
 }

@@ -9,6 +9,7 @@
     "build:api": "npm run build --workspace=packages/api",
     "build:web": "npm run build --workspace=packages/web",
     "build": "turbo run build --output-logs=errors-only",
+    "check:ts:coverage": "NODE_ENV=production typescript-coverage-report",
     "check:ai": "turbo run check:ai --output-logs=errors-only",
     "check:all": "turbo run check:all --output-logs=errors-only",
     "check:prettier": "node --experimental-strip-types node_modules/prettier/bin/prettier.cjs --check .",
@@ -64,11 +65,13 @@
     "prettier-plugin-embed": "^0.5.0",
     "prettier-plugin-sql": "^0.19.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
+    "semantic-ui-react": "^2.1.5",
     "ts-jest": "^29.4.1",
     "tsx": "^4.20.5",
     "turbo": "^2.5.6",
     "type-fest": "^4.41.0",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "typescript-coverage-report": "^1.1.1"
   },
   "lint-staged": {
     "**/*.{ts,tsx,js,jsx,css,md,json,yml,yaml,sql}": [
@@ -82,5 +85,24 @@
   "packageManager": "npm@10.2.4",
   "dependencies": {
     "eslint-plugin-gitterdun": "^0.1.0"
+  },
+  "typeCoverage": {
+    "atLeast": 100,
+    "cache": true,
+    "detail": true,
+    "ignoreFiles": [
+      "**/scripts/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/bundle/**",
+      "**/test/**",
+      "**/tests/**",
+      "**/__test__/**",
+      "**/__tests__/**",
+      "**/*.test.*",
+      "**/*.config.*",
+      "**/jest.*"
+    ],
+    "strict": true
   }
 }

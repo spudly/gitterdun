@@ -17,6 +17,7 @@
 *.tsbuildinfo
 build
 coverage
+coverage-ts
 data
 dist
 extracted

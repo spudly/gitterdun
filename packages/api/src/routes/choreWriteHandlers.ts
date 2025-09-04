@@ -1,7 +1,6 @@
 import express from 'express';
 import {StatusCodes} from 'http-status-codes';
 import {CreateChoreSchema} from '@gitterdun/shared';
-// import db from '../lib/db';
 import {transaction} from '../utils/crud/db';
 import {logger} from '../utils/logger';
 import {requireUserId} from '../utils/auth';

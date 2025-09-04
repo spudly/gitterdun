@@ -1,4 +1,5 @@
 npm run knip
 npm run build
+npm run check:ts:coverage
 npm run test:changed
 npm run lint-staged

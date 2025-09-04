@@ -226,6 +226,46 @@ jobs:
       - name: Check dependencies
         run: npm run knip
 
+  ts-coverage:
+    name: TS Coverage
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+
+      - name: Restore node_modules cache
+        id: cache-node-modules-ts-coverage
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key:
+            ${{ runner.os }}-node_modules-${{ github.sha }}-${{
+            hashFiles('package-lock.json') }}
+
+      - name: Install dependencies (cache miss)
+        if: steps.cache-node-modules-ts-coverage.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Restore build artifacts cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            packages/*/dist
+            packages/*/src/i18n/extracted
+            packages/*/tsconfig.build.tsbuildinfo
+          key: ${{ runner.os }}-build-${{ github.sha }}
+
+      - name: TypeScript coverage report
+        run: npm run check:ts:coverage
+
   e2e:
     name: E2E Tests
     needs: build
