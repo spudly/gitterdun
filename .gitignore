@@ -9,6 +9,7 @@
 .pnp.*
 .pnpm-debug.log*
 .turbo
+.type-coverage
 .vscode
 .yarn/*
 *.log

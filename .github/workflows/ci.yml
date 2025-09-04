@@ -113,7 +113,15 @@ jobs:
       - name: Run tests
         env:
           CI: true
-        run: npm test
+        run: npm test -- --coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: |
+            ./coverage/lcov.info
+            ./packages/*/coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   lint:
     name: Lint
