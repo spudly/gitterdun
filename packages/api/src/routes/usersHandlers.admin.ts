@@ -11,15 +11,15 @@ import {
   listUsers,
 } from '../utils/crud/users';
 
-export const listUsersHandler = (
+export const listUsersHandler = async (
   req: express.Request,
   res: express.Response,
-): void => {
+): Promise<void> => {
   try {
-    if (!requireAdmin(req, res)) {
+    if (!(await requireAdmin(req, res))) {
       return;
     }
-    const rows = listUsers();
+    const rows = await listUsers();
     const users = rows.map(row => UserSchema.parse(row));
     res.json({success: true, data: users});
   } catch (error) {
@@ -30,19 +30,19 @@ export const listUsersHandler = (
   }
 };
 
-export const deleteUserHandler = (
+export const deleteUserHandler = async (
   req: express.Request,
   res: express.Response,
-): void => {
+): Promise<void> => {
   try {
-    if (!requireAdmin(req, res)) {
+    if (!(await requireAdmin(req, res))) {
       return;
     }
     const id = z.coerce.number().int().parse(req.params['id']);
 
-    clearChoresCreatedBy(id);
-    deleteInvitationsByInviter(id);
-    const info = deleteUserById(id);
+    await clearChoresCreatedBy(id);
+    await deleteInvitationsByInviter(id);
+    const info = await deleteUserById(id);
     if (info.changes === 0) {
       res
         .status(StatusCodes.NOT_FOUND)

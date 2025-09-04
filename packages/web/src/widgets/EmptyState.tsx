@@ -16,8 +16,8 @@ export const EmptyState: FC<EmptyStateProps> = ({
   action,
   className = '',
 }) => {
-  const hasIcon = icon !== null && icon !== undefined;
-  const hasDescription = description !== null && description !== undefined;
+  const hasIcon = icon != null;
+  const hasDescription = description != null;
 
   return (
     <div className={clsx('flex flex-col items-center gap-4 py-12', className)}>

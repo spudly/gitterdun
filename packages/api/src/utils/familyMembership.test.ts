@@ -19,11 +19,11 @@ jest.mock('../lib/db.js', () => {
 // Use real implementations for modules under test
 
 describe('single-family membership enforcement', () => {
-  test('createFamily deletes existing memberships using a shared utility', () => {
+  test('createFamily deletes existing memberships using a shared utility', async () => {
     const db = jest.mocked(dbModule).default;
     const prepareSpy = jest.spyOn(db, 'prepare');
 
-    familyOps.createFamily('Fam', 123);
+    await familyOps.createFamily('Fam', 123);
 
     // Expect a DELETE FROM family_members statement to be prepared
     expect(prepareSpy).toHaveBeenCalledWith(
@@ -31,11 +31,11 @@ describe('single-family membership enforcement', () => {
     );
   });
 
-  test('ensureFamilyMembership deletes existing memberships using a shared utility', () => {
+  test('ensureFamilyMembership deletes existing memberships using a shared utility', async () => {
     const db = jest.mocked(dbModule).default;
     const prepareSpy = jest.spyOn(db, 'prepare');
 
-    invitationOps.ensureFamilyMembership(1, 123, 'parent');
+    await invitationOps.ensureFamilyMembership(1, 123, 'parent');
 
     expect(prepareSpy).toHaveBeenCalledWith(
       expect.stringMatching(/DELETE\s+FROM\s+family_members/),

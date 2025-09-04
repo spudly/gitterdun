@@ -11,15 +11,15 @@ type CreateInvitationParams = {
   expiresAt: Date;
 };
 
-export const createInvitation = ({
+export const createInvitation = async ({
   token,
   familyId,
   email,
   role,
   inviterId,
   expiresAt,
-}: CreateInvitationParams): void => {
-  run(
+}: CreateInvitationParams): Promise<void> => {
+  await run(
     sql`
       INSERT INTO
         family_invitations (
@@ -42,15 +42,15 @@ export const createInvitation = ({
   );
 };
 
-export const ensureFamilyMembership = (
+export const ensureFamilyMembership = async (
   familyId: number,
   userId: number,
   role: string,
-): void => {
+): Promise<void> => {
   // Enforce single-family membership: remove any existing memberships first
-  removeAllMembershipsForUser(userId);
+  await removeAllMembershipsForUser(userId);
 
-  run(
+  await run(
     sql`
       INSERT INTO
         family_members (family_id, user_id, role)
@@ -60,18 +60,5 @@ export const ensureFamilyMembership = (
     familyId,
     userId,
     role,
-  );
-};
-
-export const markInvitationAccepted = (token: string): void => {
-  run(
-    sql`
-      UPDATE family_invitations
-      SET
-        accepted = 1
-      WHERE
-        token = ?
-    `,
-    token,
   );
 };

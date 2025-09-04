@@ -115,3 +115,51 @@ describe('db module', () => {
     expect(mockDb.pragma).toHaveBeenCalledWith('journal_mode = WAL');
   });
 });
+
+describe('db selection by environment', () => {
+  test('uses SQLite in development by default', async () => {
+    jest.resetModules();
+    const originalEnv = {...process.env};
+    process.env = {...originalEnv, NODE_ENV: 'development'};
+
+    // Fresh import of db module
+    const {default: db} = await import('./db');
+    expect(db).toBeDefined();
+
+    process.env = originalEnv;
+  });
+
+  test('uses Postgres in production', async () => {
+    jest.resetModules();
+    const originalEnv = {...process.env};
+    process.env = {
+      ...originalEnv,
+      NODE_ENV: 'production',
+      EXTERNAL_POSTGRES_URL:
+        'postgresql://user:pass@localhost:5432/giterdone_postgres',
+    };
+
+    // Import db
+    const {default: db} = await import('./db');
+    expect(db).toBeDefined();
+
+    process.env = originalEnv;
+  });
+
+  test('uses Postgres in development when POSTGRES env flag is set', async () => {
+    jest.resetModules();
+    const originalEnv = {...process.env};
+    process.env = {
+      ...originalEnv,
+      NODE_ENV: 'development',
+      EXTERNAL_POSTGRES_URL:
+        'postgresql://user:pass@localhost:5432/giterdone_postgres',
+      USE_POSTGRES: 'true',
+    };
+
+    const {default: db} = await import('./db');
+    expect(db).toBeDefined();
+
+    process.env = originalEnv;
+  });
+});

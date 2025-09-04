@@ -1,30 +1,43 @@
 import {sql} from '../sql';
-import {all, get, run} from './db';
+import {allTyped, getTyped, run} from './db';
+import {UserSchema} from '@gitterdun/shared';
 
-export const listUsers = () => {
-  return all(sql`
-    SELECT
-      id,
-      username,
-      email,
-      role,
-      points,
-      streak_count,
-      created_at,
-      updated_at
-    FROM
-      users
-    ORDER BY
-      id ASC
-  `);
+export const listUsers = async () => {
+  return allTyped(
+    UserSchema.pick({
+      id: true,
+      username: true,
+      email: true,
+      role: true,
+      points: true,
+      streak_count: true,
+      created_at: true,
+      updated_at: true,
+    }),
+    sql`
+      SELECT
+        id,
+        username,
+        email,
+        role,
+        points,
+        streak_count,
+        created_at,
+        updated_at
+      FROM
+        users
+      ORDER BY
+        id ASC
+    `,
+  );
 };
 
-export const updateUserProfile = (
+export const updateUserProfile = async (
   id: number,
   displayName: string | null,
   avatarUrl: string | null,
   email: string | null,
-) => {
+): Promise<unknown> => {
   return run(
     sql`
       UPDATE users
@@ -43,8 +56,20 @@ export const updateUserProfile = (
   );
 };
 
-export const getUserById = (id: number) => {
-  return get(
+export const getUserById = async (id: number) => {
+  return getTyped(
+    UserSchema.pick({
+      id: true,
+      username: true,
+      email: true,
+      role: true,
+      points: true,
+      streak_count: true,
+      display_name: true,
+      avatar_url: true,
+      created_at: true,
+      updated_at: true,
+    }),
     sql`
       SELECT
         id,
@@ -66,7 +91,9 @@ export const getUserById = (id: number) => {
   );
 };
 
-export const deleteUserById = (id: number) => {
+export const deleteUserById = async (
+  id: number,
+): Promise<{changes: number}> => {
   return run(
     sql`
       DELETE FROM users
@@ -74,10 +101,12 @@ export const deleteUserById = (id: number) => {
         id = ?
     `,
     id,
-  );
+  ) as Promise<{changes: number}>;
 };
 
-export const clearChoresCreatedBy = (userId: number) => {
+export const clearChoresCreatedBy = async (
+  userId: number,
+): Promise<unknown> => {
   return run(
     sql`
       UPDATE chores
@@ -90,7 +119,9 @@ export const clearChoresCreatedBy = (userId: number) => {
   );
 };
 
-export const deleteInvitationsByInviter = (userId: number) => {
+export const deleteInvitationsByInviter = async (
+  userId: number,
+): Promise<unknown> => {
   return run(
     sql`
       DELETE FROM family_invitations

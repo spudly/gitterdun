@@ -10,10 +10,10 @@ import {
   PASSWORD_RESET_EXPIRATION_MS,
 } from '../constants';
 
-const createPasswordResetToken = (userId: number) => {
+const createPasswordResetToken = async (userId: number) => {
   const token = crypto.randomBytes(SECURE_TOKEN_BYTES).toString('hex');
   const expiresAt = new Date(Date.now() + PASSWORD_RESET_EXPIRATION_MS);
-  run(
+  await run(
     sql`
       INSERT INTO
         password_resets (token, user_id, created_at, expires_at, used)
@@ -27,8 +27,8 @@ const createPasswordResetToken = (userId: number) => {
   return token;
 };
 
-export const findUserForReset = (email: string) => {
-  const row = get(
+export const findUserForReset = async (email: string) => {
+  const row = await get(
     sql`
       SELECT
         id
@@ -39,11 +39,17 @@ export const findUserForReset = (email: string) => {
     `,
     email,
   );
-  return row === null ? undefined : IdRowSchema.parse(row);
+  if (row == null) {
+    return undefined;
+  }
+  return IdRowSchema.parse(row);
 };
 
-export const handlePasswordResetRequest = (email: string, userId: number) => {
-  const token = createPasswordResetToken(userId);
+export const handlePasswordResetRequest = async (
+  email: string,
+  userId: number,
+) => {
+  const token = await createPasswordResetToken(userId);
   // In a real app, send email. For now, log the token.
   logger.info({email, token}, 'Password reset requested');
   return {
@@ -57,8 +63,8 @@ export const getSecuritySafeResponse = () => ({
   message: 'If the email exists, a reset link has been sent',
 });
 
-const validatePasswordResetToken = (token: string) => {
-  const row = get(
+const validatePasswordResetToken = async (token: string) => {
+  const row = await get(
     sql`
       SELECT
         token,
@@ -72,9 +78,8 @@ const validatePasswordResetToken = (token: string) => {
     `,
     token,
   );
-  const found = row === null ? undefined : PasswordResetRowSchema.parse(row);
-
-  if (!found || found.used) {
+  const found = row == null ? undefined : PasswordResetRowSchema.parse(row);
+  if (found == null || found.used === 1) {
     return {isValid: false, error: 'Invalid token'};
   }
   if (new Date(found.expires_at).getTime() < Date.now()) {
@@ -90,7 +95,7 @@ export const resetUserPassword = async (
   token: string,
 ) => {
   const hashed = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
-  run(
+  await run(
     sql`
       UPDATE users
       SET
@@ -101,7 +106,7 @@ export const resetUserPassword = async (
     hashed,
     userId,
   );
-  run(
+  await run(
     sql`
       UPDATE password_resets
       SET
@@ -113,8 +118,8 @@ export const resetUserPassword = async (
   );
 };
 
-export const validateResetToken = (token: string) => {
-  const validation = validatePasswordResetToken(token);
+export const validateResetToken = async (token: string) => {
+  const validation = await validatePasswordResetToken(token);
   if (!validation.isValid || !validation.resetData) {
     const errorMessage = validation.error ?? 'Invalid token';
     throw Object.assign(new Error(errorMessage), {status: 400});

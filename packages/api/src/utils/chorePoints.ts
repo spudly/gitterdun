@@ -29,8 +29,8 @@ const requireTimestamp = (value: unknown, fieldName: string): number => {
   return ts;
 };
 
-export const getChoreForCompletion = (choreId: number) => {
-  const choreRow = get(
+export const getChoreForCompletion = async (choreId: number) => {
+  const choreRow = await get(
     sql`
       SELECT
         id,
@@ -56,7 +56,7 @@ export const getChoreForCompletion = (choreId: number) => {
     throw new Error('Chore not found');
   }
 
-  const base = choreRow as Record<string, unknown>;
+  const base = choreRow;
   const normalized = {
     ...base,
     start_date: toTimestamp(base['start_date']) ?? undefined,
@@ -78,11 +78,11 @@ export const calculateCompletionPoints = (chore: Chore) => {
   return {pointsEarned, bonusPointsEarned, penaltyPointsEarned};
 };
 
-export const updateUserPointsForChore = (
+export const updateUserPointsForChore = async (
   userId: number,
   totalPoints: number,
 ) => {
-  run(
+  await run(
     sql`
       UPDATE users
       SET
@@ -95,12 +95,12 @@ export const updateUserPointsForChore = (
   );
 };
 
-export const createChoreCompletionNotification = (
+export const createChoreCompletionNotification = async (
   userId: number,
   chore: Chore,
   choreId: number,
 ) => {
-  run(
+  await run(
     sql`
       INSERT INTO
         notifications (user_id, title, message, type, related_id)

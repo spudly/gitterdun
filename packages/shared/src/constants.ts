@@ -9,9 +9,11 @@ const ONE_SECOND_MS = 1000;
 const SECONDS_PER_MINUTE = 60;
 const MINUTES_PER_HOUR = 60;
 const HOURS_PER_DAY = 24;
+const DAYS_PER_WEEK = 7;
 export const ONE_MINUTE_MS = SECONDS_PER_MINUTE * ONE_SECOND_MS;
 export const ONE_HOUR_MS = MINUTES_PER_HOUR * ONE_MINUTE_MS;
 export const ONE_DAY_MS = HOURS_PER_DAY * ONE_HOUR_MS;
+export const ONE_WEEK_MS = DAYS_PER_WEEK * ONE_DAY_MS;
 
 /**
  * Authentication and security constants

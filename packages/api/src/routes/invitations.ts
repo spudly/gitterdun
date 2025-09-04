@@ -1,59 +1,56 @@
 import express from 'express';
+import crypto from 'node:crypto';
+import {StatusCodes} from 'http-status-codes';
 import {
   CreateInvitationSchema,
-  AcceptInvitationSchema,
   FamilyIdParamSchema,
+  asError,
+  ONE_WEEK_MS,
 } from '@gitterdun/shared';
 import {requireUserId} from '../utils/auth';
-
-import {
-  validateParentMembership,
-  generateInvitationToken,
-  validateInvitationToken,
-  validateInvitationExpiry,
-  authenticateOrCreateUser,
-} from '../utils/invitationAuthUtils';
-import {
-  createInvitation,
-  ensureFamilyMembership,
-  markInvitationAccepted,
-} from '../utils/invitationOperations';
+import {createInvitation} from '../utils/invitationOperations';
+import {getUserFamily} from '../utils/familyOperations';
+import {validateParentMembership} from '../utils/familyAuthUtils';
+import {logger} from '../utils/logger';
 
 // eslint-disable-next-line new-cap -- express.Router() is a factory function
 const router = express.Router();
 
-// Authentication utility moved to ../utils/auth
-
 // POST /api/invitations/:familyId - invite by email as parent or child
-router.post('/:familyId', (req, res) => {
-  const inviterId = requireUserId(req);
-  const {familyId} = FamilyIdParamSchema.parse(req.params);
-  const {email, role} = CreateInvitationSchema.parse(req.body);
+router.post('/:familyId', async (req, res) => {
+  try {
+    const inviterId = await requireUserId(req);
+    const {familyId} = FamilyIdParamSchema.parse(req.params);
+    const family = await getUserFamily(inviterId);
+    if (family === null || family.id !== familyId) {
+      return res
+        .status(StatusCodes.FORBIDDEN)
+        .json({success: false, error: 'Forbidden'});
+    }
 
-  validateParentMembership(inviterId, familyId);
+    const {email, role} = CreateInvitationSchema.parse(req.body);
+    validateParentMembership(inviterId, familyId);
 
-  const {token, expiresAt} = generateInvitationToken();
-  createInvitation({token, familyId, email, role, inviterId, expiresAt});
+    const token = crypto.randomUUID();
+    const expiresAt: Date = new Date(Date.now() + ONE_WEEK_MS);
 
-  // Email sending would go here; return token for dev
-  res.json({success: true, message: 'Invitation created', token});
-});
+    await createInvitation({
+      token,
+      familyId,
+      email,
+      role,
+      inviterId,
+      expiresAt,
+    });
 
-// POST /api/invitations/accept - accept an invitation and create/link account
-router.post('/accept', async (req, res) => {
-  const {token, username, password} = AcceptInvitationSchema.parse(req.body);
-  const invitation = validateInvitationToken(token);
-  validateInvitationExpiry(invitation);
-
-  const userId = await authenticateOrCreateUser(
-    invitation.email,
-    username,
-    password,
-  );
-  ensureFamilyMembership(invitation.family_id, userId, invitation.role);
-  markInvitationAccepted(token);
-
-  res.json({success: true, message: 'Invitation accepted'});
+    logger.info({familyId, email, role}, 'Invitation created');
+    return res.json({success: true});
+  } catch (error) {
+    logger.error({error: asError(error)}, 'Create invitation error');
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({success: false, error: 'Internal server error'});
+  }
 });
 
 export default router;

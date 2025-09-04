@@ -1,10 +1,6 @@
 import express from 'express';
 
-import {
-  LeaderboardRowSchema,
-  LeaderboardQuerySchema,
-  LeaderboardEntrySchema,
-} from '@gitterdun/shared';
+import {LeaderboardRowSchema, LeaderboardQuerySchema} from '@gitterdun/shared';
 import {sql} from '../utils/sql';
 import {requireUserId} from '../utils/auth';
 import {getLeaderboard} from '../utils/crud/leaderboard';
@@ -53,28 +49,20 @@ const buildLeaderboardQuery = (sortBy: string): string => {
   `;
 };
 
-const processLeaderboardResults = (rows: Array<unknown>) => {
-  return rows.map((row: unknown, index: number) => {
-    const parsed = LeaderboardRowSchema.parse(row);
-    return LeaderboardEntrySchema.parse({rank: index + 1, ...parsed});
-  });
-};
+const processLeaderboardResults = (rows: Array<unknown>) =>
+  rows.map(row => LeaderboardRowSchema.parse(row));
 
 // GET /api/leaderboard - Get leaderboard rankings
 router.get('/', async (req, res) => {
-  const userId = requireUserId(req);
+  const userId = await requireUserId(req);
   const {limit, sortBy} = LeaderboardQuerySchema.parse(req.query);
   const query = buildLeaderboardQuery(sortBy);
-  const leaderboard = getLeaderboard(query, userId, limit);
-  const validatedLeaderboard = processLeaderboardResults(leaderboard);
-
+  const rows = await getLeaderboard(query, userId, limit);
+  const parsed = processLeaderboardResults(rows);
+  const leaderboard = parsed.map((row, index) => ({rank: index + 1, ...row}));
   res.json({
     success: true,
-    data: {
-      leaderboard: validatedLeaderboard,
-      sortBy,
-      totalUsers: validatedLeaderboard.length,
-    },
+    data: {leaderboard, sortBy, totalUsers: leaderboard.length},
   });
 });
 

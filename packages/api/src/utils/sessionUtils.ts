@@ -9,12 +9,12 @@ import {SECURE_TOKEN_BYTES, SESSION_EXPIRATION_MS} from '../constants';
 
 type User = z.infer<typeof UserSchema>;
 
-export const createSession = (userId: number) => {
+export const createSession = async (userId: number) => {
   const sessionId = crypto.randomBytes(SECURE_TOKEN_BYTES).toString('hex');
   const now = new Date();
   const expiresAt = new Date(now.getTime() + SESSION_EXPIRATION_MS);
 
-  run(
+  await run(
     sql`
       INSERT INTO
         sessions (id, user_id, created_at, expires_at)
@@ -29,8 +29,8 @@ export const createSession = (userId: number) => {
   return {sessionId, expiresAt};
 };
 
-const fetchSessionFromDb = (sessionId: string) => {
-  const sessionRow = get(
+const fetchSessionFromDb = async (sessionId: string) => {
+  const sessionRow = await get(
     sql`
       SELECT
         s.user_id AS user_id,
@@ -42,14 +42,14 @@ const fetchSessionFromDb = (sessionId: string) => {
     `,
     sessionId,
   );
-  if (sessionRow === undefined || sessionRow === null) {
+  if (sessionRow == null) {
     return undefined;
   }
   return SessionRowSchema.parse(sessionRow);
 };
 
-const removeExpiredSession = (sessionId: string): void => {
-  run(
+const removeExpiredSession = async (sessionId: string): Promise<void> => {
+  await run(
     sql`
       DELETE FROM sessions
       WHERE
@@ -59,33 +59,33 @@ const removeExpiredSession = (sessionId: string): void => {
   );
 };
 
-const validateSessionExpiry = (
+const validateSessionExpiry = async (
   session: {expires_at: string},
   sessionId: string,
-): boolean => {
+): Promise<boolean> => {
   if (new Date(session.expires_at).getTime() < Date.now()) {
-    removeExpiredSession(sessionId);
+    await removeExpiredSession(sessionId);
     return false;
   }
   return true;
 };
 
-const validateSession = (sessionId: string) => {
-  const session = fetchSessionFromDb(sessionId);
+const validateSession = async (sessionId: string) => {
+  const session = await fetchSessionFromDb(sessionId);
 
   if (!session) {
     return null;
   }
 
-  if (!validateSessionExpiry(session, sessionId)) {
+  if (!(await validateSessionExpiry(session, sessionId))) {
     return null;
   }
 
   return session;
 };
 
-const getUserById = (userId: number): User | null => {
-  const user = get(
+const getUserById = async (userId: number): Promise<User | null> => {
+  const user = await get(
     sql`
       SELECT
         id,
@@ -108,22 +108,27 @@ const getUserById = (userId: number): User | null => {
   return user === undefined ? null : UserSchema.parse(user);
 };
 
-export const getUserFromSession = (req: express.Request): User | null => {
+export const getUserFromSession = async (
+  req: express.Request,
+): Promise<User | null> => {
   const sessionId = getCookie(req, 'sid');
   if (sessionId === undefined) {
     return null;
   }
-
-  const session = validateSession(sessionId);
-  if (!session) {
+  try {
+    const session = await validateSession(sessionId);
+    if (!session) {
+      return null;
+    }
+    const user = await getUserById(session.user_id);
+    return user;
+  } catch {
     return null;
   }
-
-  return getUserById(session.user_id);
 };
 
-export const deleteSession = (sessionId: string): void => {
-  run(
+export const deleteSession = async (sessionId: string): Promise<void> => {
+  await run(
     sql`
       DELETE FROM sessions
       WHERE

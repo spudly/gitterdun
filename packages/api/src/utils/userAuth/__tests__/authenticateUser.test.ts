@@ -5,8 +5,12 @@ jest.mock('../findUser');
 
 describe('authenticateUser', () => {
   test('throws 401 when neither email nor username resolves to a user', async () => {
-    jest.spyOn(findUser, 'findUserByEmail').mockReturnValue(undefined);
-    jest.spyOn(findUser, 'findUserByUsername').mockReturnValue(undefined);
+    jest
+      .spyOn(findUser, 'findUserByEmail')
+      .mockResolvedValue(undefined as never);
+    jest
+      .spyOn(findUser, 'findUserByUsername')
+      .mockResolvedValue(undefined as never);
 
     await expect(
       authenticateUser({email: 'nosuch@example.com'}, 'password123'),

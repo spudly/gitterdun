@@ -2,7 +2,6 @@ import {ChoreSchema} from '@gitterdun/shared';
 import {
   insertChore,
   insertChoreAssignment,
-  selectChoreById,
   deleteChoreById,
 } from './crud/chores';
 import {logger} from './logger';
@@ -38,33 +37,7 @@ type CreateChoreParams = {
   familyId: number;
 };
 
-export const fetchChoreById = (choreId: number) => {
-  const chore = selectChoreById(choreId);
-
-  if (chore === undefined) {
-    throw new Error('Chore not found');
-  }
-
-  const base = chore as Record<string, unknown>;
-  const normalized = {
-    ...base,
-    reward_points:
-      typeof base['reward_points'] === 'number' ? base['reward_points'] : 0,
-    start_date: toTimestamp(base['start_date']) ?? undefined,
-    due_date: toTimestamp(base['due_date']) ?? undefined,
-    recurrence_rule:
-      (base['recurrence_rule'] as string | null | undefined) ?? undefined,
-    created_at: toTimestamp(base['created_at']),
-    updated_at: toTimestamp(base['updated_at']),
-  };
-  try {
-    return ChoreSchema.parse(normalized);
-  } catch (_err) {
-    return ChoreSchema.parse(normalized);
-  }
-};
-
-export const createChoreInDb = (params: CreateChoreParams) => {
+export const createChoreInDb = async (params: CreateChoreParams) => {
   const {
     title,
     description,
@@ -77,7 +50,7 @@ export const createChoreInDb = (params: CreateChoreParams) => {
     createdBy,
     familyId,
   } = params;
-  const createdRow = insertChore({
+  const createdRow = await insertChore({
     title,
     description,
     rewardPoints: rewardPoints ?? 0,
@@ -90,7 +63,7 @@ export const createChoreInDb = (params: CreateChoreParams) => {
     familyId,
   });
 
-  const base = createdRow as Record<string, unknown>;
+  const base: Record<string, unknown> = createdRow as Record<string, unknown>;
   const normalized = {
     ...base,
     reward_points:
@@ -105,19 +78,20 @@ export const createChoreInDb = (params: CreateChoreParams) => {
   return ChoreSchema.parse(normalized);
 };
 
-export const assignChoreToUsers = (
+export const assignChoreToUsers = async (
   choreId: number,
   assignedUsers: Array<number>,
 ) => {
   if (assignedUsers.length > 0) {
-    assignedUsers.forEach(userId => {
-      insertChoreAssignment(choreId, userId);
-    });
+    for (const userId of assignedUsers) {
+      // eslint-disable-next-line no-await-in-loop -- serialize inserts
+      await insertChoreAssignment(choreId, userId);
+    }
   }
 };
 
-export const checkChoreExists = (choreId: number) => {
-  const existingChore = get(
+export const checkChoreExists = async (choreId: number) => {
+  const existingChore = await get(
     sql`
       SELECT
         id
@@ -135,11 +109,11 @@ export const checkChoreExists = (choreId: number) => {
   return existingChore;
 };
 
-export const processChoreDelete = (choreId: number) => {
-  checkChoreExists(choreId);
+export const processChoreDelete = async (choreId: number) => {
+  await checkChoreExists(choreId);
 
   // Delete the chore (chore_assignments will be deleted due to CASCADE)
-  deleteChoreById(choreId);
+  await deleteChoreById(choreId);
 
   logger.info({choreId}, 'Chore deleted');
 };

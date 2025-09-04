@@ -18,17 +18,17 @@ jest.mock('../lib/db.js', () => {
 });
 
 describe('shared family membership removal', () => {
-  test('createFamily calls removeAllMembershipsForUser', () => {
+  test('createFamily calls removeAllMembershipsForUser', async () => {
     const mockedUtil = jest.mocked(membershipUtil);
     mockedUtil.removeAllMembershipsForUser.mockClear();
-    familyOps.createFamily('Fam', 42);
+    await familyOps.createFamily('Fam', 42);
     expect(mockedUtil.removeAllMembershipsForUser).toHaveBeenCalledWith(42);
   });
 
-  test('ensureFamilyMembership calls removeAllMembershipsForUser', () => {
+  test('ensureFamilyMembership calls removeAllMembershipsForUser', async () => {
     const mockedUtil = jest.mocked(membershipUtil);
     mockedUtil.removeAllMembershipsForUser.mockClear();
-    invitationOps.ensureFamilyMembership(7, 99, 'parent');
+    await invitationOps.ensureFamilyMembership(7, 99, 'parent');
     expect(mockedUtil.removeAllMembershipsForUser).toHaveBeenCalledWith(99);
   });
 });

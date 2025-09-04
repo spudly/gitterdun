@@ -25,21 +25,3 @@ export const validateParentMembership = (
     throw Object.assign(new Error('Forbidden'), {status: 403});
   }
 };
-
-export const checkIsFamilyMember = (
-  userId: number,
-  familyId: number,
-): boolean => {
-  const isMember = db
-    .prepare(sql`
-      SELECT
-        1
-      FROM
-        family_members
-      WHERE
-        family_id = ?
-        AND user_id = ?
-    `)
-    .get(familyId, userId);
-  return isMember !== undefined;
-};

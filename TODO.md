@@ -53,3 +53,6 @@
 - [ ] remove build step from api package
 - [ ] fix eslint config issue where rules get disabled inadvertently
 - [ ] esm all the packages
+- [ ] setup typescript-coverage-report?
+- [ ] add eslint rule to enforce that unawaited promises are assigned to a
+      variable named /promise$/i

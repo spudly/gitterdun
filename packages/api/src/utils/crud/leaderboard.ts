@@ -1,9 +1,9 @@
 import {all} from './db';
 
-export const getLeaderboard = (
+export const getLeaderboard = async (
   query: string,
   userId: number,
   limit: number,
-) => {
-  return all(query, userId, limit);
+): Promise<Array<unknown>> => {
+  return (await all(query, userId, limit)) as Array<unknown>;
 };

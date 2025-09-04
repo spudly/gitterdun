@@ -2,11 +2,11 @@ import type express from 'express';
 import {StatusCodes} from 'http-status-codes';
 import {getUserFromSession} from '../utils/sessionUtils';
 
-export const requireAdmin = (
+export const requireAdmin = async (
   req: express.Request,
   res: express.Response,
-): boolean => {
-  const user = getUserFromSession(req);
+): Promise<boolean> => {
+  const user = await getUserFromSession(req);
   if (!user || user.role !== 'admin') {
     res
       .status(StatusCodes.FORBIDDEN)

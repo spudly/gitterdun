@@ -32,13 +32,16 @@ router.get('/', async (req, res) => {
     userId,
     status,
   );
-  const total = getTotalGoalsCount(baseQuery, baseParams);
+  const total = await getTotalGoalsCount(baseQuery, baseParams);
   const {query: paginatedQuery, params: finalParams} = addPaginationToQuery(
     baseQuery,
     baseParams,
     {page, limit},
   );
-  const validatedGoals = fetchAndValidateGoals(paginatedQuery, finalParams);
+  const validatedGoals = await fetchAndValidateGoals(
+    paginatedQuery,
+    finalParams,
+  );
 
   res.json({
     success: true,
@@ -50,7 +53,11 @@ router.get('/', async (req, res) => {
 // POST /api/goals - Create a new goal
 router.post('/', async (req, res) => {
   const {title, description, targetPoints} = validateCreateGoalData(req.body);
-  const validatedGoal = createGoalInDatabase(title, description, targetPoints);
+  const validatedGoal = await createGoalInDatabase(
+    title,
+    description,
+    targetPoints,
+  );
 
   logger.info(
     {goalId: validatedGoal.id, title, targetPoints},
@@ -71,7 +78,7 @@ router.get('/:id', async (req, res) => {
   const {id} = IdParamSchema.parse(req.params);
   validateGoalId(id);
 
-  const goal = fetchGoalById(id);
+  const goal = await fetchGoalById(id);
   if (goal === undefined) {
     res
       .status(StatusCodes.NOT_FOUND)
@@ -87,7 +94,7 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const {goalId, updateData} = validateUpdateGoalRequest(req);
 
-  if (!checkGoalExists(goalId)) {
+  if (!(await checkGoalExists(goalId))) {
     res
       .status(StatusCodes.NOT_FOUND)
       .json({success: false, error: 'Goal not found'});
@@ -95,7 +102,7 @@ router.put('/:id', async (req, res) => {
   }
 
   const builder = buildGoalUpdateQuery(updateData);
-  const validatedGoal = executeGoalUpdate(goalId, builder);
+  const validatedGoal = await executeGoalUpdate(goalId, builder);
 
   logger.info({goalId}, 'Goal updated');
 
@@ -111,14 +118,14 @@ router.delete('/:id', async (req, res) => {
   const {id} = IdParamSchema.parse(req.params);
   validateGoalId(id);
 
-  if (!checkGoalExists(id)) {
+  if (!(await checkGoalExists(id))) {
     res
       .status(StatusCodes.NOT_FOUND)
       .json({success: false, error: 'Goal not found'});
     return;
   }
 
-  deleteGoalFromDatabase(id);
+  await deleteGoalFromDatabase(id);
   logger.info({goalId: id}, 'Goal deleted');
 
   res.json({success: true, message: 'Goal deleted successfully'});

@@ -22,7 +22,7 @@ export const BottomNav: FC<BottomNavProps> = ({
   ariaLabel,
 }) => {
   return (
-    <nav aria-label={ariaLabel} className="border-t bg-white md:hidden">
+    <nav aria-label={ariaLabel} className="border-t bg-white">
       <div className="flex flex-nowrap">
         {items.map(item => {
           const isActive = currentPath === item.path;

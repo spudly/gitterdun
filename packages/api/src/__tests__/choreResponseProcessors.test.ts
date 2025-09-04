@@ -22,7 +22,7 @@ describe('choreResponseProcessors normalization', () => {
     }) as typeof mockDb.prepare);
   });
 
-  test('coerces nulls to undefined and returns numeric timestamps', () => {
+  test('coerces nulls to undefined and returns numeric timestamps', async () => {
     const rows = [
       {
         id: 1,
@@ -53,7 +53,7 @@ describe('choreResponseProcessors normalization', () => {
       return {all: mockAll} as unknown as ReturnType<typeof db.prepare>;
     }) as typeof mockDb.prepare);
 
-    const result = processChoresRequest({});
+    const result = await processChoresRequest({});
     expect(result.success).toBe(true);
     expect(result.data).toHaveLength(1);
     const [chore] = result.data;

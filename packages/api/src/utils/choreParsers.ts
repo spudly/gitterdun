@@ -1,29 +1,9 @@
 import express from 'express';
 import {
-  ChoreQuerySchema,
   IdParamSchema,
   CompleteChoreBodySchema,
   UpdateChoreSchema,
 } from '@gitterdun/shared';
-
-export const parseChoresQueryRequest = (req: express.Request) => {
-  const validatedQuery = ChoreQuerySchema.parse(req.query);
-  const {
-    status,
-    chore_type: choreType,
-    user_id: userId,
-    page,
-    limit,
-    sort_by: sortBy,
-    order,
-  } = validatedQuery;
-  return {status, choreType, userId, page, limit, sortBy, order};
-};
-
-export const parseGetChoreRequest = (req: express.Request) => {
-  const {id: choreId} = IdParamSchema.parse(req.params);
-  return {choreId};
-};
 
 export const parseUpdateChoreRequest = (req: express.Request) => {
   const {id} = IdParamSchema.parse(req.params);
@@ -40,24 +20,6 @@ export const parseChoreCompletionRequest = (req: express.Request) => {
   const {id} = IdParamSchema.parse(req.params);
   const {userId, notes} = CompleteChoreBodySchema.parse(req.body);
   return {choreId: id, userId, notes};
-};
-
-export const validateGetChoreInput = (choreId: number) => {
-  if (Number.isNaN(choreId)) {
-    throw new Error('Invalid chore ID');
-  }
-};
-
-export const validateUpdateChoreInput = (choreId: number) => {
-  if (Number.isNaN(choreId)) {
-    throw new Error('Invalid chore ID');
-  }
-};
-
-export const validateDeleteChoreInput = (choreId: number) => {
-  if (Number.isNaN(choreId)) {
-    throw new Error('Invalid chore ID');
-  }
 };
 
 export const validateChoreCompletionInput = (choreId: number) => {

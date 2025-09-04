@@ -18,7 +18,6 @@ describe('sessionUtils', () => {
     const {getUserFromSession} = await import('./sessionUtils');
     const req = {headers: {cookie: 'sid=abc'}} as unknown as express.Request;
 
-    expect(() => getUserFromSession(req)).not.toThrow();
-    expect(getUserFromSession(req)).toBeNull();
+    await expect(getUserFromSession(req)).resolves.toBeNull();
   });
 });

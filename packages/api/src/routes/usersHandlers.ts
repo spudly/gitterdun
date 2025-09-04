@@ -14,12 +14,12 @@ import {
 // Admin-only handlers
 export {listUsersHandler, deleteUserHandler} from './usersHandlers.admin';
 
-export const getMeHandler = (
+export const getMeHandler = async (
   req: express.Request,
   res: express.Response,
-): void => {
+): Promise<void> => {
   try {
-    const sessionUser = getUserFromSession(req);
+    const sessionUser = await getUserFromSession(req);
     if (!sessionUser) {
       res
         .status(StatusCodes.UNAUTHORIZED)
@@ -36,12 +36,12 @@ export const getMeHandler = (
   }
 };
 
-export const patchMeHandler = (
+export const patchMeHandler = async (
   req: express.Request,
   res: express.Response,
-): void => {
+): Promise<void> => {
   try {
-    const sessionUser = getUserFromSession(req);
+    const sessionUser = await getUserFromSession(req);
     if (!sessionUser) {
       res
         .status(StatusCodes.UNAUTHORIZED)
@@ -59,12 +59,12 @@ export const patchMeHandler = (
     const nextAvatarUrl = parsed.avatar_url ?? user.avatar_url ?? null;
     const nextEmail = parsed.email ?? user.email ?? null;
 
-    const info = updateUserProfile(
+    const info = (await updateUserProfile(
       user.id,
       nextDisplayName,
       nextAvatarUrl,
       nextEmail,
-    );
+    )) as {changes?: number};
 
     if (info.changes === 0) {
       res
@@ -73,7 +73,7 @@ export const patchMeHandler = (
       return;
     }
 
-    const updated = getUserById(user.id);
+    const updated = await getUserById(user.id);
 
     res.json({success: true, data: UserSchema.parse(updated)});
   } catch (error) {
@@ -84,12 +84,12 @@ export const patchMeHandler = (
   }
 };
 
-export const deleteMeHandler = (
+export const deleteMeHandler = async (
   req: express.Request,
   res: express.Response,
-): void => {
+): Promise<void> => {
   try {
-    const sessionUser = getUserFromSession(req);
+    const sessionUser = await getUserFromSession(req);
     if (!sessionUser) {
       res
         .status(StatusCodes.UNAUTHORIZED)
@@ -98,9 +98,9 @@ export const deleteMeHandler = (
     }
     const user = UserSchema.parse(sessionUser);
 
-    clearChoresCreatedBy(user.id);
-    deleteInvitationsByInviter(user.id);
-    const info = deleteUserById(user.id);
+    await clearChoresCreatedBy(user.id);
+    await deleteInvitationsByInviter(user.id);
+    const info = await deleteUserById(user.id);
 
     if (info.changes === 0) {
       res

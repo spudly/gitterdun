@@ -1,7 +1,26 @@
 import {sql} from '../sql';
 import {get, run} from './db';
+import {z} from 'zod';
 
-export const insertChore = (params: {
+const ChoreRowSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+  description: z.string().nullable(),
+  reward_points: z.number().nullable().optional(),
+  penalty_points: z.number().nullable().optional(),
+  start_date: z.any().optional(),
+  due_date: z.any().nullable().optional(),
+  recurrence_rule: z.string().nullable().optional(),
+  chore_type: z.string(),
+  created_by: z.number(),
+  created_at: z.any(),
+  updated_at: z.any(),
+  created_by_username: z.string().nullable().optional(),
+});
+
+type ChoreRow = z.infer<typeof ChoreRowSchema>;
+
+export const insertChore = async (params: {
   title: string;
   description: string;
   rewardPoints: number | null;
@@ -25,7 +44,7 @@ export const insertChore = (params: {
     createdBy,
     familyId,
   } = params;
-  return get(
+  const row = await get(
     sql`
       INSERT INTO
         chores (
@@ -54,35 +73,16 @@ export const insertChore = (params: {
     createdBy,
     familyId,
   );
+  if (row === undefined) {
+    return undefined as unknown as ChoreRow;
+  }
+  return ChoreRowSchema.parse(row);
 };
 
-export const selectChoreById = (choreId: number) => {
-  return get(
-    sql`
-      SELECT
-        c.id,
-        c.title,
-        c.description,
-        c.reward_points,
-        c.penalty_points,
-        c.due_date,
-        c.recurrence_rule,
-        c.chore_type,
-        c.created_by,
-        c.created_at,
-        c.updated_at,
-        u.username AS created_by_username
-      FROM
-        chores c
-        LEFT JOIN users u ON c.created_by = u.id
-      WHERE
-        c.id = ?
-    `,
-    choreId,
-  );
-};
-
-export const insertChoreAssignment = (choreId: number, userId: number) => {
+export const insertChoreAssignment = async (
+  choreId: number,
+  userId: number,
+) => {
   return run(
     sql`
       INSERT INTO
@@ -95,7 +95,7 @@ export const insertChoreAssignment = (choreId: number, userId: number) => {
   );
 };
 
-export const deleteChoreById = (choreId: number) => {
+export const deleteChoreById = async (choreId: number) => {
   return run(
     sql`
       DELETE FROM chores

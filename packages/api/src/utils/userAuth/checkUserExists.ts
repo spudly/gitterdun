@@ -1,14 +1,14 @@
 import {get} from '../crud/db';
 import {sql} from '../sql';
 
-export const checkUserExists = (
+export const checkUserExists = async (
   email: string | undefined,
   username: string,
-) => {
+): Promise<boolean> => {
   const trimmedEmail = typeof email === 'string' ? email.trim() : undefined;
   const existingUserRow =
     trimmedEmail !== undefined && trimmedEmail !== ''
-      ? get(
+      ? await get(
           sql`
             SELECT
               id
@@ -21,7 +21,7 @@ export const checkUserExists = (
           trimmedEmail,
           username,
         )
-      : get(
+      : await get(
           sql`
             SELECT
               id
@@ -32,5 +32,5 @@ export const checkUserExists = (
           `,
           username,
         );
-  return existingUserRow !== null && existingUserRow !== undefined;
+  return existingUserRow != null;
 };

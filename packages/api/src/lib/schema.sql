@@ -11,6 +11,43 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Sessions table
+CREATE TABLE IF NOT EXISTS sessions (
+  id TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+  created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+  expires_at timestamp NOT NULL
+);
+
+-- Password reset tokens
+CREATE TABLE IF NOT EXISTS password_resets (
+  token TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+  created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+  expires_at timestamp NOT NULL,
+  used INTEGER DEFAULT 0
+);
+
+-- Families: group of users managed by a parent (owner)
+CREATE TABLE IF NOT EXISTS families (
+  id serial PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  owner_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+  timezone VARCHAR(100) DEFAULT 'UTC',
+  created_at timestamp DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Membership of users within a family with family-specific roles
+CREATE TABLE IF NOT EXISTS family_members (
+  family_id INTEGER NOT NULL REFERENCES families (id) ON DELETE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+  role VARCHAR(10) NOT NULL CHECK (role IN ('parent', 'child')),
+  PRIMARY KEY (family_id, user_id)
+);
+
+-- Enforce single-family per user (PostgreSQL)
+CREATE UNIQUE INDEX IF NOT EXISTS ux_family_members_user_id ON family_members (user_id);
+
 -- Chores table
 CREATE TABLE IF NOT EXISTS chores (
   id serial PRIMARY KEY,
@@ -166,26 +203,6 @@ VALUES
   )
 ON CONFLICT DO NOTHING;
 
--- Families: group of users managed by a parent (owner)
-CREATE TABLE IF NOT EXISTS families (
-  id serial PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  owner_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-  timezone VARCHAR(100) DEFAULT 'UTC',
-  created_at timestamp DEFAULT CURRENT_TIMESTAMP
-);
-
--- Membership of users within a family with family-specific roles
-CREATE TABLE IF NOT EXISTS family_members (
-  family_id INTEGER NOT NULL REFERENCES families (id) ON DELETE CASCADE,
-  user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-  role VARCHAR(10) NOT NULL CHECK (role IN ('parent', 'child')),
-  PRIMARY KEY (family_id, user_id)
-);
-
--- Enforce single-family per user (PostgreSQL)
-CREATE UNIQUE INDEX IF NOT EXISTS ux_family_members_user_id ON family_members (user_id);
-
 -- Chore instances table (per recurrence occurrence)
 CREATE TABLE IF NOT EXISTS chore_instances (
   id serial PRIMARY KEY,
@@ -204,3 +221,15 @@ CREATE TABLE IF NOT EXISTS chore_instances (
 CREATE INDEX IF NOT EXISTS idx_chore_instances_chore_id ON chore_instances (chore_id);
 
 CREATE INDEX IF NOT EXISTS idx_chore_instances_date ON chore_instances (instance_date);
+
+-- Invitations to join a family
+CREATE TABLE IF NOT EXISTS family_invitations (
+  token TEXT PRIMARY KEY,
+  family_id INTEGER NOT NULL REFERENCES families (id) ON DELETE CASCADE,
+  email VARCHAR(255) NOT NULL,
+  role VARCHAR(10) NOT NULL CHECK (role IN ('parent', 'child')),
+  invited_by INTEGER NOT NULL REFERENCES users (id),
+  created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+  expires_at timestamp NOT NULL,
+  accepted INTEGER DEFAULT 0
+);

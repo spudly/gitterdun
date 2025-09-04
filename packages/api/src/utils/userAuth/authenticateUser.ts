@@ -23,9 +23,9 @@ export const authenticateUser = async (
 
   let user: UserWithPasswordRow | undefined;
   if (email !== undefined && email !== '') {
-    user = findUserByEmail(email);
+    user = await findUserByEmail(email);
   } else if (username !== undefined && username !== '') {
-    user = findUserByUsername(username);
+    user = await findUserByUsername(username);
   }
 
   if (!user) {
