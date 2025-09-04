@@ -1,19 +1,13 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import type express from 'express';
-import db from '../lib/db';
+import * as crudDb from './crud/db';
 
-jest.mock('../lib/db', () => ({
-  __esModule: true,
-  default: {prepare: jest.fn()},
-}));
+jest.mock('./crud/db', () => ({__esModule: true, get: jest.fn()}));
 
 describe('sessionUtils', () => {
   test('getUserFromSession returns null when session row is undefined', async () => {
-    const mockDb = jest.mocked(db);
-    // First prepare() call is for sessions; return undefined row
-    mockDb.prepare.mockReturnValue({
-      get: jest.fn().mockReturnValue(undefined),
-    } as unknown as import('better-sqlite3').Statement);
+    const mockedCrudDb = jest.mocked(crudDb);
+    mockedCrudDb.get.mockResolvedValue(undefined);
 
     const {getUserFromSession} = await import('./sessionUtils');
     const req = {headers: {cookie: 'sid=abc'}} as unknown as express.Request;

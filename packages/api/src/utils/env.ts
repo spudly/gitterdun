@@ -1,6 +1,4 @@
-const isProduction = (): boolean => {
-  return process.env['NODE_ENV'] === 'production';
-};
+// Postgres-only mode; production detection is not used here
 
 export const getPostgresUrl = (): string | null => {
   const directUrl = process.env['PG_URL'];
@@ -18,17 +16,4 @@ export const getPostgresUrl = (): string | null => {
   const auth =
     user !== undefined ? `${user}${pass !== undefined ? `:${pass}` : ''}@` : '';
   return `postgresql://${auth}${host}:${port}/${db}`;
-};
-
-export const isPostgresEnabled = (): boolean => {
-  // Only enable Postgres when a URL can be resolved
-  const url = getPostgresUrl();
-  if (url === null) {
-    return false;
-  }
-  // Enable in development when explicitly requested, or automatically in production
-  if (process.env['USE_POSTGRES'] === 'true' || isProduction()) {
-    return true;
-  }
-  return false;
 };

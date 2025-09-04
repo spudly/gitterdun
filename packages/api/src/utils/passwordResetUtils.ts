@@ -18,7 +18,7 @@ const createPasswordResetToken = async (userId: number) => {
       INSERT INTO
         password_resets (token, user_id, created_at, expires_at, used)
       VALUES
-        (?, ?, CURRENT_TIMESTAMP, ?, 0)
+        (?, ?, current_timestamp, ?, 0)
     `,
     token,
     userId,

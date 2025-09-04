@@ -13,7 +13,6 @@
     "PLAYWRIGHT_SKIP_WEBSERVER",
     "MODE",
     "DEBUG",
-    "USE_POSTGRES",
     "PG_HOSTNAME",
     "PG_PORT",
     "PG_DATABASE",

@@ -75,7 +75,7 @@ router.post('/:id/children', async (req, res) => {
         .json({success: false, error: 'Forbidden'});
     }
 
-    validateParentMembership(userId, familyId);
+    await validateParentMembership(userId, familyId);
     // Ensure username/email availability
     const exists = await checkUserExists(email, username);
     if (exists) {
@@ -108,7 +108,7 @@ router.get('/mine', async (req, res) => {
 router.put('/:id/timezone', async (req, res) => {
   const userId = await requireUserId(req);
   const {id} = IdParamSchema.parse(req.params);
-  validateParentMembership(userId, id);
+  await validateParentMembership(userId, id);
   // ... update logic omitted for brevity
   res.json({success: true});
 });

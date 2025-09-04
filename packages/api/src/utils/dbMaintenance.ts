@@ -1,28 +1,19 @@
-import {pragma, all, run} from './crud/db';
-import {sql} from './sql';
+import {run} from './crud/db';
 
-type TableRow = {name: string};
+type TableRow = {table_name: string};
 
 const listUserTables = async (): Promise<ReadonlyArray<string>> => {
-  const rows = (await all(sql`
-    SELECT
-      name
-    FROM
-      sqlite_master
-    WHERE
-      type = 'table'
-      AND name NOT like 'sqlite_%'
-  `)) as ReadonlyArray<TableRow>;
-  return rows.map((row: TableRow) => row.name);
+  const rows = (await run(
+    `SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE' AND table_name <> 'spatial_ref_sys'`,
+  )) as ReadonlyArray<TableRow>;
+  return rows.map((row: TableRow) => row.table_name);
 };
 
 const dropTables = async (tableNames: ReadonlyArray<string>): Promise<void> => {
-  pragma('foreign_keys = OFF');
   for (const name of tableNames) {
     // eslint-disable-next-line no-await-in-loop -- sequential drops
-    await run(`DROP TABLE IF EXISTS ${name}`);
+    await run(`DROP TABLE IF EXISTS ${name} CASCADE`);
   }
-  pragma('foreign_keys = ON');
 };
 
 export const dropAllTables = async (): Promise<void> => {

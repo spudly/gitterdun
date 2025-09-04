@@ -19,7 +19,9 @@ export const createFamily = async (
       INSERT INTO
         families (name, owner_id, timezone)
       VALUES
-        (?, ?, ?) RETURNING id,
+        (?, ?, ?)
+      RETURNING
+        id,
         name,
         owner_id,
         timezone,
@@ -116,7 +118,9 @@ export const createChildUser = async (
       INSERT INTO
         users (username, email, password_hash, role)
       VALUES
-        (?, ?, ?, 'user') RETURNING id
+        (?, ?, ?, 'user')
+      RETURNING
+        id
     `,
     username,
     resolvedEmail,

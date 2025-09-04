@@ -4,18 +4,12 @@ import * as invitationOps from './invitationOperations.js';
 import * as membershipUtil from './familyMembership.js';
 
 jest.mock('./familyMembership.js');
-jest.mock('../lib/db.js', () => {
-  const run = jest.fn();
-  const get = jest.fn(() => ({
-    id: 1,
-    name: 'Fam',
-    owner_id: 1,
-    created_at: '',
-  }));
-  const all = jest.fn(() => []);
-  const prepare = jest.fn(() => ({run, get, all}));
-  return {__esModule: true, default: {prepare}};
-});
+jest.mock('./crud/db.js', () => ({
+  __esModule: true,
+  run: jest.fn(),
+  get: jest.fn(() => ({id: 1, name: 'Fam', owner_id: 1, created_at: ''})),
+  all: jest.fn(() => []),
+}));
 
 describe('shared family membership removal', () => {
   test('createFamily calls removeAllMembershipsForUser', async () => {

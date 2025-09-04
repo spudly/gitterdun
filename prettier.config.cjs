@@ -31,7 +31,7 @@ module.exports = {
   embeddedSqlTags: ['sql'],
 
   // prettier-plugin-sql:
-  language: 'sqlite',
+  language: 'postgresql',
   keywordCase: 'upper',
   dataTypeCase: 'upper',
   functionCase: 'upper',

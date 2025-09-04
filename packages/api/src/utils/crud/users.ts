@@ -45,7 +45,7 @@ export const updateUserProfile = async (
         display_name = ?,
         avatar_url = ?,
         email = ?,
-        updated_at = CURRENT_TIMESTAMP
+        updated_at = current_timestamp
       WHERE
         id = ?
     `,

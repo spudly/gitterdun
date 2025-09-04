@@ -3,7 +3,6 @@ import path from 'node:path';
 import {asError} from '@gitterdun/shared';
 import {logger} from '../utils/logger';
 import {BCRYPT_SALT_ROUNDS} from '../constants';
-import {isPostgresEnabled} from '../utils/env';
 import {run} from '../utils/crud/db';
 import {sql} from '../utils/sql';
 import {
@@ -15,10 +14,7 @@ import {
 } from '../utils/crud/init';
 
 const readSchemaFile = (): string => {
-  const schemaFile = isPostgresEnabled()
-    ? 'src/lib/schema.sql'
-    : 'src/lib/schema.sqlite.sql';
-  const schemaPath = path.join(process.cwd(), schemaFile);
+  const schemaPath = path.join(process.cwd(), 'src/lib/schema.sql');
   return fs.readFileSync(schemaPath, 'utf8');
 };
 
@@ -38,17 +34,11 @@ const columnExists = async (
 const ensureUsersProfileColumns = async (): Promise<void> => {
   try {
     if (!(await columnExists('users', 'display_name'))) {
-      await alterTableAddColumn(
-        'users',
-        isPostgresEnabled() ? 'display_name TEXT' : 'display_name TEXT',
-      );
+      await alterTableAddColumn('users', 'display_name TEXT');
       logger.info("Added 'display_name' column to users table");
     }
     if (!(await columnExists('users', 'avatar_url'))) {
-      await alterTableAddColumn(
-        'users',
-        isPostgresEnabled() ? 'avatar_url TEXT' : 'avatar_url TEXT',
-      );
+      await alterTableAddColumn('users', 'avatar_url TEXT');
       logger.info("Added 'avatar_url' column to users table");
     }
   } catch (error) {
@@ -62,10 +52,10 @@ const ensureUsersProfileColumns = async (): Promise<void> => {
 const ensureFamilyUpdatedAt = async (): Promise<void> => {
   try {
     if (!(await columnExists('families', 'updated_at'))) {
-      const col = isPostgresEnabled()
-        ? 'updated_at timestamp DEFAULT CURRENT_TIMESTAMP'
-        : 'updated_at datetime DEFAULT CURRENT_TIMESTAMP';
-      await alterTableAddColumn('families', col);
+      await alterTableAddColumn(
+        'families',
+        'updated_at timestamp DEFAULT CURRENT_TIMESTAMP',
+      );
       logger.info("Added 'updated_at' column to families table");
     }
   } catch (error) {
@@ -121,7 +111,7 @@ const createDefaultAdmin = async (): Promise<void> => {
 };
 
 export const initializeDatabase = async (): Promise<void> => {
-  logger.info(`Using ${isPostgresEnabled() ? 'Postgres' : 'SQLite'}`);
+  logger.info('Using Postgres');
   try {
     const schema = readSchemaFile();
     await executeSchema(schema);

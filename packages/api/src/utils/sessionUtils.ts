@@ -19,7 +19,7 @@ export const createSession = async (userId: number) => {
       INSERT INTO
         sessions (id, user_id, created_at, expires_at)
       VALUES
-        (?, ?, CURRENT_TIMESTAMP, ?)
+        (?, ?, current_timestamp, ?)
     `,
     sessionId,
     userId,

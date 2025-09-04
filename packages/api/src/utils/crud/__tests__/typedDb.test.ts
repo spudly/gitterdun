@@ -1,27 +1,16 @@
 import {describe, expect, test, beforeEach, jest} from '@jest/globals';
 import {z} from 'zod';
-import db from '../../../lib/db';
 import {listUsers} from '../users';
 import {UserSchema} from '@gitterdun/shared';
 import {allTyped, getTyped} from '../db';
+import {pgQuery} from '../../../lib/pgClient';
 
-// Mock env to force sqlite code paths (not Postgres)
-jest.mock('../../env', () => ({isPostgresEnabled: () => false}));
-
-// Mock the underlying sqlite db interface used by crud/db
-jest.mock('../../../lib/db', () => ({
+jest.mock('../../../lib/pgClient', () => ({
   __esModule: true,
-  default: {
-    prepare: jest
-      .fn()
-      .mockReturnValue({all: jest.fn(), get: jest.fn(), run: jest.fn()}),
-    transaction: jest.fn(),
-    exec: jest.fn(),
-    pragma: jest.fn(),
-  },
+  pgQuery: jest.fn(),
 }));
 
-const mockedDb = jest.mocked(db);
+const mockedPgQuery = jest.mocked(pgQuery);
 
 describe('typed DB helpers', () => {
   beforeEach(() => {
@@ -33,11 +22,9 @@ describe('typed DB helpers', () => {
       {id: 1, name: 'ok'},
       {id: 2, name: 'ok2'},
     ];
-    mockedDb.prepare.mockReturnValue({
-      all: jest.fn().mockReturnValue(rows),
-      get: jest.fn(),
-      run: jest.fn(),
-    } as unknown as ReturnType<typeof mockedDb.prepare>);
+    mockedPgQuery.mockResolvedValueOnce({
+      rows,
+    } as unknown as import('pg').QueryResult);
 
     const Row = z.object({id: z.number(), name: z.string()});
     const parsed = await allTyped(Row, 'SELECT 1');
@@ -50,20 +37,16 @@ describe('typed DB helpers', () => {
     const Row = z.object({id: z.number(), name: z.string()});
 
     // First: found
-    mockedDb.prepare.mockReturnValueOnce({
-      all: jest.fn(),
-      get: jest.fn().mockReturnValue(row),
-      run: jest.fn(),
-    } as unknown as ReturnType<typeof mockedDb.prepare>);
+    mockedPgQuery.mockResolvedValueOnce({
+      rows: [row],
+    } as unknown as import('pg').QueryResult);
     const found = await getTyped(Row, 'SELECT 1');
     expect(found).toEqual(row);
 
     // Second: not found
-    mockedDb.prepare.mockReturnValueOnce({
-      all: jest.fn(),
-      get: jest.fn().mockReturnValue(undefined),
-      run: jest.fn(),
-    } as unknown as ReturnType<typeof mockedDb.prepare>);
+    mockedPgQuery.mockResolvedValueOnce({
+      rows: [],
+    } as unknown as import('pg').QueryResult);
     const notFound = await getTyped(Row, 'SELECT 1 WHERE 0');
     expect(notFound).toBeUndefined();
   });
@@ -80,11 +63,9 @@ describe('typed DB helpers', () => {
       updated_at: '2024-01-01T00:00:00.000Z',
     };
 
-    mockedDb.prepare.mockReturnValue({
-      all: jest.fn().mockReturnValue([validUser]),
-      get: jest.fn(),
-      run: jest.fn(),
-    } as unknown as ReturnType<typeof mockedDb.prepare>);
+    mockedPgQuery.mockResolvedValueOnce({
+      rows: [validUser],
+    } as unknown as import('pg').QueryResult);
 
     const users = (await listUsers()) as Array<unknown>;
     // If listUsers integrates zod parsing, this parse should be a no-op pass

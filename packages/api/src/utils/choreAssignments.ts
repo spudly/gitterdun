@@ -93,7 +93,7 @@ export const updateChoreAssignmentCompletion = async ({
     sql`
       UPDATE chore_assignments
       SET
-        completed_at = CURRENT_TIMESTAMP,
+        completed_at = current_timestamp,
         points_earned = ?,
         bonus_points_earned = ?,
         penalty_points_earned = ?,

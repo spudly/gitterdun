@@ -49,8 +49,8 @@ export const handleGetChores = async (
           c.chore_type,
           'pending' AS status,
           c.created_by,
-          DATETIME('now') AS created_at,
-          DATETIME('now') AS updated_at,
+          datetime ('now') AS created_at,
+          datetime ('now') AS updated_at,
           u.username AS created_by_username
         FROM
           chores c

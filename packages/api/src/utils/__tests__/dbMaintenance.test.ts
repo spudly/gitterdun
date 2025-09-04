@@ -1,9 +1,6 @@
-import {describe, expect, jest, test} from '@jest/globals';
+import {describe, expect, test} from '@jest/globals';
 
-jest.mock('../../lib/db', () => ({
-  __esModule: true,
-  default: {prepare: jest.fn(), pragma: jest.fn()},
-}));
+// No DB mocking needed; this test only verifies export shape
 
 describe('dbMaintenance exports', () => {
   test('should export dropAllTables from utils', async () => {
