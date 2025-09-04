@@ -18,7 +18,9 @@ export const createGoalInDatabase = async (
           user_id
         )
       VALUES
-        (?, ?, ?, ?, ?) RETURNING *
+        (?, ?, ?, ?, ?)
+      RETURNING
+        *
     `,
     title,
     description,

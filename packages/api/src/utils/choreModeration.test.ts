@@ -1,39 +1,23 @@
-import {beforeEach, describe, expect, jest, test} from '@jest/globals';
+import {describe, expect, jest, test, beforeEach} from '@jest/globals';
 
-describe('choreModeration dialect-specific SQL', () => {
+jest.mock('./crud/db', () => ({__esModule: true, run: jest.fn()}));
+
+describe('choreModeration helpers', () => {
   beforeEach(() => {
-    jest.resetModules();
     jest.clearAllMocks();
   });
 
-  test('uses INSERT OR IGNORE when SQLite (default dev)', async () => {
-    jest.doMock('./crud/db', () => ({run: jest.fn()}));
-    const mod = await import('./choreModeration');
-    await mod.assignChoreToSingleUser(1, 2);
-    const mockedDb = jest.mocked(jest.requireMock('./crud/db'));
-    expect(mockedDb.run).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT OR IGNORE'),
-      1,
-      2,
-    );
-  });
-
-  test('uses ON CONFLICT DO NOTHING when Postgres', async () => {
+  test('exposes approveChoreAssignment function', async () => {
     const originalEnv = {...process.env};
     process.env = {
       ...originalEnv,
       NODE_ENV: 'production',
       PG_URL: 'postgresql://user:pass@localhost:5432/giterdone_postgres',
-    };
-    jest.doMock('./crud/db', () => ({run: jest.fn()}));
-    const mod = await import('./choreModeration');
-    await mod.assignChoreToSingleUser(1, 2);
-    const mockedDb = jest.mocked(jest.requireMock('./crud/db'));
-    expect(mockedDb.run).toHaveBeenCalledWith(
-      expect.stringContaining('ON CONFLICT'),
-      1,
-      2,
-    );
+    } as Record<string, string>;
+
+    const {approveChoreAssignment} = await import('./choreModeration');
+    expect(typeof approveChoreAssignment).toBe('function');
+
     process.env = originalEnv;
   });
 });

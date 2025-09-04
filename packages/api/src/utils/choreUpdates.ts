@@ -57,7 +57,9 @@ const executeChoreUpdate = async (
     SET
       ${updateFields.join(', ')}
     WHERE
-      id = ? RETURNING *
+      id = ?
+    RETURNING
+      *
   `;
   const updatedChore = await get(updateQuery, ...values);
   return ChoreSchema.parse(updatedChore);

@@ -24,7 +24,9 @@ export const createNewUser = async ({
       INSERT INTO
         users (username, email, password_hash, role)
       VALUES
-        (?, ?, ?, ?) RETURNING id,
+        (?, ?, ?, ?)
+      RETURNING
+        id,
         username,
         email,
         role,

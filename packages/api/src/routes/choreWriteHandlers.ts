@@ -11,8 +11,6 @@ import {
   parseUpdateChoreRequest,
   parseDeleteChoreRequest,
   parseChoreCompletionRequest,
-  validateUpdateChoreInput,
-  validateDeleteChoreInput,
   validateChoreCompletionInput,
 } from '../utils/choreParsers';
 import {
@@ -43,7 +41,7 @@ export const handleCreateChore = async (
         .status(StatusCodes.FORBIDDEN)
         .json({success: false, error: 'Forbidden'});
     }
-    validateParentMembership(userId, family.id);
+    await validateParentMembership(userId, family.id);
 
     const {
       title,
@@ -106,9 +104,8 @@ export const handleUpdateChore = async (
         .status(StatusCodes.FORBIDDEN)
         .json({success: false, error: 'Forbidden'});
     }
-    validateParentMembership(userId, family.id);
+    await validateParentMembership(userId, family.id);
     const {choreId, validatedBody} = parseUpdateChoreRequest(req);
-    validateUpdateChoreInput(choreId);
     const validatedChore = await processChoreUpdate(choreId, validatedBody);
     return res.json({
       success: true,
@@ -133,9 +130,8 @@ export const handleDeleteChore = async (
         .status(StatusCodes.FORBIDDEN)
         .json({success: false, error: 'Forbidden'});
     }
-    validateParentMembership(userId, family.id);
+    await validateParentMembership(userId, family.id);
     const {choreId} = parseDeleteChoreRequest(req);
-    validateDeleteChoreInput(choreId);
     await processChoreDelete(choreId);
     return res.json({success: true, message: 'Chore deleted successfully'});
   } catch (error) {
@@ -151,7 +147,11 @@ export const handleCompleteChore = async (
   try {
     const {choreId, userId, notes} = parseChoreCompletionRequest(req);
     validateChoreCompletionInput(choreId);
-    const result = executeChoreCompletionTransaction(choreId, userId, notes);
+    const result = await executeChoreCompletionTransaction(
+      choreId,
+      userId,
+      notes,
+    );
     logger.info(
       {choreId, userId, pointsEarned: result.pointsEarned},
       'Chore marked as completed',

@@ -1,14 +1,12 @@
 import {beforeEach, describe, expect, jest, test} from '@jest/globals';
-import db from '../../../lib/db';
+import * as crudDb from '../../crud/db';
 import {findUserByEmail, findUserByUsername} from '../findUser';
 
 describe('findUser utils', () => {
-  const prepareMock = jest.fn();
   const getMock = jest.fn();
 
   beforeEach(() => {
-    prepareMock.mockReturnValue({get: getMock});
-    jest.spyOn(db, 'prepare').mockImplementation(prepareMock as never);
+    jest.spyOn(crudDb, 'get').mockImplementation(getMock as never);
     getMock.mockReset();
   });
 

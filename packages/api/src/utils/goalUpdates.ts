@@ -51,7 +51,9 @@ export const executeGoalUpdate = async (
     SET
       ${builder.updateFields.join(', ')}
     WHERE
-      id = ? RETURNING *
+      id = ?
+    RETURNING
+      *
   `;
   const updatedGoal = await get(updateQuery, ...values);
   return GoalSchema.parse(updatedGoal);

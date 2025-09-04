@@ -8,24 +8,24 @@ import {
 } from '@jest/globals';
 import express from 'express';
 import {Server} from 'node:http';
-import type {Statement} from 'better-sqlite3';
 import {
   ChoreWithUsernameSchema,
   ChoreQuerySchema,
   CountRowSchema,
 } from '@gitterdun/shared';
 import choresRouter from './chores';
-import db from '../lib/db';
+import * as crudDb from '../utils/crud/db';
 import {setupErrorHandling} from '../middleware/errorHandler';
 
 // Mocks
-jest.mock('../lib/db', () => ({
+jest.mock('../utils/crud/db', () => ({
   __esModule: true,
-  default: {prepare: jest.fn()},
+  get: jest.fn(),
+  all: jest.fn(),
 }));
 jest.mock('@gitterdun/shared');
 
-const mockDb = jest.mocked(db);
+const mockedCrudDb = jest.mocked(crudDb);
 const mockedChoreQuerySchema = jest.mocked(ChoreQuerySchema);
 const mockedChoreSchema = jest.mocked(ChoreWithUsernameSchema);
 const mockedCountRowSchema = jest.mocked(CountRowSchema);
@@ -75,17 +75,19 @@ describe('chores routes', () => {
         chore_type: 'required',
         status: 'pending',
         created_by: 1,
-        created_at: '2024-01-01T00:00:00.000Z',
-        updated_at: '2024-01-01T00:00:00.000Z',
+        created_at: Date.now(),
+        updated_at: Date.now(),
         created_by_username: 'admin',
       },
     ];
 
-    const mockPreparedStatement = {
-      get: jest.fn().mockReturnValue({count: 1}),
-      all: jest.fn().mockReturnValue(mockChores),
-    } as unknown as Statement;
-    mockDb.prepare.mockReturnValue(mockPreparedStatement);
+    mockedCrudDb.get.mockResolvedValue({count: 1} as unknown as Record<
+      string,
+      unknown
+    >);
+    mockedCrudDb.all.mockResolvedValue(
+      mockChores as unknown as Array<Record<string, unknown>>,
+    );
 
     mockedChoreQuerySchema.parse.mockReturnValue({
       status: undefined,

@@ -60,7 +60,9 @@ export const insertChore = async (params: {
           family_id
         )
       VALUES
-        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      RETURNING
+        *
     `,
     title,
     description,

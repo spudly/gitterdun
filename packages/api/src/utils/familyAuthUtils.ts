@@ -1,13 +1,13 @@
 import {RoleRowSchema} from '@gitterdun/shared';
-import db from '../lib/db';
+import {get} from './crud/db';
 import {sql} from './sql';
 
-export const validateParentMembership = (
+export const validateParentMembership = async (
   userId: number,
   familyId: number,
-): void => {
-  const membershipRow = db
-    .prepare(sql`
+): Promise<void> => {
+  const membershipRow = (await get(
+    sql`
       SELECT
         role
       FROM
@@ -15,11 +15,13 @@ export const validateParentMembership = (
       WHERE
         family_id = ?
         AND user_id = ?
-    `)
-    .get(familyId, userId);
+    `,
+    familyId,
+    userId,
+  )) as unknown;
   const membership =
     membershipRow !== undefined
-      ? RoleRowSchema.parse(membershipRow)
+      ? RoleRowSchema.parse(membershipRow as Record<string, unknown>)
       : undefined;
   if (!membership || membership.role !== 'parent') {
     throw Object.assign(new Error('Forbidden'), {status: 403});

@@ -1,31 +1,17 @@
 import {sql} from './sql';
 import {run} from './crud/db';
-import {isPostgresEnabled} from './env';
 
 export const assignChoreToSingleUser = async (
   choreId: number,
   userId: number,
 ): Promise<void> => {
-  if (isPostgresEnabled()) {
-    await run(
-      sql`
-        INSERT INTO
-          chore_assignments (chore_id, user_id)
-        VALUES
-          (?, ?)
-        ON CONFLICT (chore_id, user_id) DO NOTHING
-      `,
-      choreId,
-      userId,
-    );
-    return;
-  }
   await run(
     sql`
-      INSERT OR IGNORE INTO
+      INSERT INTO
         chore_assignments (chore_id, user_id)
       VALUES
         (?, ?)
+      ON CONFLICT (chore_id, user_id) DO NOTHING
     `,
     choreId,
     userId,
@@ -40,7 +26,7 @@ export const approveChoreAssignment = async (
     sql`
       UPDATE chore_assignments
       SET
-        approved_at = CURRENT_TIMESTAMP,
+        approved_at = current_timestamp,
         approved_by = ?
       WHERE
         chore_id = ?

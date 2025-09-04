@@ -1,13 +1,10 @@
 import {describe, expect, test, beforeEach, jest} from '@jest/globals';
-import db from '../lib/db';
+import * as crudDb from './crud/db';
 import {validateRegistrationData} from './userAuthUtils';
 
-jest.mock('../lib/db', () => ({
-  __esModule: true,
-  default: {prepare: jest.fn()},
-}));
+jest.mock('./crud/db', () => ({__esModule: true, get: jest.fn()}));
 
-const mockDb = jest.mocked(db);
+const mockedCrudDb = jest.mocked(crudDb);
 
 describe('userAuthUtils - registration validation', () => {
   beforeEach(() => {
@@ -16,9 +13,7 @@ describe('userAuthUtils - registration validation', () => {
 
   test('allows registration without email when username not taken', async () => {
     // Simulate no existing user match
-    mockDb.prepare.mockReturnValue({
-      get: jest.fn().mockReturnValue(undefined),
-    } as never);
+    mockedCrudDb.get.mockResolvedValue(undefined);
 
     const result = await validateRegistrationData({
       username: 'spudly',
@@ -34,9 +29,10 @@ describe('userAuthUtils - registration validation', () => {
 
   test('rejects registration when username already exists', async () => {
     // Simulate existing user match on username
-    mockDb.prepare.mockReturnValue({
-      get: jest.fn().mockReturnValue({id: 1}),
-    } as never);
+    mockedCrudDb.get.mockResolvedValue({id: 1} as unknown as Record<
+      string,
+      unknown
+    >);
 
     await expect(
       validateRegistrationData({username: 'spudly', password: 'test'}),

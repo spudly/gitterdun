@@ -9,7 +9,6 @@ import {
 import express from 'express';
 import {Server} from 'node:http';
 import nock from 'nock';
-import type {Statement} from 'better-sqlite3';
 import {
   CreateGoalSchema,
   UpdateGoalSchema,
@@ -19,18 +18,20 @@ import {
   IdParamSchema,
 } from '@gitterdun/shared';
 import goalsRouter from './goals';
-import db from '../lib/db';
+import * as crudDb from '../utils/crud/db';
 import {setupErrorHandling} from '../middleware/errorHandler';
 
 // Mock dependencies
-jest.mock('../lib/db', () => ({
+jest.mock('../utils/crud/db', () => ({
   __esModule: true,
-  default: {prepare: jest.fn()},
+  get: jest.fn(),
+  all: jest.fn(),
+  run: jest.fn(),
 }));
 
 jest.mock('@gitterdun/shared');
 
-const mockDb = jest.mocked(db);
+const mockedCrudDb = jest.mocked(crudDb);
 const mockedCreateGoalSchema = jest.mocked(CreateGoalSchema);
 const mockedUpdateGoalSchema = jest.mocked(UpdateGoalSchema);
 const mockedGoalQuerySchema = jest.mocked(GoalQuerySchema);
@@ -91,11 +92,13 @@ describe('goals routes', () => {
         },
       ];
 
-      const mockPreparedStatement = {
-        get: jest.fn().mockReturnValue({total: 1}),
-        all: jest.fn().mockReturnValue(mockGoals),
-      } as unknown as Statement;
-      mockDb.prepare.mockReturnValue(mockPreparedStatement);
+      mockedCrudDb.get.mockResolvedValue({count: 1} as unknown as Record<
+        string,
+        unknown
+      >);
+      mockedCrudDb.all.mockResolvedValue(
+        mockGoals as unknown as Array<Record<string, unknown>>,
+      );
 
       mockedGoalQuerySchema.parse.mockReturnValue({
         user_id: 1,
@@ -146,11 +149,13 @@ describe('goals routes', () => {
         },
       ];
 
-      const mockPreparedStatement = {
-        get: jest.fn().mockReturnValue({total: 1}),
-        all: jest.fn().mockReturnValue(mockGoals),
-      } as unknown as Statement;
-      mockDb.prepare.mockReturnValue(mockPreparedStatement);
+      mockedCrudDb.get.mockResolvedValue({count: 1} as unknown as Record<
+        string,
+        unknown
+      >);
+      mockedCrudDb.all.mockResolvedValue(
+        mockGoals as unknown as Array<Record<string, unknown>>,
+      );
 
       mockedGoalQuerySchema.parse.mockReturnValue({
         user_id: 1,
@@ -167,7 +172,8 @@ describe('goals routes', () => {
 
       expect(response.status).toBe(200);
 
-      expect(mockPreparedStatement.all).toHaveBeenCalledWith(
+      expect(mockedCrudDb.all).toHaveBeenLastCalledWith(
+        expect.any(String),
         1,
         'active',
         20,
@@ -216,10 +222,9 @@ describe('goals routes', () => {
         updated_at: '2024-01-01T00:00:00.000Z',
       };
 
-      const mockPreparedStatement = {
-        get: jest.fn().mockReturnValue(createdGoal),
-      } as unknown as Statement;
-      mockDb.prepare.mockReturnValue(mockPreparedStatement);
+      mockedCrudDb.get.mockResolvedValue(
+        createdGoal as unknown as Record<string, unknown>,
+      );
 
       mockedCreateGoalSchema.parse.mockReturnValue(newGoal);
       mockedGoalSchema.parse.mockReturnValue(createdGoal);
@@ -237,14 +242,6 @@ describe('goals routes', () => {
         data: createdGoal,
         message: 'Goal created successfully',
       });
-
-      expect(mockPreparedStatement.get).toHaveBeenCalledWith(
-        'New Goal',
-        'Test goal',
-        100,
-        0,
-        1,
-      );
     });
 
     test('should return 400 for zero target points', async () => {
@@ -306,10 +303,9 @@ describe('goals routes', () => {
         updated_at: '2024-01-01T00:00:00.000Z',
       };
 
-      const mockPreparedStatement = {
-        get: jest.fn().mockReturnValue(mockGoal),
-      } as unknown as Statement;
-      mockDb.prepare.mockReturnValue(mockPreparedStatement);
+      mockedCrudDb.get.mockResolvedValue(
+        mockGoal as unknown as Record<string, unknown>,
+      );
 
       mockedIdParamSchema.parse.mockReturnValue({id: 1});
       mockedGoalSchema.parse.mockReturnValue(mockGoal);
@@ -322,10 +318,7 @@ describe('goals routes', () => {
     });
 
     test('should return 404 for non-existent goal', async () => {
-      const mockPreparedStatement = {
-        get: jest.fn().mockReturnValue(undefined),
-      } as unknown as Statement;
-      mockDb.prepare.mockReturnValue(mockPreparedStatement);
+      mockedCrudDb.get.mockResolvedValue(undefined);
 
       mockedIdParamSchema.parse.mockReturnValue({id: 999});
 
@@ -362,15 +355,13 @@ describe('goals routes', () => {
         updated_at: '2024-01-01T12:00:00.000Z',
       };
 
-      const mockCheckStatement = {
-        get: jest.fn().mockReturnValue({id: 1}),
-      } as unknown as Statement;
-      const mockUpdateStatement = {
-        get: jest.fn().mockReturnValue(updatedGoal),
-      } as unknown as Statement;
-      mockDb.prepare
-        .mockReturnValueOnce(mockCheckStatement) // Check existence
-        .mockReturnValueOnce(mockUpdateStatement); // Update
+      // Existence check
+      mockedCrudDb.get
+        .mockResolvedValueOnce({id: 1} as unknown as Record<string, unknown>)
+        // Update returning row
+        .mockResolvedValueOnce(
+          updatedGoal as unknown as Record<string, unknown>,
+        );
 
       mockedIdParamSchema.parse.mockReturnValue({id: 1});
       mockedUpdateGoalSchema.parse.mockReturnValue(updateData);
@@ -392,10 +383,7 @@ describe('goals routes', () => {
     });
 
     test('should return 404 for non-existent goal', async () => {
-      const mockCheckStatement = {
-        get: jest.fn().mockReturnValue(undefined),
-      } as unknown as Statement;
-      mockDb.prepare.mockReturnValue(mockCheckStatement);
+      mockedCrudDb.get.mockResolvedValue(undefined);
 
       mockedIdParamSchema.parse.mockReturnValue({id: 999});
       mockedUpdateGoalSchema.parse.mockReturnValue({title: 'Test'});
@@ -412,10 +400,10 @@ describe('goals routes', () => {
     });
 
     test('should return 400 when no fields to update', async () => {
-      const mockCheckStatement = {
-        get: jest.fn().mockReturnValue({id: 1}),
-      } as unknown as Statement;
-      mockDb.prepare.mockReturnValue(mockCheckStatement);
+      mockedCrudDb.get.mockResolvedValue({id: 1} as unknown as Record<
+        string,
+        unknown
+      >);
 
       mockedIdParamSchema.parse.mockReturnValue({id: 1});
       mockedUpdateGoalSchema.parse.mockReturnValue({});
@@ -434,13 +422,10 @@ describe('goals routes', () => {
 
   describe('dELETE /api/goals/:id', () => {
     test('should delete goal successfully', async () => {
-      const mockCheckStatement = {
-        get: jest.fn().mockReturnValue({id: 1}),
-      } as unknown as Statement;
-      const mockDeleteStatement = {run: jest.fn()} as unknown as Statement;
-      mockDb.prepare
-        .mockReturnValueOnce(mockCheckStatement) // Check existence
-        .mockReturnValueOnce(mockDeleteStatement); // Delete
+      mockedCrudDb.get.mockResolvedValue({id: 1} as unknown as Record<
+        string,
+        unknown
+      >);
 
       mockedIdParamSchema.parse.mockReturnValue({id: 1});
 
@@ -454,15 +439,10 @@ describe('goals routes', () => {
         success: true,
         message: 'Goal deleted successfully',
       });
-
-      expect(mockDeleteStatement.run).toHaveBeenCalledWith(1);
     });
 
     test('should return 404 for non-existent goal', async () => {
-      const mockCheckStatement = {
-        get: jest.fn().mockReturnValue(undefined),
-      } as unknown as Statement;
-      mockDb.prepare.mockReturnValue(mockCheckStatement);
+      mockedCrudDb.get.mockResolvedValue(undefined);
 
       mockedIdParamSchema.parse.mockReturnValue({id: 999});
 

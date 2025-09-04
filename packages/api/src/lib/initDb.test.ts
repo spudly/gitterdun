@@ -4,16 +4,17 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {CountRowSchema, asError} from '@gitterdun/shared';
 import {initializeDatabase} from './initDb';
-import db from './db';
+import * as crudInit from '../utils/crud/init';
 import {logger} from '../utils/logger';
 
 // Mock dependencies before importing
-jest.mock('./db', () => ({
+jest.mock('../utils/crud/init', () => ({
   __esModule: true,
-  default: {
-    exec: jest.fn(),
-    prepare: jest.fn().mockReturnValue({get: jest.fn(), run: jest.fn()}),
-  },
+  execSchema: jest.fn(),
+  countAdmins: jest.fn(),
+  insertDefaultAdmin: jest.fn(),
+  pragmaTableInfo: jest.fn(),
+  alterTableAddColumn: jest.fn(),
 }));
 
 jest.mock('../utils/logger', () => ({
@@ -24,7 +25,7 @@ jest.mock('node:fs');
 jest.mock('node:path');
 jest.mock('@gitterdun/shared');
 
-const mockedDb = jest.mocked(db);
+const mockedCrudInit = jest.mocked(crudInit);
 const mockedLogger = jest.mocked(logger);
 const mockedFs = jest.mocked(fs);
 const mockedPath = jest.mocked(path);
@@ -42,12 +43,11 @@ describe('initializeDatabase', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Reset all mock implementations to their default state
-    mockedDb.exec.mockImplementation(() => ({}) as never);
-    mockedDb.prepare.mockReturnValue({
-      get: jest.fn(),
-      run: jest.fn(),
-    } as unknown as ReturnType<typeof mockedDb.prepare>);
+    mockedCrudInit.execSchema.mockResolvedValue();
+    mockedCrudInit.countAdmins.mockResolvedValue({count: 0});
+    mockedCrudInit.pragmaTableInfo.mockResolvedValue([]);
+    mockedCrudInit.alterTableAddColumn.mockResolvedValue();
+    mockedCrudInit.insertDefaultAdmin.mockResolvedValue();
 
     // Setup default mocks
     mockedPath.join.mockReturnValue('/mock/schema/path.sql');
@@ -56,50 +56,34 @@ describe('initializeDatabase', () => {
   });
 
   test('should initialize database successfully with schema', async () => {
-    const mockPreparedStatement = {
-      get: jest.fn().mockReturnValue({count: 1}),
-      run: jest.fn(),
-    } as unknown as ReturnType<typeof mockedDb.prepare>;
-    mockedDb.prepare.mockReturnValue(mockPreparedStatement);
-    mockedCountRowSchema.parse.mockReturnValue({count: 1});
+    mockedCrudInit.countAdmins.mockResolvedValue({count: 1});
 
     await initializeDatabase();
 
     expect(mockedPath.join).toHaveBeenCalledWith(
       process.cwd(),
-      'src/lib/schema.sqlite.sql',
+      'src/lib/schema.sql',
     );
     expect(mockedFs.readFileSync).toHaveBeenCalledWith(
       '/mock/schema/path.sql',
       'utf8',
     );
 
-    expect(mockedDb.exec).toHaveBeenCalledWith(mockSchemaContent);
+    expect(mockedCrudInit.execSchema).toHaveBeenCalledWith(mockSchemaContent);
     expect(mockedLogger.info).toHaveBeenCalledWith(
       'Database initialized successfully',
     );
   });
 
   test('should create admin user when none exists', async () => {
-    const mockPreparedStatement = {
-      get: jest.fn().mockReturnValue({count: 0}),
-      run: jest.fn(),
-    } as unknown as ReturnType<typeof mockedDb.prepare>;
-    mockedDb.prepare.mockReturnValue(mockPreparedStatement);
-    mockedCountRowSchema.parse.mockReturnValue({count: 0});
+    mockedCrudInit.countAdmins.mockResolvedValue({count: 0});
 
     await initializeDatabase();
 
-    // The dynamic import will succeed, but we can still test the behavior
-    // by verifying the admin user was created with the expected data
-
-    expect(mockPreparedStatement.run).toHaveBeenCalledWith(
+    expect(mockedCrudInit.insertDefaultAdmin).toHaveBeenCalledWith(
       'admin',
       'admin@gitterdun.com',
-      expect.any(String), // The actual hashed password will vary
-      'admin',
-      0,
-      0,
+      expect.any(String),
     );
     expect(mockedLogger.info).toHaveBeenCalledWith(
       'Default admin user created: admin@gitterdun.com / admin123',
@@ -107,16 +91,11 @@ describe('initializeDatabase', () => {
   });
 
   test('should not create admin user when one already exists', async () => {
-    const mockPreparedStatement = {
-      get: jest.fn().mockReturnValue({count: 1}),
-      run: jest.fn(),
-    } as unknown as ReturnType<typeof mockedDb.prepare>;
-    mockedDb.prepare.mockReturnValue(mockPreparedStatement);
-    mockedCountRowSchema.parse.mockReturnValue({count: 1});
+    mockedCrudInit.countAdmins.mockResolvedValue({count: 1});
 
     await initializeDatabase();
 
-    expect(mockPreparedStatement.run).not.toHaveBeenCalled();
+    expect(mockedCrudInit.insertDefaultAdmin).not.toHaveBeenCalled();
     expect(mockedLogger.info).toHaveBeenCalledWith(
       'Database initialized successfully',
     );
@@ -141,30 +120,22 @@ describe('initializeDatabase', () => {
   });
 
   test('should handle database execution errors', async () => {
-    const dbError = new Error('Database error');
-    mockedDb.exec.mockImplementation(() => {
-      throw dbError;
-    });
-    mockedAsError.mockReturnValue(dbError);
+    const execError = new Error('Database error');
+    mockedCrudInit.execSchema.mockRejectedValue(execError);
+    mockedAsError.mockReturnValue(execError);
 
     await expect(initializeDatabase()).rejects.toThrow('Database error');
 
     expect(mockedLogger.error).toHaveBeenCalledWith(
-      {error: dbError},
+      {error: execError},
       'Failed to initialize database',
     );
   });
 
   test('should handle admin user creation errors', async () => {
     const insertError = new Error('Insert failed');
-    const mockPreparedStatement = {
-      get: jest.fn().mockReturnValue({count: 0}),
-      run: jest.fn().mockImplementation(() => {
-        throw insertError;
-      }),
-    } as unknown as ReturnType<typeof mockedDb.prepare>;
-    mockedDb.prepare.mockReturnValue(mockPreparedStatement);
-    mockedCountRowSchema.parse.mockReturnValue({count: 0});
+    mockedCrudInit.countAdmins.mockResolvedValue({count: 0});
+    mockedCrudInit.insertDefaultAdmin.mockRejectedValue(insertError);
     mockedAsError.mockReturnValue(insertError);
 
     await expect(initializeDatabase()).rejects.toThrow('Insert failed');
@@ -178,29 +149,6 @@ describe('initializeDatabase', () => {
   test('should read Postgres schema when PG is enabled via env', async () => {
     jest.resetModules();
 
-    // Re-establish mocks after reset
-    jest.doMock('./db', () => ({
-      __esModule: true,
-      default: {
-        exec: jest.fn(),
-        prepare: jest.fn().mockReturnValue({get: jest.fn(), run: jest.fn()}),
-      },
-    }));
-    jest.doMock('../utils/logger', () => ({
-      logger: {info: jest.fn(), error: jest.fn()},
-    }));
-    jest.doMock('../utils/crud/init', () => {
-      // Re-wire init helpers to avoid shelling out to psql during test
-      const real = jest.requireActual('../utils/crud/init');
-      return {
-        __esModule: true,
-        ...real,
-        execSchema: jest.fn(),
-        countAdmins: jest.fn(() => ({count: 1})),
-      };
-    });
-
-    // Local fs/path mocks for this test after module reset
     const fsMock = {readFileSync: jest.fn().mockReturnValue('SQL')};
     const pathMock = {join: jest.fn().mockReturnValue('/mock/schema.sql')};
     jest.doMock('node:fs', () => fsMock);
@@ -212,6 +160,16 @@ describe('initializeDatabase', () => {
       NODE_ENV: 'production',
       PG_URL: 'postgresql://user:pass@localhost:5432/giterdone_postgres',
     } as Record<string, string>;
+
+    const crudInitMock = {
+      __esModule: true,
+      execSchema: jest.fn(),
+      countAdmins: jest.fn(() => ({count: 1})),
+      insertDefaultAdmin: jest.fn(),
+      pragmaTableInfo: jest.fn(),
+      alterTableAddColumn: jest.fn(),
+    };
+    jest.doMock('../utils/crud/init', () => crudInitMock);
 
     const {initializeDatabase: initializeDatabasePg} = await import('./initDb');
 

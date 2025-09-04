@@ -1,25 +1,23 @@
 import {describe, expect, test, jest, beforeEach} from '@jest/globals';
 import {processChoresRequest} from '../utils/choreResponseProcessors';
-import db from '../lib/db';
+import * as crudDb from '../utils/crud/db';
 
-jest.mock('../lib/db', () => ({
+jest.mock('../utils/crud/db', () => ({
   __esModule: true,
-  default: {prepare: jest.fn()},
+  get: jest.fn(),
+  all: jest.fn(),
 }));
 
-const mockDb = jest.mocked(db);
+const mockedCrudDb = jest.mocked(crudDb);
 
 describe('choreResponseProcessors normalization', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    const mockAll = jest.fn().mockReturnValue([]);
-    const mockGet = jest.fn().mockReturnValue({count: 0});
-    mockDb.prepare.mockImplementation(((query: string) => {
-      if (query.includes('COUNT(*)')) {
-        return {get: mockGet} as unknown as ReturnType<typeof db.prepare>;
-      }
-      return {all: mockAll} as unknown as ReturnType<typeof db.prepare>;
-    }) as typeof mockDb.prepare);
+    mockedCrudDb.all.mockResolvedValue([]);
+    mockedCrudDb.get.mockResolvedValue({count: 0} as unknown as Record<
+      string,
+      unknown
+    >);
   });
 
   test('coerces nulls to undefined and returns numeric timestamps', async () => {
@@ -43,15 +41,13 @@ describe('choreResponseProcessors normalization', () => {
       },
     ];
 
-    const mockAll = jest.fn().mockReturnValue(rows);
-    const mockGet = jest.fn().mockReturnValue({count: 1});
-    mockDb.prepare.mockImplementation(((query: string) => {
-      // eslint-disable-next-line jest/no-conditional-in-test -- this conditional is in a mock implementation
-      if (query.includes('COUNT(*)')) {
-        return {get: mockGet} as unknown as ReturnType<typeof db.prepare>;
-      }
-      return {all: mockAll} as unknown as ReturnType<typeof db.prepare>;
-    }) as typeof mockDb.prepare);
+    mockedCrudDb.all.mockResolvedValue(
+      rows as unknown as Array<Record<string, unknown>>,
+    );
+    mockedCrudDb.get.mockResolvedValue({count: 1} as unknown as Record<
+      string,
+      unknown
+    >);
 
     const result = await processChoresRequest({});
     expect(result.success).toBe(true);

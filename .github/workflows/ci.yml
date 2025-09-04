@@ -230,6 +230,18 @@ jobs:
     name: E2E Tests
     needs: build
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: giterdone_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d giterdone_test"
+          --health-interval=10s --health-timeout=5s --health-retries=12
     timeout-minutes: 30
     steps:
       - name: Checkout
@@ -267,6 +279,27 @@ jobs:
       - name: Install Playwright browsers
         run: npm run ci:install:browsers
 
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Wait for Postgres
+        env:
+          PGPASSWORD: postgres
+        run: |
+          for i in {1..30}; do
+            if pg_isready -h localhost -p 5432 -U postgres -d giterdone_test; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Postgres did not become ready in time" >&2
+          exit 1
+
+      - name: Reset database
+        env:
+          PG_URL: postgresql://postgres:postgres@localhost:5432/giterdone_test
+        run: npm run db:reset
+
       - name: Debug system info
         run: |
           echo "Node version: $(node --version)"
@@ -278,4 +311,5 @@ jobs:
         env:
           CI: true
           DEBUG: pw:webserver
+          PG_URL: postgresql://postgres:postgres@localhost:5432/giterdone_test
         run: npm test --workspace=packages/e2e

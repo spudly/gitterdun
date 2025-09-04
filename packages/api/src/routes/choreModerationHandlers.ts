@@ -13,14 +13,14 @@ export const handleAssignChore = async (
   res: express.Response,
 ) => {
   try {
-    const userId = requireUserId(req);
+    const userId = await requireUserId(req);
     const family = await getUserFamily(userId);
     if (family === null) {
       return res
         .status(StatusCodes.FORBIDDEN)
         .json({success: false, error: 'Forbidden'});
     }
-    validateParentMembership(userId, family.id);
+    await validateParentMembership(userId, family.id);
     const choreId = Number((req.params as Record<string, string>)['id']);
     const {userId: assignedUserId} = req.body as {userId?: number};
     if (
@@ -46,14 +46,14 @@ export const handleApproveChore = async (
   res: express.Response,
 ) => {
   try {
-    const userId = requireUserId(req);
+    const userId = await requireUserId(req);
     const family = await getUserFamily(userId);
     if (family === null) {
       return res
         .status(StatusCodes.FORBIDDEN)
         .json({success: false, error: 'Forbidden'});
     }
-    validateParentMembership(userId, family.id);
+    await validateParentMembership(userId, family.id);
     const choreId = Number((req.params as Record<string, string>)['id']);
     const {approvedBy} = req.body as {approvedBy?: number};
     if (

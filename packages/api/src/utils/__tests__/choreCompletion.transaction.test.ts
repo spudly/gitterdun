@@ -1,13 +1,9 @@
 import {describe, expect, jest, test} from '@jest/globals';
 
-jest.mock('../crud/db', () => {
-  const actual = jest.requireActual('../crud/db');
-  return {
-    __esModule: true,
-    ...actual,
-    transaction: jest.fn(async (fn: () => Promise<unknown>) => fn()),
-  };
-});
+jest.mock('../crud/db', () => ({
+  __esModule: true,
+  transaction: jest.fn(async (fn: () => Promise<unknown>) => fn()),
+}));
 
 jest.mock('../chorePoints', () => ({
   __esModule: true,

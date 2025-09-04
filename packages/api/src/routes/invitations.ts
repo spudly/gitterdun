@@ -29,7 +29,7 @@ router.post('/:familyId', async (req, res) => {
     }
 
     const {email, role} = CreateInvitationSchema.parse(req.body);
-    validateParentMembership(inviterId, familyId);
+    await validateParentMembership(inviterId, familyId);
 
     const token = crypto.randomUUID();
     const expiresAt: Date = new Date(Date.now() + ONE_WEEK_MS);
