@@ -49,13 +49,12 @@ export const AdminUsers: FC = () => {
               <Button
                 color="red"
                 onClick={() => {
-                  const run = safeAsync(async () => {
+                  safeAsync(async () => {
                     await deleteMutation.mutateAsync(row.id);
                     await queryClient.invalidateQueries({
                       queryKey: ['admin', 'users'],
                     });
-                  }, 'Failed to delete user');
-                  run();
+                  }, 'Failed to delete user')();
                 }}
                 size="sm"
               >

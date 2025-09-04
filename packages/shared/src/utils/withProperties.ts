@@ -16,11 +16,11 @@ export const withProperties = <FN extends () => Promise<void> | void>(
   Object.assign(obj, props);
 
   // Run the function
-  const result = fn();
+  const maybePromise = fn();
 
-  if (result instanceof Promise) {
+  if (maybePromise instanceof Promise) {
     // @ts-expect-error -- we know the return type is void
-    return result.then(() => {}).finally(restore);
+    return maybePromise.then(() => {}).finally(restore);
   }
   restore();
   // @ts-expect-error -- we know the return type is void

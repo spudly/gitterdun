@@ -86,12 +86,9 @@ const useAcceptInvitationSetup = () => {
     username,
     password,
     setMessage,
-    onAccepted: () => {
-      const handleNavigate = safeAsync(async () => {
-        await navigate('/login');
-      }, 'Failed to redirect to login');
-      handleNavigate();
-    },
+    onAccepted: safeAsync(async () => {
+      await navigate('/login');
+    }, 'Failed to redirect to login'),
   });
   return {
     token,

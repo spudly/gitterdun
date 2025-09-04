@@ -41,7 +41,7 @@ const Register: FC = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setMessage(null);
-    const run = safeAsync(
+    safeAsync(
       async () => {
         const trimmedEmail = email.trim();
         const payload =
@@ -53,8 +53,7 @@ const Register: FC = () => {
       },
       intl.formatMessage(messages.failed),
       setMessage,
-    );
-    run();
+    )();
   };
 
   return (
