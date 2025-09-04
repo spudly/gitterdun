@@ -4,8 +4,7 @@ import {z} from 'zod';
 import type {Family} from '@gitterdun/shared';
 import {requireUserId} from '../utils/auth';
 import {getUserFamily} from '../utils/familyOperations';
-import {run} from '../utils/crud/db';
-import {sql} from '../utils/sql';
+import {upsertChoreInstance} from '../utils/crud/choreInstances';
 
 // eslint-disable-next-line new-cap -- express.Router() is a factory function
 const router = express.Router();
@@ -67,18 +66,7 @@ router.post('/', async (req, res) => {
       ? 'unapproved'
       : (body.approval_status ?? 'unapproved');
 
-  await run(
-    sql`
-      INSERT INTO
-        chore_instances (chore_id, day, status, approval_status, notes)
-      VALUES
-        (?, ?, ?, ?, ?)
-      ON CONFLICT (chore_id, day) DO UPDATE
-      SET
-        status = excluded.status,
-        approval_status = excluded.approval_status,
-        notes = excluded.notes
-    `,
+  await upsertChoreInstance(
     body.chore_id,
     body.date,
     nextStatus,

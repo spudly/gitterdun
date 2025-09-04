@@ -1,6 +1,5 @@
 import {z} from 'zod';
 import {ChoreSchema} from '@gitterdun/shared';
-import db from '../lib/db';
 import type {ChoreCompletionParams} from './choreAssignments';
 import {
   findChoreAssignment,
@@ -12,6 +11,7 @@ import {
   updateUserPointsForChore,
   createChoreCompletionNotification,
 } from './chorePoints';
+import {transaction} from './crud/db';
 
 type Chore = z.infer<typeof ChoreSchema>;
 
@@ -20,9 +20,7 @@ export const executeChoreCompletionTransaction = async (
   userId: number,
   notes?: string,
 ): Promise<{chore: Chore; pointsEarned: number}> => {
-  const tx = db.transaction(async () => {
-    // Note: chore completion remains using sqlite transaction for now
-    // The helpers are async, we await them inside the transaction
+  return transaction(async () => {
     await findChoreAssignment(choreId, userId);
     const chore = await getChoreForCompletion(choreId);
     const points = calculateCompletionPoints(chore);
@@ -43,6 +41,4 @@ export const executeChoreCompletionTransaction = async (
 
     return {chore, pointsEarned: points.pointsEarned};
   });
-
-  return tx();
 };

@@ -89,8 +89,22 @@ export const transaction = async <T>(fn: () => Promise<T>): Promise<T> => {
     const {withPgTransaction} = await import('../../lib/pgClient');
     return withPgTransaction(fn);
   }
-  const tx = db.transaction((inner: () => T) => inner());
-  return tx(fn as unknown as () => T);
+  // In SQLite (better-sqlite3), the built-in transaction wrapper expects a
+  // synchronous function. Because our callers are async, we perform a manual
+  // BEGIN/COMMIT/ROLLBACK flow to ensure proper handling.
+  db.exec('BEGIN');
+  try {
+    const result = await fn();
+    db.exec('COMMIT');
+    return result;
+  } catch (error) {
+    try {
+      db.exec('ROLLBACK');
+    } catch (_rollbackError) {
+      // ignore rollback error
+    }
+    throw error;
+  }
 };
 
 // Strongly-typed helpers that parse query results using Zod
