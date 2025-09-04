@@ -1,12 +1,14 @@
-import {run} from './crud/db';
+import {all, run} from './crud/db';
+import {z} from 'zod';
 
-type TableRow = {table_name: string};
+const TableRowSchema = z.object({table_name: z.string()});
 
 const listUserTables = async (): Promise<ReadonlyArray<string>> => {
-  const rows = (await run(
+  const rawRows = await all(
     `SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE' AND table_name <> 'spatial_ref_sys'`,
-  )) as ReadonlyArray<TableRow>;
-  return rows.map((row: TableRow) => row.table_name);
+  );
+  const rows = z.array(TableRowSchema).parse(rawRows);
+  return rows.map(row => row.table_name);
 };
 
 const dropTables = async (tableNames: ReadonlyArray<string>): Promise<void> => {

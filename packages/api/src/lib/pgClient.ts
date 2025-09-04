@@ -63,7 +63,7 @@ export const withPgTransaction = async <T>(
 
 export const pgQuery = async (
   text: string,
-  params: ReadonlyArray<unknown>,
+  params: Array<unknown>,
 ): Promise<QueryResult> => {
   const activeClient = txContext.getStore();
   if (activeClient !== undefined) {

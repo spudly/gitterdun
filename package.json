@@ -71,7 +71,7 @@
     "typescript": "^5.9.2"
   },
   "lint-staged": {
-    "**/*.{ts,tsx,js,jsx,css,md,json,yml,yaml}": [
+    "**/*.{ts,tsx,js,jsx,css,md,json,yml,yaml,sql}": [
       "eslint --fix --no-warn-ignored",
       "prettier --write"
     ]
