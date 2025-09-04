@@ -1,6 +1,5 @@
 import {z} from 'zod';
 import {ChoreSchema} from '@gitterdun/shared';
-import db from '../lib/db';
 import type {ChoreCompletionParams} from './choreAssignments';
 import {
   findChoreAssignment,
@@ -12,17 +11,18 @@ import {
   updateUserPointsForChore,
   createChoreCompletionNotification,
 } from './chorePoints';
+import {transaction} from './crud/db';
 
 type Chore = z.infer<typeof ChoreSchema>;
 
-export const executeChoreCompletionTransaction = (
+export const executeChoreCompletionTransaction = async (
   choreId: number,
   userId: number,
   notes?: string,
-): {chore: Chore; pointsEarned: number} => {
-  const transaction = db.transaction(() => {
-    findChoreAssignment(choreId, userId);
-    const chore = getChoreForCompletion(choreId);
+): Promise<{chore: Chore; pointsEarned: number}> => {
+  return transaction(async () => {
+    await findChoreAssignment(choreId, userId);
+    const chore = await getChoreForCompletion(choreId);
     const points = calculateCompletionPoints(chore);
 
     const completionParams: ChoreCompletionParams = {
@@ -31,16 +31,14 @@ export const executeChoreCompletionTransaction = (
       points,
       notes,
     };
-    updateChoreAssignmentCompletion(completionParams);
+    await updateChoreAssignmentCompletion(completionParams);
     const totalPoints =
       points.pointsEarned
       + points.bonusPointsEarned
       - points.penaltyPointsEarned;
-    updateUserPointsForChore(userId, totalPoints);
-    createChoreCompletionNotification(userId, chore, choreId);
+    await updateUserPointsForChore(userId, totalPoints);
+    await createChoreCompletionNotification(userId, chore, choreId);
 
     return {chore, pointsEarned: points.pointsEarned};
   });
-
-  return transaction();
 };

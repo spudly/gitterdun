@@ -41,10 +41,10 @@ export const buildGoalUpdateQuery = (
   return builder;
 };
 
-export const executeGoalUpdate = (
+export const executeGoalUpdate = async (
   goalId: number,
   builder: UpdateQueryBuilder,
-): Goal => {
+): Promise<Goal> => {
   const values = [...builder.values, goalId];
   const updateQuery = sql`
     UPDATE goals
@@ -53,6 +53,6 @@ export const executeGoalUpdate = (
     WHERE
       id = ? RETURNING *
   `;
-  const updatedGoal = get(updateQuery, ...values);
+  const updatedGoal = await get(updateQuery, ...values);
   return GoalSchema.parse(updatedGoal);
 };

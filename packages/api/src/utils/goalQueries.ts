@@ -56,15 +56,15 @@ export const buildGoalsQuery = (
   return {query, params};
 };
 
-export const getTotalGoalsCount = (
+export const getTotalGoalsCount = async (
   baseQuery: string,
   params: Array<string | number>,
-): number => {
+): Promise<number> => {
   const countQuery = baseQuery.replace(
     /SELECT[\s\S]*?FROM/,
     'SELECT COUNT(*) as total FROM',
   );
-  const totalRow = get(countQuery, ...params);
+  const totalRow = await get(countQuery, ...params);
   const {count: total} = CountRowSchema.parse(totalRow);
   return total;
 };
@@ -81,10 +81,10 @@ export const addPaginationToQuery = (
   return {query, params: paginatedParams};
 };
 
-export const fetchAndValidateGoals = (
+export const fetchAndValidateGoals = async (
   query: string,
   params: Array<string | number>,
-): Array<Goal> => {
-  const goals = all(query, ...params);
+): Promise<Array<Goal>> => {
+  const goals = (await all(query, ...params)) as Array<unknown>;
   return goals.map(goal => GoalSchema.parse(goal));
 };

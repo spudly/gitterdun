@@ -1,7 +1,8 @@
 import express from 'express';
 import {StatusCodes} from 'http-status-codes';
 import {CreateChoreSchema} from '@gitterdun/shared';
-import db from '../lib/db';
+// import db from '../lib/db';
+import {transaction} from '../utils/crud/db';
 import {logger} from '../utils/logger';
 import {requireUserId} from '../utils/auth';
 import {getUserFamily} from '../utils/familyOperations';
@@ -35,8 +36,8 @@ export const handleCreateChore = async (
   res: express.Response,
 ) => {
   try {
-    const userId = requireUserId(req);
-    const family = getUserFamily(userId);
+    const userId = await requireUserId(req);
+    const family = await getUserFamily(userId);
     if (family === null) {
       return res
         .status(StatusCodes.FORBIDDEN)
@@ -62,8 +63,8 @@ export const handleCreateChore = async (
       recurrenceRule = rr.replace(/^RRULE:/i, '');
     }
 
-    const newChore = db.transaction(() => {
-      const chore = createChoreInDb({
+    const newChore = await transaction(async () => {
+      const chore = await createChoreInDb({
         title,
         description,
         rewardPoints: rewardPoints ?? null,
@@ -75,9 +76,9 @@ export const handleCreateChore = async (
         createdBy: userId,
         familyId: family.id,
       });
-      assignChoreToUsers(chore.id, assignedUsers);
+      await assignChoreToUsers(chore.id, assignedUsers);
       return chore;
-    })();
+    });
 
     logger.info({choreId: newChore.id, title}, 'New chore created');
     return res
@@ -98,8 +99,8 @@ export const handleUpdateChore = async (
   res: express.Response,
 ) => {
   try {
-    const userId = requireUserId(req);
-    const family = getUserFamily(userId);
+    const userId = await requireUserId(req);
+    const family = await getUserFamily(userId);
     if (family === null) {
       return res
         .status(StatusCodes.FORBIDDEN)
@@ -108,7 +109,7 @@ export const handleUpdateChore = async (
     validateParentMembership(userId, family.id);
     const {choreId, validatedBody} = parseUpdateChoreRequest(req);
     validateUpdateChoreInput(choreId);
-    const validatedChore = processChoreUpdate(choreId, validatedBody);
+    const validatedChore = await processChoreUpdate(choreId, validatedBody);
     return res.json({
       success: true,
       data: validatedChore,
@@ -125,8 +126,8 @@ export const handleDeleteChore = async (
   res: express.Response,
 ) => {
   try {
-    const userId = requireUserId(req);
-    const family = getUserFamily(userId);
+    const userId = await requireUserId(req);
+    const family = await getUserFamily(userId);
     if (family === null) {
       return res
         .status(StatusCodes.FORBIDDEN)
@@ -135,7 +136,7 @@ export const handleDeleteChore = async (
     validateParentMembership(userId, family.id);
     const {choreId} = parseDeleteChoreRequest(req);
     validateDeleteChoreInput(choreId);
-    processChoreDelete(choreId);
+    await processChoreDelete(choreId);
     return res.json({success: true, message: 'Chore deleted successfully'});
   } catch (error) {
     return handleDeleteChoreError(error, res);

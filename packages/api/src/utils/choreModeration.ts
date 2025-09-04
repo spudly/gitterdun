@@ -1,8 +1,26 @@
 import {sql} from './sql';
 import {run} from './crud/db';
+import {isPostgresEnabled} from './env';
 
-export const assignChoreToSingleUser = (choreId: number, userId: number) => {
-  run(
+export const assignChoreToSingleUser = async (
+  choreId: number,
+  userId: number,
+): Promise<void> => {
+  if (isPostgresEnabled()) {
+    await run(
+      sql`
+        INSERT INTO
+          chore_assignments (chore_id, user_id)
+        VALUES
+          (?, ?)
+        ON CONFLICT (chore_id, user_id) DO NOTHING
+      `,
+      choreId,
+      userId,
+    );
+    return;
+  }
+  await run(
     sql`
       INSERT OR IGNORE INTO
         chore_assignments (chore_id, user_id)
@@ -14,8 +32,11 @@ export const assignChoreToSingleUser = (choreId: number, userId: number) => {
   );
 };
 
-export const approveChoreAssignment = (choreId: number, approvedBy: number) => {
-  run(
+export const approveChoreAssignment = async (
+  choreId: number,
+  approvedBy: number,
+): Promise<void> => {
+  await run(
     sql`
       UPDATE chore_assignments
       SET
@@ -33,9 +54,9 @@ export const approveChoreAssignment = (choreId: number, approvedBy: number) => {
   // status no longer stored on chores; no direct chore update here
 };
 
-export const rejectChoreAssignment = (choreId: number) => {
+export const rejectChoreAssignment = async (choreId: number): Promise<void> => {
   // Reset completion fields and set chore back to pending
-  run(
+  await run(
     sql`
       UPDATE chore_assignments
       SET

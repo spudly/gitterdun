@@ -30,12 +30,15 @@ type ProcessChoresParams = {
   order?: 'asc' | 'desc' | undefined;
 };
 
-const getChoresCount = (query: string, params: Array<string | number>) => {
+const getChoresCount = async (
+  query: string,
+  params: Array<string | number>,
+) => {
   const countQuery = query.replace(
     /SELECT[\s\S]*?FROM/u,
     'SELECT COUNT(*) as count FROM',
   );
-  const totalRow = get(countQuery, ...params);
+  const totalRow = await get(countQuery, ...params);
   const {count: total} = CountRowSchema.parse(totalRow);
   return total;
 };
@@ -76,11 +79,11 @@ const buildPaginatedChoresQuery = ({
   return {finalQuery, finalParams};
 };
 
-const executeChoresQuery = (
+const executeChoresQuery = async (
   query: string,
   params: Array<string | number>,
-): Array<ChoreWithUsername> => {
-  const chores = all(query, ...params);
+): Promise<Array<ChoreWithUsername>> => {
+  const chores = (await all(query, ...params)) as Array<unknown>;
   return chores.map(raw => {
     const base = raw as Record<string, unknown>;
     const normalized = {
@@ -111,7 +114,7 @@ const formatChoresResponse = ({
   };
 };
 
-export const processChoresRequest = ({
+export const processChoresRequest = async ({
   status,
   choreType,
   userId,
@@ -127,7 +130,7 @@ export const processChoresRequest = ({
     sortBy,
     order,
   );
-  const total = getChoresCount(query, queryParams);
+  const total = await getChoresCount(query, queryParams);
 
   // Provide default values for pagination
   const safePage = page ?? 1;
@@ -139,7 +142,7 @@ export const processChoresRequest = ({
     page: safePage,
     limit: safeLimit,
   });
-  const validatedChores = executeChoresQuery(finalQuery, finalParams);
+  const validatedChores = await executeChoresQuery(finalQuery, finalParams);
   return formatChoresResponse({
     chores: validatedChores,
     page: safePage,

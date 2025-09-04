@@ -48,10 +48,10 @@ const buildChoreUpdateQuery = (validatedBody: UpdateChore, choreId: number) => {
   return {updateFields, values};
 };
 
-const executeChoreUpdate = (
+const executeChoreUpdate = async (
   updateFields: Array<string>,
   values: Array<string | number | null>,
-): Chore => {
+): Promise<Chore> => {
   const updateQuery = sql`
     UPDATE chores
     SET
@@ -59,18 +59,18 @@ const executeChoreUpdate = (
     WHERE
       id = ? RETURNING *
   `;
-  const updatedChore = get(updateQuery, ...values);
+  const updatedChore = await get(updateQuery, ...values);
   return ChoreSchema.parse(updatedChore);
 };
 
-export const processChoreUpdate = (
+export const processChoreUpdate = async (
   choreId: number,
   validatedBody: UpdateChore,
 ) => {
-  checkChoreExists(choreId);
+  await checkChoreExists(choreId);
 
   const {updateFields, values} = buildChoreUpdateQuery(validatedBody, choreId);
-  const validatedChore = executeChoreUpdate(updateFields, values);
+  const validatedChore = await executeChoreUpdate(updateFields, values);
 
   logger.info({choreId}, 'Chore updated');
   return validatedChore;

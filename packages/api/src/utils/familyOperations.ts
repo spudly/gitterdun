@@ -1,20 +1,20 @@
-import {FamilySchema, FamilyMemberSchema, IdRowSchema} from '@gitterdun/shared';
+import {FamilySchema, IdRowSchema} from '@gitterdun/shared';
 import type {Family} from '@gitterdun/shared';
 import bcrypt from 'bcryptjs';
-import {get, all, run} from './crud/db';
+import {get, run} from './crud/db';
 import {sql} from './sql';
 import {removeAllMembershipsForUser} from './familyMembership';
 import {BCRYPT_SALT_ROUNDS} from '../constants';
 
-export const createFamily = (
+export const createFamily = async (
   name: string,
   userId: number,
   timezone?: string,
-) => {
+): Promise<Family> => {
   // Enforce single-family membership: remove any existing memberships first
-  removeAllMembershipsForUser(userId);
+  await removeAllMembershipsForUser(userId);
 
-  const familyRow = get(
+  const familyRow = await get(
     sql`
       INSERT INTO
         families (name, owner_id, timezone)
@@ -32,7 +32,7 @@ export const createFamily = (
 
   const family = FamilySchema.parse(familyRow);
 
-  run(
+  await run(
     sql`
       INSERT INTO
         family_members (family_id, user_id, role)
@@ -47,28 +47,8 @@ export const createFamily = (
   return family;
 };
 
-export const getFamilyMembers = (familyId: number) => {
-  const rows = all(
-    sql`
-      SELECT
-        fm.family_id,
-        fm.user_id,
-        fm.role,
-        u.username,
-        u.email
-      FROM
-        family_members fm
-        JOIN users u ON u.id = fm.user_id
-      WHERE
-        fm.family_id = ?
-    `,
-    familyId,
-  );
-  return rows.map(row => FamilyMemberSchema.parse(row));
-};
-
-export const getUserFamily = (userId: number): Family | null => {
-  const row = get(
+export const getUserFamily = async (userId: number): Promise<Family | null> => {
+  const row = await get(
     sql`
       SELECT
         f.id,
@@ -89,34 +69,14 @@ export const getUserFamily = (userId: number): Family | null => {
   return row === undefined ? null : FamilySchema.parse(row);
 };
 
-export const updateFamilyTimezone = (familyId: number, timezone: string) => {
-  const row = get(
-    sql`
-      UPDATE families
-      SET
-        timezone = ?,
-        updated_at = CURRENT_TIMESTAMP
-      WHERE
-        id = ? RETURNING id,
-        name,
-        owner_id,
-        timezone,
-        created_at
-    `,
-    timezone,
-    familyId,
-  );
-  return FamilySchema.parse(row);
-};
-
-export const checkUserExists = (
+export const checkUserExists = async (
   email: string | undefined,
   username: string,
-): boolean => {
+): Promise<boolean> => {
   const trimmedEmail = typeof email === 'string' ? email.trim() : undefined;
   const existingUserRow =
     trimmedEmail !== undefined && trimmedEmail !== ''
-      ? get(
+      ? await get(
           sql`
             SELECT
               id
@@ -129,7 +89,7 @@ export const checkUserExists = (
           trimmedEmail,
           username,
         )
-      : get(
+      : await get(
           sql`
             SELECT
               id
@@ -140,7 +100,7 @@ export const checkUserExists = (
           `,
           username,
         );
-  return existingUserRow !== null && existingUserRow !== undefined;
+  return existingUserRow != null;
 };
 
 export const createChildUser = async (
@@ -151,7 +111,7 @@ export const createChildUser = async (
   const resolvedEmail: string | null =
     email != null && email.trim() !== '' ? email : null;
   const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
-  const userRow = get(
+  const userRow = await get(
     sql`
       INSERT INTO
         users (username, email, password_hash, role)
@@ -166,8 +126,11 @@ export const createChildUser = async (
   return user.id;
 };
 
-export const addChildToFamily = (familyId: number, childId: number): void => {
-  run(
+export const addChildToFamily = async (
+  familyId: number,
+  childId: number,
+): Promise<void> => {
+  await run(
     sql`
       INSERT INTO
         family_members (family_id, user_id, role)

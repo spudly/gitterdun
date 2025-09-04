@@ -14,13 +14,13 @@ describe('userAuthUtils - registration validation', () => {
     jest.clearAllMocks();
   });
 
-  test('allows registration without email when username not taken', () => {
+  test('allows registration without email when username not taken', async () => {
     // Simulate no existing user match
     mockDb.prepare.mockReturnValue({
       get: jest.fn().mockReturnValue(undefined),
     } as never);
 
-    const result = validateRegistrationData({
+    const result = await validateRegistrationData({
       username: 'spudly',
       password: 'test',
     });
@@ -32,14 +32,14 @@ describe('userAuthUtils - registration validation', () => {
     });
   });
 
-  test('rejects registration when username already exists', () => {
+  test('rejects registration when username already exists', async () => {
     // Simulate existing user match on username
     mockDb.prepare.mockReturnValue({
       get: jest.fn().mockReturnValue({id: 1}),
     } as never);
 
-    expect(() =>
+    await expect(
       validateRegistrationData({username: 'spudly', password: 'test'}),
-    ).toThrow('User with this email or username already exists');
+    ).rejects.toThrow('User with this email or username already exists');
   });
 });

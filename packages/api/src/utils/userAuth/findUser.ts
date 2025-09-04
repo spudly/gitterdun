@@ -5,10 +5,10 @@ import {UserWithPasswordRowSchema} from '@gitterdun/shared';
 
 type UserWithPasswordRow = z.infer<typeof UserWithPasswordRowSchema>;
 
-export const findUserByEmail = (
+export const findUserByEmail = async (
   email: string,
-): UserWithPasswordRow | undefined => {
-  const userRow = get(
+): Promise<UserWithPasswordRow | undefined> => {
+  const userRow = await get(
     sql`
       SELECT
         id,
@@ -33,10 +33,10 @@ export const findUserByEmail = (
   return UserWithPasswordRowSchema.parse(userRow);
 };
 
-export const findUserByUsername = (
+export const findUserByUsername = async (
   username: string,
-): UserWithPasswordRow | undefined => {
-  const userRow = get(
+): Promise<UserWithPasswordRow | undefined> => {
+  const userRow = await get(
     sql`
       SELECT
         id,

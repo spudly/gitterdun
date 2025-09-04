@@ -28,8 +28,8 @@ const seedSampleData = async (): Promise<void> => {
   );
 
   // Family and membership
-  const family = createFamily('Sample Family', parentId);
-  addChildToFamily(family.id, childId);
+  const family = await createFamily('Sample Family', parentId);
+  await addChildToFamily(family.id, childId);
   logger.info(
     `Seed: created family "${family.name}" (id=${family.id}) and added child user ${childId}`,
   );
@@ -39,7 +39,7 @@ const seedSampleData = async (): Promise<void> => {
   const startIso = new Date(now + ONE_HOUR_MS).toISOString();
   const dueIso = new Date(now + ONE_DAY_MS).toISOString();
 
-  const trash = createChoreInDb({
+  const trash = await createChoreInDb({
     title: 'Take out trash',
     description: 'Take out the kitchen trash',
     rewardPoints: 5,
@@ -51,7 +51,7 @@ const seedSampleData = async (): Promise<void> => {
     createdBy: parentId,
     familyId: family.id,
   });
-  const dishes = createChoreInDb({
+  const dishes = await createChoreInDb({
     title: 'Do the dishes',
     description: 'Wash and put away dishes',
     rewardPoints: 3,
@@ -67,8 +67,8 @@ const seedSampleData = async (): Promise<void> => {
     `Seed: created chore "${trash.title}" (id=${trash.id}) and chore "${dishes.title}" (id=${dishes.id})`,
   );
 
-  assignChoreToUsers(trash.id, [childId]);
-  assignChoreToUsers(dishes.id, [childId]);
+  await assignChoreToUsers(trash.id, [childId]);
+  await assignChoreToUsers(dishes.id, [childId]);
   logger.info(
     `Seed: assigned chores ${trash.id}, ${dishes.id} to user ${childId}`,
   );
@@ -78,7 +78,7 @@ const seedSampleData = async (): Promise<void> => {
 
 export const resetDb = async (opts?: {seed?: boolean}): Promise<void> => {
   // For reliability with active connections, drop and recreate schema instead of deleting files
-  dropAllTables();
+  await dropAllTables();
 
   await initializeDatabase();
 

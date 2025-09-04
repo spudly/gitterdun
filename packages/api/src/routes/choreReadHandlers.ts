@@ -1,61 +1,94 @@
 import express from 'express';
-import {processChoresRequest} from '../utils/choreQueries';
+import {StatusCodes} from 'http-status-codes';
+import {sql} from '../utils/sql';
+import {all} from '../utils/crud/db';
+import {ChoreQuerySchema} from '@gitterdun/shared';
 import {
-  parseChoresQueryRequest,
-  parseGetChoreRequest,
-  validateGetChoreInput,
-} from '../utils/choreParsers';
-import {
-  handleChoresQueryError,
-  handleGetChoreError,
-} from '../utils/choreErrorHandlers';
-import {fetchChoreById} from '../utils/choreCrud';
-import {requireUserId} from '../utils/auth';
-import {getUserFamily} from '../utils/familyOperations';
+  DEFAULT_LIMIT,
+  buildFilters,
+  fetchTotalChores,
+  mapRowToSchema,
+} from './helpers/choreRead';
+import type {DbChoreRow} from './helpers/choreRead';
 
-// GET /api/chores - Get all chores
 export const handleGetChores = async (
   req: express.Request,
   res: express.Response,
-) => {
+): Promise<void> => {
   try {
-    const {status, choreType, userId, page, limit} =
-      parseChoresQueryRequest(req);
-    // Infer family_id from current user if available; fall back to parsed userId
-    let effectiveFamilyId: number | undefined;
-    try {
-      const currentUserId = requireUserId(req);
-      const family = getUserFamily(currentUserId);
-      if (family != null) {
-        effectiveFamilyId = family.id;
-      }
-    } catch {
-      // unauthenticated or no family; leave undefined to avoid filtering
-    }
-    const response = processChoresRequest({
+    const parsed = ChoreQuerySchema.parse(req.query) as {
+      status?: string;
+      chore_type?: string;
+      user_id?: number;
+      page?: number;
+      limit?: number;
+    };
+    const {
       status,
-      choreType,
-      userId: effectiveFamilyId ?? userId,
-      page,
+      chore_type: choreType,
+      user_id: userId,
+      page = 1,
+      limit = DEFAULT_LIMIT,
+    } = parsed;
+    const offset = (page - 1) * limit;
+
+    const total = await fetchTotalChores();
+    const {where, params} = buildFilters(status, choreType, userId);
+
+    const rows = (await all(
+      sql`
+        SELECT
+          c.id,
+          c.title,
+          c.description,
+          c.reward_points AS point_reward,
+          0 AS bonus_points,
+          c.penalty_points,
+          NULL AS due_date,
+          NULL AS recurrence_rule,
+          c.chore_type,
+          'pending' AS status,
+          c.created_by,
+          DATETIME('now') AS created_at,
+          DATETIME('now') AS updated_at,
+          u.username AS created_by_username
+        FROM
+          chores c
+          JOIN users u ON u.id = c.created_by ${where}
+        LIMIT
+          ?
+        OFFSET
+          ?
+      `,
+      ...params,
       limit,
+      offset,
+    )) as Array<DbChoreRow>;
+
+    const data = rows.map(mapRowToSchema);
+
+    res.json({
+      success: true,
+      data,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / limit)),
+      },
     });
-    return res.json(response);
   } catch (error) {
-    return handleChoresQueryError(error, res);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({success: false, error: (error as Error).message});
   }
 };
 
-// GET /api/chores/:id - Get a specific chore
 export const handleGetChoreById = async (
-  req: express.Request,
+  _req: express.Request,
   res: express.Response,
-) => {
-  try {
-    const {choreId} = parseGetChoreRequest(req);
-    validateGetChoreInput(choreId);
-    const validatedChore = fetchChoreById(choreId);
-    return res.json({success: true, data: validatedChore});
-  } catch (error) {
-    return handleGetChoreError(error, res);
-  }
+): Promise<void> => {
+  res
+    .status(StatusCodes.NOT_FOUND)
+    .json({success: false, error: 'Chore not found'});
 };

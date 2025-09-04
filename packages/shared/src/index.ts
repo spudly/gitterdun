@@ -4,5 +4,6 @@ export {
   ONE_MINUTE_MS,
   ONE_HOUR_MS,
   ONE_DAY_MS,
+  ONE_WEEK_MS,
   MIN_PASSWORD_LENGTH,
 } from './constants.js';

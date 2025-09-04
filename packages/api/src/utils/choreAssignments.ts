@@ -26,8 +26,8 @@ const requireTimestamp = (value: unknown, fieldName: string): number => {
   return ts;
 };
 
-export const findChoreAssignment = (choreId: number, userId: number) => {
-  const assignmentRow = get(
+export const findChoreAssignment = async (choreId: number, userId: number) => {
+  const assignmentRow = await get(
     sql`
       SELECT
         id,
@@ -55,7 +55,7 @@ export const findChoreAssignment = (choreId: number, userId: number) => {
     throw new Error('Chore assignment not found');
   }
 
-  const base = assignmentRow as Record<string, unknown>;
+  const base = assignmentRow;
   const normalized = {
     ...base,
     assigned_at: requireTimestamp(base['assigned_at'], 'assigned_at'),
@@ -83,13 +83,13 @@ export type ChoreCompletionParams = {
   notes?: string | undefined;
 };
 
-export const updateChoreAssignmentCompletion = ({
+export const updateChoreAssignmentCompletion = async ({
   choreId,
   userId,
   points,
   notes,
 }: ChoreCompletionParams) => {
-  run(
+  await run(
     sql`
       UPDATE chore_assignments
       SET

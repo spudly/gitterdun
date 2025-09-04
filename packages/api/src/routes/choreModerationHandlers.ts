@@ -14,7 +14,7 @@ export const handleAssignChore = async (
 ) => {
   try {
     const userId = requireUserId(req);
-    const family = getUserFamily(userId);
+    const family = await getUserFamily(userId);
     if (family === null) {
       return res
         .status(StatusCodes.FORBIDDEN)
@@ -32,7 +32,7 @@ export const handleAssignChore = async (
         .status(StatusCodes.BAD_REQUEST)
         .json({success: false, error: 'Invalid chore or user id'});
     }
-    assignChoreToSingleUser(choreId, assignedUserId);
+    await assignChoreToSingleUser(choreId, assignedUserId);
     return res.json({success: true});
   } catch (error) {
     return res
@@ -47,7 +47,7 @@ export const handleApproveChore = async (
 ) => {
   try {
     const userId = requireUserId(req);
-    const family = getUserFamily(userId);
+    const family = await getUserFamily(userId);
     if (family === null) {
       return res
         .status(StatusCodes.FORBIDDEN)
@@ -65,7 +65,7 @@ export const handleApproveChore = async (
         .status(StatusCodes.BAD_REQUEST)
         .json({success: false, error: 'Invalid chore id or approver id'});
     }
-    approveChoreAssignment(choreId, approvedBy);
+    await approveChoreAssignment(choreId, approvedBy);
     return res.json({success: true});
   } catch (error) {
     return res

@@ -3,6 +3,7 @@ import path from 'node:path';
 import {asError} from '@gitterdun/shared';
 import {logger} from '../utils/logger';
 import {BCRYPT_SALT_ROUNDS} from '../constants';
+import {isPostgresEnabled} from '../utils/env';
 import {run} from '../utils/crud/db';
 import {sql} from '../utils/sql';
 import {
@@ -14,28 +15,40 @@ import {
 } from '../utils/crud/init';
 
 const readSchemaFile = (): string => {
-  const schemaPath = path.join(process.cwd(), 'src/lib/schema.sqlite.sql');
+  const schemaFile = isPostgresEnabled()
+    ? 'src/lib/schema.sql'
+    : 'src/lib/schema.sqlite.sql';
+  const schemaPath = path.join(process.cwd(), schemaFile);
   return fs.readFileSync(schemaPath, 'utf8');
 };
 
-const executeSchema = (schema: string): void => {
-  execSchema(schema);
+const executeSchema = async (schema: string): Promise<void> => {
+  await execSchema(schema);
   logger.info('Database initialized successfully');
 };
 
-const columnExists = (table: string, column: string): boolean => {
-  const row = pragmaTableInfo(table);
+const columnExists = async (
+  table: string,
+  column: string,
+): Promise<boolean> => {
+  const row = await pragmaTableInfo(table);
   return row.some(rowItem => rowItem.name === column);
 };
 
-const ensureUsersProfileColumns = (): void => {
+const ensureUsersProfileColumns = async (): Promise<void> => {
   try {
-    if (!columnExists('users', 'display_name')) {
-      alterTableAddColumn('users', 'display_name TEXT');
+    if (!(await columnExists('users', 'display_name'))) {
+      await alterTableAddColumn(
+        'users',
+        isPostgresEnabled() ? 'display_name TEXT' : 'display_name TEXT',
+      );
       logger.info("Added 'display_name' column to users table");
     }
-    if (!columnExists('users', 'avatar_url')) {
-      alterTableAddColumn('users', 'avatar_url TEXT');
+    if (!(await columnExists('users', 'avatar_url'))) {
+      await alterTableAddColumn(
+        'users',
+        isPostgresEnabled() ? 'avatar_url TEXT' : 'avatar_url TEXT',
+      );
       logger.info("Added 'avatar_url' column to users table");
     }
   } catch (error) {
@@ -46,13 +59,13 @@ const ensureUsersProfileColumns = (): void => {
   }
 };
 
-const ensureFamilyUpdatedAt = (): void => {
+const ensureFamilyUpdatedAt = async (): Promise<void> => {
   try {
-    if (!columnExists('families', 'updated_at')) {
-      alterTableAddColumn(
-        'families',
-        'updated_at datetime DEFAULT CURRENT_TIMESTAMP',
-      );
+    if (!(await columnExists('families', 'updated_at'))) {
+      const col = isPostgresEnabled()
+        ? 'updated_at timestamp DEFAULT CURRENT_TIMESTAMP'
+        : 'updated_at datetime DEFAULT CURRENT_TIMESTAMP';
+      await alterTableAddColumn('families', col);
       logger.info("Added 'updated_at' column to families table");
     }
   } catch (error) {
@@ -63,12 +76,12 @@ const ensureFamilyUpdatedAt = (): void => {
   }
 };
 
-const ensureChoreFamilyId = (): void => {
+const ensureChoreFamilyId = async (): Promise<void> => {
   try {
-    if (!columnExists('chores', 'family_id')) {
-      alterTableAddColumn('chores', 'family_id INTEGER');
+    if (!(await columnExists('chores', 'family_id'))) {
+      await alterTableAddColumn('chores', 'family_id INTEGER');
       // Backfill: set family_id for chores created by users who belong to a family
-      run(sql`
+      await run(sql`
         UPDATE chores
         SET
           family_id = (
@@ -90,8 +103,8 @@ const ensureChoreFamilyId = (): void => {
   }
 };
 
-const checkAdminExists = (): boolean => {
-  const adminExists = countAdmins();
+const checkAdminExists = async (): Promise<boolean> => {
+  const adminExists = await countAdmins();
   return adminExists.count > 0;
 };
 
@@ -102,20 +115,21 @@ const createDefaultAdmin = async (): Promise<void> => {
     BCRYPT_SALT_ROUNDS,
   );
 
-  insertDefaultAdmin('admin', 'admin@gitterdun.com', hashedPassword);
+  await insertDefaultAdmin('admin', 'admin@gitterdun.com', hashedPassword);
 
   logger.info('Default admin user created: admin@gitterdun.com / admin123');
 };
 
 export const initializeDatabase = async (): Promise<void> => {
+  logger.info(`Using ${isPostgresEnabled() ? 'Postgres' : 'SQLite'}`);
   try {
     const schema = readSchemaFile();
-    executeSchema(schema);
-    ensureUsersProfileColumns();
-    ensureFamilyUpdatedAt();
-    ensureChoreFamilyId();
+    await executeSchema(schema);
+    await ensureUsersProfileColumns();
+    await ensureFamilyUpdatedAt();
+    await ensureChoreFamilyId();
 
-    if (!checkAdminExists()) {
+    if (!(await checkAdminExists())) {
       await createDefaultAdmin();
     }
   } catch (error) {

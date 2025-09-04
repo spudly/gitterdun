@@ -21,8 +21,8 @@ export const ListRow: FC<ListRowProps> = ({
   right,
   className = '',
 }) => {
-  const hasLeft = left !== null && left !== undefined;
-  const hasDescription = description !== null && description !== undefined;
+  const hasLeft = left != null;
+  const hasDescription = description != null;
   const hasMeta = Children.count(meta) > 0;
 
   return (

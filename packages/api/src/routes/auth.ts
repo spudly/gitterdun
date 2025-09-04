@@ -34,7 +34,7 @@ router.post('/login', async (req, res) => {
     | {username: string; password: string};
   const user = await authenticateUser(parsed, parsed.password);
 
-  createLoginSession(res, user.id);
+  await createLoginSession(res, user.id);
   const identifier = 'email' in parsed ? parsed.email : parsed.username;
   const response = prepareLoginResponse(user, identifier);
   res.json(response);
@@ -43,7 +43,9 @@ router.post('/login', async (req, res) => {
 // POST /api/auth/register - Parent self-registration and family creation optional later
 
 router.post('/register', async (req, res) => {
-  const {username, email, password, role} = validateRegistrationData(req.body);
+  const {username, email, password, role} = await validateRegistrationData(
+    req.body,
+  );
   const validatedUser = await createNewUser(
     email !== undefined
       ? {username, email, password, role}
@@ -51,7 +53,7 @@ router.post('/register', async (req, res) => {
   );
 
   // Automatically log in the user after successful registration
-  createLoginSession(res, validatedUser.id);
+  await createLoginSession(res, validatedUser.id);
 
   logger.info(`New user registered: ${username}`);
   res
@@ -64,11 +66,11 @@ router.post('/register', async (req, res) => {
 });
 
 // POST /api/auth/logout - Invalidate session
-router.post('/logout', (req, res) => {
+router.post('/logout', async (req, res) => {
   try {
     const sessionId = getCookie(req, 'sid');
     if (sessionId !== undefined) {
-      deleteSession(sessionId);
+      await deleteSession(sessionId);
     }
     res.clearCookie('sid', {path: '/'});
     return res.json({success: true, message: 'Logged out'});
@@ -81,9 +83,9 @@ router.post('/logout', (req, res) => {
 });
 
 // GET /api/auth/me - Current user
-router.get('/me', (req, res) => {
+router.get('/me', async (req, res) => {
   try {
-    const user = getUserFromSession(req);
+    const user = await getUserFromSession(req);
     if (!user) {
       return res
         .status(StatusCodes.UNAUTHORIZED)
@@ -99,9 +101,9 @@ router.get('/me', (req, res) => {
 });
 
 // POST /api/auth/forgot - request password reset
-router.post('/forgot', (req, res) => {
+router.post('/forgot', async (req, res) => {
   const {email} = ForgotPasswordRequestSchema.parse(req.body);
-  const user = findUserForReset(email);
+  const user = await findUserForReset(email);
   const response = getSecuritySafeResponse();
 
   if (!user) {
@@ -109,7 +111,7 @@ router.post('/forgot', (req, res) => {
     return;
   }
 
-  const resetResponse = handlePasswordResetRequest(email, user.id);
+  const resetResponse = await handlePasswordResetRequest(email, user.id);
   res.json(resetResponse);
 });
 
@@ -117,7 +119,7 @@ router.post('/forgot', (req, res) => {
 
 router.post('/reset', async (req, res) => {
   const {token, password} = ResetPasswordSchema.parse(req.body);
-  const resetData = validateResetToken(token);
+  const resetData = await validateResetToken(token);
 
   await resetUserPassword(resetData.user_id, password, token);
   res.json({success: true, message: 'Password has been reset'});

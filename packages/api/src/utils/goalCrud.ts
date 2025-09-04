@@ -2,12 +2,12 @@ import {GoalSchema} from '@gitterdun/shared';
 import {get, run} from './crud/db';
 import {sql} from './sql';
 
-export const createGoalInDatabase = (
+export const createGoalInDatabase = async (
   title: string,
   description: string | undefined,
   targetPoints: number,
 ) => {
-  const result = get(
+  const result = await get(
     sql`
       INSERT INTO
         goals (
@@ -30,7 +30,7 @@ export const createGoalInDatabase = (
   return GoalSchema.parse(result);
 };
 
-export const fetchGoalById = (goalId: number) => {
+export const fetchGoalById = async (goalId: number) => {
   return get(
     sql`
       SELECT
@@ -52,8 +52,8 @@ export const fetchGoalById = (goalId: number) => {
   );
 };
 
-export const checkGoalExists = (goalId: number): boolean => {
-  const existingGoal = get(
+export const checkGoalExists = async (goalId: number): Promise<boolean> => {
+  const existingGoal = await get(
     sql`
       SELECT
         id
@@ -67,8 +67,8 @@ export const checkGoalExists = (goalId: number): boolean => {
   return existingGoal !== undefined;
 };
 
-export const deleteGoalFromDatabase = (goalId: number): void => {
-  run(
+export const deleteGoalFromDatabase = async (goalId: number): Promise<void> => {
+  await run(
     sql`
       DELETE FROM goals
       WHERE

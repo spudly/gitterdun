@@ -37,8 +37,10 @@ const extractSessionId = (req: express.Request): string => {
   return sid;
 };
 
-const fetchSession = (sessionId: string): SessionData | undefined => {
-  const sessionRow = get(
+const fetchSession = async (
+  sessionId: string,
+): Promise<SessionData | undefined> => {
+  const sessionRow = await get(
     sql`
       SELECT
         user_id,
@@ -58,15 +60,15 @@ const fetchSession = (sessionId: string): SessionData | undefined => {
 const validateSessionExpiry: (
   session: SessionData | undefined,
   sessionId: string,
-) => asserts session is SessionData = (
+) => Promise<void> = async (
   session: SessionData | undefined,
   sessionId: string,
-): asserts session is SessionData => {
+): Promise<void> => {
   if (session === undefined) {
     throw Object.assign(new Error('Not authenticated'), {status: 401});
   }
   if (new Date(session.expires_at).getTime() < Date.now()) {
-    run(
+    await run(
       sql`
         DELETE FROM sessions
         WHERE
@@ -78,9 +80,13 @@ const validateSessionExpiry: (
   }
 };
 
-export const requireUserId = (req: express.Request): number => {
+export const requireUserId = async (req: express.Request): Promise<number> => {
   const sessionId = extractSessionId(req);
-  const session = fetchSession(sessionId);
-  validateSessionExpiry(session, sessionId);
+  const session = await fetchSession(sessionId);
+  await validateSessionExpiry(session, sessionId);
+  // At this point, session is not undefined, but assert for TS
+  if (session === undefined) {
+    throw Object.assign(new Error('Not authenticated'), {status: 401});
+  }
   return session.user_id;
 };

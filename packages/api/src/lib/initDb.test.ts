@@ -174,4 +174,58 @@ describe('initializeDatabase', () => {
       'Failed to initialize database',
     );
   });
+
+  test('should read Postgres schema when PG is enabled via env', async () => {
+    jest.resetModules();
+
+    // Re-establish mocks after reset
+    jest.doMock('./db', () => ({
+      __esModule: true,
+      default: {
+        exec: jest.fn(),
+        prepare: jest.fn().mockReturnValue({get: jest.fn(), run: jest.fn()}),
+      },
+    }));
+    jest.doMock('../utils/logger', () => ({
+      logger: {info: jest.fn(), error: jest.fn()},
+    }));
+    jest.doMock('../utils/crud/init', () => {
+      // Re-wire init helpers to avoid shelling out to psql during test
+      const real = jest.requireActual('../utils/crud/init');
+      return {
+        __esModule: true,
+        ...real,
+        execSchema: jest.fn(),
+        countAdmins: jest.fn(() => ({count: 1})),
+      };
+    });
+
+    // Local fs/path mocks for this test after module reset
+    const fsMock = {readFileSync: jest.fn().mockReturnValue('SQL')};
+    const pathMock = {join: jest.fn().mockReturnValue('/mock/schema.sql')};
+    jest.doMock('node:fs', () => fsMock);
+    jest.doMock('node:path', () => pathMock);
+
+    const originalEnv = {...process.env};
+    process.env = {
+      ...originalEnv,
+      NODE_ENV: 'production',
+      PG_URL: 'postgresql://user:pass@localhost:5432/giterdone_postgres',
+    } as Record<string, string>;
+
+    const {initializeDatabase: initializeDatabasePg} = await import('./initDb');
+
+    await initializeDatabasePg();
+
+    expect(pathMock.join).toHaveBeenCalledWith(
+      process.cwd(),
+      'src/lib/schema.sql',
+    );
+    expect(fsMock.readFileSync).toHaveBeenCalledWith(
+      '/mock/schema.sql',
+      'utf8',
+    );
+
+    process.env = originalEnv;
+  });
 });

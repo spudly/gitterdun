@@ -1,33 +1,30 @@
-import express from 'express';
+import type express from 'express';
 import {StatusCodes} from 'http-status-codes';
-import {rejectChoreAssignment} from '../utils/choreModeration';
 import {requireUserId} from '../utils/auth';
 import {getUserFamily} from '../utils/familyOperations';
-import {validateParentMembership} from '../utils/familyAuthUtils';
+import {rejectChoreAssignment} from '../utils/choreModeration';
 
 export const handleRejectChore = async (
   req: express.Request,
   res: express.Response,
 ): Promise<void> => {
   try {
-    const userId = requireUserId(req);
-    const family = getUserFamily(userId);
+    const userId = await requireUserId(req);
+    const family = await getUserFamily(userId);
     if (family === null) {
       res
         .status(StatusCodes.FORBIDDEN)
         .json({success: false, error: 'Forbidden'});
       return;
     }
-    validateParentMembership(userId, family.id);
-    const choreIdRaw = (req.params as Record<string, string>)['id'];
-    const choreId = Number(choreIdRaw);
+    const choreId = Number((req.params as Record<string, string>)['id']);
     if (!Number.isInteger(choreId)) {
       res
         .status(StatusCodes.BAD_REQUEST)
         .json({success: false, error: 'Invalid chore id'});
       return;
     }
-    rejectChoreAssignment(choreId);
+    await rejectChoreAssignment(choreId);
     res.json({success: true});
   } catch (error) {
     res
