@@ -1,47 +1,12 @@
-- [x] extract all html elements w/ tailwind classes to widgets
-- [x] use clsx for concatenating classnames
-- [x] setup the react compiler eslint plugin
-- [x] cleanup eslint configuration, merging other configs into a single unified
-      config
-- [x] write jest tests => 100% coverage
-- [x] IconButton demo has duplicate code (SVGs). Clean that up and make sure
-      other stuff isn't duplicated.
-- [x] Use padding/gap. Do not use margins
-- [x] Use `test` instead of `it` for jest tests. maybe there's a eslint rule for
-      this
-- [x] add depcheck
-- [x] comment reasons for disabling eslint rules
-  - [x] stylistic rules not necessary because of prettier
-  - [x] add unused eslint rules
-- [x] use types, not interfaces
-- [x] prettier-plugin-tailwindcss
-- [x] eslint-plugin-tailwindcss
-- [x] re-enable import/max-dependencies
-- [x] re-enable react/jsx-max-depth
-- [x] add eslint-plugin-jest
-- [x] format SQL using prettier-plugin-embed + prettier-plugin-sql
-- [x] upgrade to express 5
-- [x] update all dependencies
-- [x] instruct cursor to always make sure that any new code it writes passes
-      checks: eslint, jest, typescript, prettier
 - [ ] audit all the eslint-disable rules that AI added; make sure they're not
       for stupid reasons
 - [ ] where possible, use user-event instead of fireEvent
 - [ ] jest - configure clearAllMocks (or better?) in the jest config so it
       doesn't have to be set everwhere
-- [x] setup react-i18n; include pig-latin & pirate-speak
-- [x] add french translation
-- [x] add deseret translation
 - [ ] refine landing => sign-up/login flow
-- [x] add eslint-plugin-turbo
 - [ ] scan repo for strings that haven't been internationalized
 - [ ] add secret detection to precommit hook:
       https://docs.gitguardian.com/ggshield-docs/integrations/git-hooks/pre-commit
-- [x] write an eslint rule to ensure i18n messages are not used without
-      <FormattedMessage /> or intl.formatMessage()
-- [x] eslint rule (or something else) to forbid use of CSS margins
-- [x] eslint rule to check for unused data-test-id attributes
-- [x] create a new way to define eslint rules
 - [ ] add cursor ignore file?
 - [ ] Feature: Chore Scheduling/Rotation
   - [ ] as needed
@@ -51,8 +16,14 @@
 - [ ] Feature: late penalty
 - [ ] add date-fns
 - [ ] remove build step from api package
-- [ ] fix eslint config issue where rules get disabled inadvertently
 - [ ] esm all the packages
 - [ ] setup typescript-coverage-report?
 - [ ] add eslint rule to enforce that unawaited promises are assigned to a
       variable named /promise$/i
+- [ ] badges for git repo
+  - [ ] test coverage
+  - [ ] dependencies up to date
+  - [ ] build passing
+  - [ ] snyk
+  - [ ] typescript coverage?
+  - [ ] code climate maintainability

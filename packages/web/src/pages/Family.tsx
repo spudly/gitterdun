@@ -128,7 +128,7 @@ const Family: FC = () => {
                       return; // don't persist until a valid option is selected
                     }
                     if (selectedFamilyId != null) {
-                      const run = safeAsync(
+                      safeAsync(
                         async () => {
                           await familiesApi.updateTimezone(selectedFamilyId, {
                             timezone: val,
@@ -139,8 +139,7 @@ const Family: FC = () => {
                           defaultMessage: 'Failed to update timezone',
                           id: 'pages.Family.update-timezone-failed',
                         }),
-                      );
-                      run();
+                      )();
                     }
                   }}
                   options={tzQuery.data?.data ?? ['UTC']}

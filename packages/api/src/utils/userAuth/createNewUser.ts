@@ -19,7 +19,7 @@ export const createNewUser = async ({
 }: CreateUserParams) => {
   const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
 
-  const result = get(
+  const result = await get(
     sql`
       INSERT INTO
         users (username, email, password_hash, role)

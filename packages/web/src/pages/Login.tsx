@@ -38,15 +38,14 @@ const Login: FC = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setMessage(null);
-    const run = safeAsync(
+    safeAsync(
       async () => {
         await login(email, password);
         await navigate('/');
       },
       intl.formatMessage(messages.failed),
       setMessage,
-    );
-    run();
+    )();
   };
 
   return (

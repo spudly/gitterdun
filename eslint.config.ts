@@ -324,6 +324,8 @@ export const RULES: MyRules = {
     },
   ],
   'gitterdun/require-i18n-formatting': errorFor('react'),
+  // Enforce promise-suffix only where TS types are available
+  'gitterdun/require-promise-suffix-on-unawaited': errorFor('typescript'),
   'grouped-accessor-pairs': 'error',
   'guard-for-in': 'error',
   'id-denylist': 'error',
