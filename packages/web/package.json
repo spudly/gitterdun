@@ -2,6 +2,7 @@
   "name": "@gitterdun/web",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "start:dev": "vite",
     "check:types": "tsc",

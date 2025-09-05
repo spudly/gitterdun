@@ -10,7 +10,7 @@ describe('@gitterdun/shared public API', () => {
   test('asError wraps non-error values', () => {
     const err = asError('x');
     expect(err).toBeInstanceOf(Error);
-    expect(err.message).toMatch(/Non-Error thrown/u);
+    expect(err.message).toBe('Non-Error value thrown!');
     expect(err.value).toBe('x');
   });
 });

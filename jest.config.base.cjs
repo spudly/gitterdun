@@ -18,7 +18,10 @@ module.exports = {
     '!**/*.config.*',
     '!**/coverage/**',
   ],
-  moduleNameMapper: {'^(\\.{1,2}/.*)\\.js$': '$1'},
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+    '^@gitterdun/shared$': '<rootDir>/../shared/src/index.ts',
+  },
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.(spec|test).(ts|tsx|js|jsx)',
     '<rootDir>/src/**/*.(spec|test).(ts|tsx|js|jsx)',

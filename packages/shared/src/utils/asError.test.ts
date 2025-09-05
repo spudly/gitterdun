@@ -41,7 +41,7 @@ describe('asError', () => {
         const result = asError('test string');
 
         expect(result).toBeInstanceOf(Error);
-        expect(result.message).toBe('Non-Error thrown: test string');
+        expect(result.message).toBe('Non-Error value thrown!');
         expect(result.value).toBe('test string');
       });
 
@@ -49,7 +49,7 @@ describe('asError', () => {
         const result = asError(42);
 
         expect(result).toBeInstanceOf(Error);
-        expect(result.message).toBe('Non-Error thrown: 42');
+        expect(result.message).toBe('Non-Error value thrown!');
         expect(result.value).toBe(42);
       });
 
@@ -57,7 +57,7 @@ describe('asError', () => {
         const result = asError(true);
 
         expect(result).toBeInstanceOf(Error);
-        expect(result.message).toBe('Non-Error thrown: true');
+        expect(result.message).toBe('Non-Error value thrown!');
         expect(result.value).toBe(true);
       });
 
@@ -65,7 +65,7 @@ describe('asError', () => {
         const result = asError(false);
 
         expect(result).toBeInstanceOf(Error);
-        expect(result.message).toBe('Non-Error thrown: false');
+        expect(result.message).toBe('Non-Error value thrown!');
         expect(result.value).toBe(false);
       });
     });
@@ -75,7 +75,7 @@ describe('asError', () => {
         const result = asError(null);
 
         expect(result).toBeInstanceOf(Error);
-        expect(result.message).toBe('Non-Error thrown: null');
+        expect(result.message).toBe('Non-Error value thrown!');
         expect(result.value).toBeNull();
       });
 
@@ -83,7 +83,7 @@ describe('asError', () => {
         const result = asError(undefined);
 
         expect(result).toBeInstanceOf(Error);
-        expect(result.message).toBe('Non-Error thrown: undefined');
+        expect(result.message).toBe('Non-Error value thrown!');
         expect(result.value).toBeUndefined();
       });
     });
@@ -94,7 +94,7 @@ describe('asError', () => {
         const result = asError(testObject);
 
         expect(result).toBeInstanceOf(Error);
-        expect(result.message).toBe('Non-Error thrown: [object Object]');
+        expect(result.message).toBe('Non-Error value thrown!');
         expect(result.value).toBe(testObject);
       });
 
@@ -103,7 +103,7 @@ describe('asError', () => {
         const result = asError(testArray);
 
         expect(result).toBeInstanceOf(Error);
-        expect(result.message).toBe('Non-Error thrown: 1,2,3');
+        expect(result.message).toBe('Non-Error value thrown!');
         expect(result.value).toBe(testArray);
       });
     });
@@ -114,7 +114,7 @@ describe('asError', () => {
         const result = asError(testSymbol);
 
         expect(result).toBeInstanceOf(Error);
-        expect(result.message).toBe('Non-Error thrown: Symbol(test)');
+        expect(result.message).toBe('Non-Error value thrown!');
         expect(result.value).toBe(testSymbol);
       });
 
@@ -123,7 +123,7 @@ describe('asError', () => {
         const result = asError(testBigInt);
 
         expect(result).toBeInstanceOf(Error);
-        expect(result.message).toBe('Non-Error thrown: 123');
+        expect(result.message).toBe('Non-Error value thrown!');
         expect(result.value).toBe(testBigInt);
       });
 
@@ -132,7 +132,7 @@ describe('asError', () => {
         const result = asError(testFunction);
 
         expect(result).toBeInstanceOf(Error);
-        expect(result.message).toBe("Non-Error thrown: () => 'test'");
+        expect(result.message).toBe('Non-Error value thrown!');
         expect(result.value).toBe(testFunction);
       });
     });
