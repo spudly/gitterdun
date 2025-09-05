@@ -1,6 +1,6 @@
 # Gitterdun - Kids' Chore Tracking App
 
-[![codecov](https://codecov.io/github/spudly/gitterdun/graph/badge.svg?token=LybARijPwy)](https://codecov.io/github/spudly/gitterdun)
+[![codecov](https://codecov.io/github/spudly/gitterdun/branch/master/graph/badge.svg?token=LybARijPwy)](https://codecov.io/github/spudly/gitterdun?branch=master)
 [![Libraries.io dependency status](https://img.shields.io/librariesio/github/spudly/gitterdun)](https://libraries.io/github/spudly/gitterdun)
 [![CI](https://github.com/spudly/gitterdun/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/spudly/gitterdun/actions/workflows/ci.yml)
 [![GitGuardian scan](https://img.shields.io/badge/GitGuardian-Scan-blue?logo=gitguardian)](https://github.com/spudly/gitterdun/actions/workflows/ggshield.yml)
