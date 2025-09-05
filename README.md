@@ -3,7 +3,7 @@
 [![codecov](https://codecov.io/github/spudly/gitterdun/branch/master/graph/badge.svg?token=LybARijPwy)](https://codecov.io/github/spudly/gitterdun?branch=master)
 [![CI](https://github.com/spudly/gitterdun/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/spudly/gitterdun/actions/workflows/ci.yml)
 [![GitGuardian scan](https://img.shields.io/badge/GitGuardian-Scan-blue?logo=gitguardian)](https://github.com/spudly/gitterdun/actions/workflows/ggshield.yml)
-![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability-percentage/spudly/gitterdun)
+[![Maintainability](https://qlty.sh/gh/spudly/projects/gitterdun/maintainability.svg)](https://qlty.sh/gh/spudly/projects/gitterdun)
 [![Depfu](https://img.shields.io/depfu/spudly/gitterdun)](https://depfu.com/repos/github/spudly/gitterdun)
 [![Known Vulnerabilities](https://snyk.io/test/github/spudly/gitterdun/badge.svg)](https://snyk.io/test/github/spudly/gitterdun)
 [![Dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen?logo=dependabot)](#)
