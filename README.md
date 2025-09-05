@@ -6,7 +6,6 @@
 [![Maintainability](https://qlty.sh/gh/spudly/projects/gitterdun/maintainability.svg)](https://qlty.sh/gh/spudly/projects/gitterdun)
 [![Depfu](https://img.shields.io/depfu/spudly/gitterdun)](https://depfu.com/repos/github/spudly/gitterdun)
 [![Known Vulnerabilities](https://snyk.io/test/github/spudly/gitterdun/badge.svg)](https://snyk.io/test/github/spudly/gitterdun)
-[![Dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen?logo=dependabot)](#)
 
 A comprehensive web application for tracking kids' chores with gamification
 features, built with Express 4 and modern web technologies.
