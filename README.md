@@ -5,6 +5,9 @@
 [![CI](https://github.com/spudly/gitterdun/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/spudly/gitterdun/actions/workflows/ci.yml)
 [![GitGuardian scan](https://img.shields.io/badge/GitGuardian-Scan-blue?logo=gitguardian)](https://github.com/spudly/gitterdun/actions/workflows/ggshield.yml)
 ![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability-percentage/spudly/gitterdun)
+[![Depfu](https://img.shields.io/depfu/spudly/gitterdun)](https://depfu.com/repos/github/spudly/gitterdun)
+[![Known Vulnerabilities](https://snyk.io/test/github/spudly/gitterdun/badge.svg)](https://snyk.io/test/github/spudly/gitterdun)
+[![Dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen?logo=dependabot)](#)
 
 A comprehensive web application for tracking kids' chores with gamification
 features, built with Express 4 and modern web technologies.
