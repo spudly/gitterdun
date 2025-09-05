@@ -20,10 +20,8 @@
 - [ ] setup typescript-coverage-report?
 - [ ] add eslint rule to enforce that unawaited promises are assigned to a
       variable named /promise$/i
-- [ ] badges for git repo
-  - [ ] test coverage
-  - [ ] dependencies up to date
-  - [ ] build passing
-  - [ ] snyk
-  - [ ] typescript coverage?
-  - [ ] code climate maintainability
+- [x] badges for git repo
+  - [x] test coverage
+  - [x] dependencies up to date
+  - [x] build passing
+  - [x] code climate maintainability
