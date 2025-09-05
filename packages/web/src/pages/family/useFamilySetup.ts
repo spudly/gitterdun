@@ -3,6 +3,17 @@ import {useQuery} from '@tanstack/react-query';
 import {familiesApi} from '../../lib/api.js';
 import {useFamilyMutations} from './useFamilyMutations.js';
 
+const hasSupportedValuesOf = (
+  intl: unknown,
+): intl is {supportedValuesOf: (key: string) => Array<string>} => {
+  return (
+    typeof intl === 'object'
+    && intl !== null
+    && typeof (intl as {supportedValuesOf?: unknown}).supportedValuesOf
+      === 'function'
+  );
+};
+
 export const useFamilySetup = (user: {id?: number} | null) => {
   const [selectedFamilyId, setSelectedFamilyId] = useState<number | null>(null);
   const [newFamilyName, setNewFamilyName] = useState('');
@@ -15,11 +26,10 @@ export const useFamilySetup = (user: {id?: number} | null) => {
     queryKey: ['timezones'],
     queryFn: async () => {
       try {
-        const vals = (
-          Intl as unknown as {
-            supportedValuesOf?: (key: string) => Array<string>;
-          }
-        ).supportedValuesOf?.('timeZone');
+        const intl = (globalThis as {Intl?: unknown}).Intl;
+        const vals = hasSupportedValuesOf(intl)
+          ? intl.supportedValuesOf('timeZone')
+          : undefined;
         const list = Array.isArray(vals) && vals.length > 0 ? vals : ['UTC'];
         return {success: true, data: list} as const;
       } catch {
@@ -30,7 +40,7 @@ export const useFamilySetup = (user: {id?: number} | null) => {
   useEffect(() => {
     const fam = myFamilyQuery.data?.data;
     if (fam != null && selectedFamilyId == null) {
-      const candidate = (fam as {id?: unknown}).id;
+      const candidate = (fam as Partial<Record<'id', unknown>>).id;
       if (typeof candidate === 'number') {
         setSelectedFamilyId(candidate);
       }
@@ -48,10 +58,8 @@ export const useFamilySetup = (user: {id?: number} | null) => {
   });
   const {createFamilyMutation, createChildMutation, inviteMutation} =
     useFamilyMutations(myFamilyQuery, membersQuery);
-  const family = (myFamilyQuery.data?.data ?? null) as {
-    id?: number;
-    timezone?: string;
-  } | null;
+  const family: {id?: number; timezone?: string} | null = (myFamilyQuery.data
+    ?.data ?? null) as {id?: number; timezone?: string} | null;
   return {
     selectedFamilyId,
     newFamilyName,

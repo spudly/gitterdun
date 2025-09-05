@@ -33,7 +33,7 @@ type ProcessChoresParams = {
 const getChoresCount = async (
   query: string,
   params: Array<string | number>,
-) => {
+): Promise<number> => {
   const countQuery = query.replace(
     /SELECT[\s\S]*?FROM/u,
     'SELECT COUNT(*) as count FROM',
@@ -67,12 +67,18 @@ const requireTimestamp = (value: unknown, fieldName: string): number => {
   return ts;
 };
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
 const buildPaginatedChoresQuery = ({
   baseQuery,
   params: queryParams,
   page,
   limit,
-}: PaginatedQueryParams) => {
+}: PaginatedQueryParams): {
+  finalQuery: string;
+  finalParams: Array<string | number>;
+} => {
   const finalQuery = `${baseQuery} ORDER BY c.created_at DESC LIMIT ? OFFSET ?`;
   const offset = (page - 1) * limit;
   const finalParams = [...queryParams, limit, offset];
@@ -85,15 +91,22 @@ const executeChoresQuery = async (
 ): Promise<Array<ChoreWithUsername>> => {
   const chores = (await all(query, ...params)) as Array<unknown>;
   return chores.map(raw => {
-    const base = raw as Record<string, unknown>;
+    const base: Record<string, unknown> = isRecord(raw) ? raw : {};
     const normalized = {
       ...base,
       // status omitted; derived elsewhere if needed
-      reward_points: base['reward_points'] ?? base['point_reward'] ?? 0,
+      reward_points:
+        typeof base['reward_points'] === 'number'
+          ? base['reward_points']
+          : typeof base['point_reward'] === 'number'
+            ? base['point_reward']
+            : 0,
       start_date: toTimestamp(base['start_date']) ?? undefined,
       due_date: toTimestamp(base['due_date']) ?? undefined,
       recurrence_rule:
-        (base['recurrence_rule'] as string | null | undefined) ?? undefined,
+        typeof base['recurrence_rule'] === 'string'
+          ? base['recurrence_rule']
+          : undefined,
       created_at: requireTimestamp(base['created_at'], 'created_at'),
       updated_at: requireTimestamp(base['updated_at'], 'updated_at'),
     };
@@ -106,7 +119,11 @@ const formatChoresResponse = ({
   page,
   limit,
   total,
-}: ChoresResponseParams) => {
+}: ChoresResponseParams): {
+  success: true;
+  data: Array<ChoreWithUsername>;
+  pagination: {page: number; limit: number; total: number; totalPages: number};
+} => {
   return {
     success: true as const,
     data: chores,

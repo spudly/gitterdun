@@ -1,14 +1,8 @@
 import type {IconComponent} from './common.js';
-import {SIZE} from './common.js';
+import {SvgIconBase} from './common.js';
 
 export const GearIcon: IconComponent = ({size = 'md'}) => (
-  <svg
-    fill="none"
-    height={SIZE[size]}
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-    width={SIZE[size]}
-  >
+  <SvgIconBase size={size}>
     <path
       d="M12 8a4 4 0 100 8 4 4 0 000-8z"
       strokeLinecap="round"
@@ -21,5 +15,5 @@ export const GearIcon: IconComponent = ({size = 'md'}) => (
       strokeLinejoin="round"
       strokeWidth={2}
     />
-  </svg>
+  </SvgIconBase>
 );

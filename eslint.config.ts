@@ -130,6 +130,7 @@ const GROUPS = {
       '**/e2e/{test,tests,__test__,__tests__}/**/*',
     ],
   },
+  eslintRules: {files: [`**/eslint-plugin-gitterdun/**`]},
   javascript: {files: [`**/*.${extensionsGlob(JAVASCRIPT_EXTENSIONS)}`]},
   react: {
     files: [`**/*.${extensionsGlob(REACT_EXTENSIONS)}`],
@@ -647,7 +648,10 @@ export const RULES: MyRules = {
   'max-nested-callbacks': 'error',
   'max-params': ['error', {max: 5}],
   'max-statements': [
-    composeSeverity(errorFor('all'), offFor('configs', 'tests', 'e2eTests')),
+    composeSeverity(
+      errorFor('all'),
+      offFor('configs', 'tests', 'e2eTests', 'eslintRules'),
+    ),
     {max: 20},
   ],
   'new-cap': 'error',

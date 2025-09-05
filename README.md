@@ -1,5 +1,7 @@
 # Gitterdun - Kids' Chore Tracking App
 
+[![codecov](https://codecov.io/github/spudly/gitterdun/graph/badge.svg?token=LybARijPwy)](https://codecov.io/github/spudly/gitterdun)
+
 A comprehensive web application for tracking kids' chores with gamification
 features, built with Express 4 and modern web technologies.
 

@@ -62,7 +62,9 @@ export const getChoreForCompletion = async (choreId: number) => {
     start_date: toTimestamp(base['start_date']) ?? undefined,
     due_date: toTimestamp(base['due_date']) ?? undefined,
     recurrence_rule:
-      (base['recurrence_rule'] as string | null | undefined) ?? undefined,
+      typeof base['recurrence_rule'] === 'string'
+        ? base['recurrence_rule']
+        : undefined,
     created_at: requireTimestamp(base['created_at'], 'created_at'),
     updated_at: requireTimestamp(base['updated_at'], 'updated_at'),
   };

@@ -1,5 +1,25 @@
+import type {
+  ArrayExpression,
+  ArrayPattern,
+  Expression,
+  ObjectExpression,
+  ObjectPattern,
+  Pattern,
+} from 'estree';
+
 // internal helper type; not exported to avoid knip unused exports
 type IdentifierNode = {type: 'Identifier'; name: string};
+
+type WithProperty = {property: unknown};
+type WithObject = {object: unknown};
+type WithCallee = {callee: unknown};
+
+type MaybeComputed = {computed?: unknown};
+
+type WithName = {name?: unknown};
+
+const read = <T extends object, K extends keyof T>(obj: T, key: K): T[K] =>
+  obj[key];
 
 export const getType = (node: unknown): string | null => {
   if (typeof node !== 'object' || node === null) {
@@ -9,10 +29,23 @@ export const getType = (node: unknown): string | null => {
   return typeof type === 'string' ? type : null;
 };
 
+export const isArrayPattern = (node: Pattern): node is ArrayPattern =>
+  getType(node) === 'ArrayPattern';
+
+export const isObjectPattern = (node: Pattern): node is ObjectPattern =>
+  getType(node) === 'ObjectPattern';
+
+export const isObjectExpression = (
+  node: Expression,
+): node is ObjectExpression => getType(node) === 'ObjectExpression';
+
+export const isArrayExpression = (node: Expression): node is ArrayExpression =>
+  getType(node) === 'ArrayExpression';
+
 export const isIdentifier = (node: unknown): node is IdentifierNode => {
   return (
     getType(node) === 'Identifier'
-    && typeof (node as {name?: unknown}).name === 'string'
+    && typeof (node as WithName).name === 'string'
   );
 };
 
@@ -20,17 +53,17 @@ export const isAwaitExpression = (node: unknown): boolean =>
   getType(node) === 'AwaitExpression';
 
 const getMemberProperty = (member: unknown): unknown => {
-  const {property} = member as {property: unknown};
-  return property;
+  const prop = (member as WithProperty).property;
+  return prop;
 };
 
 const getMemberObject = (member: unknown): unknown => {
-  const {object} = member as {object: unknown};
-  return object;
+  const obj = (member as WithObject).object;
+  return obj;
 };
 
 const getCallCallee = (call: unknown): unknown => {
-  const {callee} = call as {callee: unknown};
+  const {callee} = call as WithCallee;
   return callee;
 };
 
@@ -41,7 +74,7 @@ const isThenCatchFinallyCall = (expr: unknown): boolean => {
   const callee = getCallCallee(expr);
   if (
     getType(callee) === 'MemberExpression'
-    && (callee as {computed?: unknown}).computed === false
+    && (callee as MaybeComputed).computed === false
   ) {
     const property = getMemberProperty(callee);
     if (isIdentifier(property)) {
@@ -62,7 +95,7 @@ const isPromiseStaticCall = (expr: unknown): boolean => {
   const callee = getCallCallee(expr);
   if (
     getType(callee) !== 'MemberExpression'
-    || (callee as {computed?: unknown}).computed !== false
+    || (callee as MaybeComputed).computed !== false
   ) {
     return false;
   }
@@ -90,7 +123,7 @@ const isNewPromise = (expr: unknown): boolean => {
   if (getType(expr) !== 'NewExpression') {
     return false;
   }
-  const {callee} = expr as {callee: unknown};
+  const callee = read(expr as {callee: unknown}, 'callee');
   return isIdentifier(callee) && callee.name === 'Promise';
 };
 

@@ -36,7 +36,7 @@ const toPgPlaceholders = (
 export const run = async (
   query: string,
   ...params: Array<unknown>
-): Promise<unknown> => {
+): Promise<{changes: number}> => {
   const {text} = toPgPlaceholders(query);
   await pgQuery(text, params);
   return {changes: 0};
@@ -48,7 +48,7 @@ export const get = async (
 ): Promise<Record<string, unknown> | undefined> => {
   const {text} = toPgPlaceholders(query);
   const res = await pgQuery(text, params);
-  const first = res.rows[0] as Record<string, unknown> | undefined;
+  const [first] = res.rows;
   return first ? normalizeRowValues(first) : undefined;
 };
 
@@ -58,9 +58,7 @@ export const all = async (
 ): Promise<Array<Record<string, unknown>>> => {
   const {text} = toPgPlaceholders(query);
   const res = await pgQuery(text, params);
-  return res.rows.map(row =>
-    normalizeRowValues(row as Record<string, unknown>),
-  );
+  return res.rows.map(row => normalizeRowValues(row));
 };
 
 export const pragma = (_pragmaCommand: string): void => {

@@ -5,6 +5,7 @@ import {useLocation} from 'react-router-dom';
 import {FormattedMessage, useIntl} from 'react-intl';
 import type {MessageDescriptor} from 'react-intl';
 import {UserIcon} from './icons/index.js';
+import {CheckCircleIcon} from './icons/CheckCircleIcon.js';
 import {IconButton} from './IconButton.js';
 import {UserMenuDrawer} from './UserMenuDrawer.js';
 import {BottomNav} from './BottomNav.js';
@@ -25,7 +26,7 @@ type LayoutProps = {
 };
 
 const Layout: FC<LayoutProps> = ({children, navigation}) => {
-  const location = useLocation();
+  const {pathname} = useLocation();
   const intl = useIntl();
   // locale controls moved to Settings page
   const {user, logout} = useUser();
@@ -76,7 +77,7 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
     computedNavigation.push({
       message: {defaultMessage: 'Approvals', id: 'widgets.Layout.approvals'},
       path: '/family/approvals',
-      icon: '✅',
+      icon: <CheckCircleIcon size="sm" />,
     });
   }
 
@@ -120,7 +121,7 @@ const Layout: FC<LayoutProps> = ({children, navigation}) => {
       <footer>
         <BottomNav
           ariaLabel={menuLabel}
-          currentPath={location.pathname}
+          currentPath={pathname}
           items={computedNavigation}
         />
       </footer>

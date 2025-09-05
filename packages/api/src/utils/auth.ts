@@ -1,35 +1,12 @@
-import express from 'express';
+import type {RequestDefault} from '../types/http';
 import {SessionRowSchema} from '@gitterdun/shared';
 import {sql} from './sql';
 import {get, run} from './crud/db';
+import {getCookie} from './cookieUtils';
 
 type SessionData = {user_id: number; expires_at: string};
 
-const getCookie = (req: express.Request, name: string): string | undefined => {
-  const cookieHeader = req.headers.cookie;
-  if (cookieHeader === undefined) {
-    return undefined;
-  }
-  const cookieString = Array.isArray(cookieHeader)
-    ? cookieHeader.join(';')
-    : cookieHeader;
-  const cookies = cookieString
-    .split(';')
-    .map(cookie => cookie.trim())
-    .reduce((acc: Record<string, string>, cookie) => {
-      const [rawKey, ...rest] = cookie.split('=');
-      if (rawKey === undefined) {
-        return acc;
-      }
-      const key = decodeURIComponent(rawKey);
-      const value = decodeURIComponent(rest.join('=') || '');
-      acc[key] = value;
-      return acc;
-    }, {});
-  return cookies[name];
-};
-
-const extractSessionId = (req: express.Request): string => {
+const extractSessionId = (req: RequestDefault): string => {
   const sid = getCookie(req, 'sid');
   if (sid === undefined) {
     throw Object.assign(new Error('Not authenticated'), {status: 401});
@@ -80,7 +57,7 @@ const validateSessionExpiry: (
   }
 };
 
-export const requireUserId = async (req: express.Request): Promise<number> => {
+export const requireUserId = async (req: RequestDefault): Promise<number> => {
   const sessionId = extractSessionId(req);
   const session = await fetchSession(sessionId);
   await validateSessionExpiry(session, sessionId);

@@ -38,13 +38,9 @@ const FamilyApprovals: FC = () => {
     staleTime: 10_000,
   });
   const instances = useMemo(() => {
-    const all = (data?.data ?? []) as Array<{
-      chore_id: number;
-      title: string;
-      status: 'incomplete' | 'complete';
-      approval_status: 'unapproved' | 'approved' | 'rejected';
-      notes?: string;
-    }>;
+    const all = (data?.data ?? []) as
+      | Awaited<ReturnType<typeof choreInstancesApi.listForDay>>['data']
+      | [];
     return all.filter(
       instance =>
         instance.status === 'complete'

@@ -29,20 +29,25 @@ const meta = {
 export const noMissingI18nMessages: Rule.RuleModule = {
   meta,
   create: (context: Rule.RuleContext): Rule.RuleListener => {
-    const {options} = context;
+    const optionsArray: Array<unknown> = Array.isArray(context.options)
+      ? context.options
+      : [];
     const normalizedFile = context.filename.replace(/\\/g, '/');
     if (
-      !hasValidRuleOptions(options)
-      || !/\/(?:^|.*\/)?messages\//.test(normalizedFile)
+      !hasValidRuleOptions(optionsArray)
+      || !/\/(?:^|.*\/)?.*messages\//.test(normalizedFile)
     ) {
       return {};
     }
-    const [{enPath}] = options;
+    const [{enPath} = {}] = optionsArray as Array<{enPath: string}>;
+    if (enPath == null) {
+      throw new Error('enPath is required');
+    }
     const enJson = readJson<Record<string, string>>(resolveFromCwd(enPath));
     const enKeys = new Set(Object.keys(enJson));
 
     const localeAbs = resolveFromCwd(context.filename);
-    let source;
+    let source: string;
     try {
       source = fs.readFileSync(localeAbs, 'utf8');
     } catch {

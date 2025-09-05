@@ -27,7 +27,15 @@ const processChoreUpdateFields = (validatedBody: UpdateChore) => {
     const value = (validatedBody as Record<string, unknown>)[field];
     if (value !== undefined) {
       updateFields.push(`${column} = ?`);
-      values.push(value as string | number | null);
+      if (
+        typeof value === 'string'
+        || typeof value === 'number'
+        || value === null
+      ) {
+        values.push(value);
+      } else {
+        throw new Error(`Invalid value type for ${field}`);
+      }
     }
   }
 

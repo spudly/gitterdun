@@ -1,8 +1,23 @@
 import {sql} from '../sql';
 import {allTyped, getTyped, run} from './db';
 import {UserSchema} from '@gitterdun/shared';
+import {z} from 'zod';
 
-export const listUsers = async () => {
+export const listUsers = async (): Promise<
+  Array<
+    Pick<
+      z.infer<typeof UserSchema>,
+      | 'id'
+      | 'username'
+      | 'email'
+      | 'role'
+      | 'points'
+      | 'streak_count'
+      | 'created_at'
+      | 'updated_at'
+    >
+  >
+> => {
   return allTyped(
     UserSchema.pick({
       id: true,
@@ -37,7 +52,7 @@ export const updateUserProfile = async (
   displayName: string | null,
   avatarUrl: string | null,
   email: string | null,
-): Promise<unknown> => {
+): Promise<{changes: number} | {changes?: number}> => {
   return run(
     sql`
       UPDATE users
@@ -53,10 +68,24 @@ export const updateUserProfile = async (
     avatarUrl,
     email,
     id,
-  );
+  ) as Promise<{changes: number} | {changes?: number}>;
 };
 
-export const getUserById = async (id: number) => {
+export const getUserById = async (
+  id: number,
+): Promise<Pick<
+  z.infer<typeof UserSchema>,
+  | 'id'
+  | 'username'
+  | 'email'
+  | 'role'
+  | 'points'
+  | 'streak_count'
+  | 'display_name'
+  | 'avatar_url'
+  | 'created_at'
+  | 'updated_at'
+> | null> => {
   return getTyped(
     UserSchema.pick({
       id: true,

@@ -52,7 +52,7 @@ export const withPgTransaction = async <T>(
   } catch (error) {
     try {
       await client.query('ROLLBACK');
-    } catch (_rollbackError) {
+    } catch (_rollbackError: unknown) {
       // ignore rollback error
     }
     throw error;
@@ -64,7 +64,7 @@ export const withPgTransaction = async <T>(
 export const pgQuery = async (
   text: string,
   params: Array<unknown>,
-): Promise<QueryResult> => {
+): Promise<QueryResult<Record<string, unknown>>> => {
   const activeClient = txContext.getStore();
   if (activeClient !== undefined) {
     return activeClient.query(text, params);

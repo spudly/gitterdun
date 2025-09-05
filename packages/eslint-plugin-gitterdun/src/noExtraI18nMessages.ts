@@ -31,19 +31,24 @@ export const noExtraI18nMessages: Rule.RuleModule = {
   create: (context: Rule.RuleContext): Rule.RuleListener => {
     // Guard: only run inside messages folders
     const normalizedFile = context.filename.replace(/\\/g, '/');
-    const {options} = context;
+    const optionsArray: Array<unknown> = Array.isArray(context.options)
+      ? context.options
+      : [];
     if (
-      !hasValidRuleOptions(options)
-      || !/\/(?:^|.*\/)?messages\//.test(normalizedFile)
+      !hasValidRuleOptions(optionsArray)
+      || !/\/(?:^|.*\/)?.*messages\//.test(normalizedFile)
     ) {
       return {};
     }
-    const [{enPath}] = options;
+    const [{enPath} = {}] = optionsArray as Array<{enPath: string}>;
+    if (enPath == null) {
+      throw new Error('enPath is required');
+    }
     const enJson = readJson<Record<string, string>>(resolveFromCwd(enPath));
     const enKeys = new Set(Object.keys(enJson));
 
     const localeAbs = resolveFromCwd(context.filename);
-    let source;
+    let source: string;
     try {
       source = fs.readFileSync(localeAbs, 'utf8');
     } catch {

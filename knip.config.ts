@@ -7,6 +7,7 @@ const config: KnipConfig = {
     '.': {
       ignoreDependencies: [
         'husky', // Used by Git hooks, not imported
+        'semantic-ui-react', // Used by typescript-coverage-report but missing from its dependencies
       ],
       ignoreBinaries: [],
     },

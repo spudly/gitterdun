@@ -63,7 +63,7 @@ export const createChoreInDb = async (params: CreateChoreParams) => {
     familyId,
   });
 
-  const base: Record<string, unknown> = createdRow as Record<string, unknown>;
+  const base = createdRow as Record<string, unknown>;
   const normalized = {
     ...base,
     reward_points:
@@ -71,7 +71,9 @@ export const createChoreInDb = async (params: CreateChoreParams) => {
     start_date: toTimestamp(base['start_date']) ?? undefined,
     due_date: toTimestamp(base['due_date']) ?? undefined,
     recurrence_rule:
-      (base['recurrence_rule'] as string | null | undefined) ?? undefined,
+      typeof base['recurrence_rule'] === 'string'
+        ? base['recurrence_rule']
+        : undefined,
     created_at: toTimestamp(base['created_at']),
     updated_at: toTimestamp(base['updated_at']),
   };

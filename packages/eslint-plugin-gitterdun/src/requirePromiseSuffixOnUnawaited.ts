@@ -1,113 +1,31 @@
-import type {Rule} from 'eslint';
+import type {JSSyntaxElement, Rule} from 'eslint';
 import {
   getType,
   isIdentifier,
   isAwaitExpression,
   isPromiseLikeExpression,
+  isArrayPattern,
+  isObjectPattern,
 } from './utils/astNodeUtils.js';
 import {isPromiseByType} from './utils/isPromiseByType.js';
 import {
-  checkArrayDestructureAssignments,
-  checkObjectDestructureAssignments,
-} from './utils/assignDetection.js';
-
-const endsWithPromiseSuffix = (name: string): boolean => /promise$/i.test(name);
-
+  handleArrayDestructuring,
+  handleObjectDestructuring,
+  hasParserServices,
+} from './utils/requirePromiseHelpers.js';
 const reportNameViolation = (
   context: Rule.RuleContext,
-  nodeForReport: unknown,
+  nodeForReport: JSSyntaxElement,
   name: string,
 ): void => {
-  if (!endsWithPromiseSuffix(name)) {
+  if (!/promise$/i.test(name)) {
     context.report({
-      node: nodeForReport as never,
+      node: nodeForReport,
       messageId: 'requirePromiseSuffix',
       data: {name},
     });
   }
 };
-
-const buildInitMapFromObjectExpression = (init: {
-  properties: Array<unknown>;
-}): Map<string, unknown> => {
-  const {properties} = init;
-  const initMap = new Map<string, unknown>();
-  for (const propertyNode of properties) {
-    if (getType(propertyNode) !== 'Property') {
-      continue;
-    }
-    const isComputed = (propertyNode as {computed?: unknown}).computed === true;
-    if (isComputed) {
-      continue;
-    }
-    const {key, value} = propertyNode as {key: unknown; value: unknown};
-    if (!isIdentifier(key)) {
-      continue;
-    }
-    const valueType = getType(value);
-    const valueExpr =
-      valueType === 'AssignmentPattern'
-        ? (value as {right: unknown}).right
-        : value;
-    initMap.set(key.name, valueExpr);
-  }
-  return initMap;
-};
-
-const reportPatternPropertiesAgainstMap = (
-  context: Rule.RuleContext,
-  pattern: {properties: Array<unknown>},
-  initMap: Map<string, unknown>,
-): void => {
-  checkObjectDestructureAssignments(context, pattern, initMap, (node, name) => {
-    reportNameViolation(context, node, name);
-  });
-};
-
-const handleObjectDestructuring = (
-  context: Rule.RuleContext,
-  pattern: unknown,
-  init: unknown,
-): void => {
-  if (
-    getType(init) !== 'ObjectExpression'
-    || getType(pattern) !== 'ObjectPattern'
-  ) {
-    return;
-  }
-  const initMap = buildInitMapFromObjectExpression(
-    init as {properties: Array<unknown>},
-  );
-  reportPatternPropertiesAgainstMap(
-    context,
-    pattern as {properties: Array<unknown>},
-    initMap,
-  );
-};
-
-const handleArrayDestructuring = (
-  context: Rule.RuleContext,
-  pattern: unknown,
-  init: unknown,
-): void => {
-  if (
-    getType(init) !== 'ArrayExpression'
-    || getType(pattern) !== 'ArrayPattern'
-  ) {
-    return;
-  }
-  const {elements} = init as {elements: Array<unknown>};
-  const {elements: patternElements} = pattern as {elements: Array<unknown>};
-  checkArrayDestructureAssignments(
-    context,
-    {elements: patternElements},
-    elements,
-    (node, name) => {
-      reportNameViolation(context, node, name);
-    },
-  );
-};
-
 export const requirePromiseSuffixOnUnawaited = {
   meta: {
     type: 'suggestion',
@@ -122,13 +40,16 @@ export const requirePromiseSuffixOnUnawaited = {
         "Variable '{{name}}' should end with 'promise' when assigned a Promise without await",
     },
   },
-  create(context) {
-    const services = (context.sourceCode.parserServices ?? {}) as {
-      program?: unknown;
-      esTreeNodeToTSNodeMap?: unknown;
-    };
+  create(context): Rule.NodeListener {
+    const sourceCode = hasParserServices(context.sourceCode)
+      ? context.sourceCode
+      : null;
+    const services = sourceCode?.parserServices as
+      | {program?: unknown; esTreeNodeToTSNodeMap?: unknown}
+      | undefined;
     const hasTypeInfo =
-      services.program !== undefined
+      services !== undefined
+      && services.program !== undefined
       && services.esTreeNodeToTSNodeMap !== undefined;
     const isPromiseLike = (_ctx: Rule.RuleContext, node: unknown): boolean => {
       // Prefer TS types when available
@@ -142,45 +63,52 @@ export const requirePromiseSuffixOnUnawaited = {
       // Fallback for RuleTester (no type info): treat bare calls as promise-like
       return !hasTypeInfo && getType(node) === 'CallExpression';
     };
-    const onVariableDeclarator = (node: unknown): void => {
-      const {init} = node as {init?: unknown};
-      const {id} = node as {id: unknown};
+    const report = (node: unknown, name: string): void => {
+      reportNameViolation(context, node as JSSyntaxElement, name);
+    };
+    const onVariableDeclarator: Rule.NodeListener['VariableDeclarator'] = (
+      node,
+    ): void => {
+      const {init} = node;
+      const {id} = node;
 
       if (init === undefined || init === null) {
         return;
       }
 
-      if (getType(id) === 'Identifier') {
+      if (isIdentifier(id)) {
         if (isPromiseLike(context, init)) {
-          const {name} = id as {name: string};
+          const {name} = id;
           reportNameViolation(context, id, name);
         }
       }
 
-      if (getType(id) === 'ObjectPattern') {
-        handleObjectDestructuring(context, id, init);
+      if (isObjectPattern(id)) {
+        handleObjectDestructuring(context, id, init, report);
       }
-      if (getType(id) === 'ArrayPattern') {
-        handleArrayDestructuring(context, id, init);
+      if (isArrayPattern(id)) {
+        handleArrayDestructuring(context, id, init, report);
       }
     };
-    const onAssignmentExpression = (node: unknown): void => {
-      const {right} = node as {right: unknown};
+    const onAssignmentExpression: Rule.NodeListener['AssignmentExpression'] = (
+      node,
+    ): void => {
+      const {right} = node;
       if (isAwaitExpression(right)) {
         return;
       }
-      const {left} = node as {left: unknown};
-      if (getType(left) === 'Identifier') {
+      const {left} = node;
+      if (isIdentifier(left)) {
         if (isPromiseLike(context, right)) {
-          const {name} = left as {name: string};
+          const {name} = left;
           reportNameViolation(context, left, name);
         }
       }
-      if (getType(left) === 'ObjectPattern') {
-        handleObjectDestructuring(context, left, right);
+      if (isObjectPattern(left)) {
+        handleObjectDestructuring(context, left, right, report);
       }
-      if (getType(left) === 'ArrayPattern') {
-        handleArrayDestructuring(context, left, right);
+      if (isArrayPattern(left)) {
+        handleArrayDestructuring(context, left, right, report);
       }
     };
     return {

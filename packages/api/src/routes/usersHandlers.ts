@@ -1,4 +1,8 @@
-import type express from 'express';
+import type {
+  RequestWithBody,
+  TypedResponse,
+  RequestDefault,
+} from '../types/http';
 import {StatusCodes} from 'http-status-codes';
 import {logger} from '../utils/logger';
 import {UserSchema, UpdateUserSchema, asError} from '@gitterdun/shared';
@@ -15,8 +19,8 @@ import {
 export {listUsersHandler, deleteUserHandler} from './usersHandlers.admin';
 
 export const getMeHandler = async (
-  req: express.Request,
-  res: express.Response,
+  req: RequestDefault,
+  res: TypedResponse,
 ): Promise<void> => {
   try {
     const sessionUser = await getUserFromSession(req);
@@ -37,8 +41,8 @@ export const getMeHandler = async (
 };
 
 export const patchMeHandler = async (
-  req: express.Request,
-  res: express.Response,
+  req: RequestWithBody<unknown>,
+  res: TypedResponse,
 ): Promise<void> => {
   try {
     const sessionUser = await getUserFromSession(req);
@@ -59,12 +63,12 @@ export const patchMeHandler = async (
     const nextAvatarUrl = parsed.avatar_url ?? user.avatar_url ?? null;
     const nextEmail = parsed.email ?? user.email ?? null;
 
-    const info = (await updateUserProfile(
+    const info = await updateUserProfile(
       user.id,
       nextDisplayName,
       nextAvatarUrl,
       nextEmail,
-    )) as {changes?: number};
+    );
 
     if (info.changes === 0) {
       res
@@ -85,8 +89,8 @@ export const patchMeHandler = async (
 };
 
 export const deleteMeHandler = async (
-  req: express.Request,
-  res: express.Response,
+  req: RequestDefault,
+  res: TypedResponse,
 ): Promise<void> => {
   try {
     const sessionUser = await getUserFromSession(req);

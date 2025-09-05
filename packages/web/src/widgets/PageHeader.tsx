@@ -14,14 +14,20 @@ export const PageHeader: FC<PageHeaderProps> = ({
   actions,
   className = '',
 }) => {
-  const hasSubtitle =
-    subtitle !== null
-    && subtitle !== undefined
-    && (!Array.isArray(subtitle) || subtitle.length > 0);
-  const hasActions =
-    actions !== null
-    && actions !== undefined
-    && (!Array.isArray(actions) || actions.length > 0);
+  const subtitleItems: ReadonlyArray<ReactNode> =
+    subtitle === null || subtitle === undefined
+      ? []
+      : Array.isArray(subtitle)
+        ? subtitle
+        : [subtitle];
+  const actionItems: ReadonlyArray<ReactNode> =
+    actions === null || actions === undefined
+      ? []
+      : Array.isArray(actions)
+        ? actions
+        : [actions];
+  const hasSubtitle = subtitleItems.length > 0;
+  const hasActions = actionItems.length > 0;
 
   return (
     <div className={clsx('mb-8', className)}>
@@ -30,18 +36,16 @@ export const PageHeader: FC<PageHeaderProps> = ({
           <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
 
           {hasSubtitle ? (
-            Array.isArray(subtitle) ? (
-              <div className="flex gap-2 text-gray-600">{subtitle}</div>
+            subtitleItems.length > 1 ? (
+              <div className="flex gap-2 text-gray-600">{subtitleItems}</div>
             ) : (
-              <p className="text-gray-600">{subtitle}</p>
+              <p className="text-gray-600">{subtitleItems[0]}</p>
             )
           ) : null}
         </div>
 
         {hasActions ? (
-          <div className="flex items-center gap-2">
-            {Array.isArray(actions) ? actions : actions}
-          </div>
+          <div className="flex items-center gap-2">{actionItems}</div>
         ) : null}
       </div>
     </div>

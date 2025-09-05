@@ -1,28 +1,26 @@
-import express from 'express';
+import type {
+  RequestDefault,
+  RequestWithQuery,
+  TypedResponse,
+} from '../types/http';
+import {asError, ChoreQuerySchema} from '@gitterdun/shared';
 import {StatusCodes} from 'http-status-codes';
 import {sql} from '../utils/sql';
 import {all} from '../utils/crud/db';
-import {ChoreQuerySchema} from '@gitterdun/shared';
 import {
   DEFAULT_LIMIT,
   buildFilters,
   fetchTotalChores,
   mapRowToSchema,
 } from './helpers/choreRead';
-import type {DbChoreRow} from './helpers/choreRead';
+// DbChoreRow no longer used; map rows directly
 
 export const handleGetChores = async (
-  req: express.Request,
-  res: express.Response,
+  req: RequestWithQuery<unknown>,
+  res: TypedResponse,
 ): Promise<void> => {
   try {
-    const parsed = ChoreQuerySchema.parse(req.query) as {
-      status?: string;
-      chore_type?: string;
-      user_id?: number;
-      page?: number;
-      limit?: number;
-    };
+    const parsed = ChoreQuerySchema.parse(req.query);
     const {
       status,
       chore_type: choreType,
@@ -35,7 +33,7 @@ export const handleGetChores = async (
     const total = await fetchTotalChores();
     const {where, params} = buildFilters(status, choreType, userId);
 
-    const rows = (await all(
+    const rows = await all(
       sql`
         SELECT
           c.id,
@@ -63,7 +61,7 @@ export const handleGetChores = async (
       ...params,
       limit,
       offset,
-    )) as Array<DbChoreRow>;
+    );
 
     const data = rows.map(mapRowToSchema);
 
@@ -80,13 +78,13 @@ export const handleGetChores = async (
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({success: false, error: (error as Error).message});
+      .json({success: false, error: asError(error).message});
   }
 };
 
 export const handleGetChoreById = async (
-  _req: express.Request,
-  res: express.Response,
+  _req: RequestDefault,
+  res: TypedResponse,
 ): Promise<void> => {
   res
     .status(StatusCodes.NOT_FOUND)

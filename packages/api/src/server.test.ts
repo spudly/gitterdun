@@ -11,15 +11,6 @@ import {logger} from './utils/logger';
 import {asError, withProperties} from '@gitterdun/shared';
 import dotenv from 'dotenv';
 
-// Mock dependencies before importing server
-jest.mock('./lib/db', () => ({
-  __esModule: true,
-  default: {
-    exec: jest.fn(),
-    prepare: jest.fn(() => ({get: jest.fn(), run: jest.fn()})),
-    pragma: jest.fn(),
-  },
-}));
 jest.mock('./lib/initDb');
 jest.mock('./utils/logger');
 jest.mock('./routes/auth');

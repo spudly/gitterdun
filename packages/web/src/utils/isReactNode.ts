@@ -10,11 +10,11 @@ export const isReactNode = (value: unknown): value is ReactNode => {
   ) {
     return true;
   }
-  if (isValidElement(value)) {
+  if (isValidElement(value as unknown)) {
     return true;
   }
   if (Array.isArray(value)) {
-    return value.every(isReactNode);
+    return (value as Array<unknown>).every(isReactNode);
   }
   return false;
 };

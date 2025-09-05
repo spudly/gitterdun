@@ -1,16 +1,17 @@
-import type {Rule} from 'eslint';
+import type {JSSyntaxElement, Rule} from 'eslint';
 import {
   getType,
   isIdentifier,
   isPromiseLikeExpression,
 } from './astNodeUtils.js';
 import {isPromiseByType} from './isPromiseByType.js';
+import type {Pattern} from 'estree';
 
 export const checkObjectDestructureAssignments = (
   context: Rule.RuleContext,
   pattern: {properties: Array<unknown>},
   initMap: Map<string, unknown>,
-  report: (node: unknown, name: string) => void,
+  report: (node: JSSyntaxElement, name: string) => void,
 ): void => {
   const {properties} = pattern;
   for (const propertyNode of properties) {
@@ -41,12 +42,12 @@ export const checkObjectDestructureAssignments = (
 
 export const checkArrayDestructureAssignments = (
   context: Rule.RuleContext,
-  pattern: {elements: Array<unknown>},
+  pattern: {elements: Array<Pattern | null>},
   elements: Array<unknown>,
-  report: (node: unknown, name: string) => void,
+  report: (node: Pattern | null, name: string) => void,
 ): void => {
   pattern.elements.forEach((elementNode, index) => {
-    if (getType(elementNode) !== 'Identifier') {
+    if (!isIdentifier(elementNode)) {
       return;
     }
     const slice = elements.slice(index, index + 1);
@@ -55,13 +56,13 @@ export const checkArrayDestructureAssignments = (
     if (valueExpr == null || isSpread) {
       return;
     }
-    const isCall = getType(valueExpr) === 'CallExpression';
     if (
       isPromiseByType(context, valueExpr)
       || isPromiseLikeExpression(valueExpr)
-      || isCall
+      || getType(valueExpr) === 'CallExpression'
     ) {
-      report(elementNode, (elementNode as {name: string}).name);
+      const {name} = elementNode;
+      report(elementNode, name);
     }
   });
 };

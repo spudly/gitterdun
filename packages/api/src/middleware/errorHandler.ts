@@ -1,10 +1,12 @@
-import express from 'express';
+import type express from 'express';
+import type {RequestDefault, TypedResponse} from '../types/http';
 import {StatusCodes} from 'http-status-codes';
 import {logger} from '../utils/logger';
 import {ZodError} from 'zod';
+import {asError} from '@gitterdun/shared';
 
 export const sendZodErrorResponse = (
-  res: express.Response,
+  res: TypedResponse,
   err: ZodError,
 ): void => {
   const isProd = process.env['NODE_ENV'] === 'production';
@@ -17,14 +19,14 @@ export const sendZodErrorResponse = (
     );
 };
 
-export const sendJsonParseErrorResponse = (res: express.Response): void => {
+export const sendJsonParseErrorResponse = (res: TypedResponse): void => {
   res
     .status(StatusCodes.BAD_REQUEST)
     .json({success: false, error: 'Invalid JSON payload'});
 };
 
 export const sendErrorResponse = (
-  res: express.Response,
+  res: TypedResponse,
   status: number,
   message: string,
 ): void => {
@@ -39,10 +41,7 @@ export const sendErrorResponse = (
     });
 };
 
-export const handleErrorInstance = (
-  err: Error,
-  res: express.Response,
-): void => {
+export const handleErrorInstance = (err: Error, res: TypedResponse): void => {
   const errorObj = err as Error & {type?: string; status?: number};
 
   if (errorObj.type === 'entity.parse.failed') {
@@ -60,7 +59,7 @@ export const handleErrorInstance = (
 const SERVER_ERROR_MIN: number = StatusCodes.INTERNAL_SERVER_ERROR;
 const isServerErrorStatus = (code: number): boolean => code >= SERVER_ERROR_MIN;
 
-export const handleError = (err: unknown, res: express.Response): void => {
+export const handleError = (err: unknown, res: TypedResponse): void => {
   if (err instanceof ZodError) {
     // 400 level validation error: do not log
     sendZodErrorResponse(res, err);
@@ -72,14 +71,14 @@ export const handleError = (err: unknown, res: express.Response): void => {
       (err as Error & {status?: number}).status
       ?? StatusCodes.INTERNAL_SERVER_ERROR;
     if (isServerErrorStatus(status)) {
-      logger.error({error: err}, 'Error');
+      logger.error({error: asError(err)}, 'Error');
     }
     handleErrorInstance(err, res);
     return;
   }
 
   // Unknown error: log and send 500
-  logger.error({error: err}, 'Error');
+  logger.error({error: asError(err)}, 'Error');
   sendErrorResponse(
     res,
     StatusCodes.INTERNAL_SERVER_ERROR,
@@ -89,16 +88,16 @@ export const handleError = (err: unknown, res: express.Response): void => {
 
 const globalErrorHandler = (
   err: unknown,
-  _req: express.Request,
-  res: express.Response,
+  _req: RequestDefault,
+  res: TypedResponse,
   _next: express.NextFunction,
 ): void => {
   handleError(err, res);
 };
 
 export const notFoundHandler = (
-  _req: express.Request,
-  res: express.Response,
+  _req: RequestDefault,
+  res: TypedResponse,
 ): void => {
   res
     .status(StatusCodes.NOT_FOUND)
