@@ -1,17 +1,18 @@
-import express from 'express';
-import type {Response} from 'express';
+import type {RequestDefault, TypedResponse} from '../types/http';
 
 const parseCookieString = (cookieString: string): Record<string, string> => {
-  return cookieString.split(';').reduce<Record<string, string>>((acc, part) => {
-    const [rawKey, ...rest] = part.trim().split('=');
-    if (rawKey === undefined || rawKey === '') {
+  return cookieString
+    .split(';')
+    .reduce<Record<string, string>>((acc, part: string) => {
+      const [rawKey, ...rest] = part.trim().split('=');
+      if (rawKey === undefined || rawKey === '') {
+        return acc;
+      }
+      const key = decodeURIComponent(rawKey);
+      const value = decodeURIComponent(rest.join('=') || '');
+      acc[key] = value;
       return acc;
-    }
-    const key = decodeURIComponent(rawKey);
-    const value = decodeURIComponent(rest.join('=') || '');
-    acc[key] = value;
-    return acc;
-  }, {});
+    }, {});
 };
 
 const extractCookieString = (
@@ -27,7 +28,7 @@ const extractCookieString = (
 };
 
 export const getCookie = (
-  req: express.Request,
+  req: RequestDefault,
   name: string,
 ): string | undefined => {
   const cookieString = extractCookieString(req.headers.cookie);
@@ -39,10 +40,10 @@ export const getCookie = (
 };
 
 export const setSessionCookie = (
-  res: Response,
+  res: TypedResponse,
   sessionId: string,
   expiresAt: Date,
-) => {
+): void => {
   res.cookie('sid', sessionId, {
     httpOnly: true,
     secure: process.env['NODE_ENV'] === 'production',

@@ -1,4 +1,5 @@
 import type {Rule} from 'eslint';
+import type {TSESTree} from '@typescript-eslint/types';
 import type {LiteralNode} from './utils/astTypes';
 import {isObjectRecord} from './utils/isObjectRecord';
 import {isLiteralNode} from './utils/isLiteralNode';
@@ -23,7 +24,7 @@ const reportViolatingClasses = (
       messageId:
         violatingClasses.length === 1
           ? 'noMarginClasses'
-          : 'noMarginClassesMultiple',
+          : 'noTailwindMarginsMultiple',
       data: {
         className: violatingClasses[0] ?? '',
         classNames: violatingClasses.join(', '),
@@ -79,7 +80,7 @@ export const noTailwindMargins: Rule.RuleModule = {
     messages: {
       noMarginClasses:
         'Tailwind CSS margin class "{{className}}" is not allowed. Use padding or gap instead.',
-      noMarginClassesMultiple:
+      noTailwindMarginsMultiple:
         'Tailwind CSS margin classes are not allowed: {{classNames}}. Use padding or gap instead.',
     },
   },
@@ -89,20 +90,20 @@ export const noTailwindMargins: Rule.RuleModule = {
     const processedLiterals = new Set<LiteralNode>();
 
     return {
-      JSXAttribute(node: unknown) {
+      JSXAttribute(node: TSESTree.JSXAttribute) {
         // Only check className and class attributes
         if (!isObjectRecord(node)) {
           return;
         }
-        const nameNode = node['name'];
+        const nameNode = node.name;
         let attributeName: string | undefined;
-        if (isObjectRecord(nameNode) && typeof nameNode['name'] === 'string') {
-          attributeName = nameNode['name'];
+        if (isObjectRecord(nameNode) && typeof nameNode.name === 'string') {
+          attributeName = nameNode.name;
         }
         if (attributeName !== 'className' && attributeName !== 'class') {
           return;
         }
-        const valueNode = node['value'];
+        const valueNode = node.value;
         if (isLiteralNode(valueNode)) {
           processedLiterals.add(valueNode);
           handleLiteralValue(context, node, valueNode);

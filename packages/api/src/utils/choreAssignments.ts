@@ -61,8 +61,9 @@ export const findChoreAssignment = async (choreId: number, userId: number) => {
     assigned_at: requireTimestamp(base['assigned_at'], 'assigned_at'),
     completed_at: toTimestamp(base['completed_at']),
     approved_at: toTimestamp(base['approved_at']),
-    approved_by: base['approved_by'] ?? undefined,
-    notes: (base['notes'] as string | null | undefined) ?? undefined,
+    approved_by:
+      typeof base['approved_by'] === 'number' ? base['approved_by'] : undefined,
+    notes: typeof base['notes'] === 'string' ? base['notes'] : undefined,
   };
   const assignment = ChoreAssignmentSchema.parse(normalized);
   if (assignment.completed_at !== undefined) {

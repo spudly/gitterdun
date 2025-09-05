@@ -1,10 +1,10 @@
-import type express from 'express';
+import type {RequestWithBody, TypedResponse} from '../types/http';
 import {StatusCodes} from 'http-status-codes';
 import {getUserFromSession} from '../utils/sessionUtils';
 
 export const requireAdmin = async (
-  req: express.Request,
-  res: express.Response,
+  req: RequestWithBody<unknown>,
+  res: TypedResponse,
 ): Promise<boolean> => {
   const user = await getUserFromSession(req);
   if (!user || user.role !== 'admin') {

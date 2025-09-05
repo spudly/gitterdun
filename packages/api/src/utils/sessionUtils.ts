@@ -1,4 +1,4 @@
-import express from 'express';
+import type {RequestDefault} from '../types/http';
 import crypto from 'node:crypto';
 import {SessionRowSchema, UserSchema} from '@gitterdun/shared';
 import {z} from 'zod';
@@ -9,7 +9,9 @@ import {SECURE_TOKEN_BYTES, SESSION_EXPIRATION_MS} from '../constants';
 
 type User = z.infer<typeof UserSchema>;
 
-export const createSession = async (userId: number) => {
+export const createSession = async (
+  userId: number,
+): Promise<{sessionId: string; expiresAt: Date}> => {
   const sessionId = crypto.randomBytes(SECURE_TOKEN_BYTES).toString('hex');
   const now = new Date();
   const expiresAt = new Date(now.getTime() + SESSION_EXPIRATION_MS);
@@ -29,7 +31,9 @@ export const createSession = async (userId: number) => {
   return {sessionId, expiresAt};
 };
 
-const fetchSessionFromDb = async (sessionId: string) => {
+const fetchSessionFromDb = async (
+  sessionId: string,
+): Promise<z.infer<typeof SessionRowSchema> | undefined> => {
   const sessionRow = await get(
     sql`
       SELECT
@@ -70,7 +74,9 @@ const validateSessionExpiry = async (
   return true;
 };
 
-const validateSession = async (sessionId: string) => {
+const validateSession = async (
+  sessionId: string,
+): Promise<z.infer<typeof SessionRowSchema> | null> => {
   const session = await fetchSessionFromDb(sessionId);
 
   if (!session) {
@@ -109,7 +115,7 @@ const getUserById = async (userId: number): Promise<User | null> => {
 };
 
 export const getUserFromSession = async (
-  req: express.Request,
+  req: RequestDefault,
 ): Promise<User | null> => {
   const sessionId = getCookie(req, 'sid');
   if (sessionId === undefined) {

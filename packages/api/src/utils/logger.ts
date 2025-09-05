@@ -11,15 +11,7 @@ const baseOptions: LoggerOptions = {
     error: (err: unknown) => {
       if (err instanceof Error) {
         const {name, message, stack, cause} = err as Error & {cause?: unknown};
-        // Include enumerable props on the error too (avoid spreading class instance directly)
-        const ownPropNames = Object.keys(err as object);
-        const plainErr: Record<string, unknown> = {};
-        for (const key of ownPropNames) {
-          const anyErr = err as unknown as Record<string, unknown>;
-          plainErr[key] = anyErr[key];
-        }
-        const extras = Object.fromEntries(Object.entries(plainErr));
-        return {name, message, stack, cause, ...extras};
+        return {name, message, stack, cause};
       }
       return err;
     },

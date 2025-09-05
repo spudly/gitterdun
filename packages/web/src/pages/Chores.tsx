@@ -35,13 +35,9 @@ const Chores: FC = () => {
     queryFn: async () => choreInstancesApi.listForDay({date: 'today'}),
   });
   const visibleInstances = useMemo(() => {
-    const instances = (instancesResponse?.data ?? []) as Array<{
-      chore_id: number;
-      title: string;
-      status: 'incomplete' | 'complete';
-      approval_status: 'unapproved' | 'approved' | 'rejected';
-      notes?: string;
-    }>;
+    const instances = (instancesResponse?.data ?? []) as
+      | Awaited<ReturnType<typeof choreInstancesApi.listForDay>>['data']
+      | [];
     if (!hideCompleted) {
       return instances;
     }

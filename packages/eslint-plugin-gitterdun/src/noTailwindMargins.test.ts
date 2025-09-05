@@ -45,7 +45,10 @@ new RuleTester({
     {
       code: '<div className="flex m-4 mb-2 p-2" />',
       errors: [
-        {messageId: 'noMarginClassesMultiple', data: {classNames: 'm-4, mb-2'}},
+        {
+          messageId: 'noTailwindMarginsMultiple',
+          data: {classNames: 'm-4, mb-2'},
+        },
       ],
     },
     // All margin direction classes
@@ -141,7 +144,7 @@ new RuleTester({
       code: '<div className={`flex mt-2 mb-4 ${className}`} />',
       errors: [
         {
-          messageId: 'noMarginClassesMultiple',
+          messageId: 'noTailwindMarginsMultiple',
           data: {classNames: 'mt-2, mb-4'},
         },
       ],

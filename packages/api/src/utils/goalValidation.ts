@@ -3,7 +3,7 @@ import {
   UpdateGoalSchema,
   IdParamSchema,
 } from '@gitterdun/shared';
-import express from 'express';
+import type {RequestWithParamsAndBody} from '../types/http';
 
 export const validateCreateGoalData = (body: unknown) => {
   const validatedBody = CreateGoalSchema.parse(body);
@@ -36,7 +36,7 @@ export type UpdateGoalRequest = {
 };
 
 export const validateUpdateGoalRequest = (
-  req: express.Request,
+  req: RequestWithParamsAndBody<{id: string}, unknown>,
 ): UpdateGoalRequest => {
   const {id} = IdParamSchema.parse(req.params);
   const updateData = UpdateGoalSchema.parse(req.body);

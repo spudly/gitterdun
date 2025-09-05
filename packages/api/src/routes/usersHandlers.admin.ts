@@ -1,8 +1,12 @@
-import type express from 'express';
+import type {
+  RequestWithParams,
+  TypedResponse,
+  RequestDefault,
+} from '../types/http';
+import {IdParamSchema, UserSchema, asError} from '@gitterdun/shared';
 import {StatusCodes} from 'http-status-codes';
-import {z} from 'zod';
+// zod import removed; using shared IdParamSchema
 import {logger} from '../utils/logger';
-import {UserSchema, asError} from '@gitterdun/shared';
 import {requireAdmin} from './usersAuth';
 import {
   clearChoresCreatedBy,
@@ -12,8 +16,8 @@ import {
 } from '../utils/crud/users';
 
 export const listUsersHandler = async (
-  req: express.Request,
-  res: express.Response,
+  req: RequestDefault,
+  res: TypedResponse,
 ): Promise<void> => {
   try {
     if (!(await requireAdmin(req, res))) {
@@ -31,14 +35,14 @@ export const listUsersHandler = async (
 };
 
 export const deleteUserHandler = async (
-  req: express.Request,
-  res: express.Response,
+  req: RequestWithParams<{id: string}>,
+  res: TypedResponse,
 ): Promise<void> => {
   try {
     if (!(await requireAdmin(req, res))) {
       return;
     }
-    const id = z.coerce.number().int().parse(req.params['id']);
+    const {id} = IdParamSchema.parse(req.params);
 
     await clearChoresCreatedBy(id);
     await deleteInvitationsByInviter(id);

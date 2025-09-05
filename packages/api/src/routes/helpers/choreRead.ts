@@ -2,23 +2,6 @@ import {sql} from '../../utils/sql';
 import {get} from '../../utils/crud/db';
 import {ChoreWithUsernameSchema, CountRowSchema} from '@gitterdun/shared';
 
-export type DbChoreRow = {
-  id: number;
-  title: string;
-  description: string | null;
-  point_reward: number;
-  bonus_points: number;
-  penalty_points: number;
-  due_date: string | null;
-  recurrence_rule: string | null;
-  chore_type: string;
-  status: string;
-  created_by: number;
-  created_at: string;
-  updated_at: string;
-  created_by_username: string;
-};
-
 export const DEFAULT_LIMIT = 10;
 
 export const fetchTotalChores = async (): Promise<number> => {
@@ -54,34 +37,37 @@ export const buildFilters = (
   return {where, params};
 };
 
-export const mapRowToSchema = (row: DbChoreRow) => {
+export const mapRowToSchema = (row: Record<string, unknown>) => {
+  const descriptionRaw = row['description'];
+  const recurrenceRaw = row['recurrence_rule'];
+  const rewardRaw = row['point_reward'];
+  const penaltyRaw = row['penalty_points'];
+
   const description =
-    typeof row.description === 'string' && row.description.trim() !== ''
-      ? row.description
+    typeof descriptionRaw === 'string' && descriptionRaw.trim() !== ''
+      ? descriptionRaw
       : undefined;
   const recurrence =
-    typeof row.recurrence_rule === 'string' && row.recurrence_rule.trim() !== ''
-      ? row.recurrence_rule
+    typeof recurrenceRaw === 'string' && recurrenceRaw.trim() !== ''
+      ? recurrenceRaw
       : undefined;
-  const rewardPoints =
-    typeof row.point_reward === 'number' ? row.point_reward : 0;
-  const penaltyPoints =
-    typeof row.penalty_points === 'number' ? row.penalty_points : 0;
+  const rewardPoints = typeof rewardRaw === 'number' ? rewardRaw : 0;
+  const penaltyPoints = typeof penaltyRaw === 'number' ? penaltyRaw : 0;
 
   return ChoreWithUsernameSchema.parse({
-    id: row.id,
-    title: row.title,
+    id: Number(row['id']),
+    title: String(row['title']),
     description,
     reward_points: rewardPoints,
     penalty_points: penaltyPoints,
     start_date: undefined,
     due_date: undefined,
     recurrence_rule: recurrence,
-    chore_type: row.chore_type,
-    status: row.status,
-    created_by: row.created_by,
-    created_at: Date.parse(row.created_at),
-    updated_at: Date.parse(row.updated_at),
-    created_by_username: row.created_by_username,
+    chore_type: String(row['chore_type']),
+    status: String(row['status']),
+    created_by: Number(row['created_by']),
+    created_at: Date.parse(String(row['created_at'])),
+    updated_at: Date.parse(String(row['updated_at'])),
+    created_by_username: String(row['created_by_username']),
   });
 };

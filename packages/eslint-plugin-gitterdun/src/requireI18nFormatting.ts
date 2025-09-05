@@ -1,4 +1,5 @@
 import type {Rule} from 'eslint';
+import type {TSESTree} from '@typescript-eslint/types';
 // Note: avoid importing extraneous runtime deps; use simple structural guards
 
 // Enforce that i18n MessageDescriptors are only rendered using
@@ -60,7 +61,7 @@ export const requireI18nFormatting: Rule.RuleModule = {
     },
     schema: [],
   },
-  create(context) {
+  create(context): Rule.NodeListener {
     return {
       JSXExpressionContainer(node) {
         // Flag descriptor.defaultMessage usages like {descriptor.defaultMessage}
@@ -69,7 +70,10 @@ export const requireI18nFormatting: Rule.RuleModule = {
           isNodeType(expr, 'MemberExpression')
           && isIdentifierWithName(getProp(expr, 'property'), 'defaultMessage')
         ) {
-          context.report({node, messageId: 'requireFormatting'});
+          context.report({
+            node: node as unknown as TSESTree.Node,
+            messageId: 'requireFormatting',
+          });
         }
       },
       CallExpression(node) {
@@ -87,7 +91,10 @@ export const requireI18nFormatting: Rule.RuleModule = {
             isNodeType(arg, 'MemberExpression')
             && isIdentifierWithName(getProp(arg, 'property'), 'defaultMessage')
           ) {
-            context.report({node, messageId: 'requireFormatting'});
+            context.report({
+              node: node as unknown as TSESTree.Node,
+              messageId: 'requireFormatting',
+            });
           }
         }
       },

@@ -1,4 +1,8 @@
-import express from 'express';
+import type {
+  RequestWithParams,
+  RequestWithBody,
+  TypedResponse,
+} from '../types/http';
 import {StatusCodes} from 'http-status-codes';
 import {CreateChoreSchema} from '@gitterdun/shared';
 import {transaction} from '../utils/crud/db';
@@ -29,16 +33,17 @@ import {executeChoreCompletionTransaction} from '../utils/choreCompletion';
 
 // POST /api/chores - Create a new chore
 export const handleCreateChore = async (
-  req: express.Request,
-  res: express.Response,
-) => {
+  req: RequestWithBody<unknown>,
+  res: TypedResponse,
+): Promise<void> => {
   try {
     const userId = await requireUserId(req);
     const family = await getUserFamily(userId);
     if (family === null) {
-      return res
+      res
         .status(StatusCodes.FORBIDDEN)
         .json({success: false, error: 'Forbidden'});
+      return;
     }
     await validateParentMembership(userId, family.id);
 
@@ -78,7 +83,7 @@ export const handleCreateChore = async (
     });
 
     logger.info({choreId: newChore.id, title}, 'New chore created');
-    return res
+    res
       .status(StatusCodes.CREATED)
       .json({
         success: true,
@@ -86,63 +91,65 @@ export const handleCreateChore = async (
         message: 'Chore created successfully',
       });
   } catch (error) {
-    return handleCreateChoreError(error, res);
+    handleCreateChoreError(error, res);
   }
 };
 
 // PUT /api/chores/:id - Update a chore
 export const handleUpdateChore = async (
-  req: express.Request,
-  res: express.Response,
-) => {
+  req: RequestWithBody<unknown>,
+  res: TypedResponse,
+): Promise<void> => {
   try {
     const userId = await requireUserId(req);
     const family = await getUserFamily(userId);
     if (family === null) {
-      return res
+      res
         .status(StatusCodes.FORBIDDEN)
         .json({success: false, error: 'Forbidden'});
+      return;
     }
     await validateParentMembership(userId, family.id);
     const {choreId, validatedBody} = parseUpdateChoreRequest(req);
     const validatedChore = await processChoreUpdate(choreId, validatedBody);
-    return res.json({
+    res.json({
       success: true,
       data: validatedChore,
       message: 'Chore updated successfully',
     });
   } catch (error) {
-    return handleUpdateChoreError(error, res);
+    handleUpdateChoreError(error, res);
   }
 };
 
 // DELETE /api/chores/:id - Delete a chore
 export const handleDeleteChore = async (
-  req: express.Request,
-  res: express.Response,
-) => {
+  req: RequestWithParams<{id: string}>,
+  res: TypedResponse,
+): Promise<void> => {
   try {
     const userId = await requireUserId(req);
     const family = await getUserFamily(userId);
     if (family === null) {
-      return res
+      res
         .status(StatusCodes.FORBIDDEN)
         .json({success: false, error: 'Forbidden'});
+      return;
     }
     await validateParentMembership(userId, family.id);
     const {choreId} = parseDeleteChoreRequest(req);
     await processChoreDelete(choreId);
-    return res.json({success: true, message: 'Chore deleted successfully'});
+    res.json({success: true, message: 'Chore deleted successfully'});
   } catch (error) {
-    return handleDeleteChoreError(error, res);
+    handleDeleteChoreError(error, res);
   }
 };
 
 // POST /api/chores/:id/complete - Mark a chore as completed
 export const handleCompleteChore = async (
-  req: express.Request,
-  res: express.Response,
-) => {
+  req: RequestWithBody<unknown>,
+  res: TypedResponse,
+): Promise<void> => {
   try {
     const {choreId, userId, notes} = parseChoreCompletionRequest(req);
     validateChoreCompletionInput(choreId);
@@ -155,12 +162,12 @@ export const handleCompleteChore = async (
       {choreId, userId, pointsEarned: result.pointsEarned},
       'Chore marked as completed',
     );
-    return res.json({
+    res.json({
       success: true,
       message: 'Chore marked as completed successfully',
     });
   } catch (error) {
-    return handleChoreCompletionError(error, res);
+    handleChoreCompletionError(error, res);
   }
 };
 

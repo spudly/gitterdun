@@ -31,7 +31,7 @@ export const insertChore = async (params: {
   choreType: string;
   createdBy: number;
   familyId: number;
-}) => {
+}): Promise<ChoreRow> => {
   const {
     title,
     description,
@@ -76,7 +76,7 @@ export const insertChore = async (params: {
     familyId,
   );
   if (row === undefined) {
-    return undefined as unknown as ChoreRow;
+    throw new Error('Failed to insert chore');
   }
   return ChoreRowSchema.parse(row);
 };

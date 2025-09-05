@@ -1,4 +1,5 @@
 import express from 'express';
+import type {RequestWithBody} from '../types/http';
 
 import {LeaderboardRowSchema, LeaderboardQuerySchema} from '@gitterdun/shared';
 import {sql} from '../utils/sql';
@@ -53,7 +54,7 @@ const processLeaderboardResults = (rows: Array<unknown>) =>
   rows.map(row => LeaderboardRowSchema.parse(row));
 
 // GET /api/leaderboard - Get leaderboard rankings
-router.get('/', async (req, res) => {
+router.get('/', async (req: RequestWithBody<unknown>, res) => {
   const userId = await requireUserId(req);
   const {limit, sortBy} = LeaderboardQuerySchema.parse(req.query);
   const query = buildLeaderboardQuery(sortBy);

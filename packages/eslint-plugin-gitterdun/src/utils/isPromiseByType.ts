@@ -39,8 +39,9 @@ export const isPromiseByType = (
   context: Rule.RuleContext,
   node: unknown,
 ): boolean => {
-  const services = context.sourceCode
-    .parserServices as unknown as ParserServicesLike;
+  const servicesRaw = context.sourceCode.parserServices;
+  const services: ParserServicesLike = (servicesRaw
+    ?? {}) as ParserServicesLike;
   const {program, esTreeNodeToTSNodeMap: map} = services;
   if (program === undefined || map === undefined) {
     return false;
@@ -69,9 +70,8 @@ export const isPromiseByType = (
     return false;
   }
   return type.types.some(memberType => {
-    const memberCalls = (
-      memberType as {getCallSignatures?: () => Array<unknown>}
-    ).getCallSignatures?.();
+    const mt = memberType as {getCallSignatures?: () => Array<unknown>};
+    const memberCalls = mt.getCallSignatures?.();
     if (Array.isArray(memberCalls) && memberCalls.length > 0) {
       return false;
     }

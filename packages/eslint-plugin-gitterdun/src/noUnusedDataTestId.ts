@@ -46,9 +46,10 @@ export const noUnusedDataTestId: Rule.RuleModule = {
     },
   },
   create(context) {
-    const option = (context.options[0] ?? {}) as {
-      testFileGlobs?: Array<string>;
-    };
+    const optionsArray: Array<unknown> = Array.isArray(context.options)
+      ? context.options
+      : [];
+    const option = (optionsArray[0] ?? {}) as {testFileGlobs?: Array<string>};
     const globs = Array.isArray(option.testFileGlobs)
       ? option.testFileGlobs
       : [];
@@ -57,7 +58,16 @@ export const noUnusedDataTestId: Rule.RuleModule = {
 
     return {
       JSXAttribute(attributeNode) {
-        const named = attributeNode as unknown as {
+        const named: {
+          type?: string;
+          name?: {type?: string; name?: unknown};
+          value?:
+            | {type?: 'Literal'; value?: unknown}
+            | {
+                type?: 'JSXExpressionContainer';
+                expression?: {type?: string; value?: unknown};
+              };
+        } = attributeNode as unknown as {
           type?: string;
           name?: {type?: string; name?: unknown};
           value?:

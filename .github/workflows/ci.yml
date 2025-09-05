@@ -274,6 +274,37 @@ jobs:
       - name: TypeScript coverage report
         run: npm run check:ts:coverage
 
+  jscpd:
+    name: JSCPD
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+
+      - name: Restore node_modules cache
+        id: cache-node-modules-jscpd
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key:
+            ${{ runner.os }}-node_modules-${{ github.sha }}-${{
+            hashFiles('package-lock.json') }}
+
+      - name: Install dependencies (cache miss)
+        if: steps.cache-node-modules-jscpd.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Run JSCPD
+        run: npm run check:jscpd
+
   e2e:
     name: E2E Tests
     needs: build

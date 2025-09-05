@@ -8,7 +8,12 @@ import {RankingList} from '../widgets/RankingList.js';
 import {PageLoading} from '../widgets/PageLoading.js';
 import {Text} from '../widgets/Text.js';
 import {useIntl} from 'react-intl';
-import {PODIUM_ITEMS_COUNT, SILVER_RANK, BRONZE_RANK} from '../constants';
+import {
+  PODIUM_ITEMS_COUNT,
+  SILVER_RANK,
+  BRONZE_RANK,
+  GOLD_RANK,
+} from '../constants';
 
 const Leaderboard: FC = () => {
   const intl = useIntl();
@@ -44,7 +49,12 @@ const Leaderboard: FC = () => {
     .slice(0, PODIUM_ITEMS_COUNT)
     .map((entry, index) => ({
       id: entry.id,
-      rank: (index + 1) as 1 | typeof SILVER_RANK | typeof BRONZE_RANK,
+      rank:
+        index + 1 === GOLD_RANK
+          ? GOLD_RANK
+          : index + 1 === SILVER_RANK
+            ? SILVER_RANK
+            : BRONZE_RANK,
       content: (
         <>
           <Text as="h3" size="lg" weight="semibold">

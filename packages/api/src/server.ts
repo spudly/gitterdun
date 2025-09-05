@@ -1,4 +1,5 @@
 import express from 'express';
+import type {TypedResponse, RequestDefault} from './types/http';
 import cors from 'cors';
 import helmet from 'helmet';
 import path from 'node:path';
@@ -6,6 +7,7 @@ import dotenv from 'dotenv';
 import {initializeDatabase} from './lib/initDb';
 import {logger} from './utils/logger';
 import {DEFAULT_PORT} from './constants';
+import {setupErrorHandling} from './middleware/errorHandler';
 
 import authRoutes from './routes/auth';
 import choreRoutes from './routes/chores';
@@ -15,8 +17,19 @@ import familyRoutes from './routes/families';
 import usersRoutes from './routes/users';
 import invitationRoutes from './routes/invitations';
 import choreInstanceRoutes from './routes/choreInstances';
-import {asError} from '@gitterdun/shared';
-import {setupErrorHandling} from './middleware/errorHandler';
+const asError = (err: unknown): Error => {
+  if (err instanceof Error) {
+    return err;
+  }
+  if (typeof err === 'string') {
+    return new Error(err);
+  }
+  try {
+    return new Error(JSON.stringify(err));
+  } catch {
+    return new Error('Unknown error');
+  }
+};
 
 Error.stackTraceLimit = 100;
 
@@ -88,11 +101,7 @@ const setupSpaFallback = (app: express.Express): void => {
     const indexHtmlPath = path.join(staticDir, 'index.html');
     app.get(
       '*path',
-      (
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction,
-      ) => {
+      (req: RequestDefault, res: TypedResponse, next: express.NextFunction) => {
         if (req.path.startsWith('/api')) {
           next();
           return;
@@ -113,11 +122,14 @@ const setupRoutes = (app: express.Express): void => {
   app.use('/api/users', usersRoutes);
   app.use('/api/chore-instances', choreInstanceRoutes);
 
-  app.get('/api/health', (_req: express.Request, res: express.Response) => {
+  app.get('/api/health', (_req: RequestDefault, res: TypedResponse) => {
     res.json({
-      status: 'OK',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
+      success: true,
+      data: {
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+      },
     });
   });
 };

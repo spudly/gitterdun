@@ -1,4 +1,6 @@
-import express from 'express';
+import {asError} from '@gitterdun/shared';
+import type {RequestWithParamsAndBody, TypedResponse} from '../types/http';
+import {z} from 'zod';
 import {StatusCodes} from 'http-status-codes';
 import {requireUserId} from '../utils/auth';
 import {getUserFamily} from '../utils/familyOperations';
@@ -8,68 +10,70 @@ import {
   approveChoreAssignment,
 } from '../utils/choreModeration';
 
+const AssignChoreBodySchema = z.object({userId: z.number().int()});
+type AssignChoreBody = z.infer<typeof AssignChoreBodySchema>;
+
 export const handleAssignChore = async (
-  req: express.Request,
-  res: express.Response,
-) => {
+  req: RequestWithParamsAndBody<{id: string}, AssignChoreBody>,
+  res: TypedResponse,
+): Promise<void> => {
   try {
     const userId = await requireUserId(req);
     const family = await getUserFamily(userId);
     if (family === null) {
-      return res
+      res
         .status(StatusCodes.FORBIDDEN)
         .json({success: false, error: 'Forbidden'});
+    } else {
+      await validateParentMembership(userId, family.id);
+      const choreId = Number(req.params.id);
+      const {userId: assignedUserId} = AssignChoreBodySchema.parse(req.body);
+      if (!Number.isInteger(choreId)) {
+        res
+          .status(StatusCodes.BAD_REQUEST)
+          .json({success: false, error: 'Invalid chore or user id'});
+      } else {
+        await assignChoreToSingleUser(choreId, assignedUserId);
+        res.json({success: true});
+      }
     }
-    await validateParentMembership(userId, family.id);
-    const choreId = Number((req.params as Record<string, string>)['id']);
-    const {userId: assignedUserId} = req.body as {userId?: number};
-    if (
-      !Number.isInteger(choreId)
-      || typeof assignedUserId !== 'number'
-      || !Number.isInteger(assignedUserId)
-    ) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({success: false, error: 'Invalid chore or user id'});
-    }
-    await assignChoreToSingleUser(choreId, assignedUserId);
-    return res.json({success: true});
   } catch (error) {
-    return res
+    res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({success: false, error: (error as Error).message});
+      .json({success: false, error: asError(error).message});
   }
 };
 
+const ApproveChoreBodySchema = z.object({approvedBy: z.number().int()});
+type ApproveChoreBody = z.infer<typeof ApproveChoreBodySchema>;
+
 export const handleApproveChore = async (
-  req: express.Request,
-  res: express.Response,
-) => {
+  req: RequestWithParamsAndBody<{id: string}, ApproveChoreBody>,
+  res: TypedResponse,
+): Promise<void> => {
   try {
     const userId = await requireUserId(req);
     const family = await getUserFamily(userId);
     if (family === null) {
-      return res
+      res
         .status(StatusCodes.FORBIDDEN)
         .json({success: false, error: 'Forbidden'});
+    } else {
+      await validateParentMembership(userId, family.id);
+      const choreId = Number(req.params.id);
+      const {approvedBy} = ApproveChoreBodySchema.parse(req.body);
+      if (!Number.isInteger(choreId)) {
+        res
+          .status(StatusCodes.BAD_REQUEST)
+          .json({success: false, error: 'Invalid chore id or approver id'});
+      } else {
+        await approveChoreAssignment(choreId, approvedBy);
+        res.json({success: true});
+      }
     }
-    await validateParentMembership(userId, family.id);
-    const choreId = Number((req.params as Record<string, string>)['id']);
-    const {approvedBy} = req.body as {approvedBy?: number};
-    if (
-      !Number.isInteger(choreId)
-      || typeof approvedBy !== 'number'
-      || !Number.isInteger(approvedBy)
-    ) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({success: false, error: 'Invalid chore id or approver id'});
-    }
-    await approveChoreAssignment(choreId, approvedBy);
-    return res.json({success: true});
   } catch (error) {
-    return res
+    res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({success: false, error: (error as Error).message});
+      .json({success: false, error: asError(error).message});
   }
 };

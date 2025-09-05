@@ -28,11 +28,11 @@ export const isTemplateLiteralNode = (
     }
     return typeof qv['raw'] === 'string';
   };
-  for (const quasi of quasis) {
+  for (const quasi of quasis as Array<unknown>) {
     if (!hasValueProp(quasi)) {
       return false;
     }
-    const qv = quasi.value;
+    const qv = (quasi as {value: unknown}).value;
     if (!hasRawString(qv)) {
       return false;
     }

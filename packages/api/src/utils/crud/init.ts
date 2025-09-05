@@ -12,7 +12,7 @@ export const pragmaTableInfo = async (
     'SELECT column_name AS name FROM information_schema.columns WHERE table_name = $1',
     [table],
   );
-  return (res.rows as Array<{name: string}>).map(row => ({name: row.name}));
+  return res.rows.map(row => ({name: String(row['name'])}));
 };
 
 export const alterTableAddColumn = async (
@@ -30,9 +30,8 @@ export const countAdmins = async (): Promise<{count: number}> => {
     'SELECT COUNT(*)::int AS count FROM users WHERE role = $1',
     ['admin'],
   );
-  const row = (res.rows[0] ?? {}) as {count?: number | string};
-  const count =
-    typeof row.count === 'string' ? Number.parseInt(row.count, 10) : row.count;
+  const row = res.rows[0] as {count?: number} | undefined;
+  const count = row?.count ?? 0;
   return CountRowSchema.parse({count});
 };
 

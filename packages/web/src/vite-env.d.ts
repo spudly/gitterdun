@@ -4,7 +4,7 @@
 
 // eslint-disable-next-line ts/consistent-type-definitions -- augmenting an existing interface
 interface ImportMetaEnv {
-  readonly MODE: string;
+  readonly MODE: 'development' | 'test' | 'production';
 }
 
 // eslint-disable-next-line ts/consistent-type-definitions -- augmenting an existing interface

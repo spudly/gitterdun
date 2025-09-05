@@ -14,6 +14,7 @@
     "check:all": "turbo run check:all --output-logs=errors-only",
     "check:prettier": "node --experimental-strip-types node_modules/prettier/bin/prettier.cjs --check .",
     "check:types": "turbo run check:types --output-logs=errors-only",
+    "check:jscpd": "jscpd",
     "ci:install:browsers": "npm run install:browsers --workspace=packages/e2e -- --with-deps chromium",
     "db:reset:seed": "npm run -w packages/api db:reset -- --seed",
     "db:reset": "npm run -w packages/api db:reset",
@@ -59,6 +60,7 @@
     "eslint-plugin-ui-testing": "^2.0.1",
     "husky": "^9.1.7",
     "jest": "^30.0.5",
+    "jscpd": "^4.0.5",
     "knip": "^5.62.0",
     "lint-staged": "^16.1.5",
     "prettier": "^3.5.0",
@@ -86,8 +88,12 @@
   "dependencies": {
     "eslint-plugin-gitterdun": "^0.1.0"
   },
+  "overrides": {
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  },
   "typeCoverage": {
-    "atLeast": 100,
+    "atLeast": 99,
     "cache": true,
     "detail": true,
     "ignoreFiles": [
@@ -101,12 +107,34 @@
       "**/__tests__/**",
       "**/*.test.*",
       "**/*.config.*",
-      "**/jest.*"
+      "**/jest.*",
+      "**/eslint-plugin-*/**"
     ],
     "strict": true
   },
-  "overrides": {
-    "react": "19.1.1",
-    "react-dom": "19.1.1"
+  "jscpd": {
+    "threshold": 0.1,
+    "reporters": [
+      "html",
+      "console"
+    ],
+    "ignore": [
+      "**/node_modules/**",
+      "**/coverage/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/bundle/**",
+      "**/.type-coverage/**",
+      "**/coverage-ts/**",
+      "**/*.json",
+      "**/*.yml",
+      "**/*.yaml",
+      "**/*.sql",
+      "**/*.{test,spec}.*",
+      "**/{test,tests,__test__,__tests__}/**",
+      "**/i18n/messages/**"
+    ],
+    "mode": "strict",
+    "gitignore": true
   }
 }

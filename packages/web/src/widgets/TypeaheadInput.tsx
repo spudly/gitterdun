@@ -2,6 +2,15 @@ import type {ChangeEvent, FC} from 'react';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {clsx} from 'clsx';
 
+const isDomNode = (value: unknown): value is Node => {
+  return (
+    typeof value === 'object'
+    && value !== null
+    && typeof (value as {nodeType?: unknown}).nodeType === 'number'
+    && typeof (value as {nodeName?: unknown}).nodeName === 'string'
+  );
+};
+
 type TypeaheadInputProps = {
   readonly id?: string;
   readonly value: string;
@@ -35,7 +44,8 @@ export const TypeaheadInput: FC<TypeaheadInputProps> = ({
     const handleClick = (evt: MouseEvent) => {
       if (
         containerRef.current
-        && !containerRef.current.contains(evt.target as Node)
+        && (!isDomNode(evt.target)
+          || !containerRef.current.contains(evt.target))
       ) {
         setIsOpen(false);
       }

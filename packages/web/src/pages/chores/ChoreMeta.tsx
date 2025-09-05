@@ -13,7 +13,7 @@ export const ChoreMeta: FC<ChoreMetaProps> = ({chore}) => {
       ? chore.reward_points
       : // Some legacy records may use `point_reward`
         ((): number => {
-          const candidate = (chore as unknown as {point_reward?: unknown})
+          const candidate = (chore as Partial<Record<'point_reward', unknown>>)
             .point_reward;
           return typeof candidate === 'number' ? candidate : 0;
         })();

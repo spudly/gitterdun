@@ -6,7 +6,7 @@ export const validateParentMembership = async (
   userId: number,
   familyId: number,
 ): Promise<void> => {
-  const membershipRow = (await get(
+  const membershipRow = await get(
     sql`
       SELECT
         role
@@ -18,10 +18,10 @@ export const validateParentMembership = async (
     `,
     familyId,
     userId,
-  )) as unknown;
+  );
   const membership =
     membershipRow !== undefined
-      ? RoleRowSchema.parse(membershipRow as Record<string, unknown>)
+      ? RoleRowSchema.parse(membershipRow)
       : undefined;
   if (!membership || membership.role !== 'parent') {
     throw Object.assign(new Error('Forbidden'), {status: 403});

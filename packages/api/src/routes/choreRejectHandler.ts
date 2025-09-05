@@ -1,12 +1,13 @@
-import type express from 'express';
+import {asError} from '@gitterdun/shared';
+import type {RequestWithParams, TypedResponse} from '../types/http';
 import {StatusCodes} from 'http-status-codes';
 import {requireUserId} from '../utils/auth';
 import {getUserFamily} from '../utils/familyOperations';
 import {rejectChoreAssignment} from '../utils/choreModeration';
 
 export const handleRejectChore = async (
-  req: express.Request,
-  res: express.Response,
+  req: RequestWithParams<{id: string}>,
+  res: TypedResponse,
 ): Promise<void> => {
   try {
     const userId = await requireUserId(req);
@@ -17,7 +18,7 @@ export const handleRejectChore = async (
         .json({success: false, error: 'Forbidden'});
       return;
     }
-    const choreId = Number((req.params as Record<string, string>)['id']);
+    const choreId = Number(req.params.id);
     if (!Number.isInteger(choreId)) {
       res
         .status(StatusCodes.BAD_REQUEST)
@@ -29,6 +30,6 @@ export const handleRejectChore = async (
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({success: false, error: (error as Error).message});
+      .json({success: false, error: asError(error).message});
   }
 };
