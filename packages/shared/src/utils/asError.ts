@@ -5,7 +5,5 @@ export const asError = (value: unknown): AugmentedError => {
     return value;
   }
 
-  return Object.assign(new Error(`Non-Error thrown: ${String(value)}`), {
-    value,
-  });
+  return Object.assign(new Error(`Non-Error value thrown!`), {value});
 };
