@@ -17,23 +17,9 @@ import familyRoutes from './routes/families';
 import usersRoutes from './routes/users';
 import invitationRoutes from './routes/invitations';
 import choreInstanceRoutes from './routes/choreInstances';
-const asError = (err: unknown): Error => {
-  if (err instanceof Error) {
-    return err;
-  }
-  if (typeof err === 'string') {
-    return new Error(err);
-  }
-  try {
-    return new Error(JSON.stringify(err));
-  } catch {
-    return new Error('Unknown error');
-  }
-};
 
 Error.stackTraceLimit = 100;
 
-// Load environment variables
 dotenv.config();
 
 const appRootDir = path.resolve();
@@ -164,13 +150,5 @@ export const createServer = async (): Promise<void> => {
     throw error;
   }
 };
-
-// Only start server if this file is run directly (not imported for tests)
-if (require.main === module) {
-  createServer().catch((err: unknown) => {
-    logger.error({error: asError(err)}, 'Failed to start server');
-    process.exit(1);
-  });
-}
 
 export * from './constants';
