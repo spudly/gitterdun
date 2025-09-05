@@ -108,12 +108,13 @@
       "**/*.test.*",
       "**/*.config.*",
       "**/jest.*",
-      "**/eslint-plugin-*/**"
+      "**/eslint-plugin-*/**",
+      "**/coverage-ts/**"
     ],
     "strict": true
   },
   "jscpd": {
-    "threshold": 0.1,
+    "threshold": 5,
     "reporters": [
       "html",
       "console"

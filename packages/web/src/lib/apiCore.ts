@@ -3,6 +3,29 @@ import {z} from 'zod';
 import type {ApiResponse} from './apiUtils';
 import {API_BASE_URL, handleResponseWithSchema} from './apiUtils';
 
+export const buildUrlWithParams = (
+  endpoint: string,
+  params?: Record<string, unknown>,
+): string => {
+  const url = new URL(`${API_BASE_URL}${endpoint}`);
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value != null) {
+        if (
+          typeof value === 'string'
+          || typeof value === 'number'
+          || typeof value === 'boolean'
+        ) {
+          url.searchParams.append(key, String(value));
+        } else {
+          url.searchParams.append(key, JSON.stringify(value));
+        }
+      }
+    });
+  }
+  return url.toString();
+};
+
 export const api = {
   // GET request
   async get<T>(
@@ -10,25 +33,7 @@ export const api = {
     dataSchema: z.ZodType<T>,
     params?: Record<string, unknown>,
   ): Promise<ApiResponse<T>> {
-    const url = new URL(`${API_BASE_URL}${endpoint}`);
-
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value != null) {
-          if (
-            typeof value === 'string'
-            || typeof value === 'number'
-            || typeof value === 'boolean'
-          ) {
-            url.searchParams.append(key, String(value));
-          } else {
-            url.searchParams.append(key, JSON.stringify(value));
-          }
-        }
-      });
-    }
-
-    const response = await fetch(url.toString(), {
+    const response = await fetch(buildUrlWithParams(endpoint, params), {
       method: 'GET',
       headers: {'Content-Type': 'application/json'},
       credentials: 'include',
