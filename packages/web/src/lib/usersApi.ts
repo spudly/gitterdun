@@ -1,6 +1,6 @@
 import {z} from 'zod';
 import {UserSchema} from '@gitterdun/shared';
-import {api} from './apiCore';
+import {api} from './apiCore.js';
 
 const EmptyObjectSchema = z.object({});
 const UpdateProfileResponseSchema = z

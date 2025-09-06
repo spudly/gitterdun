@@ -1,7 +1,7 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {StatusBadge, getStatusClass} from './StatusBadge';
-import {StatusDot} from './StatusDot';
+import {StatusBadge, getStatusClass} from './StatusBadge.js';
+import {StatusDot} from './StatusDot.js';
 
 describe('status components', () => {
   test('renders StatusBadge and StatusDot', () => {

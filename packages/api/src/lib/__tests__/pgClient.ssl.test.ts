@@ -21,7 +21,7 @@ describe('pg client SSL config', () => {
   test('sets ssl=require when PG_URL has render.com host', async () => {
     process.env['PG_URL'] = 'postgresql://u:p@dpg-foo.render.com:5432/db';
     const {Pool} = await import('pg');
-    const {pgQuery} = await import('../pgClient');
+    const {pgQuery} = await import('../pgClient.js');
     await pgQuery('SELECT 1', []);
     expect(jest.mocked(Pool)).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -35,7 +35,7 @@ describe('pg client SSL config', () => {
   test('no ssl config for localhost', async () => {
     process.env['PG_URL'] = 'postgresql://u:p@localhost:5432/db';
     const {Pool} = await import('pg');
-    const {pgQuery} = await import('../pgClient');
+    const {pgQuery} = await import('../pgClient.js');
     await pgQuery('SELECT 1', []);
     expect(jest.mocked(Pool)).toHaveBeenCalledWith(
       expect.objectContaining({

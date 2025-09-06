@@ -1,8 +1,8 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {CreateChildForm} from './CreateChildForm';
-import {createWrapper} from '../../test/createWrapper';
+import {CreateChildForm} from './CreateChildForm.js';
+import {createWrapper} from '../../test/createWrapper.js';
 
 describe('<CreateChildForm />', () => {
   test('renders header, placeholders and button label', () => {

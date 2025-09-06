@@ -1,8 +1,8 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {createWrapper} from '../test/createWrapper';
-import Settings from './Settings';
+import {createWrapper} from '../test/createWrapper.js';
+import Settings from './Settings.js';
 
 describe('settings', () => {
   test('renders locale select and changes locale', async () => {

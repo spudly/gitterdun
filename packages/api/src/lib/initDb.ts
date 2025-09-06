@@ -1,17 +1,17 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {asError} from '@gitterdun/shared';
-import {logger} from '../utils/logger';
-import {BCRYPT_SALT_ROUNDS} from '../constants';
-import {run} from '../utils/crud/db';
-import {sql} from '../utils/sql';
+import {logger} from '../utils/logger.js';
+import {BCRYPT_SALT_ROUNDS} from '../constants.js';
+import {run} from '../utils/crud/db.js';
+import {sql} from '../utils/sql.js';
 import {
   alterTableAddColumn,
   countAdmins,
   execSchema,
   insertDefaultAdmin,
   pragmaTableInfo,
-} from '../utils/crud/init';
+} from '../utils/crud/init.js';
 
 const readSchemaFile = (): string => {
   const schemaPath = path.join(process.cwd(), 'src/lib/schema.sql');

@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {Badge} from './Badge';
+import {Badge} from './Badge.js';
 
 describe('badge', () => {
   test('renders children', () => {

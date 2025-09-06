@@ -2,34 +2,34 @@ import type {
   RequestWithParams,
   RequestWithBody,
   TypedResponse,
-} from '../types/http';
+} from '../types/http.js';
 import {StatusCodes} from 'http-status-codes';
 import {CreateChoreSchema} from '@gitterdun/shared';
-import {transaction} from '../utils/crud/db';
-import {logger} from '../utils/logger';
-import {requireUserId} from '../utils/auth';
-import {getUserFamily} from '../utils/familyOperations';
-import {validateParentMembership} from '../utils/familyAuthUtils';
+import {transaction} from '../utils/crud/db.js';
+import {logger} from '../utils/logger.js';
+import {requireUserId} from '../utils/auth.js';
+import {getUserFamily} from '../utils/familyOperations.js';
+import {validateParentMembership} from '../utils/familyAuthUtils.js';
 import {
   parseUpdateChoreRequest,
   parseDeleteChoreRequest,
   parseChoreCompletionRequest,
   validateChoreCompletionInput,
-} from '../utils/choreParsers';
+} from '../utils/choreParsers.js';
 import {
   handleUpdateChoreError,
   handleDeleteChoreError,
   handleChoreCompletionError,
   handleCreateChoreError,
-} from '../utils/choreErrorHandlers';
+} from '../utils/choreErrorHandlers.js';
 import {
   createChoreInDb,
   assignChoreToUsers,
   processChoreDelete,
-} from '../utils/choreCrud';
-import {buildRRuleString} from '../utils/recurrence';
-import {processChoreUpdate} from '../utils/choreUpdates';
-import {executeChoreCompletionTransaction} from '../utils/choreCompletion';
+} from '../utils/choreCrud.js';
+import {buildRRuleString} from '../utils/recurrence.js';
+import {processChoreUpdate} from '../utils/choreUpdates.js';
+import {executeChoreCompletionTransaction} from '../utils/choreCompletion.js';
 
 // POST /api/chores - Create a new chore
 export const handleCreateChore = async (

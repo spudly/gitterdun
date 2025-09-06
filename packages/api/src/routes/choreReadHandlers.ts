@@ -2,17 +2,17 @@ import type {
   RequestDefault,
   RequestWithQuery,
   TypedResponse,
-} from '../types/http';
+} from '../types/http.js';
 import {asError, ChoreQuerySchema} from '@gitterdun/shared';
 import {StatusCodes} from 'http-status-codes';
-import {sql} from '../utils/sql';
-import {all} from '../utils/crud/db';
+import {sql} from '../utils/sql.js';
+import {all} from '../utils/crud/db.js';
 import {
   DEFAULT_LIMIT,
   buildFilters,
   fetchTotalChores,
   mapRowToSchema,
-} from './helpers/choreRead';
+} from './helpers/choreRead.js';
 // DbChoreRow no longer used; map rows directly
 
 export const handleGetChores = async (

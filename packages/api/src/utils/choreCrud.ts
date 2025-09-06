@@ -3,10 +3,10 @@ import {
   insertChore,
   insertChoreAssignment,
   deleteChoreById,
-} from './crud/chores';
-import {logger} from './logger';
-import {sql} from './sql';
-import {get} from './crud/db';
+} from './crud/chores.js';
+import {logger} from './logger.js';
+import {sql} from './sql.js';
+import {get} from './crud/db.js';
 
 const toTimestamp = (value: unknown): number | undefined => {
   if (typeof value !== 'string' || value.length === 0) {

@@ -17,7 +17,7 @@ describe('main entry', () => {
 
     // Import after setting up DOM
     await jest.isolateModulesAsync(async () => {
-      await import('./main');
+      await import('./main.js');
     });
 
     const {createRoot} = await import('react-dom/client');
@@ -29,7 +29,7 @@ describe('main entry', () => {
     document.body.innerHTML = '';
     await expect(
       jest.isolateModulesAsync(async () => {
-        await import('./main');
+        await import('./main.js');
       }),
     ).rejects.toThrow('Root element not found');
   });

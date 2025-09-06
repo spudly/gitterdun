@@ -1,7 +1,7 @@
 // Core API HTTP methods
 import {z} from 'zod';
-import type {ApiResponse} from './apiUtils';
-import {API_BASE_URL, handleResponseWithSchema} from './apiUtils';
+import type {ApiResponse} from './apiUtils.js';
+import {API_BASE_URL, handleResponseWithSchema} from './apiUtils.js';
 
 export const buildUrlWithParams = (
   endpoint: string,

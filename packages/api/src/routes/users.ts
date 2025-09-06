@@ -5,7 +5,7 @@ import {
   getMeHandler,
   patchMeHandler,
   deleteMeHandler,
-} from './usersHandlers';
+} from './usersHandlers.js';
 
 // eslint-disable-next-line new-cap -- express.Router() is a factory function
 const router = express.Router();

@@ -1,5 +1,5 @@
 import {CountRowSchema} from '@gitterdun/shared';
-import {pgQuery} from '../../lib/pgClient';
+import {pgQuery} from '../../lib/pgClient.js';
 
 export const execSchema = async (schema: string): Promise<void> => {
   await pgQuery(schema, []);

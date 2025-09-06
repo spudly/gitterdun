@@ -7,7 +7,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prebuild": "rm -rf dist; rm -f tsconfig.build.tsbuildinfo",
-    "check:types": "tsc",
+    "check:ts": "tsc",
     "build": "tsc -p tsconfig.build.json",
     "test": "jest",
     "test:dev": "jest --watch"

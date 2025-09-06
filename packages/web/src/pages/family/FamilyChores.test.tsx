@@ -1,8 +1,8 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {QueryClient} from '@tanstack/react-query';
 import {render, screen} from '@testing-library/react';
-import {createWrapper} from '../../test/createWrapper';
-import Family from '../Family';
+import {createWrapper} from '../../test/createWrapper.js';
+import Family from '../Family.js';
 
 jest.mock('../../hooks/useUser', () => ({
   useUser: jest.fn(() => ({user: {id: 1, role: 'user'}})),

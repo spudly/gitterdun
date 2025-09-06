@@ -2,8 +2,8 @@ import {describe, expect, test} from '@jest/globals';
 import {render, screen, waitFor} from '@testing-library/react';
 import {FormattedMessage} from 'react-intl';
 
-import {I18nProvider, useI18n} from './I18nProvider';
-import {messages} from '../pages/Login';
+import {I18nProvider, useI18n} from './I18nProvider.js';
+import {messages} from '../pages/Login.js';
 import en from './extracted/en.json';
 
 const TestComponent = () => {

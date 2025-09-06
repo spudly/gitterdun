@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {Section} from './Section';
+import {Section} from './Section.js';
 
 describe('section', () => {
   describe('basic rendering', () => {

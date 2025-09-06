@@ -1,8 +1,8 @@
-export {api} from './apiCore';
-export {ApiError} from './apiUtils';
-export {authApi} from './authApi';
-export {choresApi} from './choresApi';
-export {goalsApi} from './goalsApi';
-export {leaderboardApi, familiesApi, invitationsApi} from './familiesApi';
-export {usersApi} from './usersApi';
-export {choreInstancesApi} from './choreInstancesApi';
+export {api} from './apiCore.js';
+export {ApiError} from './apiUtils.js';
+export {authApi} from './authApi.js';
+export {choresApi} from './choresApi.js';
+export {goalsApi} from './goalsApi.js';
+export {leaderboardApi, familiesApi, invitationsApi} from './familiesApi.js';
+export {usersApi} from './usersApi.js';
+export {choreInstancesApi} from './choreInstancesApi.js';

@@ -1,10 +1,13 @@
 // Re-export handlers from focused modules
-export {handleGetChores, handleGetChoreById} from './choreReadHandlers';
+export {handleGetChores, handleGetChoreById} from './choreReadHandlers.js';
 export {
   handleCreateChore,
   handleUpdateChore,
   handleDeleteChore,
   handleCompleteChore,
-} from './choreWriteHandlers';
-export {handleAssignChore, handleApproveChore} from './choreModerationHandlers';
-export {handleRejectChore} from './choreRejectHandler';
+} from './choreWriteHandlers.js';
+export {
+  handleAssignChore,
+  handleApproveChore,
+} from './choreModerationHandlers.js';
+export {handleRejectChore} from './choreRejectHandler.js';

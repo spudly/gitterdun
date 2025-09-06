@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {StatusDot, getDotColorClass} from './StatusDot';
+import {StatusDot, getDotColorClass} from './StatusDot.js';
 
 describe('statusDot', () => {
   test('renders with label (role=img) and without', () => {

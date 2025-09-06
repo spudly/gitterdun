@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {SectionHeader} from './SectionHeader';
+import {SectionHeader} from './SectionHeader.js';
 
 describe('sectionHeader', () => {
   test('renders title, subtitle, children', () => {

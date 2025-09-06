@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import {api} from './apiCore';
+import {api} from './apiCore.js';
 
 const ChoreInstanceListItemSchema = z.object({
   chore_id: z.number(),

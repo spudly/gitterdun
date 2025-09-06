@@ -7,12 +7,12 @@ import {
   asError,
   ONE_WEEK_MS,
 } from '@gitterdun/shared';
-import {requireUserId} from '../utils/auth';
-import {createInvitation} from '../utils/invitationOperations';
-import {getUserFamily} from '../utils/familyOperations';
-import {validateParentMembership} from '../utils/familyAuthUtils';
-import {logger} from '../utils/logger';
-import type {RequestWithParamsAndBody, TypedResponse} from '../types/http';
+import {requireUserId} from '../utils/auth.js';
+import {createInvitation} from '../utils/invitationOperations.js';
+import {getUserFamily} from '../utils/familyOperations.js';
+import {validateParentMembership} from '../utils/familyAuthUtils.js';
+import {logger} from '../utils/logger.js';
+import type {RequestWithParamsAndBody, TypedResponse} from '../types/http.js';
 
 // eslint-disable-next-line new-cap -- express.Router() is a factory function
 const router = express.Router();

@@ -1,8 +1,8 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {InlineMeta} from './InlineMeta';
-import {Toolbar} from './Toolbar';
-import {KeyValue} from './KeyValue';
+import {InlineMeta} from './InlineMeta.js';
+import {Toolbar} from './Toolbar.js';
+import {KeyValue} from './KeyValue.js';
 
 describe('inlineMeta/Toolbar/KeyValue', () => {
   test('renders content', () => {

@@ -1,9 +1,9 @@
 import {UpdateChoreSchema, ChoreSchema} from '@gitterdun/shared';
 import {z} from 'zod';
-import {get} from './crud/db';
-import {logger} from './logger';
-import {sql} from './sql';
-import {checkChoreExists} from './choreCrud';
+import {get} from './crud/db.js';
+import {logger} from './logger.js';
+import {sql} from './sql.js';
+import {checkChoreExists} from './choreCrud.js';
 
 type UpdateChore = z.infer<typeof UpdateChoreSchema>;
 type Chore = z.infer<typeof ChoreSchema>;

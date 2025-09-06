@@ -1,7 +1,7 @@
 // Chores API functions
 import {z} from 'zod';
 import {ChoreSchema, ChoreWithUsernameSchema} from '@gitterdun/shared';
-import {api} from './apiCore';
+import {api} from './apiCore.js';
 
 export const choresApi = {
   getAll: async (params?: {

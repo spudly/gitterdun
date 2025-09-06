@@ -1,6 +1,6 @@
 import {describe, expect, test, beforeEach, jest} from '@jest/globals';
-import * as crudDb from './crud/db';
-import {validateRegistrationData} from './userAuthUtils';
+import * as crudDb from './crud/db.js';
+import {validateRegistrationData} from './userAuthUtils.js';
 
 jest.mock('./crud/db', () => ({__esModule: true, get: jest.fn()}));
 

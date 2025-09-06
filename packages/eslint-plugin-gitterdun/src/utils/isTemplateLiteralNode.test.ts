@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
-import {isTemplateLiteralNode} from './isTemplateLiteralNode';
-import type {TemplateLiteralNode} from './astTypes';
+import {isTemplateLiteralNode} from './isTemplateLiteralNode.js';
+import type {TemplateLiteralNode} from './astTypes.js';
 
 describe('isTemplateLiteralNode', () => {
   test('valid template literal node', () => {

@@ -1,9 +1,9 @@
 import {describe, expect, test, beforeEach, jest} from '@jest/globals';
 import {z} from 'zod';
-import {listUsers} from '../users';
+import {listUsers} from '../users.js';
 import {UserSchema} from '@gitterdun/shared';
-import {allTyped, getTyped} from '../db';
-import {pgQuery} from '../../../lib/pgClient';
+import {allTyped, getTyped} from '../db.js';
+import {pgQuery} from '../../../lib/pgClient.js';
 
 jest.mock('../../../lib/pgClient', () => ({
   __esModule: true,

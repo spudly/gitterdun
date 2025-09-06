@@ -1,7 +1,7 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
-import {TextLink} from './TextLink';
+import {TextLink} from './TextLink.js';
 
 describe('textLink', () => {
   test('renders within router', () => {

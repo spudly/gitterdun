@@ -1,5 +1,5 @@
 import {execFileSync} from 'node:child_process';
-import {getPostgresUrl} from '../env';
+import {getPostgresUrl} from '../env.js';
 
 const getPsqlCommand = (): string => {
   const cmd = process.env['POSTGRES_PSQL_COMMAND'] ?? 'psql';

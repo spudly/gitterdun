@@ -1,7 +1,7 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {Modal, isOverlayKey, shouldCloseOnOverlayClick} from './Modal';
+import {Modal, isOverlayKey, shouldCloseOnOverlayClick} from './Modal.js';
 
 describe('modal', () => {
   test('opens and closes via overlay, escape and close button', async () => {

@@ -1,6 +1,6 @@
 import {describe, expect, test, jest} from '@jest/globals';
 
-import {transaction} from '../db';
+import {transaction} from '../db.js';
 
 jest.mock('../../../lib/pgClient', () => ({
   __esModule: true,

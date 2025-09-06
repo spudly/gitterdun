@@ -13,9 +13,9 @@ import {
   ChoreQuerySchema,
   CountRowSchema,
 } from '@gitterdun/shared';
-import choresRouter from './chores';
-import * as crudDb from '../utils/crud/db';
-import {setupErrorHandling} from '../middleware/errorHandler';
+import choresRouter from './chores.js';
+import * as crudDb from '../utils/crud/db.js';
+import {setupErrorHandling} from '../middleware/errorHandler.js';
 
 // Mocks
 jest.mock('../utils/crud/db', () => ({

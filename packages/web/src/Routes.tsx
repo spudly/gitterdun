@@ -1,25 +1,27 @@
 import type {FC} from 'react';
 import {Suspense, lazy} from 'react';
 import {Routes as RouterRoutes, Route} from 'react-router-dom';
-import {Spinner} from './widgets/Spinner';
+import {Spinner} from './widgets/Spinner.js';
 import {ProtectedRoute} from './ProtectedRoute.js';
 
-const Dashboard = lazy(async () => import('./pages/Dashboard'));
-const Chores = lazy(async () => import('./pages/Chores'));
+const Dashboard = lazy(async () => import('./pages/Dashboard.js'));
+const Chores = lazy(async () => import('./pages/Chores.js'));
 const Settings = lazy(async () => import('./pages/Settings.js'));
-const Leaderboard = lazy(async () => import('./pages/Leaderboard'));
-const Profile = lazy(async () => import('./pages/Profile'));
-const Admin = lazy(async () => import('./pages/Admin'));
-const Login = lazy(async () => import('./pages/Login'));
-const ForgotPassword = lazy(async () => import('./pages/ForgotPassword'));
-const ResetPassword = lazy(async () => import('./pages/ResetPassword'));
-const Register = lazy(async () => import('./pages/Register'));
-const Family = lazy(async () => import('./pages/Family'));
-const FamilyApprovals = lazy(async () => import('./pages/FamilyApprovals'));
-const AcceptInvitation = lazy(async () => import('./pages/AcceptInvitation'));
-const Demos = lazy(async () => import('./pages/Demos'));
-const Landing = lazy(async () => import('./pages/Landing'));
-const ChoreCreate = lazy(async () => import('./pages/ChoreCreate'));
+const Leaderboard = lazy(async () => import('./pages/Leaderboard.js'));
+const Profile = lazy(async () => import('./pages/Profile.js'));
+const Admin = lazy(async () => import('./pages/Admin.js'));
+const Login = lazy(async () => import('./pages/Login.js'));
+const ForgotPassword = lazy(async () => import('./pages/ForgotPassword.js'));
+const ResetPassword = lazy(async () => import('./pages/ResetPassword.js'));
+const Register = lazy(async () => import('./pages/Register.js'));
+const Family = lazy(async () => import('./pages/Family.js'));
+const FamilyApprovals = lazy(async () => import('./pages/FamilyApprovals.js'));
+const AcceptInvitation = lazy(
+  async () => import('./pages/AcceptInvitation.js'),
+);
+const Demos = lazy(async () => import('./pages/Demos.js'));
+const Landing = lazy(async () => import('./pages/Landing.js'));
+const ChoreCreate = lazy(async () => import('./pages/ChoreCreate.js'));
 
 // moved to ProtectedRoute.tsx
 

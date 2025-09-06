@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {IconButton} from './IconButton';
+import {IconButton} from './IconButton.js';
 
 describe('iconButton', () => {
   test('renders and can be disabled', () => {

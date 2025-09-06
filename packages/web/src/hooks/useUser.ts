@@ -2,7 +2,7 @@ import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query';
 import {UserSchema} from '@gitterdun/shared';
 import type {User} from '@gitterdun/shared';
 import {authApi} from '../lib/api.js';
-import {USER_STALE_TIME} from '../constants';
+import {USER_STALE_TIME} from '../constants.js';
 
 const NO_DATA_SUCCESS = {__noData: true} as const;
 

@@ -1,8 +1,8 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {createWrapper} from '../test/createWrapper';
-import FamilyApprovals from './FamilyApprovals';
+import {createWrapper} from '../test/createWrapper.js';
+import FamilyApprovals from './FamilyApprovals.js';
 
 const mockInvalidate = jest.fn();
 jest.mock('@tanstack/react-query', () => {
@@ -72,7 +72,7 @@ describe('familyApprovals page', () => {
     await screen.findByText('Approve completed chores');
     const approveBtn = await screen.findByRole('button', {name: 'Approve'});
     await user.click(approveBtn);
-    const {choreInstancesApi} = jest.mocked(await import('../lib/api'));
+    const {choreInstancesApi} = jest.mocked(await import('../lib/api.js'));
     expect(choreInstancesApi.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         chore_id: 1,
@@ -90,7 +90,7 @@ describe('familyApprovals page', () => {
     await screen.findByText('Approve completed chores');
     const rejectBtn = await screen.findByRole('button', {name: 'Reject'});
     await user.click(rejectBtn);
-    const {choreInstancesApi} = jest.mocked(await import('../lib/api'));
+    const {choreInstancesApi} = jest.mocked(await import('../lib/api.js'));
     expect(choreInstancesApi.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         chore_id: 1,

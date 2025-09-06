@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {InputGroup} from './InputGroup';
+import {InputGroup} from './InputGroup.js';
 
 describe('inputGroup', () => {
   test('renders help and error', () => {

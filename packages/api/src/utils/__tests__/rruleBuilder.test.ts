@@ -1,5 +1,5 @@
 import {describe, expect, test} from '@jest/globals';
-import {buildRRuleString} from '../recurrence';
+import {buildRRuleString} from '../recurrence.js';
 
 describe('buildRRuleString', () => {
   test('builds FREQ with INTERVAL and COUNT', () => {

@@ -1,5 +1,5 @@
 import {describe, expect, test} from '@jest/globals';
-import {asError} from './asError';
+import {asError} from './asError.js';
 
 describe('asError', () => {
   describe('when value is already an Error', () => {

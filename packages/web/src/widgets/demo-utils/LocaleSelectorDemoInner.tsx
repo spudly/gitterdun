@@ -1,6 +1,6 @@
 import type {FC} from 'react';
-import {useI18n} from '../../i18n/I18nProvider';
-import {LocaleSelector} from '../LocaleSelector';
+import {useI18n} from '../../i18n/I18nProvider.js';
+import {LocaleSelector} from '../LocaleSelector.js';
 
 export const LocaleSelectorDemoInner: FC = () => {
   const {locale, setLocale} = useI18n();

@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {EmptyState} from './EmptyState';
+import {EmptyState} from './EmptyState.js';
 
 describe('emptyState', () => {
   test('renders title, description and action', () => {

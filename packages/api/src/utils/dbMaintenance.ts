@@ -1,4 +1,4 @@
-import {all, run} from './crud/db';
+import {all, run} from './crud/db.js';
 import {z} from 'zod';
 
 const TableRowSchema = z.object({table_name: z.string()});

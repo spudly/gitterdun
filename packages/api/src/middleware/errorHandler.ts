@@ -1,7 +1,7 @@
 import type express from 'express';
-import type {RequestDefault, TypedResponse} from '../types/http';
+import type {RequestDefault, TypedResponse} from '../types/http.js';
 import {StatusCodes} from 'http-status-codes';
-import {logger} from '../utils/logger';
+import {logger} from '../utils/logger.js';
 import {ZodError} from 'zod';
 import {asError} from '@gitterdun/shared';
 

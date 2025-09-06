@@ -1,7 +1,7 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {createWrapper} from '../test/createWrapper';
-import {InfoCircleIcon} from './icons';
+import {createWrapper} from '../test/createWrapper.js';
+import {InfoCircleIcon} from './icons/index.js';
 
 describe('infoCircleIcon', () => {
   test('renders an svg', () => {

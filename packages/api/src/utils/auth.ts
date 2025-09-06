@@ -1,8 +1,8 @@
-import type {RequestDefault} from '../types/http';
+import type {RequestDefault} from '../types/http.js';
 import {SessionRowSchema} from '@gitterdun/shared';
-import {sql} from './sql';
-import {get, run} from './crud/db';
-import {getCookie} from './cookieUtils';
+import {sql} from './sql.js';
+import {get, run} from './crud/db.js';
+import {getCookie} from './cookieUtils.js';
 
 type SessionData = {user_id: number; expires_at: string};
 

@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {Spinner} from './Spinner';
+import {Spinner} from './Spinner.js';
 
 describe('spinner', () => {
   test('renders after delay inline and block', async () => {

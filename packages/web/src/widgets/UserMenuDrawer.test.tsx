@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, jest, test} from '@jest/globals';
 import {act, render, screen} from '@testing-library/react';
-import {createWrapper} from '../test/createWrapper';
-import {UserMenuDrawer} from './UserMenuDrawer';
+import {createWrapper} from '../test/createWrapper.js';
+import {UserMenuDrawer} from './UserMenuDrawer.js';
 
 describe('userMenuDrawer animations', () => {
   beforeEach(() => {

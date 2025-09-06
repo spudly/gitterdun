@@ -1,4 +1,4 @@
-import type {NavigationItem} from './widgets/Layout';
+import type {NavigationItem} from './widgets/Layout.js';
 import {defineMessages} from 'react-intl';
 import type {MessageDescriptor} from 'react-intl';
 import {ONE_MINUTE_MS, ONE_HOUR_MS} from '@gitterdun/shared';

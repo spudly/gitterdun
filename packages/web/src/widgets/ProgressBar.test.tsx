@@ -1,7 +1,7 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {ProgressBar} from './ProgressBar';
-import {createWrapper} from '../test/createWrapper';
+import {ProgressBar} from './ProgressBar.js';
+import {createWrapper} from '../test/createWrapper.js';
 
 describe('progressBar', () => {
   test('shows percentage and clamps to 100%', () => {

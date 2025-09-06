@@ -1,14 +1,14 @@
 import {asError} from '@gitterdun/shared';
-import type {RequestWithParamsAndBody, TypedResponse} from '../types/http';
+import type {RequestWithParamsAndBody, TypedResponse} from '../types/http.js';
 import {z} from 'zod';
 import {StatusCodes} from 'http-status-codes';
-import {requireUserId} from '../utils/auth';
-import {getUserFamily} from '../utils/familyOperations';
-import {validateParentMembership} from '../utils/familyAuthUtils';
+import {requireUserId} from '../utils/auth.js';
+import {getUserFamily} from '../utils/familyOperations.js';
+import {validateParentMembership} from '../utils/familyAuthUtils.js';
 import {
   assignChoreToSingleUser,
   approveChoreAssignment,
-} from '../utils/choreModeration';
+} from '../utils/choreModeration.js';
 
 const AssignChoreBodySchema = z.object({userId: z.number().int()});
 type AssignChoreBody = z.infer<typeof AssignChoreBodySchema>;

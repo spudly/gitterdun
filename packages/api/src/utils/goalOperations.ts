@@ -3,13 +3,13 @@ export {
   validateCreateGoalData,
   validateGoalId,
   validateUpdateGoalRequest,
-} from './goalValidation';
+} from './goalValidation.js';
 
 export {
   createGoalInDatabase,
   fetchGoalById,
   checkGoalExists,
   deleteGoalFromDatabase,
-} from './goalCrud';
+} from './goalCrud.js';
 
-export {buildGoalUpdateQuery, executeGoalUpdate} from './goalUpdates';
+export {buildGoalUpdateQuery, executeGoalUpdate} from './goalUpdates.js';

@@ -1,11 +1,12 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {createWrapper} from '../test/createWrapper';
-import Profile from './Profile';
+import {createWrapper} from '../test/createWrapper.js';
+import Profile from './Profile.js';
 
 jest.mock('../lib/api', () => {
-  const actual = jest.requireActual<typeof import('../lib/api')>('../lib/api');
+  const actual =
+    jest.requireActual<typeof import('../lib/api.js')>('../lib/api');
   return {
     ...actual,
     usersApi: {

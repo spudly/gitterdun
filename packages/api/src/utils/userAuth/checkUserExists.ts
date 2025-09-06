@@ -1,5 +1,5 @@
-import {get} from '../crud/db';
-import {sql} from '../sql';
+import {get} from '../crud/db.js';
+import {sql} from '../sql.js';
 
 export const checkUserExists = async (
   email: string | undefined,

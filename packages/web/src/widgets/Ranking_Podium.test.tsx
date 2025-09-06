@@ -1,10 +1,10 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import type {RankingItem} from './RankingList';
-import {RankingList} from './RankingList';
-import type {PodiumItem} from './Podium';
-import {Podium} from './Podium';
-import {createWrapper} from '../test/createWrapper';
+import type {RankingItem} from './RankingList.js';
+import {RankingList} from './RankingList.js';
+import type {PodiumItem} from './Podium.js';
+import {Podium} from './Podium.js';
+import {createWrapper} from '../test/createWrapper.js';
 
 describe('rankingList & Podium', () => {
   test('renders ranking list with/without rank', () => {

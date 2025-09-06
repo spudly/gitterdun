@@ -38,9 +38,9 @@ jest.mock('../choreAssignments', () => ({
 describe('executeChoreCompletionTransaction', () => {
   test('uses shared transaction helper', async () => {
     const {executeChoreCompletionTransaction} = await import(
-      '../choreCompletion'
+      '../choreCompletion.js'
     );
-    const {transaction} = await import('../crud/db');
+    const {transaction} = await import('../crud/db.js');
 
     // Run
     const result = await executeChoreCompletionTransaction(1, 2, 'done');

@@ -1,5 +1,5 @@
 import {describe, expect, test} from '@jest/globals';
-import {hasTailwindMarginClasses} from './hasTailwindMarginClasses';
+import {hasTailwindMarginClasses} from './hasTailwindMarginClasses.js';
 
 describe('hasTailwindMarginClasses', () => {
   test('detects single margin class', () => {

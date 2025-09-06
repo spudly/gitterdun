@@ -1,9 +1,9 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type {Column} from './DataTable';
-import {DataTable} from './DataTable';
-import {createWrapper} from '../test/createWrapper';
+import type {Column} from './DataTable.js';
+import {DataTable} from './DataTable.js';
+import {createWrapper} from '../test/createWrapper.js';
 
 describe('dataTable', () => {
   test('renders, handles click and loading/empty', async () => {

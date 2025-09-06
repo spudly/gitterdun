@@ -1,22 +1,22 @@
 import express from 'express';
-import type {TypedResponse, RequestDefault} from './types/http';
+import type {TypedResponse, RequestDefault} from './types/http.js';
 import cors from 'cors';
 import helmet from 'helmet';
 import path from 'node:path';
 import dotenv from 'dotenv';
-import {initializeDatabase} from './lib/initDb';
-import {logger} from './utils/logger';
-import {DEFAULT_PORT} from './constants';
-import {setupErrorHandling} from './middleware/errorHandler';
+import {initializeDatabase} from './lib/initDb.js';
+import {logger} from './utils/logger.js';
+import {DEFAULT_PORT} from './constants.js';
+import {setupErrorHandling} from './middleware/errorHandler.js';
 
-import authRoutes from './routes/auth';
-import choreRoutes from './routes/chores';
-import goalRoutes from './routes/goals';
-import leaderboardRoutes from './routes/leaderboard';
-import familyRoutes from './routes/families';
-import usersRoutes from './routes/users';
-import invitationRoutes from './routes/invitations';
-import choreInstanceRoutes from './routes/choreInstances';
+import authRoutes from './routes/auth.js';
+import choreRoutes from './routes/chores.js';
+import goalRoutes from './routes/goals.js';
+import leaderboardRoutes from './routes/leaderboard.js';
+import familyRoutes from './routes/families.js';
+import usersRoutes from './routes/users.js';
+import invitationRoutes from './routes/invitations.js';
+import choreInstanceRoutes from './routes/choreInstances.js';
 
 Error.stackTraceLimit = 100;
 
@@ -151,4 +151,4 @@ export const createServer = async (): Promise<void> => {
   }
 };
 
-export * from './constants';
+export * from './constants.js';

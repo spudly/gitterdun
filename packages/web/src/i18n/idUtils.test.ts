@@ -1,5 +1,5 @@
 import {describe, expect, test} from '@jest/globals';
-import {computeHumanReadableId, slugifyDefaultMessage} from './idUtils';
+import {computeHumanReadableId, slugifyDefaultMessage} from './idUtils.js';
 
 describe('slugifyDefaultMessage', () => {
   test('lowercases and replaces non-alphanumerics with hyphens', () => {

@@ -1,9 +1,9 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {createWrapper} from '../test/createWrapper';
+import {createWrapper} from '../test/createWrapper.js';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import Goals from './Goals';
-import * as apiModule from '../lib/api';
+import Goals from './Goals.js';
+import * as apiModule from '../lib/api.js';
 
 const mockUseUser = jest.fn(() => ({user: {id: 1}}));
 jest.mock('../hooks/useUser', () => ({useUser: () => mockUseUser()}));

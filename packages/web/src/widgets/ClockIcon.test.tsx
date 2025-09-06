@@ -1,7 +1,7 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {createWrapper} from '../test/createWrapper';
-import {ClockIcon} from './icons';
+import {createWrapper} from '../test/createWrapper.js';
+import {ClockIcon} from './icons/index.js';
 
 describe('clockIcon', () => {
   test('renders an svg', () => {

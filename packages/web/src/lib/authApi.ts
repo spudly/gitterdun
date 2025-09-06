@@ -1,6 +1,6 @@
 // Auth API functions
 import {z} from 'zod';
-import {api} from './apiCore';
+import {api} from './apiCore.js';
 
 export const authApi = {
   login: async (credentials: {

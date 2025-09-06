@@ -1352,6 +1352,8 @@ const eslintConfig: Array<Linter.Config> = [
       '**/bundle/**',
       'node_modules/**',
       '**/playwright-report/**',
+      '**/report/**',
+      '**/coverage-ts/**',
     ],
   },
   ...resolveConfigs(RULES),

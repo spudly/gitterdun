@@ -1,7 +1,7 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {createWrapper} from '../test/createWrapper';
-import {SparklesIcon} from './icons';
+import {createWrapper} from '../test/createWrapper.js';
+import {SparklesIcon} from './icons/index.js';
 
 describe('sparklesIcon', () => {
   test('renders an svg', () => {

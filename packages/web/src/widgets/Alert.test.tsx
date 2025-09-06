@@ -1,8 +1,8 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {Alert} from './Alert';
-import {createWrapper} from '../test/createWrapper';
+import {Alert} from './Alert.js';
+import {createWrapper} from '../test/createWrapper.js';
 
 describe('alert', () => {
   test('shows types, title and dismiss', async () => {

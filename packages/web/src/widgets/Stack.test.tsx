@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {Stack, getGapClass} from './Stack';
+import {Stack, getGapClass} from './Stack.js';
 
 describe('stack', () => {
   test('renders children', () => {

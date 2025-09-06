@@ -1,9 +1,9 @@
 import {asError} from '@gitterdun/shared';
-import type {RequestWithParams, TypedResponse} from '../types/http';
+import type {RequestWithParams, TypedResponse} from '../types/http.js';
 import {StatusCodes} from 'http-status-codes';
-import {requireUserId} from '../utils/auth';
-import {getUserFamily} from '../utils/familyOperations';
-import {rejectChoreAssignment} from '../utils/choreModeration';
+import {requireUserId} from '../utils/auth.js';
+import {getUserFamily} from '../utils/familyOperations.js';
+import {rejectChoreAssignment} from '../utils/choreModeration.js';
 
 export const handleRejectChore = async (
   req: RequestWithParams<{id: string}>,

@@ -1,5 +1,5 @@
-import type {TemplateLiteralNode} from './astTypes';
-import {isObjectRecord} from './isObjectRecord';
+import type {TemplateLiteralNode} from './astTypes.js';
+import {isObjectRecord} from './isObjectRecord.js';
 
 export const isTemplateLiteralNode = (
   value: unknown,

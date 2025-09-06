@@ -3,13 +3,13 @@ import type {
   RequestWithParams,
   RequestWithParamsAndBody,
   TypedResponse,
-} from '../types/http';
+} from '../types/http.js';
 import {StatusCodes} from 'http-status-codes';
 import {z} from 'zod';
 import type {Family} from '@gitterdun/shared';
-import {requireUserId} from '../utils/auth';
-import {getUserFamily} from '../utils/familyOperations';
-import {upsertChoreInstance} from '../utils/crud/choreInstances';
+import {requireUserId} from '../utils/auth.js';
+import {getUserFamily} from '../utils/familyOperations.js';
+import {upsertChoreInstance} from '../utils/crud/choreInstances.js';
 
 // eslint-disable-next-line new-cap -- express.Router() is a factory function
 const router = express.Router();

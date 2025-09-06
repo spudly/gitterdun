@@ -1,8 +1,8 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {IntlProvider} from 'react-intl';
-import {Routes} from './Routes';
-import {createWrapper} from './test/createWrapper';
+import {Routes} from './Routes.js';
+import {createWrapper} from './test/createWrapper.js';
 
 jest.mock('./hooks/useUser', () => ({
   __esModule: true,

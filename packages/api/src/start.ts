@@ -1,5 +1,5 @@
-import {createServer} from './server';
-import {logger} from './utils/logger';
+import {createServer} from './server.js';
+import {logger} from './utils/logger.js';
 
 try {
   await createServer();

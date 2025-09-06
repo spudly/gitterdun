@@ -1,4 +1,4 @@
-import {pgQuery} from '../../lib/pgClient';
+import {pgQuery} from '../../lib/pgClient.js';
 import {z} from 'zod';
 
 const normalizeRowValues = (
@@ -66,7 +66,7 @@ export const pragma = (_pragmaCommand: string): void => {
 };
 
 export const transaction = async <T>(fn: () => Promise<T>): Promise<T> => {
-  const {withPgTransaction} = await import('../../lib/pgClient');
+  const {withPgTransaction} = await import('../../lib/pgClient.js');
   return withPgTransaction(fn);
 };
 

@@ -11,7 +11,7 @@ import {Alert} from '../widgets/Alert.js';
 import {Stack} from '../widgets/Stack.js';
 import {useToast} from '../widgets/ToastProvider.js';
 import {FormattedMessage, defineMessages, useIntl} from 'react-intl';
-import {PASSWORD_RESET_REDIRECT_DELAY} from '../constants';
+import {PASSWORD_RESET_REDIRECT_DELAY} from '../constants.js';
 
 const ResetPassword: FC = () => {
   const {resetPassword} = useUser();

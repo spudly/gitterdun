@@ -1,8 +1,8 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {FamilySelector} from './FamilySelector';
-import {createWrapper} from '../../test/createWrapper';
+import {FamilySelector} from './FamilySelector.js';
+import {createWrapper} from '../../test/createWrapper.js';
 
 describe('<FamilySelector />', () => {
   const families = [

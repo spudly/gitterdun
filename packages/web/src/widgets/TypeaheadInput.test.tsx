@@ -1,7 +1,7 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {TypeaheadInput} from './TypeaheadInput';
+import {TypeaheadInput} from './TypeaheadInput.js';
 
 describe('typeaheadInput', () => {
   test('filters and selects options', async () => {

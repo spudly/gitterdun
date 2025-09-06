@@ -1,7 +1,7 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {GridContainer} from './GridContainer';
-import {FormSection} from './FormSection';
+import {GridContainer} from './GridContainer.js';
+import {FormSection} from './FormSection.js';
 
 describe('gridContainer + FormSection', () => {
   test('renders content', () => {

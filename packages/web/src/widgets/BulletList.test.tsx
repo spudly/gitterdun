@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {BulletList, getDensityClass, getIndentClass} from './BulletList';
+import {BulletList, getDensityClass, getIndentClass} from './BulletList.js';
 
 describe('bulletList', () => {
   test('renders items with props', () => {

@@ -2,8 +2,8 @@ import {beforeEach, describe, expect, jest, test} from '@jest/globals';
 import type {FC, PropsWithChildren} from 'react';
 import {renderHook, act, waitFor} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {useUser} from './useUser';
-import * as apis from '../lib/api';
+import {useUser} from './useUser.js';
+import * as apis from '../lib/api.js';
 
 jest.mock('../lib/api', () => {
   return {

@@ -1,11 +1,11 @@
-import type {RequestDefault} from '../types/http';
+import type {RequestDefault} from '../types/http.js';
 import crypto from 'node:crypto';
 import {SessionRowSchema, UserSchema} from '@gitterdun/shared';
 import {z} from 'zod';
-import {get, run} from './crud/db';
-import {sql} from './sql';
-import {getCookie} from './cookieUtils';
-import {SECURE_TOKEN_BYTES, SESSION_EXPIRATION_MS} from '../constants';
+import {get, run} from './crud/db.js';
+import {sql} from './sql.js';
+import {getCookie} from './cookieUtils.js';
+import {SECURE_TOKEN_BYTES, SESSION_EXPIRATION_MS} from '../constants.js';
 
 type User = z.infer<typeof UserSchema>;
 

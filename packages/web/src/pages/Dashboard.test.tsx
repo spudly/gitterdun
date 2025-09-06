@@ -1,8 +1,8 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import Dashboard from './Dashboard';
-import {createWrapper} from '../test/createWrapper';
+import Dashboard from './Dashboard.js';
+import {createWrapper} from '../test/createWrapper.js';
 
 jest.mock('../hooks/useUser', () => ({useUser: () => ({user: {id: 1}})}));
 

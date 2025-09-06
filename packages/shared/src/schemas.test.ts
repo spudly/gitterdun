@@ -17,7 +17,7 @@ import {
   LeaderboardQuerySchema,
   RoleRowSchema,
   CreateChildSchema,
-} from './schemas';
+} from './schemas/index.js';
 
 describe('user schemas', () => {
   test('userSchema should validate valid data', () => {

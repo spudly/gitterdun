@@ -1,8 +1,8 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {TextInput} from './TextInput';
-import {FormField} from './FormField';
+import {TextInput} from './TextInput.js';
+import {FormField} from './FormField.js';
 import type {ChangeEvent} from 'react';
 
 describe('textInput', () => {

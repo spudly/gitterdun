@@ -1,8 +1,8 @@
 import {StatusCodes} from 'http-status-codes';
 import {z} from 'zod';
 import {asError} from '@gitterdun/shared';
-import {logger} from './logger';
-import type {TypedResponse} from '../types/http';
+import {logger} from './logger.js';
+import type {TypedResponse} from '../types/http.js';
 
 export const handleUpdateChoreError = (
   error: unknown,

@@ -1,17 +1,17 @@
 import {z} from 'zod';
 import {ChoreSchema} from '@gitterdun/shared';
-import type {ChoreCompletionParams} from './choreAssignments';
+import type {ChoreCompletionParams} from './choreAssignments.js';
 import {
   findChoreAssignment,
   updateChoreAssignmentCompletion,
-} from './choreAssignments';
+} from './choreAssignments.js';
 import {
   getChoreForCompletion,
   calculateCompletionPoints,
   updateUserPointsForChore,
   createChoreCompletionNotification,
-} from './chorePoints';
-import {transaction} from './crud/db';
+} from './chorePoints.js';
+import {transaction} from './crud/db.js';
 
 type Chore = z.infer<typeof ChoreSchema>;
 

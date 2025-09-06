@@ -1,6 +1,6 @@
 import {RoleRowSchema} from '@gitterdun/shared';
-import {get} from './crud/db';
-import {sql} from './sql';
+import {get} from './crud/db.js';
+import {sql} from './sql.js';
 
 export const validateParentMembership = async (
   userId: number,

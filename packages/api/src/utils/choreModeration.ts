@@ -1,5 +1,5 @@
-import {sql} from './sql';
-import {run} from './crud/db';
+import {sql} from './sql.js';
+import {run} from './crud/db.js';
 
 export const assignChoreToSingleUser = async (
   choreId: number,

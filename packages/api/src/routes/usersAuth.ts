@@ -1,6 +1,6 @@
-import type {RequestWithBody, TypedResponse} from '../types/http';
+import type {RequestWithBody, TypedResponse} from '../types/http.js';
 import {StatusCodes} from 'http-status-codes';
-import {getUserFromSession} from '../utils/sessionUtils';
+import {getUserFromSession} from '../utils/sessionUtils.js';
 
 export const requireAdmin = async (
   req: RequestWithBody<unknown>,

@@ -1,8 +1,8 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {InviteMemberForm} from './InviteMemberForm';
-import {createWrapper} from '../../test/createWrapper';
+import {InviteMemberForm} from './InviteMemberForm.js';
+import {createWrapper} from '../../test/createWrapper.js';
 
 describe('<InviteMemberForm />', () => {
   test('renders labels, placeholders, and options', () => {

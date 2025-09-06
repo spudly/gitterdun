@@ -7,7 +7,7 @@ import {
   UpdateFamilyTimezoneSchema,
 } from '@gitterdun/shared';
 import type {LeaderboardResponse, FamilyMember} from '@gitterdun/shared';
-import {api} from './apiCore';
+import {api} from './apiCore.js';
 
 export const leaderboardApi = {
   get: async (params?: {limit?: number; sortBy?: 'points' | 'streak'}) =>

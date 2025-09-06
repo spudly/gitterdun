@@ -1,5 +1,5 @@
-import type {JSXExpressionContainerNode} from './astTypes';
-import {isObjectRecord} from './isObjectRecord';
+import type {JSXExpressionContainerNode} from './astTypes.js';
+import {isObjectRecord} from './isObjectRecord.js';
 
 export const isJSXExpressionContainerNode = (
   value: unknown,

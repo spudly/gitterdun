@@ -1,8 +1,8 @@
 import {GoalSchema} from '@gitterdun/shared';
 import {z} from 'zod';
-import {get} from './crud/db';
-import {sql} from './sql';
-import type {UpdateGoalRequest} from './goalValidation';
+import {get} from './crud/db.js';
+import {sql} from './sql.js';
+import type {UpdateGoalRequest} from './goalValidation.js';
 
 type Goal = z.infer<typeof GoalSchema>;
 

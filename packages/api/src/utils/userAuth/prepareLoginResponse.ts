@@ -1,4 +1,4 @@
-import {logger} from '../logger';
+import {logger} from '../logger.js';
 import {UserWithPasswordRowSchema, UserSchema} from '@gitterdun/shared';
 import {z} from 'zod';
 

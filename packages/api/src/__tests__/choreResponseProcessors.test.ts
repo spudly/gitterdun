@@ -1,6 +1,6 @@
 import {describe, expect, test, jest, beforeEach} from '@jest/globals';
-import {processChoresRequest} from '../utils/choreResponseProcessors';
-import * as crudDb from '../utils/crud/db';
+import {processChoresRequest} from '../utils/choreResponseProcessors.js';
+import * as crudDb from '../utils/crud/db.js';
 
 jest.mock('../utils/crud/db', () => ({
   __esModule: true,

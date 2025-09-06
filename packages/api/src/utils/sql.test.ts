@@ -1,5 +1,5 @@
 import {describe, expect, test} from '@jest/globals';
-import {sql} from './sql';
+import {sql} from './sql.js';
 
 describe('sql', () => {
   test('returns the raw string when there are no substitutions', () => {

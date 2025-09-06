@@ -9,7 +9,7 @@ import {
   leaderboardApi,
   familiesApi,
   invitationsApi,
-} from './api';
+} from './api.js';
 
 describe('api utils', () => {
   const originalFetch = global.fetch;
