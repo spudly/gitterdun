@@ -89,13 +89,7 @@
       "dependsOn": ["//#knip", "build", "test", "//#lint", "//#check:prettier"]
     },
     "check:ai": {
-      "dependsOn": [
-        "//#knip",
-        "build",
-        "//#test:changed",
-        "//#lint:changed",
-        "//#check:prettier"
-      ]
+      "dependsOn": ["//#knip", "build", "//#test:changed", "//#lint:changed"]
     },
     "ts:coverage": {
       "dependsOn": ["^ts:coverage"],

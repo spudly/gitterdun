@@ -1,5 +1,10 @@
-import {FamilySchema, IdRowSchema, FamilyMemberSchema} from '@gitterdun/shared';
-import type {Family} from '@gitterdun/shared';
+import {
+  FamilySchema,
+  IdRowSchema,
+  FamilyMemberSchema,
+  OutgoingFamilySchema,
+} from '@gitterdun/shared';
+import type {OutgoingFamily} from '@gitterdun/shared';
 import bcrypt from 'bcryptjs';
 import {get, run, all} from './crud/db.js';
 import {sql} from './sql.js';
@@ -10,7 +15,7 @@ export const createFamily = async (
   name: string,
   userId: number,
   timezone?: string,
-): Promise<Family> => {
+): Promise<OutgoingFamily> => {
   // Enforce single-family membership: remove any existing memberships first
   await removeAllMembershipsForUser(userId);
 
@@ -46,10 +51,12 @@ export const createFamily = async (
     'parent',
   );
 
-  return family;
+  return OutgoingFamilySchema.parse(family);
 };
 
-export const getUserFamily = async (userId: number): Promise<Family | null> => {
+export const getUserFamily = async (
+  userId: number,
+): Promise<OutgoingFamily | null> => {
   const row = await get(
     sql`
       SELECT
@@ -68,7 +75,11 @@ export const getUserFamily = async (userId: number): Promise<Family | null> => {
     `,
     userId,
   );
-  return row === undefined ? null : FamilySchema.parse(row);
+  if (row === undefined) {
+    return null;
+  }
+  const family = FamilySchema.parse(row);
+  return OutgoingFamilySchema.parse(family);
 };
 
 export const checkUserExists = async (

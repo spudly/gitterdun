@@ -6,7 +6,7 @@ import type {
   TypedResponse,
 } from '../types/http.js';
 import {StatusCodes} from 'http-status-codes';
-import {IdParamSchema, GoalSchema} from '@gitterdun/shared';
+import {IdParamSchema, OutgoingGoalSchema} from '@gitterdun/shared';
 import {logger} from '../utils/logger.js';
 
 import {
@@ -54,9 +54,13 @@ router.get(
       finalParams,
     );
 
+    const outgoingGoals = validatedGoals.map(goal =>
+      OutgoingGoalSchema.parse(goal),
+    );
+
     res.json({
       success: true,
-      data: validatedGoals,
+      data: outgoingGoals,
       pagination: {
         page,
         limit,
@@ -81,11 +85,12 @@ router.post('/', async (req: RequestWithBody<unknown>, res: TypedResponse) => {
     'New goal created',
   );
 
+  const outgoingGoal = OutgoingGoalSchema.parse(validatedGoal);
   res
     .status(StatusCodes.CREATED)
     .json({
       success: true,
-      data: validatedGoal,
+      data: outgoingGoal,
       message: 'Goal created successfully',
     });
 });
@@ -105,8 +110,8 @@ router.get(
       return;
     }
 
-    const validatedGoal = GoalSchema.parse(goal);
-    res.json({success: true, data: validatedGoal});
+    const outgoingGoal = OutgoingGoalSchema.parse(goal);
+    res.json({success: true, data: outgoingGoal});
   },
 );
 
@@ -131,9 +136,10 @@ router.put(
 
     logger.info({goalId}, 'Goal updated');
 
+    const outgoingGoal = OutgoingGoalSchema.parse(validatedGoal);
     res.json({
       success: true,
-      data: validatedGoal,
+      data: outgoingGoal,
       message: 'Goal updated successfully',
     });
   },

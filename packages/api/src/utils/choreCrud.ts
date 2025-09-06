@@ -8,7 +8,6 @@ import {
 import {logger} from './logger.js';
 import {sql} from './sql.js';
 import {get} from './crud/db.js';
-import {parseISO} from 'date-fns';
 
 type CreateChoreParams = {
   title: string;
@@ -49,17 +48,15 @@ export const createChoreInDb = async (params: CreateChoreParams) => {
     familyId,
   });
 
-  const parseTimestampColumn = (value: string) => parseISO(value).getTime();
-
   const CoercedChoreSchema = ChoreSchema.extend({
-    start_date: z.string().transform(parseTimestampColumn),
-    due_date: z.string().transform(parseTimestampColumn),
+    start_date: z.date(),
+    due_date: z.date(),
     recurrence_rule: z
       .union([z.string(), z.undefined(), z.null()])
       .transform(value => (value == null || value === '' ? undefined : value))
       .optional(),
-    created_at: z.string().transform(parseTimestampColumn),
-    updated_at: z.string().transform(parseTimestampColumn),
+    created_at: z.date(),
+    updated_at: z.date(),
   });
 
   return CoercedChoreSchema.parse(createdRow);

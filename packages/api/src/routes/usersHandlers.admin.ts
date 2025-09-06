@@ -3,7 +3,7 @@ import type {
   TypedResponse,
   RequestDefault,
 } from '../types/http.js';
-import {IdParamSchema, UserSchema, asError} from '@gitterdun/shared';
+import {IdParamSchema, asError, OutgoingUserSchema} from '@gitterdun/shared';
 import {StatusCodes} from 'http-status-codes';
 // zod import removed; using shared IdParamSchema
 import {logger} from '../utils/logger.js';
@@ -24,7 +24,7 @@ export const listUsersHandler = async (
       return;
     }
     const rows = await listUsers();
-    const users = rows.map(row => UserSchema.parse(row));
+    const users = rows.map(user => OutgoingUserSchema.parse(user));
     res.json({success: true, data: users});
   } catch (error) {
     logger.error({error: asError(error)}, 'List users error');

@@ -5,7 +5,7 @@ import type {
 } from '../types/http.js';
 import {StatusCodes} from 'http-status-codes';
 import {logger} from '../utils/logger.js';
-import {UserSchema, UpdateUserSchema, asError} from '@gitterdun/shared';
+import {OutgoingUserSchema, UpdateUserSchema, asError} from '@gitterdun/shared';
 import {getUserFromSession} from '../utils/sessionUtils.js';
 import {
   clearChoresCreatedBy,
@@ -30,7 +30,7 @@ export const getMeHandler = async (
         .json({success: false, error: 'Not authenticated'});
       return;
     }
-    const user = UserSchema.parse(sessionUser);
+    const user = OutgoingUserSchema.parse(sessionUser);
     res.json({success: true, data: user});
   } catch (error) {
     logger.error({error: asError(error)}, 'Get profile error');
@@ -52,19 +52,19 @@ export const patchMeHandler = async (
         .json({success: false, error: 'Not authenticated'});
       return;
     }
-    const user = UserSchema.parse(sessionUser);
     const parsed = UpdateUserSchema.pick({
       display_name: true,
       avatar_url: true,
       email: true,
     }).parse(req.body);
 
-    const nextDisplayName = parsed.display_name ?? user.display_name ?? null;
-    const nextAvatarUrl = parsed.avatar_url ?? user.avatar_url ?? null;
-    const nextEmail = parsed.email ?? user.email ?? null;
+    const nextDisplayName =
+      parsed.display_name ?? sessionUser.display_name ?? null;
+    const nextAvatarUrl = parsed.avatar_url ?? sessionUser.avatar_url ?? null;
+    const nextEmail = parsed.email ?? sessionUser.email ?? null;
 
     const info = await updateUserProfile(
-      user.id,
+      sessionUser.id,
       nextDisplayName,
       nextAvatarUrl,
       nextEmail,
@@ -77,9 +77,15 @@ export const patchMeHandler = async (
       return;
     }
 
-    const updated = await getUserById(user.id);
+    const updated = await getUserById(sessionUser.id);
+    if (!updated) {
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json({success: false, error: 'User not found'});
+      return;
+    }
 
-    res.json({success: true, data: UserSchema.parse(updated)});
+    res.json({success: true, data: OutgoingUserSchema.parse(updated)});
   } catch (error) {
     logger.error({error: asError(error)}, 'Update profile error');
     res
@@ -100,11 +106,9 @@ export const deleteMeHandler = async (
         .json({success: false, error: 'Not authenticated'});
       return;
     }
-    const user = UserSchema.parse(sessionUser);
-
-    await clearChoresCreatedBy(user.id);
-    await deleteInvitationsByInviter(user.id);
-    const info = await deleteUserById(user.id);
+    await clearChoresCreatedBy(sessionUser.id);
+    await deleteInvitationsByInviter(sessionUser.id);
+    const info = await deleteUserById(sessionUser.id);
 
     if (info.changes === 0) {
       res

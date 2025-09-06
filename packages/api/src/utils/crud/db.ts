@@ -1,20 +1,8 @@
 import {pgQuery} from '../../lib/pgClient.js';
 import {z} from 'zod';
 
-// TODO: we shouldn't have to do this. Let's use `types.setTypeParser` to coerce dates instead.
-const normalizeRowValues = (
-  row: Record<string, unknown>,
-): Record<string, unknown> => {
-  const out: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(row)) {
-    if (value instanceof Date) {
-      out[key] = value.toISOString();
-    } else {
-      out[key] = value;
-    }
-  }
-  return out;
-};
+// Date/timestamp columns are now automatically parsed as Date objects by types.setTypeParser
+// No need for manual normalization since we want to keep them as Date objects
 
 // (no-op placeholder for potential SQL value escaping removed)
 
@@ -49,7 +37,7 @@ export const all = async (
 ): Promise<Array<Record<string, unknown>>> => {
   const {text} = toPgPlaceholders(query);
   const res = await pgQuery(text, params);
-  return res.rows.map(row => normalizeRowValues(row));
+  return res.rows;
 };
 
 export const get = async (

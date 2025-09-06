@@ -1,7 +1,7 @@
 // Families, Leaderboard, and Invitations API functions
 import {z} from 'zod';
 import {
-  FamilySchema,
+  IncomingFamilySchema,
   FamilyMemberSchema,
   LeaderboardResponseSchema,
   UpdateFamilyTimezoneSchema,
@@ -20,12 +20,17 @@ export const leaderboardApi = {
 
 export const familiesApi = {
   create: async (data: {name: string}) =>
-    api.post('/families', FamilySchema, data),
-  myFamily: async () => api.get('/families/mine', FamilySchema.nullable()),
+    api.post('/families', IncomingFamilySchema, data),
+  myFamily: async () =>
+    api.get('/families/mine', IncomingFamilySchema.nullable()),
   updateTimezone: async (familyId: number, data: {timezone: string}) => {
     // Validate request body before sending
     const validated = UpdateFamilyTimezoneSchema.parse(data);
-    return api.put(`/families/${familyId}/timezone`, FamilySchema, validated);
+    return api.put(
+      `/families/${familyId}/timezone`,
+      IncomingFamilySchema,
+      validated,
+    );
   },
   listMembers: async (familyId: number) =>
     api.get<Array<FamilyMember>>(

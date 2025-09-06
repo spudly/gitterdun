@@ -14,5 +14,4 @@
 - [ ] Feature: Photo/Video Proof
 - [ ] Feature: disallow late chores
 - [ ] Feature: late penalty
-- [ ] add date-fns
-- [ ] use `types.setTypeParser` to coerce dates instead of `normalizeRowValues`
+- [ ] consolidate web useQuery calls into custom hooks?

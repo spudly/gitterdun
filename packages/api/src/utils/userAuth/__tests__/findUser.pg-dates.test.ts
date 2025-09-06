@@ -5,7 +5,7 @@ jest.mock('../../../lib/pgClient', () => ({
   pgQuery: jest.fn(),
 }));
 
-describe('findUser returns ISO strings for timestamp fields in PG mode', () => {
+describe('findUser returns Date objects for timestamp fields in PG mode', () => {
   const originalEnv = {...process.env};
 
   beforeEach(() => {
@@ -17,7 +17,7 @@ describe('findUser returns ISO strings for timestamp fields in PG mode', () => {
     } as Record<string, string>;
   });
 
-  test('created_at/updated_at are strings, not Date', async () => {
+  test('created_at/updated_at are Date objects, not strings', async () => {
     const now = new Date('2024-01-02T03:04:05.678Z');
     const {pgQuery} = await import('../../../lib/pgClient.js');
     jest
@@ -41,9 +41,9 @@ describe('findUser returns ISO strings for timestamp fields in PG mode', () => {
     const {findUserByEmail} = await import('../findUser.js');
     const res = await findUserByEmail('u@example.com');
     expect(res).toBeDefined();
-    expect(typeof res?.created_at).toBe('string');
-    expect(typeof res?.updated_at).toBe('string');
-    expect(res?.created_at).toBe(now.toISOString());
-    expect(res?.updated_at).toBe(now.toISOString());
+    expect(res?.created_at).toBeInstanceOf(Date);
+    expect(res?.updated_at).toBeInstanceOf(Date);
+    expect(res?.created_at).toEqual(now);
+    expect(res?.updated_at).toEqual(now);
   });
 });

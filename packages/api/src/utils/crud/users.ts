@@ -1,50 +1,34 @@
 import {sql} from '../sql.js';
-import {allTyped, getTyped, run} from './db.js';
+import {all, get, run} from './db.js';
 import {UserSchema} from '@gitterdun/shared';
-import {z} from 'zod';
 
-export const listUsers = async (): Promise<
-  Array<
-    Pick<
-      z.infer<typeof UserSchema>,
-      | 'id'
-      | 'username'
-      | 'email'
-      | 'role'
-      | 'points'
-      | 'streak_count'
-      | 'created_at'
-      | 'updated_at'
-    >
-  >
-> => {
-  return allTyped(
-    UserSchema.pick({
-      id: true,
-      username: true,
-      email: true,
-      role: true,
-      points: true,
-      streak_count: true,
-      created_at: true,
-      updated_at: true,
-    }),
-    sql`
-      SELECT
-        id,
-        username,
-        email,
-        role,
-        points,
-        streak_count,
-        created_at,
-        updated_at
-      FROM
-        users
-      ORDER BY
-        id ASC
-    `,
-  );
+export const listUsers = async () => {
+  const rows = await all(sql`
+    SELECT
+      id,
+      username,
+      email,
+      role,
+      points,
+      streak_count,
+      created_at,
+      updated_at
+    FROM
+      users
+    ORDER BY
+      id ASC
+  `);
+  const UserListSchema = UserSchema.pick({
+    id: true,
+    username: true,
+    email: true,
+    role: true,
+    points: true,
+    streak_count: true,
+    created_at: true,
+    updated_at: true,
+  });
+  return UserListSchema.array().parse(rows);
 };
 
 export const updateUserProfile = async (
@@ -71,34 +55,8 @@ export const updateUserProfile = async (
   ) as Promise<{changes: number} | {changes?: number}>;
 };
 
-export const getUserById = async (
-  id: number,
-): Promise<Pick<
-  z.infer<typeof UserSchema>,
-  | 'id'
-  | 'username'
-  | 'email'
-  | 'role'
-  | 'points'
-  | 'streak_count'
-  | 'display_name'
-  | 'avatar_url'
-  | 'created_at'
-  | 'updated_at'
-> | null> => {
-  return getTyped(
-    UserSchema.pick({
-      id: true,
-      username: true,
-      email: true,
-      role: true,
-      points: true,
-      streak_count: true,
-      display_name: true,
-      avatar_url: true,
-      created_at: true,
-      updated_at: true,
-    }),
+export const getUserById = async (id: number) => {
+  const userRow = await get(
     sql`
       SELECT
         id,
@@ -118,6 +76,19 @@ export const getUserById = async (
     `,
     id,
   );
+  const UserByIdSchema = UserSchema.pick({
+    id: true,
+    username: true,
+    email: true,
+    role: true,
+    points: true,
+    streak_count: true,
+    display_name: true,
+    avatar_url: true,
+    created_at: true,
+    updated_at: true,
+  });
+  return UserByIdSchema.nullish().parse(userRow);
 };
 
 export const deleteUserById = async (

@@ -1,6 +1,6 @@
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query';
-import {UserSchema} from '@gitterdun/shared';
-import type {User} from '@gitterdun/shared';
+import {IncomingUserSchema} from '@gitterdun/shared';
+import type {IncomingUser} from '@gitterdun/shared';
 import {authApi} from '../lib/api.js';
 import {USER_STALE_TIME} from '../constants.js';
 
@@ -18,14 +18,14 @@ const isNoDataSuccess = (value: unknown): value is typeof NO_DATA_SUCCESS => {
   return (value as {__noData?: unknown}).__noData === true;
 };
 
-type UserQueryData = User | null | typeof NO_DATA_SUCCESS;
+type UserQueryData = IncomingUser | null | typeof NO_DATA_SUCCESS;
 
 const createUserQueryFn = (): (() => Promise<UserQueryData>) => {
   return async (): Promise<UserQueryData> => {
     try {
       const res = await authApi.me();
       if (res.success && res.data) {
-        return UserSchema.parse(res.data);
+        return IncomingUserSchema.parse(res.data);
       }
       if (res.success && res.data === undefined) {
         return NO_DATA_SUCCESS;
@@ -39,7 +39,7 @@ const createUserQueryFn = (): (() => Promise<UserQueryData>) => {
 
 const processRawUserData = (
   rawUser: UserQueryData | undefined,
-): User | null | undefined => {
+): IncomingUser | null | undefined => {
   if (rawUser === undefined) {
     return undefined;
   }

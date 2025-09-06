@@ -1,11 +1,10 @@
 import type {FC} from 'react';
-import type {ChoreWithUsername} from '@gitterdun/shared';
+import type {IncomingChoreWithUsername} from '@gitterdun/shared';
 import {InlineMeta} from '../../widgets/InlineMeta.js';
 import {useIntl} from 'react-intl';
 import {choresMessages as messages} from '../chores.messages.js';
-import {parseISO} from 'date-fns';
 
-type ChoreMetaProps = {readonly chore: ChoreWithUsername};
+type ChoreMetaProps = {readonly chore: IncomingChoreWithUsername};
 
 export const ChoreMeta: FC<ChoreMetaProps> = ({chore}) => {
   const intl = useIntl();
@@ -20,12 +19,7 @@ export const ChoreMeta: FC<ChoreMetaProps> = ({chore}) => {
         })();
   const penaltyPoints =
     typeof chore.penalty_points === 'number' ? chore.penalty_points : 0;
-  const dueMs =
-    typeof chore.due_date === 'number'
-      ? chore.due_date
-      : typeof chore.due_date === 'string'
-        ? parseISO(chore.due_date).getTime()
-        : undefined;
+  const dueDate = chore.due_date; // Now a Date object from IncomingSchema transform
 
   return (
     <InlineMeta>
@@ -39,10 +33,8 @@ export const ChoreMeta: FC<ChoreMetaProps> = ({chore}) => {
           })}
         </span>
       ) : null}
-      {typeof dueMs === 'number' && Number.isFinite(dueMs) ? (
-        <span>
-          {intl.formatMessage(messages.dueWithDate, {date: new Date(dueMs)})}
-        </span>
+      {dueDate ? (
+        <span>{intl.formatMessage(messages.dueWithDate, {date: dueDate})}</span>
       ) : null}
     </InlineMeta>
   );

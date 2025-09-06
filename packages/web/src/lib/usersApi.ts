@@ -1,20 +1,17 @@
 import {z} from 'zod';
-import {UserSchema} from '@gitterdun/shared';
+import {IncomingUserSchema} from '@gitterdun/shared';
 import {api} from './apiCore.js';
 
 const EmptyObjectSchema = z.object({});
-const UpdateProfileResponseSchema = z
-  .object({ok: z.boolean()})
-  .or(EmptyObjectSchema);
 
 export const usersApi = {
-  list: async () => api.get('/users', z.array(UserSchema)),
+  list: async () => api.get('/users', z.array(IncomingUserSchema)),
   delete: async (id: number) => api.delete(`/users/${id}`, EmptyObjectSchema),
-  getMe: async () => api.get('/users/me', UserSchema),
+  getMe: async () => api.get('/users/me', IncomingUserSchema),
   updateProfile: async (data: {
     display_name?: string | null;
     avatar_url?: string | null;
     email?: string | null;
-  }) => api.patch('/users/me', UpdateProfileResponseSchema, data),
+  }) => api.patch('/users/me', IncomingUserSchema, data),
   deleteMe: async () => api.delete('/users/me', EmptyObjectSchema),
 };

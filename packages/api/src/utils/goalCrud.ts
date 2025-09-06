@@ -33,7 +33,7 @@ export const createGoalInDatabase = async (
 };
 
 export const fetchGoalById = async (goalId: number) => {
-  return get(
+  const goalRow = await get(
     sql`
       SELECT
         id,
@@ -52,6 +52,7 @@ export const fetchGoalById = async (goalId: number) => {
     `,
     goalId,
   );
+  return goalRow === undefined ? undefined : GoalSchema.parse(goalRow);
 };
 
 export const checkGoalExists = async (goalId: number): Promise<boolean> => {

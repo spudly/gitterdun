@@ -9,7 +9,7 @@ import {
   SECURE_TOKEN_BYTES,
   PASSWORD_RESET_EXPIRATION_MINUTES,
 } from '../constants.js';
-import {addMinutes, isPast, parseISO} from 'date-fns';
+import {addMinutes, isPast} from 'date-fns';
 
 const createPasswordResetToken = async (userId: number) => {
   const token = crypto.randomBytes(SECURE_TOKEN_BYTES).toString('hex');
@@ -40,10 +40,7 @@ export const findUserForReset = async (email: string) => {
     `,
     email,
   );
-  if (row == null) {
-    return undefined;
-  }
-  return IdRowSchema.parse(row);
+  return IdRowSchema.nullish().parse(row);
 };
 
 export const handlePasswordResetRequest = async (
@@ -79,11 +76,11 @@ const validatePasswordResetToken = async (token: string) => {
     `,
     token,
   );
-  const found = row == null ? undefined : PasswordResetRowSchema.parse(row);
+  const found = PasswordResetRowSchema.nullish().parse(row);
   if (found == null || found.used === 1) {
     return {isValid: false, error: 'Invalid token'};
   }
-  if (isPast(parseISO(found.expires_at))) {
+  if (isPast(found.expires_at)) {
     return {isValid: false, error: 'Token expired'};
   }
 

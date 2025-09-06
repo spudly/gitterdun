@@ -16,6 +16,7 @@ import {
   GoalSchema,
   CountRowSchema,
   IdParamSchema,
+  OutgoingGoalSchema,
 } from '@gitterdun/shared';
 import goalsRouter from './goals.js';
 import * as crudDb from '../utils/crud/db.js';
@@ -38,6 +39,7 @@ const mockedGoalQuerySchema = jest.mocked(GoalQuerySchema);
 const mockedGoalSchema = jest.mocked(GoalSchema);
 const mockedCountRowSchema = jest.mocked(CountRowSchema);
 const mockedIdParamSchema = jest.mocked(IdParamSchema);
+const mockedOutgoingGoalSchema = jest.mocked(OutgoingGoalSchema);
 
 describe('goals routes', () => {
   let app: ReturnType<typeof express> | undefined;
@@ -87,8 +89,8 @@ describe('goals routes', () => {
           target_points: 100,
           current_points: 50,
           status: 'active',
-          created_at: '2024-01-01T00:00:00.000Z',
-          updated_at: '2024-01-01T00:00:00.000Z',
+          created_at: new Date('2024-01-01T00:00:00.000Z'),
+          updated_at: new Date('2024-01-01T00:00:00.000Z'),
         },
       ];
 
@@ -108,6 +110,11 @@ describe('goals routes', () => {
       });
       mockedCountRowSchema.parse.mockReturnValue({count: 1});
       mockedGoalSchema.parse.mockReturnValue(mockGoals[0]!);
+      mockedOutgoingGoalSchema.parse.mockReturnValue({
+        ...mockGoals[0]!,
+        created_at: new Date('2024-01-01T00:00:00.000Z').getTime(),
+        updated_at: new Date('2024-01-01T00:00:00.000Z').getTime(),
+      });
 
       const response = await fetch(`${baseUrl!}/api/goals?user_id=1`);
       const body = await response.json();
@@ -115,7 +122,13 @@ describe('goals routes', () => {
       expect(response.status).toBe(200);
       expect(body).toEqual({
         success: true,
-        data: [mockGoals[0]],
+        data: [
+          {
+            ...mockGoals[0],
+            created_at: new Date('2024-01-01T00:00:00.000Z').getTime(),
+            updated_at: new Date('2024-01-01T00:00:00.000Z').getTime(),
+          },
+        ],
         pagination: {page: 1, limit: 20, total: 1, totalPages: 1},
       });
     });
@@ -144,8 +157,8 @@ describe('goals routes', () => {
           status: 'active',
           target_points: 100,
           current_points: 0,
-          created_at: '2024-01-01T00:00:00.000Z',
-          updated_at: '2024-01-01T00:00:00.000Z',
+          created_at: new Date('2024-01-01T00:00:00.000Z'),
+          updated_at: new Date('2024-01-01T00:00:00.000Z'),
         },
       ];
 
@@ -165,6 +178,11 @@ describe('goals routes', () => {
       });
       mockedCountRowSchema.parse.mockReturnValue({count: 1});
       mockedGoalSchema.parse.mockReturnValue(mockGoals[0]!);
+      mockedOutgoingGoalSchema.parse.mockReturnValue({
+        ...mockGoals[0]!,
+        created_at: new Date('2024-01-01T00:00:00.000Z').getTime(),
+        updated_at: new Date('2024-01-01T00:00:00.000Z').getTime(),
+      });
 
       const response = await fetch(
         `${baseUrl!}/api/goals?user_id=1&status=active`,
@@ -218,8 +236,8 @@ describe('goals routes', () => {
         ...newGoal,
         current_points: 0,
         status: 'active',
-        created_at: '2024-01-01T00:00:00.000Z',
-        updated_at: '2024-01-01T00:00:00.000Z',
+        created_at: new Date('2024-01-01T00:00:00.000Z'),
+        updated_at: new Date('2024-01-01T00:00:00.000Z'),
       };
 
       mockedCrudDb.get.mockResolvedValue(
@@ -228,6 +246,11 @@ describe('goals routes', () => {
 
       mockedCreateGoalSchema.parse.mockReturnValue(newGoal);
       mockedGoalSchema.parse.mockReturnValue(createdGoal);
+      mockedOutgoingGoalSchema.parse.mockReturnValue({
+        ...createdGoal,
+        created_at: new Date('2024-01-01T00:00:00.000Z').getTime(),
+        updated_at: new Date('2024-01-01T00:00:00.000Z').getTime(),
+      });
 
       const response = await fetch(`${baseUrl!}/api/goals`, {
         method: 'POST',
@@ -239,7 +262,11 @@ describe('goals routes', () => {
       expect(response.status).toBe(201);
       expect(body).toEqual({
         success: true,
-        data: createdGoal,
+        data: {
+          ...createdGoal,
+          created_at: new Date('2024-01-01T00:00:00.000Z').getTime(),
+          updated_at: new Date('2024-01-01T00:00:00.000Z').getTime(),
+        },
         message: 'Goal created successfully',
       });
     });
@@ -299,8 +326,8 @@ describe('goals routes', () => {
         target_points: 100,
         current_points: 25,
         status: 'active',
-        created_at: '2024-01-01T00:00:00.000Z',
-        updated_at: '2024-01-01T00:00:00.000Z',
+        created_at: new Date('2024-01-01T00:00:00.000Z'),
+        updated_at: new Date('2024-01-01T00:00:00.000Z'),
       };
 
       mockedCrudDb.get.mockResolvedValue(
@@ -309,12 +336,24 @@ describe('goals routes', () => {
 
       mockedIdParamSchema.parse.mockReturnValue({id: 1});
       mockedGoalSchema.parse.mockReturnValue(mockGoal);
+      mockedOutgoingGoalSchema.parse.mockReturnValue({
+        ...mockGoal,
+        created_at: new Date('2024-01-01T00:00:00.000Z').getTime(),
+        updated_at: new Date('2024-01-01T00:00:00.000Z').getTime(),
+      });
 
       const response = await fetch(`${baseUrl!}/api/goals/1`);
       const body = await response.json();
 
       expect(response.status).toBe(200);
-      expect(body).toEqual({success: true, data: mockGoal});
+      expect(body).toEqual({
+        success: true,
+        data: {
+          ...mockGoal,
+          created_at: new Date('2024-01-01T00:00:00.000Z').getTime(),
+          updated_at: new Date('2024-01-01T00:00:00.000Z').getTime(),
+        },
+      });
     });
 
     test('should return 404 for non-existent goal', async () => {
@@ -351,8 +390,8 @@ describe('goals routes', () => {
         target_points: 150,
         current_points: 25,
         status: 'active',
-        created_at: '2024-01-01T00:00:00.000Z',
-        updated_at: '2024-01-01T12:00:00.000Z',
+        created_at: new Date('2024-01-01T00:00:00.000Z'),
+        updated_at: new Date('2024-01-01T12:00:00.000Z'),
       };
 
       // Existence check
@@ -366,6 +405,11 @@ describe('goals routes', () => {
       mockedIdParamSchema.parse.mockReturnValue({id: 1});
       mockedUpdateGoalSchema.parse.mockReturnValue(updateData);
       mockedGoalSchema.parse.mockReturnValue(updatedGoal);
+      mockedOutgoingGoalSchema.parse.mockReturnValue({
+        ...updatedGoal,
+        created_at: new Date('2024-01-01T00:00:00.000Z').getTime(),
+        updated_at: new Date('2024-01-01T12:00:00.000Z').getTime(),
+      });
 
       const response = await fetch(`${baseUrl!}/api/goals/1`, {
         method: 'PUT',
@@ -377,7 +421,11 @@ describe('goals routes', () => {
       expect(response.status).toBe(200);
       expect(body).toEqual({
         success: true,
-        data: updatedGoal,
+        data: {
+          ...updatedGoal,
+          created_at: new Date('2024-01-01T00:00:00.000Z').getTime(),
+          updated_at: new Date('2024-01-01T12:00:00.000Z').getTime(),
+        },
         message: 'Goal updated successfully',
       });
     });

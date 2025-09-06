@@ -1,9 +1,22 @@
-import {Pool} from 'pg';
+import {Pool, types} from 'pg';
 import type {PoolClient, QueryResult} from 'pg';
 import {AsyncLocalStorage} from 'node:async_hooks';
+import {parseISO} from 'date-fns';
 import {getPostgresUrl} from '../utils/env.js';
 
 let pool: Pool | null = null;
+
+// Configure PostgreSQL type parsers to return Date objects for date/timestamp columns
+const parseDate = (val: string | null): Date | null =>
+  val === null ? null : parseISO(val);
+
+// Set type parsers for PostgreSQL date/timestamp types (skip in test environment where pg is mocked)
+// eslint-disable-next-line ts/no-unnecessary-condition, ts/strict-boolean-expressions -- types can be undefined in mocked test environment
+if (types && typeof types.setTypeParser === 'function') {
+  types.setTypeParser(types.builtins.DATE, parseDate); // DATE
+  types.setTypeParser(types.builtins.TIMESTAMP, parseDate); // TIMESTAMP
+  types.setTypeParser(types.builtins.TIMESTAMPTZ, parseDate); // TIMESTAMPTZ
+}
 
 const shouldUseSsl = (url: string): boolean => {
   try {
@@ -61,13 +74,41 @@ export const withPgTransaction = async <T>(
   }
 };
 
+// Helper function to format parameters before sending to PostgreSQL
+const formatParam = (
+  param: unknown,
+  _query?: string,
+  _paramIndex?: number,
+): unknown => {
+  // Convert numeric timestamps (milliseconds) to Date objects for PostgreSQL
+  if (typeof param === 'number' && param >= 0) {
+    // Check if it looks like a JavaScript timestamp (reasonable range)
+    // Timestamps should be >= 0 (Unix epoch) and < 2^53 (JavaScript max safe integer)
+    if (param <= Number.MAX_SAFE_INTEGER) {
+      return new Date(param);
+    }
+  }
+  return param;
+};
+
+// Enhanced formatter that can consider query context
+const formatParams = (
+  params: Array<unknown>,
+  query: string,
+): Array<unknown> => {
+  return params.map((param, index) => formatParam(param, query, index));
+};
+
 export const pgQuery = async (
   text: string,
   params: Array<unknown>,
 ): Promise<QueryResult<Record<string, unknown>>> => {
+  // Format parameters to handle numeric timestamps
+  const formattedParams = formatParams(params, text);
+
   const activeClient = txContext.getStore();
   if (activeClient !== undefined) {
-    return activeClient.query(text, params);
+    return activeClient.query(text, formattedParams);
   }
-  return getPgPool().query(text, params);
+  return getPgPool().query(text, formattedParams);
 };

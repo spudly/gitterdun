@@ -1,6 +1,9 @@
 // Chores API functions
 import {z} from 'zod';
-import {ChoreSchema, ChoreWithUsernameSchema} from '@gitterdun/shared';
+import {
+  IncomingChoreSchema,
+  IncomingChoreWithUsernameSchema,
+} from '@gitterdun/shared';
 import {api} from './apiCore.js';
 
 export const choresApi = {
@@ -12,10 +15,10 @@ export const choresApi = {
     limit?: number | undefined;
     sort_by?: 'created_at' | 'start_date' | 'due_date' | undefined;
     order?: 'asc' | 'desc' | undefined;
-  }) => api.get('/chores', z.array(ChoreWithUsernameSchema), params),
+  }) => api.get('/chores', z.array(IncomingChoreWithUsernameSchema), params),
 
   getById: async (id: number) =>
-    api.get(`/chores/${id}`, ChoreWithUsernameSchema),
+    api.get(`/chores/${id}`, IncomingChoreWithUsernameSchema),
 
   create: async (choreData: {
     title: string;
@@ -27,7 +30,7 @@ export const choresApi = {
     recurrence_rule?: string;
     chore_type: string;
     assigned_users?: Array<number>;
-  }) => api.post('/chores', ChoreSchema, choreData),
+  }) => api.post('/chores', IncomingChoreSchema, choreData),
 
   update: async (
     id: number,
@@ -42,7 +45,7 @@ export const choresApi = {
       chore_type?: string;
       status?: string;
     },
-  ) => api.put(`/chores/${id}`, ChoreSchema, choreData),
+  ) => api.put(`/chores/${id}`, IncomingChoreSchema, choreData),
 
   delete: async (id: number) =>
     api.delete(`/chores/${id}`, z.object({success: z.boolean()}).loose()),
