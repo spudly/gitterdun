@@ -1,3 +1,4 @@
+import {useEffect, useState} from 'react';
 import type {FC} from 'react';
 import {Stack} from '../../widgets/Stack.js';
 import {TextInput} from '../../widgets/TextInput.js';
@@ -6,7 +7,8 @@ import {FormattedMessage, useIntl} from 'react-intl';
 import {choresMessages as messages} from '../chores.messages.js';
 import {Checkbox} from '../../widgets/Checkbox.js';
 import {SelectInput} from '../../widgets/SelectInput.js';
-import {EMPTY_ARRAY} from '../../constants.js';
+import {DATE_FORMAT_FOR_INPUT_DATETIME, EMPTY_ARRAY} from '../../constants.js';
+import {format} from 'date-fns';
 
 type CreateChoreFormProps = {
   readonly title: string;
@@ -30,6 +32,16 @@ type CreateChoreFormProps = {
   readonly onRecurrenceChange: (value: string) => void;
   readonly startError?: string | null;
   readonly dueError?: string | null;
+};
+
+const useNow = () => {
+  const [now, setNow] = useState<Date>(new Date(0));
+
+  useEffect(() => {
+    setNow(new Date());
+  }, []);
+
+  return now;
 };
 
 export const CreateChoreForm: FC<CreateChoreFormProps> = ({
@@ -56,18 +68,8 @@ export const CreateChoreForm: FC<CreateChoreFormProps> = ({
   dueError,
 }) => {
   const intl = useIntl();
-  const toLocalInputValue = (date: Date): string => {
-    const TWO_DIGIT_PAD = 2;
-    const padTwo = (value: number) =>
-      String(value).padStart(TWO_DIGIT_PAD, '0');
-    const yyyy = date.getFullYear();
-    const mm = padTwo(date.getMonth() + 1);
-    const dd = padTwo(date.getDate());
-    const hh = padTwo(date.getHours());
-    const mi = padTwo(date.getMinutes());
-    return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
-  };
-  const nowMin = toLocalInputValue(new Date());
+  const now = useNow();
+
   return (
     <div>
       <Stack gap="md">
@@ -101,7 +103,7 @@ export const CreateChoreForm: FC<CreateChoreFormProps> = ({
           <TextInput
             aria-label={intl.formatMessage(messages.startDateLabel)}
             id="start-date-input"
-            min={nowMin}
+            min={format(now, DATE_FORMAT_FOR_INPUT_DATETIME)}
             onChange={onStartDateChange}
             type="datetime-local"
             value={startDate}
@@ -115,7 +117,7 @@ export const CreateChoreForm: FC<CreateChoreFormProps> = ({
           <TextInput
             aria-label={intl.formatMessage(messages.dueDateLabel)}
             id="due-date-input"
-            min={startDate || nowMin}
+            min={startDate || format(now, DATE_FORMAT_FOR_INPUT_DATETIME)}
             onChange={onDueDateChange}
             type="datetime-local"
             value={dueDate}

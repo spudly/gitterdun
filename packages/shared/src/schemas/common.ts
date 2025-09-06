@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-export const CountRowSchema = z.object({count: z.number()});
+export const CountRowSchema = z.object({count: z.coerce.number()});
 
 export const IdParamSchema = z.object({id: z.coerce.number().int().min(1)});
 

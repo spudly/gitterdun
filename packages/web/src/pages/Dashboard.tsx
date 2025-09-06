@@ -1,6 +1,6 @@
 import type {FC} from 'react';
 import {useQuery} from '@tanstack/react-query';
-import type {ChoreWithUsername} from '@gitterdun/shared';
+import type {IncomingChoreWithUsername} from '@gitterdun/shared';
 import {choresApi} from '../lib/api.js';
 import {useUser} from '../hooks/useUser.js';
 import {PageContainer} from '../widgets/PageContainer.js';
@@ -14,7 +14,7 @@ import {PageLoading} from '../widgets/PageLoading.js';
 import {CheckCircleIcon, ClockIcon, DocIcon} from '../widgets/icons/index.js';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {DUE_SOON_THRESHOLD_DAYS} from '../constants.js';
-import {ONE_DAY_MS} from '@gitterdun/shared';
+import {differenceInDays} from 'date-fns';
 
 const Dashboard: FC = () => {
   const {user} = useUser();
@@ -29,30 +29,31 @@ const Dashboard: FC = () => {
   const chores = choresResponse?.data ?? [];
 
   const getCompletedChoresCount = () =>
-    chores.filter((chore: ChoreWithUsername) => chore.status === 'completed')
-      .length;
+    chores.filter(
+      (chore: IncomingChoreWithUsername) => chore.status === 'completed',
+    ).length;
   const getPendingChoresCount = () =>
-    chores.filter((chore: ChoreWithUsername) => chore.status === 'pending')
-      .length;
+    chores.filter(
+      (chore: IncomingChoreWithUsername) => chore.status === 'pending',
+    ).length;
   const getTotalPoints = () =>
     chores
       .filter(
-        (chore: ChoreWithUsername) =>
+        (chore: IncomingChoreWithUsername) =>
           chore.status === 'completed' || chore.status === 'approved',
       )
-      .reduce((sum: number, chore: ChoreWithUsername) => {
+      .reduce((sum: number, chore: IncomingChoreWithUsername) => {
         const points = chore.reward_points ?? 0;
         return sum + points;
       }, 0);
   const getDueSoonChoresCount = () =>
-    chores.filter((chore: ChoreWithUsername) => {
+    chores.filter((chore: IncomingChoreWithUsername) => {
       if (chore.due_date === undefined) {
         return false;
       }
-      const dueDate = new Date(chore.due_date);
+      const dueDate = chore.due_date; // Already a Date object from IncomingSchema
       const now = new Date();
-      const diffTime = dueDate.getTime() - now.getTime();
-      const diffDays = Math.ceil(diffTime / ONE_DAY_MS);
+      const diffDays = differenceInDays(dueDate, now);
       return diffDays <= DUE_SOON_THRESHOLD_DAYS && diffDays >= 0;
     }).length;
 
@@ -130,7 +131,7 @@ const Dashboard: FC = () => {
           </Text>
         }
       >
-        {chores.map((chore: ChoreWithUsername) => (
+        {chores.map((chore: IncomingChoreWithUsername) => (
           <ListRow
             description={
               <Text as="span" muted size="sm">

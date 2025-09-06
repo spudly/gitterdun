@@ -3,7 +3,7 @@ import {MAX_USERNAME_LENGTH, MAX_NAME_LENGTH} from '../constants.js';
 
 export const SessionRowSchema = z.object({
   user_id: z.number(),
-  expires_at: z.string(),
+  expires_at: z.date(),
 });
 
 export const IdRowSchema = z.object({id: z.number()});
@@ -13,7 +13,7 @@ export const RoleRowSchema = z.object({role: z.enum(['parent', 'child'])});
 export const PasswordResetRowSchema = z.object({
   token: z.string(),
   user_id: z.number(),
-  expires_at: z.string(),
+  expires_at: z.date(),
   used: z.number(),
 });
 
@@ -23,7 +23,7 @@ export const FamilyInvitationRowSchema = z.object({
   email: z.email(),
   role: z.enum(['parent', 'child']),
   invited_by: z.number(),
-  expires_at: z.string(),
+  expires_at: z.date(),
   accepted: z.number(),
 });
 
@@ -40,6 +40,6 @@ export const UserWithPasswordRowSchema = z.object({
   role: z.enum(['admin', 'user']),
   points: z.number().int().min(0),
   streak_count: z.number().int().min(0),
-  created_at: z.string(),
-  updated_at: z.string(),
+  created_at: z.date(),
+  updated_at: z.date(),
 });

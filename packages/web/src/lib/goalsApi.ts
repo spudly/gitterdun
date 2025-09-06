@@ -1,6 +1,6 @@
 // Goals API functions
 import {z} from 'zod';
-import {GoalSchema} from '@gitterdun/shared';
+import {IncomingGoalSchema} from '@gitterdun/shared';
 import {api} from './apiCore.js';
 
 export const goalsApi = {
@@ -9,15 +9,15 @@ export const goalsApi = {
     status?: string;
     page?: number;
     limit?: number;
-  }) => api.get('/goals', z.array(GoalSchema), params),
+  }) => api.get('/goals', z.array(IncomingGoalSchema), params),
 
-  getById: async (id: number) => api.get(`/goals/${id}`, GoalSchema),
+  getById: async (id: number) => api.get(`/goals/${id}`, IncomingGoalSchema),
 
   create: async (goalData: {
     title: string;
     description?: string;
     target_points: number;
-  }) => api.post('/goals', GoalSchema, goalData),
+  }) => api.post('/goals', IncomingGoalSchema, goalData),
 
   update: async (
     id: number,
@@ -28,7 +28,7 @@ export const goalsApi = {
       current_points?: number;
       status?: string;
     },
-  ) => api.put(`/goals/${id}`, GoalSchema, goalData),
+  ) => api.put(`/goals/${id}`, IncomingGoalSchema, goalData),
 
   delete: async (id: number) =>
     api.delete(`/goals/${id}`, z.object({success: z.boolean()}).loose()),

@@ -7,12 +7,13 @@ import {sql} from './sql.js';
 import {
   BCRYPT_SALT_ROUNDS,
   SECURE_TOKEN_BYTES,
-  PASSWORD_RESET_EXPIRATION_MS,
+  PASSWORD_RESET_EXPIRATION_MINUTES,
 } from '../constants.js';
+import {addMinutes, isPast} from 'date-fns';
 
 const createPasswordResetToken = async (userId: number) => {
   const token = crypto.randomBytes(SECURE_TOKEN_BYTES).toString('hex');
-  const expiresAt = new Date(Date.now() + PASSWORD_RESET_EXPIRATION_MS);
+  const expiresAt = addMinutes(new Date(), PASSWORD_RESET_EXPIRATION_MINUTES);
   await run(
     sql`
       INSERT INTO
@@ -39,10 +40,7 @@ export const findUserForReset = async (email: string) => {
     `,
     email,
   );
-  if (row == null) {
-    return undefined;
-  }
-  return IdRowSchema.parse(row);
+  return IdRowSchema.nullish().parse(row);
 };
 
 export const handlePasswordResetRequest = async (
@@ -78,11 +76,11 @@ const validatePasswordResetToken = async (token: string) => {
     `,
     token,
   );
-  const found = row == null ? undefined : PasswordResetRowSchema.parse(row);
+  const found = PasswordResetRowSchema.nullish().parse(row);
   if (found == null || found.used === 1) {
     return {isValid: false, error: 'Invalid token'};
   }
-  if (new Date(found.expires_at).getTime() < Date.now()) {
+  if (isPast(found.expires_at)) {
     return {isValid: false, error: 'Token expired'};
   }
 

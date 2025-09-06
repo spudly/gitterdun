@@ -19,10 +19,7 @@ export const validateParentMembership = async (
     familyId,
     userId,
   );
-  const membership =
-    membershipRow !== undefined
-      ? RoleRowSchema.parse(membershipRow)
-      : undefined;
+  const membership = RoleRowSchema.nullish().parse(membershipRow);
   if (!membership || membership.role !== 'parent') {
     throw Object.assign(new Error('Forbidden'), {status: 403});
   }

@@ -20,6 +20,7 @@ import {
   checkUserExists,
   createChildUser,
   addChildToFamily,
+  getFamilyMembers,
 } from '../utils/familyOperations.js';
 import {validateParentMembership} from '../utils/familyAuthUtils.js';
 import {logger} from '../utils/logger.js';
@@ -57,7 +58,8 @@ router.get(
           .json({success: false, error: 'Forbidden'});
       }
 
-      return res.json({success: true, data: family});
+      const members = await getFamilyMembers(familyId);
+      return res.json({success: true, data: members});
     } catch (error) {
       logger.error({error: asError(error)}, 'List family members error');
       return res

@@ -1,4 +1,5 @@
 import {ChoreSchema} from '@gitterdun/shared';
+import {z} from 'zod';
 import {
   insertChore,
   insertChoreAssignment,
@@ -7,22 +8,6 @@ import {
 import {logger} from './logger.js';
 import {sql} from './sql.js';
 import {get} from './crud/db.js';
-
-const toTimestamp = (value: unknown): number | undefined => {
-  if (typeof value !== 'string' || value.length === 0) {
-    return undefined;
-  }
-  const direct = Date.parse(value);
-  if (!Number.isNaN(direct)) {
-    return direct;
-  }
-  const candidate = `${value.replace(' ', 'T')}Z`;
-  const parsedCandidate = Date.parse(candidate);
-  if (!Number.isNaN(parsedCandidate)) {
-    return parsedCandidate;
-  }
-  return undefined;
-};
 
 type CreateChoreParams = {
   title: string;
@@ -63,21 +48,18 @@ export const createChoreInDb = async (params: CreateChoreParams) => {
     familyId,
   });
 
-  const base = createdRow as Record<string, unknown>;
-  const normalized = {
-    ...base,
-    reward_points:
-      typeof base['reward_points'] === 'number' ? base['reward_points'] : 0,
-    start_date: toTimestamp(base['start_date']) ?? undefined,
-    due_date: toTimestamp(base['due_date']) ?? undefined,
-    recurrence_rule:
-      typeof base['recurrence_rule'] === 'string'
-        ? base['recurrence_rule']
-        : undefined,
-    created_at: toTimestamp(base['created_at']),
-    updated_at: toTimestamp(base['updated_at']),
-  };
-  return ChoreSchema.parse(normalized);
+  const CoercedChoreSchema = ChoreSchema.extend({
+    start_date: z.date(),
+    due_date: z.date(),
+    recurrence_rule: z
+      .union([z.string(), z.undefined(), z.null()])
+      .transform(value => (value == null || value === '' ? undefined : value))
+      .optional(),
+    created_at: z.date(),
+    updated_at: z.date(),
+  });
+
+  return CoercedChoreSchema.parse(createdRow);
 };
 
 export const assignChoreToUsers = async (

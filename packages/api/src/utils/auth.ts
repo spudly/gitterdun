@@ -29,9 +29,7 @@ const fetchSession = async (
     `,
     sessionId,
   );
-  return sessionRow !== undefined
-    ? SessionRowSchema.parse(sessionRow)
-    : undefined;
+  return SessionRowSchema.nullish().parse(sessionRow);
 };
 
 const validateSessionExpiry: (

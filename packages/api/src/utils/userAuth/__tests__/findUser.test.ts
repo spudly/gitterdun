@@ -10,10 +10,10 @@ describe('findUser utils', () => {
     getMock.mockReset();
   });
 
-  test('findUserByEmail returns undefined when db.get returns null', async () => {
+  test('findUserByEmail returns null when db.get returns null', async () => {
     getMock.mockReturnValueOnce(null);
     const result = await findUserByEmail('nosuch@example.com');
-    expect(result).toBeUndefined();
+    expect(result).toBeNull();
   });
 
   test('findUserByEmail returns undefined when db.get returns undefined', async () => {
@@ -22,10 +22,10 @@ describe('findUser utils', () => {
     expect(result).toBeUndefined();
   });
 
-  test('findUserByUsername returns undefined when db.get returns null', async () => {
+  test('findUserByUsername returns null when db.get returns null', async () => {
     getMock.mockReturnValueOnce(null);
     const result = await findUserByUsername('nosuchuser');
-    expect(result).toBeUndefined();
+    expect(result).toBeNull();
   });
 
   test('findUserByUsername returns undefined when db.get returns undefined', async () => {

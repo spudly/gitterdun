@@ -1,10 +1,14 @@
-import {ChoreWithUsernameSchema, CountRowSchema} from '@gitterdun/shared';
+import {
+  ChoreWithUsernameSchema,
+  OutgoingChoreWithUsernameSchema,
+  CountRowSchema,
+} from '@gitterdun/shared';
 import {z} from 'zod';
 import {all, get} from './crud/db.js';
 import {buildChoresQuery} from './choreQueryBuilders.js';
 import {DEFAULT_CHORE_PAGINATION_LIMIT} from '../constants.js';
 
-type ChoreWithUsername = z.infer<typeof ChoreWithUsernameSchema>;
+type ChoreWithUsername = z.infer<typeof OutgoingChoreWithUsernameSchema>;
 
 type PaginatedQueryParams = {
   baseQuery: string;
@@ -43,33 +47,6 @@ const getChoresCount = async (
   return total;
 };
 
-const toTimestamp = (value: unknown): number | undefined => {
-  if (typeof value !== 'string' || value.length === 0) {
-    return undefined;
-  }
-  const parsed = Date.parse(value);
-  if (!Number.isNaN(parsed)) {
-    return parsed;
-  }
-  const candidate = `${value.replace(' ', 'T')}Z`;
-  const parsedCandidate = Date.parse(candidate);
-  if (!Number.isNaN(parsedCandidate)) {
-    return parsedCandidate;
-  }
-  return undefined;
-};
-
-const requireTimestamp = (value: unknown, fieldName: string): number => {
-  const ts = toTimestamp(value);
-  if (ts == null) {
-    throw new Error(`Invalid or missing timestamp for ${fieldName}`);
-  }
-  return ts;
-};
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null;
-
 const buildPaginatedChoresQuery = ({
   baseQuery,
   params: queryParams,
@@ -85,32 +62,51 @@ const buildPaginatedChoresQuery = ({
   return {finalQuery, finalParams};
 };
 
+// Schema for parsing database rows with legacy field support and coercion
+const DatabaseChoreWithUsernameSchema = ChoreWithUsernameSchema.extend({
+  // Handle legacy point_reward field
+  reward_points: z.coerce
+    .number()
+    .optional()
+    .transform(val => val ?? 0),
+  point_reward: z.coerce.number().optional(),
+  // Handle string dates from legacy data, nulls, and existing Date objects
+  start_date: z
+    .union([
+      z.date(),
+      z.string().transform(str => new Date(str)),
+      z.null().transform(() => undefined),
+    ])
+    .optional(),
+  due_date: z
+    .union([
+      z.date(),
+      z.string().transform(str => new Date(str)),
+      z.null().transform(() => undefined),
+    ])
+    .optional(),
+  created_at: z.union([z.date(), z.string().transform(str => new Date(str))]),
+  updated_at: z.union([z.date(), z.string().transform(str => new Date(str))]),
+  recurrence_rule: z
+    .union([z.string(), z.null().transform(() => undefined)])
+    .optional(),
+}).transform(data => ({
+  ...data,
+  // Use point_reward as fallback for reward_points if needed
+  reward_points: data.point_reward ?? data.reward_points,
+  // Remove the legacy field
+  point_reward: undefined,
+}));
+
 const executeChoresQuery = async (
   query: string,
   params: Array<string | number>,
 ): Promise<Array<ChoreWithUsername>> => {
   const chores = (await all(query, ...params)) as Array<unknown>;
   return chores.map(raw => {
-    const base: Record<string, unknown> = isRecord(raw) ? raw : {};
-    const normalized = {
-      ...base,
-      // status omitted; derived elsewhere if needed
-      reward_points:
-        typeof base['reward_points'] === 'number'
-          ? base['reward_points']
-          : typeof base['point_reward'] === 'number'
-            ? base['point_reward']
-            : 0,
-      start_date: toTimestamp(base['start_date']) ?? undefined,
-      due_date: toTimestamp(base['due_date']) ?? undefined,
-      recurrence_rule:
-        typeof base['recurrence_rule'] === 'string'
-          ? base['recurrence_rule']
-          : undefined,
-      created_at: requireTimestamp(base['created_at'], 'created_at'),
-      updated_at: requireTimestamp(base['updated_at'], 'updated_at'),
-    };
-    return ChoreWithUsernameSchema.parse(normalized);
+    // Parse with database schema (handles legacy data) then transform to outgoing format
+    const choreInternal = DatabaseChoreWithUsernameSchema.parse(raw);
+    return OutgoingChoreWithUsernameSchema.parse(choreInternal);
   });
 };
 

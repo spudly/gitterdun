@@ -2,6 +2,7 @@ export * from './user.js';
 export * from './auth.js';
 export * from './family.js';
 export * from './chore.js';
+export * from './recurrence.js';
 export * from './choreAssignment.js';
 export * from './goal.js';
 export * from './badge.js';

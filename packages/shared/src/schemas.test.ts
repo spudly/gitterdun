@@ -28,8 +28,8 @@ describe('user schemas', () => {
       role: 'user' as const,
       points: 100,
       streak_count: 5,
-      created_at: '2024-01-01 10:00:00',
-      updated_at: '2024-01-01 10:00:00',
+      created_at: new Date('2024-01-01T10:00:00.000Z'),
+      updated_at: new Date('2024-01-01T10:00:00.000Z'),
     };
 
     const result = UserSchema.safeParse(validUser);
@@ -44,8 +44,8 @@ describe('user schemas', () => {
       role: 'user' as const,
       points: 100,
       streak_count: 5,
-      created_at: '2024-01-01 10:00:00',
-      updated_at: '2024-01-01 10:00:00',
+      created_at: new Date('2024-01-01T10:00:00.000Z'),
+      updated_at: new Date('2024-01-01T10:00:00.000Z'),
     };
 
     const result = UserSchema.safeParse(invalidUser);
@@ -94,12 +94,12 @@ describe('chore schemas', () => {
       title: 'Take out trash',
       reward_points: 10,
       penalty_points: 0,
-      start_date: Date.parse('2024-01-01T09:00:00.000Z'),
+      start_date: new Date('2024-01-01T09:00:00.000Z'),
       chore_type: 'required',
       // status omitted on core chore definition
       created_by: 1,
-      created_at: Date.parse('2024-01-01T10:00:00.000Z'),
-      updated_at: Date.parse('2024-01-01T10:00:00.000Z'),
+      created_at: new Date('2024-01-01T10:00:00.000Z'),
+      updated_at: new Date('2024-01-01T10:00:00.000Z'),
     };
 
     const result = ChoreSchema.safeParse(validChore);
@@ -116,8 +116,8 @@ describe('chore schemas', () => {
       chore_type: 'invalid-type',
       // status omitted on core chore definition
       created_by: 1,
-      created_at: Date.parse('2024-01-01T10:00:00.000Z'),
-      updated_at: Date.parse('2024-01-01T10:00:00.000Z'),
+      created_at: new Date('2024-01-01T10:00:00.000Z'),
+      updated_at: new Date('2024-01-01T10:00:00.000Z'),
     };
 
     const result = ChoreSchema.safeParse(invalidChore);
@@ -175,8 +175,8 @@ describe('goal schemas', () => {
       target_points: 100,
       current_points: 0,
       status: 'active',
-      created_at: '2024-01-01T10:00:00.000Z',
-      updated_at: '2024-01-01T10:00:00.000Z',
+      created_at: new Date('2024-01-01T10:00:00.000Z'),
+      updated_at: new Date('2024-01-01T10:00:00.000Z'),
     };
 
     const result = GoalSchema.safeParse(validGoal);
@@ -190,8 +190,8 @@ describe('goal schemas', () => {
       title: 'Earn 100 points',
       target_points: 100,
       status: 'invalid-status',
-      created_at: '2024-01-01T10:00:00.000Z',
-      updated_at: '2024-01-01T10:00:00.000Z',
+      created_at: new Date('2024-01-01T10:00:00.000Z'),
+      updated_at: new Date('2024-01-01T10:00:00.000Z'),
     };
 
     const result = GoalSchema.safeParse(invalidGoal);
@@ -250,8 +250,8 @@ describe('response schemas', () => {
         role: 'user' as const,
         points: 100,
         streak_count: 5,
-        created_at: '2024-01-01 10:00:00',
-        updated_at: '2024-01-01 10:00:00',
+        created_at: new Date('2024-01-01T10:00:00.000Z'),
+        updated_at: new Date('2024-01-01T10:00:00.000Z'),
       },
     };
 
@@ -279,8 +279,8 @@ describe('response schemas', () => {
           role: 'user' as const,
           points: 100,
           streak_count: 5,
-          created_at: '2024-01-01 10:00:00',
-          updated_at: '2024-01-01 10:00:00',
+          created_at: new Date('2024-01-01T10:00:00.000Z'),
+          updated_at: new Date('2024-01-01T10:00:00.000Z'),
         },
       ],
       pagination: {page: 1, limit: 20, total: 1, totalPages: 1},
@@ -299,7 +299,7 @@ describe('notification schema', () => {
       title: 'Chore Due',
       message: 'Your chore is due soon',
       type: 'chore_due' as const,
-      created_at: '2024-01-01T10:00:00.000Z',
+      created_at: new Date('2024-01-01T10:00:00.000Z'),
     };
 
     const result = NotificationSchema.safeParse(validNotification);
@@ -324,7 +324,7 @@ describe('notification schema', () => {
         title: 'Test',
         message: 'Test message',
         type,
-        created_at: '2024-01-01T10:00:00.000Z',
+        created_at: new Date('2024-01-01T10:00:00.000Z'),
       };
 
       const result = NotificationSchema.safeParse(notification);
@@ -339,7 +339,7 @@ describe('family schema', () => {
       id: 1,
       name: 'Test Family',
       owner_id: 1,
-      created_at: '2024-01-01 10:00:00',
+      created_at: new Date('2024-01-01T10:00:00.000Z'),
     };
 
     const result = FamilySchema.safeParse(validFamily);
@@ -351,7 +351,7 @@ describe('family schema', () => {
       id: 1,
       name: '',
       owner_id: 1,
-      created_at: '2024-01-01 10:00:00',
+      created_at: new Date('2024-01-01T10:00:00.000Z'),
     };
 
     const result = FamilySchema.safeParse(invalidFamily);

@@ -6,7 +6,12 @@ import * as crudDb from './crud/db.js';
 jest.mock('./crud/db.js', () => ({
   __esModule: true,
   run: jest.fn(),
-  get: jest.fn(() => ({id: 1, name: 'Fam', owner_id: 1, created_at: ''})),
+  get: jest.fn(() => ({
+    id: 1,
+    name: 'Fam',
+    owner_id: 1,
+    created_at: new Date(),
+  })),
   all: jest.fn(() => []),
 }));
 

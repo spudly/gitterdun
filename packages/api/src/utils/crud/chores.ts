@@ -8,13 +8,13 @@ const ChoreRowSchema = z.object({
   description: z.string().nullable(),
   reward_points: z.number().nullable().optional(),
   penalty_points: z.number().nullable().optional(),
-  start_date: z.any().optional(),
-  due_date: z.any().nullable().optional(),
+  start_date: z.date().nullable().optional(),
+  due_date: z.date().nullable().optional(),
   recurrence_rule: z.string().nullable().optional(),
   chore_type: z.string(),
   created_by: z.number(),
-  created_at: z.any(),
-  updated_at: z.any(),
+  created_at: z.date(),
+  updated_at: z.date(),
   created_by_username: z.string().nullable().optional(),
 });
 

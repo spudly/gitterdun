@@ -5,12 +5,31 @@ import {
   MAX_USERNAME_LENGTH,
 } from '../constants.js';
 
+// Base schema - uses Date objects for internal processing
 export const FamilySchema = z.object({
   id: z.number(),
   name: z.string().min(1).max(MAX_NAME_LENGTH),
   owner_id: z.number(),
   timezone: z.string().optional(),
-  created_at: z.string(),
+  created_at: z.date(),
+});
+
+// Outgoing schema - transforms dates to timestamps for API requests
+export const OutgoingFamilySchema = z.object({
+  ...FamilySchema.shape,
+  created_at: z.date().transform(date => date.getTime()),
+});
+
+// Incoming schema - transforms timestamps to dates from API responses
+export const IncomingFamilySchema = z.object({
+  id: z.number(),
+  name: z.string().min(1).max(MAX_NAME_LENGTH),
+  owner_id: z.number(),
+  timezone: z.string().optional(),
+  created_at: z
+    .number()
+    .int()
+    .transform(timestamp => new Date(timestamp)),
 });
 
 export const CreateFamilySchema = z.object({
@@ -51,6 +70,8 @@ export const UpdateFamilyTimezoneSchema = z.object({
 });
 
 export type Family = z.infer<typeof FamilySchema>;
+export type OutgoingFamily = z.infer<typeof OutgoingFamilySchema>;
+export type IncomingFamily = z.infer<typeof IncomingFamilySchema>;
 export type CreateFamily = z.infer<typeof CreateFamilySchema>;
 export type FamilyMember = z.infer<typeof FamilyMemberSchema>;
 export type CreateChild = z.infer<typeof CreateChildSchema>;

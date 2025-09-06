@@ -1,5 +1,5 @@
 import type {FC} from 'react';
-import type {ChoreWithUsername} from '@gitterdun/shared';
+import type {IncomingChoreWithUsername} from '@gitterdun/shared';
 import {GridContainer} from '../../widgets/GridContainer.js';
 import {StatCard} from '../../widgets/StatCard.js';
 import {
@@ -9,7 +9,7 @@ import {
   SparklesIcon,
 } from '../../widgets/icons/index.js';
 
-type AdminStatsProps = {readonly chores: Array<ChoreWithUsername>};
+type AdminStatsProps = {readonly chores: Array<IncomingChoreWithUsername>};
 
 export const AdminStats: FC<AdminStatsProps> = ({chores}) => {
   return (
@@ -27,7 +27,7 @@ export const AdminStats: FC<AdminStatsProps> = ({chores}) => {
         label="Pending Approval"
         value={
           chores.filter(
-            (chore: ChoreWithUsername) => chore.status === 'completed',
+            (chore: IncomingChoreWithUsername) => chore.status === 'completed',
           ).length
         }
       />
@@ -38,7 +38,7 @@ export const AdminStats: FC<AdminStatsProps> = ({chores}) => {
         label="Approved"
         value={
           chores.filter(
-            (chore: ChoreWithUsername) => chore.status === 'approved',
+            (chore: IncomingChoreWithUsername) => chore.status === 'approved',
           ).length
         }
       />
@@ -49,7 +49,7 @@ export const AdminStats: FC<AdminStatsProps> = ({chores}) => {
         label="Bonus Chores"
         value={
           chores.filter(
-            (chore: ChoreWithUsername) => chore.chore_type === 'bonus',
+            (chore: IncomingChoreWithUsername) => chore.chore_type === 'bonus',
           ).length
         }
       />

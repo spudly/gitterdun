@@ -7,7 +7,7 @@ type UserWithPasswordRow = z.infer<typeof UserWithPasswordRowSchema>;
 
 export const findUserByEmail = async (
   email: string,
-): Promise<UserWithPasswordRow | undefined> => {
+): Promise<UserWithPasswordRow | null | undefined> => {
   const userRow = await get(
     sql`
       SELECT
@@ -27,15 +27,12 @@ export const findUserByEmail = async (
     `,
     email,
   );
-  if (userRow == null) {
-    return undefined;
-  }
-  return UserWithPasswordRowSchema.parse(userRow);
+  return UserWithPasswordRowSchema.nullish().parse(userRow);
 };
 
 export const findUserByUsername = async (
   username: string,
-): Promise<UserWithPasswordRow | undefined> => {
+): Promise<UserWithPasswordRow | null | undefined> => {
   const userRow = await get(
     sql`
       SELECT
@@ -55,8 +52,5 @@ export const findUserByUsername = async (
     `,
     username,
   );
-  if (userRow == null) {
-    return undefined;
-  }
-  return UserWithPasswordRowSchema.parse(userRow);
+  return UserWithPasswordRowSchema.nullish().parse(userRow);
 };

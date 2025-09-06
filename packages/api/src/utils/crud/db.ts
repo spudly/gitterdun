@@ -1,19 +1,8 @@
 import {pgQuery} from '../../lib/pgClient.js';
 import {z} from 'zod';
 
-const normalizeRowValues = (
-  row: Record<string, unknown>,
-): Record<string, unknown> => {
-  const out: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(row)) {
-    if (value instanceof Date) {
-      out[key] = value.toISOString();
-    } else {
-      out[key] = value;
-    }
-  }
-  return out;
-};
+// Date/timestamp columns are now automatically parsed as Date objects by types.setTypeParser
+// No need for manual normalization since we want to keep them as Date objects
 
 // (no-op placeholder for potential SQL value escaping removed)
 
@@ -42,24 +31,20 @@ export const run = async (
   return {changes: 0};
 };
 
-export const get = async (
-  query: string,
-  ...params: Array<unknown>
-): Promise<Record<string, unknown> | undefined> => {
-  const {text} = toPgPlaceholders(query);
-  const res = await pgQuery(text, params);
-  const [first] = res.rows;
-  return first ? normalizeRowValues(first) : undefined;
-};
-
 export const all = async (
   query: string,
   ...params: Array<unknown>
 ): Promise<Array<Record<string, unknown>>> => {
   const {text} = toPgPlaceholders(query);
   const res = await pgQuery(text, params);
-  return res.rows.map(row => normalizeRowValues(row));
+  return res.rows;
 };
+
+export const get = async (
+  query: string,
+  ...params: Array<unknown>
+): Promise<Record<string, unknown> | undefined> =>
+  (await all(query, ...params)).at(0);
 
 export const pragma = (_pragmaCommand: string): void => {
   // No-op in Postgres-only mode

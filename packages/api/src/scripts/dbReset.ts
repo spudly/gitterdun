@@ -1,10 +1,11 @@
+import {addDays, addHours} from 'date-fns';
 import {initializeDatabase} from '../lib/initDb.js';
 import {logger} from '../utils/logger.js';
 import {dropAllTables} from '../utils/dbMaintenance.js';
 import {createFamily, addChildToFamily} from '../utils/familyOperations.js';
 import {createNewUser} from '../utils/userAuth/createNewUser.js';
 import {createChoreInDb, assignChoreToUsers} from '../utils/choreCrud.js';
-import {ONE_DAY_MS, ONE_HOUR_MS} from '@gitterdun/shared';
+import {ONE_HOUR_MS} from '@gitterdun/shared';
 
 const seedSampleData = async (): Promise<void> => {
   // Users (using existing helper)
@@ -35,9 +36,9 @@ const seedSampleData = async (): Promise<void> => {
   );
 
   // Chores
-  const now = Date.now();
-  const startIso = new Date(now + ONE_HOUR_MS).toISOString();
-  const dueIso = new Date(now + ONE_DAY_MS).toISOString();
+  const nowDate = new Date();
+  const startIso = addHours(nowDate, 1).toISOString();
+  const dueIso = addDays(nowDate, 1).toISOString();
 
   const trash = await createChoreInDb({
     title: 'Take out trash',

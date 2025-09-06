@@ -5,7 +5,8 @@ import {z} from 'zod';
 import {get, run} from './crud/db.js';
 import {sql} from './sql.js';
 import {getCookie} from './cookieUtils.js';
-import {SECURE_TOKEN_BYTES, SESSION_EXPIRATION_MS} from '../constants.js';
+import {SECURE_TOKEN_BYTES, SESSION_EXPIRATION_DAYS} from '../constants.js';
+import {addDays, isPast} from 'date-fns';
 
 type User = z.infer<typeof UserSchema>;
 
@@ -13,8 +14,7 @@ export const createSession = async (
   userId: number,
 ): Promise<{sessionId: string; expiresAt: Date}> => {
   const sessionId = crypto.randomBytes(SECURE_TOKEN_BYTES).toString('hex');
-  const now = new Date();
-  const expiresAt = new Date(now.getTime() + SESSION_EXPIRATION_MS);
+  const expiresAt = addDays(new Date(), SESSION_EXPIRATION_DAYS);
 
   await run(
     sql`
@@ -25,7 +25,7 @@ export const createSession = async (
     `,
     sessionId,
     userId,
-    expiresAt.toISOString(),
+    expiresAt.getTime(), // Pass timestamp, will be converted to Date by pgClient
   );
 
   return {sessionId, expiresAt};
@@ -46,10 +46,7 @@ const fetchSessionFromDb = async (
     `,
     sessionId,
   );
-  if (sessionRow == null) {
-    return undefined;
-  }
-  return SessionRowSchema.parse(sessionRow);
+  return SessionRowSchema.nullish().parse(sessionRow);
 };
 
 const removeExpiredSession = async (sessionId: string): Promise<void> => {
@@ -64,10 +61,10 @@ const removeExpiredSession = async (sessionId: string): Promise<void> => {
 };
 
 const validateSessionExpiry = async (
-  session: {expires_at: string},
+  session: z.infer<typeof SessionRowSchema>,
   sessionId: string,
 ): Promise<boolean> => {
-  if (new Date(session.expires_at).getTime() < Date.now()) {
+  if (isPast(session.expires_at)) {
     await removeExpiredSession(sessionId);
     return false;
   }
@@ -91,7 +88,7 @@ const validateSession = async (
 };
 
 const getUserById = async (userId: number): Promise<User | null> => {
-  const user = await get(
+  const userRow = await get(
     sql`
       SELECT
         id,
@@ -111,7 +108,7 @@ const getUserById = async (userId: number): Promise<User | null> => {
     `,
     userId,
   );
-  return user === undefined ? null : UserSchema.parse(user);
+  return UserSchema.nullish().parse(userRow);
 };
 
 export const getUserFromSession = async (
