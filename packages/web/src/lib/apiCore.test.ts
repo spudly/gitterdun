@@ -1,5 +1,5 @@
 import {afterEach, describe, expect, jest, test} from '@jest/globals';
-import {buildUrlWithParams} from './apiCore';
+import {buildUrlWithParams} from './apiCore.js';
 
 describe('buildUrlWithParams', () => {
   const originalFetch = global.fetch;

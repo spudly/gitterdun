@@ -1,5 +1,5 @@
-import type {LiteralNode} from './astTypes';
-import {isObjectRecord} from './isObjectRecord';
+import type {LiteralNode} from './astTypes.js';
+import {isObjectRecord} from './isObjectRecord.js';
 
 export const isLiteralNode = (value: unknown): value is LiteralNode => {
   return (

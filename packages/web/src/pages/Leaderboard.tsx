@@ -13,7 +13,7 @@ import {
   SILVER_RANK,
   BRONZE_RANK,
   GOLD_RANK,
-} from '../constants';
+} from '../constants.js';
 
 const Leaderboard: FC = () => {
   const intl = useIntl();

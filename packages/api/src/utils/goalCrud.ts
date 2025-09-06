@@ -1,6 +1,6 @@
 import {GoalSchema} from '@gitterdun/shared';
-import {get, run} from './crud/db';
-import {sql} from './sql';
+import {get, run} from './crud/db.js';
+import {sql} from './sql.js';
 
 export const createGoalInDatabase = async (
   title: string,

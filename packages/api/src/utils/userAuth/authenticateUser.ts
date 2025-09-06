@@ -1,7 +1,7 @@
 import {z} from 'zod';
 import {UserWithPasswordRowSchema} from '@gitterdun/shared';
 import bcrypt from 'bcryptjs';
-import {findUserByEmail, findUserByUsername} from './findUser';
+import {findUserByEmail, findUserByUsername} from './findUser.js';
 
 type UserWithPasswordRow = z.infer<typeof UserWithPasswordRowSchema>;
 

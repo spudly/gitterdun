@@ -1,7 +1,7 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {List} from './List';
-import {ListRow} from './ListRow';
+import {List} from './List.js';
+import {ListRow} from './ListRow.js';
 
 describe('list & ListRow', () => {
   test('renders list row content', () => {

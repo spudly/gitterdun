@@ -1,7 +1,7 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {createWrapper} from '../test/createWrapper';
-import {TrophyIcon} from './icons';
+import {createWrapper} from '../test/createWrapper.js';
+import {TrophyIcon} from './icons/index.js';
 
 describe('trophyIcon', () => {
   test('renders an svg', () => {

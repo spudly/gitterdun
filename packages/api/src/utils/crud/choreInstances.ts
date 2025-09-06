@@ -1,5 +1,5 @@
-import {run} from './db';
-import {sql} from '../sql';
+import {run} from './db.js';
+import {sql} from '../sql.js';
 
 export const upsertChoreInstance = async (
   choreId: number,

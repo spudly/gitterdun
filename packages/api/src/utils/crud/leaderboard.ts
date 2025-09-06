@@ -1,4 +1,4 @@
-import {all} from './db';
+import {all} from './db.js';
 
 export const getLeaderboard = async (
   query: string,

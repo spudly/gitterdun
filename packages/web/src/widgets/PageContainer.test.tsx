@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {PageContainer} from './PageContainer';
+import {PageContainer} from './PageContainer.js';
 
 describe('pageContainer', () => {
   test('renders variants', () => {

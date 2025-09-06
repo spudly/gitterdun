@@ -1,8 +1,8 @@
 import {ChoreWithUsernameSchema, CountRowSchema} from '@gitterdun/shared';
 import {z} from 'zod';
-import {all, get} from './crud/db';
-import {buildChoresQuery} from './choreQueryBuilders';
-import {DEFAULT_CHORE_PAGINATION_LIMIT} from '../constants';
+import {all, get} from './crud/db.js';
+import {buildChoresQuery} from './choreQueryBuilders.js';
+import {DEFAULT_CHORE_PAGINATION_LIMIT} from '../constants.js';
 
 type ChoreWithUsername = z.infer<typeof ChoreWithUsernameSchema>;
 

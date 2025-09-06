@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {PageLoading} from './PageLoading';
+import {PageLoading} from './PageLoading.js';
 
 describe('pageLoading', () => {
   test('renders message and default', () => {

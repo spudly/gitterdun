@@ -2,18 +2,18 @@ import type {
   RequestWithParams,
   TypedResponse,
   RequestDefault,
-} from '../types/http';
+} from '../types/http.js';
 import {IdParamSchema, UserSchema, asError} from '@gitterdun/shared';
 import {StatusCodes} from 'http-status-codes';
 // zod import removed; using shared IdParamSchema
-import {logger} from '../utils/logger';
-import {requireAdmin} from './usersAuth';
+import {logger} from '../utils/logger.js';
+import {requireAdmin} from './usersAuth.js';
 import {
   clearChoresCreatedBy,
   deleteInvitationsByInviter,
   deleteUserById,
   listUsers,
-} from '../utils/crud/users';
+} from '../utils/crud/users.js';
 
 export const listUsersHandler = async (
   req: RequestDefault,

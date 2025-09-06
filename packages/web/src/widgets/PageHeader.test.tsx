@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {PageHeader} from './PageHeader';
+import {PageHeader} from './PageHeader.js';
 
 describe('pageHeader', () => {
   test('renders title, subtitle and actions', () => {

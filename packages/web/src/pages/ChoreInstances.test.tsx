@@ -1,7 +1,7 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {createWrapper} from '../test/createWrapper';
+import {createWrapper} from '../test/createWrapper.js';
 
 jest.mock('../hooks/useUser', () => ({
   useUser: jest.fn(() => ({user: {id: 1, role: 'user'}})),
@@ -35,7 +35,7 @@ jest.mock('../lib/api', () => {
 
 describe('/chores page - chore instances list', () => {
   test('defaults to hide completed and can toggle to show', async () => {
-    const Page = (await import('./Chores')).default; // will render instances list now
+    const Page = (await import('./Chores.js')).default; // will render instances list now
     const user = userEvent.setup();
     render(<Page />, {
       wrapper: createWrapper({i18n: true, queryClient: true, router: true}),

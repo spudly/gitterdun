@@ -9,7 +9,7 @@ import {
   handleAssignChore,
   handleApproveChore,
   handleRejectChore,
-} from './choreHandlers';
+} from './choreHandlers.js';
 
 // eslint-disable-next-line new-cap -- express.Router() is a factory function
 const router = express.Router();

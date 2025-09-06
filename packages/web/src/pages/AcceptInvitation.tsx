@@ -11,7 +11,7 @@ import {Button} from '../widgets/Button.js';
 import {Alert} from '../widgets/Alert.js';
 import {Stack} from '../widgets/Stack.js';
 import {useToast} from '../widgets/ToastProvider.js';
-import {ACCEPT_INVITATION_REDIRECT_DELAY} from '../constants';
+import {ACCEPT_INVITATION_REDIRECT_DELAY} from '../constants.js';
 
 type InvitationSubmitParams = {
   token: string;

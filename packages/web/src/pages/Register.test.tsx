@@ -1,9 +1,9 @@
 import {beforeEach, describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {createWrapper} from '../test/createWrapper';
-import * as useUserModule from '../hooks/useUser';
-import Register from './Register';
+import {createWrapper} from '../test/createWrapper.js';
+import * as useUserModule from '../hooks/useUser.js';
+import Register from './Register.js';
 
 type UseUserReturn = ReturnType<typeof useUserModule.useUser>;
 
@@ -30,7 +30,7 @@ const createUseUserMock = (
   ...overrides,
 });
 
-jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
+jest.mock<typeof import('../hooks/useUser.js')>('../hooks/useUser', () => ({
   useUser: jest.fn(() => createUseUserMock()),
 }));
 

@@ -41,7 +41,7 @@
       "outputs": ["coverage/**"]
     },
     "start:dev": {"dependsOn": ["^build"], "cache": false, "persistent": true},
-    "check:types": {"dependsOn": ["^build"], "cache": false},
+    "check:ts": {"dependsOn": ["^build"], "cache": false},
     "//#check:prettier": {"cache": false},
     "//#knip": {
       "inputs": [

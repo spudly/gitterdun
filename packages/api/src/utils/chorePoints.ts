@@ -1,7 +1,7 @@
 import {ChoreSchema} from '@gitterdun/shared';
 import {z} from 'zod';
-import {sql} from './sql';
-import {get, run} from './crud/db';
+import {sql} from './sql.js';
+import {get, run} from './crud/db.js';
 
 type Chore = z.infer<typeof ChoreSchema>;
 

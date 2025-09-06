@@ -1,10 +1,10 @@
 import {FamilySchema, IdRowSchema} from '@gitterdun/shared';
 import type {Family} from '@gitterdun/shared';
 import bcrypt from 'bcryptjs';
-import {get, run} from './crud/db';
-import {sql} from './sql';
-import {removeAllMembershipsForUser} from './familyMembership';
-import {BCRYPT_SALT_ROUNDS} from '../constants';
+import {get, run} from './crud/db.js';
+import {sql} from './sql.js';
+import {removeAllMembershipsForUser} from './familyMembership.js';
+import {BCRYPT_SALT_ROUNDS} from '../constants.js';
 
 export const createFamily = async (
   name: string,

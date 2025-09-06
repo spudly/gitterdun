@@ -15,11 +15,11 @@ import {
   LeaderboardEntrySchema,
   asError,
 } from '@gitterdun/shared';
-import leaderboardRouter from './leaderboard';
-import * as crudDb from '../utils/crud/db';
-import {setupErrorHandling} from '../middleware/errorHandler';
-import {logger} from '../utils/logger';
-import {requireUserId} from '../utils/auth';
+import leaderboardRouter from './leaderboard.js';
+import * as crudDb from '../utils/crud/db.js';
+import {setupErrorHandling} from '../middleware/errorHandler.js';
+import {logger} from '../utils/logger.js';
+import {requireUserId} from '../utils/auth.js';
 
 // Mock dependencies
 jest.mock('../utils/crud/db', () => ({__esModule: true, all: jest.fn()}));

@@ -1,5 +1,5 @@
 import {describe, expect, test} from '@jest/globals';
-import {isObjectRecord} from './isObjectRecord';
+import {isObjectRecord} from './isObjectRecord.js';
 
 describe('isObjectRecord', () => {
   test('returns true for plain object', () => {

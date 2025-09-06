@@ -1,4 +1,4 @@
-import {MAX_SLUG_LENGTH, SRC_PREFIX_LENGTH} from '../constants';
+import {MAX_SLUG_LENGTH, SRC_PREFIX_LENGTH} from '../constants.js';
 
 export const slugifyDefaultMessage = (defaultMessage: string): string => {
   return defaultMessage

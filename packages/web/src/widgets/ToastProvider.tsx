@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react';
 import {Alert} from './Alert.js';
-import {TOAST_TIMEOUT_DURATION} from '../constants';
+import {TOAST_TIMEOUT_DURATION} from '../constants.js';
 
 type ToastVariant = 'success' | 'error' | 'info' | 'warning';
 

@@ -1,8 +1,8 @@
 import bcrypt from 'bcryptjs';
-import {get} from '../crud/db';
-import {sql} from '../sql';
+import {get} from '../crud/db.js';
+import {sql} from '../sql.js';
 import {UserSchema} from '@gitterdun/shared';
-import {BCRYPT_SALT_ROUNDS} from '../../constants';
+import {BCRYPT_SALT_ROUNDS} from '../../constants.js';
 
 type CreateUserParams = {
   username: string;

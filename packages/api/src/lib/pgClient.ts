@@ -1,7 +1,7 @@
 import {Pool} from 'pg';
 import type {PoolClient, QueryResult} from 'pg';
 import {AsyncLocalStorage} from 'node:async_hooks';
-import {getPostgresUrl} from '../utils/env';
+import {getPostgresUrl} from '../utils/env.js';
 
 let pool: Pool | null = null;
 

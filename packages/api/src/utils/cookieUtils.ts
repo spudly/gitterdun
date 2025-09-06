@@ -1,4 +1,4 @@
-import type {RequestDefault, TypedResponse} from '../types/http';
+import type {RequestDefault, TypedResponse} from '../types/http.js';
 
 const parseCookieString = (cookieString: string): Record<string, string> => {
   return cookieString

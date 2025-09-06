@@ -1,7 +1,7 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {createWrapper} from '../test/createWrapper';
-import Landing from './Landing';
+import {createWrapper} from '../test/createWrapper.js';
+import Landing from './Landing.js';
 
 describe('landing page', () => {
   test('shows welcome copy and CTA links', () => {

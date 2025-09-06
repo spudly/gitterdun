@@ -17,9 +17,9 @@ import {
   CountRowSchema,
   IdParamSchema,
 } from '@gitterdun/shared';
-import goalsRouter from './goals';
-import * as crudDb from '../utils/crud/db';
-import {setupErrorHandling} from '../middleware/errorHandler';
+import goalsRouter from './goals.js';
+import * as crudDb from '../utils/crud/db.js';
+import {setupErrorHandling} from '../middleware/errorHandler.js';
 
 // Mock dependencies
 jest.mock('../utils/crud/db', () => ({

@@ -1,7 +1,7 @@
 import {GoalQuerySchema, GoalSchema, CountRowSchema} from '@gitterdun/shared';
 import {z} from 'zod';
-import {all, get} from './crud/db';
-import {sql} from './sql';
+import {all, get} from './crud/db.js';
+import {sql} from './sql.js';
 
 type Goal = z.infer<typeof GoalSchema>;
 

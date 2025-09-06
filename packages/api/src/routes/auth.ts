@@ -3,7 +3,7 @@ import type {
   RequestWithBody,
   TypedResponse,
   RequestDefault,
-} from '../types/http';
+} from '../types/http.js';
 import {StatusCodes} from 'http-status-codes';
 import type {
   Login,
@@ -16,24 +16,24 @@ import {
   ResetPasswordSchema,
   asError,
 } from '@gitterdun/shared';
-import {logger} from '../utils/logger';
+import {logger} from '../utils/logger.js';
 
-import {getCookie} from '../utils/cookieUtils';
-import {getUserFromSession, deleteSession} from '../utils/sessionUtils';
+import {getCookie} from '../utils/cookieUtils.js';
+import {getUserFromSession, deleteSession} from '../utils/sessionUtils.js';
 import {
   authenticateUser,
   createLoginSession,
   prepareLoginResponse,
   validateRegistrationData,
   createNewUser,
-} from '../utils/userAuthUtils';
+} from '../utils/userAuthUtils.js';
 import {
   findUserForReset,
   getSecuritySafeResponse,
   handlePasswordResetRequest,
   validateResetToken,
   resetUserPassword,
-} from '../utils/passwordResetUtils';
+} from '../utils/passwordResetUtils.js';
 
 // eslint-disable-next-line new-cap -- express.Router() is a factory function
 const router = express.Router();

@@ -1,11 +1,11 @@
 import type {Rule} from 'eslint';
 import type {TSESTree} from '@typescript-eslint/types';
-import type {LiteralNode} from './utils/astTypes';
-import {isObjectRecord} from './utils/isObjectRecord';
-import {isLiteralNode} from './utils/isLiteralNode';
-import {isJSXExpressionContainerNode} from './utils/isJSXExpressionContainerNode';
-import {isTemplateLiteralNode} from './utils/isTemplateLiteralNode';
-import {hasTailwindMarginClasses} from './utils/hasTailwindMarginClasses';
+import type {LiteralNode} from './utils/astTypes.js';
+import {isObjectRecord} from './utils/isObjectRecord.js';
+import {isLiteralNode} from './utils/isLiteralNode.js';
+import {isJSXExpressionContainerNode} from './utils/isJSXExpressionContainerNode.js';
+import {isTemplateLiteralNode} from './utils/isTemplateLiteralNode.js';
+import {hasTailwindMarginClasses} from './utils/hasTailwindMarginClasses.js';
 
 // margin class detection is implemented in utils/hasTailwindMarginClasses
 

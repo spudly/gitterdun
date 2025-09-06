@@ -1,8 +1,8 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import Chores from './Chores';
-import {createWrapper} from '../test/createWrapper';
+import Chores from './Chores.js';
+import {createWrapper} from '../test/createWrapper.js';
 
 const mockInvalidate = jest.fn();
 jest.mock('@tanstack/react-query', () => {
@@ -72,7 +72,7 @@ describe('chores page', () => {
     await expect(screen.findByText('Chores')).resolves.toBeInTheDocument();
     const completeBtn = await screen.findByRole('button', {name: 'Complete'});
     await user.click(completeBtn);
-    const {choreInstancesApi} = jest.mocked(await import('../lib/api'));
+    const {choreInstancesApi} = jest.mocked(await import('../lib/api.js'));
     expect(choreInstancesApi.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         chore_id: 1,

@@ -1,6 +1,6 @@
 import {describe, expect, jest, test} from '@jest/globals';
-import * as findUser from '../findUser';
-import {authenticateUser} from '../authenticateUser';
+import * as findUser from '../findUser.js';
+import {authenticateUser} from '../authenticateUser.js';
 jest.mock('../findUser');
 
 describe('authenticateUser', () => {

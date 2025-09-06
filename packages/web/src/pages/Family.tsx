@@ -8,7 +8,7 @@ import {GridContainer} from '../widgets/GridContainer.js';
 import {Stack} from '../widgets/Stack.js';
 import {TextInput} from '../widgets/TextInput.js';
 import {Button} from '../widgets/Button.js';
-import {useUser} from '../hooks/useUser';
+import {useUser} from '../hooks/useUser.js';
 import {FamilyMembers} from './family/FamilyMembers.js';
 import {FamilyChores} from './family/FamilyChores.js';
 // forms now rendered inside FamilyMembers

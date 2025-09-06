@@ -1,9 +1,9 @@
-import {initializeDatabase} from '../lib/initDb';
-import {logger} from '../utils/logger';
-import {dropAllTables} from '../utils/dbMaintenance';
-import {createFamily, addChildToFamily} from '../utils/familyOperations';
-import {createNewUser} from '../utils/userAuth/createNewUser';
-import {createChoreInDb, assignChoreToUsers} from '../utils/choreCrud';
+import {initializeDatabase} from '../lib/initDb.js';
+import {logger} from '../utils/logger.js';
+import {dropAllTables} from '../utils/dbMaintenance.js';
+import {createFamily, addChildToFamily} from '../utils/familyOperations.js';
+import {createNewUser} from '../utils/userAuth/createNewUser.js';
+import {createChoreInDb, assignChoreToUsers} from '../utils/choreCrud.js';
 import {ONE_DAY_MS, ONE_HOUR_MS} from '@gitterdun/shared';
 
 const seedSampleData = async (): Promise<void> => {

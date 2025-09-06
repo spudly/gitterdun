@@ -5,7 +5,7 @@ import {describe, expect, test} from '@jest/globals';
 describe('dbMaintenance exports', () => {
   test('should export dropAllTables from utils', async () => {
     // Import after mocks
-    const utils = await import('../dbMaintenance');
+    const utils = await import('../dbMaintenance.js');
     expect(typeof (utils as any).dropAllTables).toBe('function');
   });
 });

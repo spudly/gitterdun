@@ -1,2 +1,2 @@
-export {occursOnDate} from './occursOnDate';
-export {buildRRuleString} from './recurrenceBuilder';
+export {occursOnDate} from './occursOnDate.js';
+export {buildRRuleString} from './recurrenceBuilder.js';

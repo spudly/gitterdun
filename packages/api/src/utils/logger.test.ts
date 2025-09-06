@@ -46,7 +46,7 @@ describe('logger module', () => {
     const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
     mockPino.mockReturnValue(mockLoggerInstance);
 
-    await import('./logger');
+    await import('./logger.js');
 
     expect(mockPino).toHaveBeenCalledWith(
       expect.objectContaining({level: 'info'}),
@@ -58,7 +58,7 @@ describe('logger module', () => {
       const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
       mockPino.mockReturnValue(mockLoggerInstance);
 
-      await import('./logger');
+      await import('./logger.js');
 
       expect(mockPino).toHaveBeenCalledWith(
         expect.objectContaining({level: 'debug'}),
@@ -74,7 +74,7 @@ describe('logger module', () => {
         const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
         mockPino.mockReturnValue(mockLoggerInstance);
 
-        await import('./logger');
+        await import('./logger.js');
 
         expect(mockPino).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -92,7 +92,7 @@ describe('logger module', () => {
       const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
       mockPino.mockReturnValue(mockLoggerInstance);
 
-      await import('./logger');
+      await import('./logger.js');
 
       expect(mockPino).toHaveBeenCalledWith(
         expect.objectContaining({level: 'info'}),
@@ -106,7 +106,7 @@ describe('logger module', () => {
     const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
     mockPino.mockReturnValue(mockLoggerInstance);
 
-    await import('./logger');
+    await import('./logger.js');
 
     expect(mockPino).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -120,7 +120,7 @@ describe('logger module', () => {
     const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
     mockPino.mockReturnValue(mockLoggerInstance);
 
-    const {logger} = await import('./logger');
+    const {logger} = await import('./logger.js');
 
     expect(logger).toBe(mockLoggerInstance);
   });
@@ -133,7 +133,7 @@ describe('logger module', () => {
         const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
         mockPino.mockReturnValue(mockLoggerInstance);
 
-        await import('./logger');
+        await import('./logger.js');
 
         expect(mockPino).toHaveBeenCalledWith(
           expect.objectContaining({level: 'silent'}),
@@ -148,7 +148,7 @@ describe('logger module', () => {
       const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
       mockPino.mockReturnValue(mockLoggerInstance);
 
-      await import('./logger');
+      await import('./logger.js');
 
       expect(mockPino).toHaveBeenCalledWith(
         expect.objectContaining({level: 'info'}),
@@ -162,7 +162,7 @@ describe('logger module', () => {
       const mockLoggerInstance = {info: jest.fn(), error: jest.fn()};
       mockPino.mockReturnValue(mockLoggerInstance);
 
-      await import('./logger');
+      await import('./logger.js');
 
       expect(mockPino).toHaveBeenCalledWith(
         expect.objectContaining({

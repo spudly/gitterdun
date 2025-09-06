@@ -15,7 +15,7 @@ describe('choreModeration helpers', () => {
       PG_URL: 'postgresql://user:pass@localhost:5432/giterdone_postgres',
     } as Record<string, string>;
 
-    const {approveChoreAssignment} = await import('./choreModeration');
+    const {approveChoreAssignment} = await import('./choreModeration.js');
     expect(typeof approveChoreAssignment).toBe('function');
 
     process.env = originalEnv;

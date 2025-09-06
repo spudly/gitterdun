@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {AvatarCircle} from './AvatarCircle';
+import {AvatarCircle} from './AvatarCircle.js';
 
 describe('avatarCircle', () => {
   test('renders initials and supports emoji/ring/size', () => {

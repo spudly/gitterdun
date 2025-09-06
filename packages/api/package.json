@@ -7,7 +7,7 @@
   "scripts": {
     "start:dev": "NODE_ENV=development nodemon --exec tsx src/start.ts",
     "start:test": "NODE_ENV=test TEST_ENV=playwright nodemon --exec tsx src/start.ts",
-    "check:types": "tsc",
+    "check:ts": "tsc",
     "start": "NODE_ENV=production tsx src/start.ts",
     "test": "jest",
     "db:reset": "tsx src/scripts/dbReset.ts",

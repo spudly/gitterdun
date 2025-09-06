@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {Card} from './Card';
+import {Card} from './Card.js';
 
 describe('card', () => {
   test('renders header/footer', () => {

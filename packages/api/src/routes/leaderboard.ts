@@ -1,10 +1,10 @@
 import express from 'express';
-import type {RequestWithBody} from '../types/http';
+import type {RequestWithBody} from '../types/http.js';
 
 import {LeaderboardRowSchema, LeaderboardQuerySchema} from '@gitterdun/shared';
-import {sql} from '../utils/sql';
-import {requireUserId} from '../utils/auth';
-import {getLeaderboard} from '../utils/crud/leaderboard';
+import {sql} from '../utils/sql.js';
+import {requireUserId} from '../utils/auth.js';
+import {getLeaderboard} from '../utils/crud/leaderboard.js';
 
 // eslint-disable-next-line new-cap -- not my function
 const router = express.Router();

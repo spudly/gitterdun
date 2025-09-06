@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {ListRow} from './ListRow';
+import {ListRow} from './ListRow.js';
 
 describe('listRow', () => {
   test('renders all regions when provided', () => {

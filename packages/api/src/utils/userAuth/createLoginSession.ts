@@ -1,7 +1,7 @@
 import type {Response} from 'express';
-import type {TypedResponse} from '../../types/http';
-import {createSession} from '../sessionUtils';
-import {setSessionCookie} from '../cookieUtils';
+import type {TypedResponse} from '../../types/http.js';
+import {createSession} from '../sessionUtils.js';
+import {setSessionCookie} from '../cookieUtils.js';
 
 export const createLoginSession = async (
   res: Response | TypedResponse,

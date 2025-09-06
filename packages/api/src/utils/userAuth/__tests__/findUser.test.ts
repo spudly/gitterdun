@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, jest, test} from '@jest/globals';
-import * as crudDb from '../../crud/db';
-import {findUserByEmail, findUserByUsername} from '../findUser';
+import * as crudDb from '../../crud/db.js';
+import {findUserByEmail, findUserByUsername} from '../findUser.js';
 
 describe('findUser utils', () => {
   const getMock = jest.fn();

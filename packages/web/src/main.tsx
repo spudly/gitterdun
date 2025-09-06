@@ -1,6 +1,6 @@
 import {createRoot} from 'react-dom/client';
-import './globals';
-import {App} from './App';
+import './globals.js';
+import {App} from './App.js';
 
 const rootElement = document.getElementById('root');
 

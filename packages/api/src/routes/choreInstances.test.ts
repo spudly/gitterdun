@@ -1,10 +1,10 @@
 import {describe, expect, test, beforeAll, afterAll, jest} from '@jest/globals';
 import express from 'express';
 import {Server} from 'node:http';
-import choreInstanceRoutes from './choreInstances';
-import {run, get} from '../utils/crud/db';
-import {requireUserId} from '../utils/auth';
-import {setupErrorHandling} from '../middleware/errorHandler';
+import choreInstanceRoutes from './choreInstances.js';
+import {run, get} from '../utils/crud/db.js';
+import {requireUserId} from '../utils/auth.js';
+import {setupErrorHandling} from '../middleware/errorHandler.js';
 
 jest.mock('../utils/auth', () => ({requireUserId: jest.fn()}));
 jest.mock('../utils/familyOperations', () => ({

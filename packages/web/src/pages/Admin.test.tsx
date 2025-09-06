@@ -1,7 +1,7 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {createWrapper} from '../test/createWrapper';
-import Admin from './Admin';
+import {createWrapper} from '../test/createWrapper.js';
+import Admin from './Admin.js';
 
 jest.mock('../hooks/useUser', () => ({
   useUser: jest.fn(() => ({

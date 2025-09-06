@@ -4,10 +4,10 @@ import type {
   RequestWithParams,
   RequestWithParamsAndBody,
   TypedResponse,
-} from '../types/http';
+} from '../types/http.js';
 import {StatusCodes} from 'http-status-codes';
 import {IdParamSchema, GoalSchema} from '@gitterdun/shared';
-import {logger} from '../utils/logger';
+import {logger} from '../utils/logger.js';
 
 import {
   validateGoalsQuery,
@@ -15,7 +15,7 @@ import {
   getTotalGoalsCount,
   addPaginationToQuery,
   fetchAndValidateGoals,
-} from '../utils/goalQueries';
+} from '../utils/goalQueries.js';
 import {
   validateCreateGoalData,
   createGoalInDatabase,
@@ -26,7 +26,7 @@ import {
   buildGoalUpdateQuery,
   executeGoalUpdate,
   deleteGoalFromDatabase,
-} from '../utils/goalOperations';
+} from '../utils/goalOperations.js';
 
 // eslint-disable-next-line new-cap -- express.Router() is a factory function
 const router = express.Router();

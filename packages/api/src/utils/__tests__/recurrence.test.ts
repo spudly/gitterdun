@@ -1,5 +1,5 @@
 import {describe, expect, test} from '@jest/globals';
-import {occursOnDate} from '../recurrence';
+import {occursOnDate} from '../recurrence.js';
 
 describe('recurrence using rrule-rust', () => {
   test('daily rule occurs on target day after start', () => {

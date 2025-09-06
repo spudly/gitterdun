@@ -1,5 +1,5 @@
-import {sql} from '../sql';
-import {get, run} from './db';
+import {sql} from '../sql.js';
+import {get, run} from './db.js';
 import {z} from 'zod';
 
 const ChoreRowSchema = z.object({

@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
-import {isLiteralNode} from './isLiteralNode';
-import type {LiteralNode} from './astTypes';
+import {isLiteralNode} from './isLiteralNode.js';
+import type {LiteralNode} from './astTypes.js';
 
 describe('isLiteralNode', () => {
   test('detects literal node', () => {

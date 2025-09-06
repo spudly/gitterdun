@@ -2,21 +2,21 @@ import type {
   RequestWithBody,
   TypedResponse,
   RequestDefault,
-} from '../types/http';
+} from '../types/http.js';
 import {StatusCodes} from 'http-status-codes';
-import {logger} from '../utils/logger';
+import {logger} from '../utils/logger.js';
 import {UserSchema, UpdateUserSchema, asError} from '@gitterdun/shared';
-import {getUserFromSession} from '../utils/sessionUtils';
+import {getUserFromSession} from '../utils/sessionUtils.js';
 import {
   clearChoresCreatedBy,
   deleteInvitationsByInviter,
   deleteUserById,
   getUserById,
   updateUserProfile,
-} from '../utils/crud/users';
+} from '../utils/crud/users.js';
 
 // Admin-only handlers
-export {listUsersHandler, deleteUserHandler} from './usersHandlers.admin';
+export {listUsersHandler, deleteUserHandler} from './usersHandlers.admin.js';
 
 export const getMeHandler = async (
   req: RequestDefault,

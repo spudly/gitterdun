@@ -7,7 +7,7 @@ import {
   ClockIcon,
   CheckCircleIcon,
   SparklesIcon,
-} from '../../widgets/icons';
+} from '../../widgets/icons/index.js';
 
 type AdminStatsProps = {readonly chores: Array<ChoreWithUsername>};
 

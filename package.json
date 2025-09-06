@@ -10,12 +10,13 @@
     "build:api": "npm run build --workspace=packages/api",
     "build:web": "npm run build --workspace=packages/web",
     "build": "turbo run build --output-logs=errors-only",
-    "check:ts:coverage": "NODE_ENV=production typescript-coverage-report",
     "check:ai": "turbo run check:ai --output-logs=errors-only",
     "check:all": "turbo run check:all --output-logs=errors-only",
-    "check:prettier": "node --experimental-strip-types node_modules/prettier/bin/prettier.cjs --check .",
-    "check:types": "turbo run check:types --output-logs=errors-only",
+    "check:eslint-config": "tsx ./scripts/check-eslint-config.ts",
     "check:jscpd": "jscpd",
+    "check:prettier": "node --experimental-strip-types node_modules/prettier/bin/prettier.cjs --check .",
+    "check:ts:coverage": "NODE_ENV=production typescript-coverage-report",
+    "check:ts": "turbo run check:ts --output-logs=errors-only",
     "ci:install:browsers": "npm run install:browsers --workspace=packages/e2e -- --with-deps chromium",
     "db:reset:seed": "npm run -w packages/api db:reset -- --seed",
     "db:reset": "npm run -w packages/api db:reset",
@@ -34,8 +35,7 @@
     "test:e2e:ui": "npm run test:ui --workspace=packages/e2e",
     "test:e2e": "npm test --workspace=packages/e2e",
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
-    "turbo:reset": "find . -name '.turbo' -type d -exec rm -rf {}",
-    "validate-eslint-config": "tsx ./scripts/validate-eslint-config.ts"
+    "turbo:reset": "find . -name '.turbo' -type d -exec rm -rf {}"
   },
   "devDependencies": {
     "@jest/globals": "^30.0.5",

@@ -1,5 +1,5 @@
-import {sql} from '../sql';
-import {allTyped, getTyped, run} from './db';
+import {sql} from '../sql.js';
+import {allTyped, getTyped, run} from './db.js';
 import {UserSchema} from '@gitterdun/shared';
 import {z} from 'zod';
 

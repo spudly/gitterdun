@@ -1,9 +1,9 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {createWrapper} from '../test/createWrapper';
-import ResetPassword from './ResetPassword';
-import {ToastProvider} from '../widgets/ToastProvider';
+import {createWrapper} from '../test/createWrapper.js';
+import ResetPassword from './ResetPassword.js';
+import {ToastProvider} from '../widgets/ToastProvider.js';
 
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => {

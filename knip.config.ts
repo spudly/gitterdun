@@ -34,12 +34,7 @@ const config: KnipConfig = {
       ],
     },
 
-    'packages/shared': {
-      entry: ['src/index.ts'], // Library entry point
-
-      // Include all TS files except tests
-      project: ['src/**/*.{ts,tsx}'],
-    },
+    'packages/shared': {project: ['src/**/*.{ts,tsx}']},
   },
 
   // Global ignore patterns

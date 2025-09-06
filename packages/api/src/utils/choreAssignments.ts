@@ -1,6 +1,6 @@
 import {ChoreAssignmentSchema} from '@gitterdun/shared';
-import {sql} from './sql';
-import {get, run} from './crud/db';
+import {sql} from './sql.js';
+import {get, run} from './crud/db.js';
 
 const toTimestamp = (value: unknown): number | undefined => {
   if (typeof value !== 'string' || value.length === 0) {

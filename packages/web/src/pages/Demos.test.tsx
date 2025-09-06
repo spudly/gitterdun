@@ -4,8 +4,8 @@ import {Routes, Route} from 'react-router-dom';
 import fs from 'node:fs';
 import path from 'node:path';
 import {z} from 'zod';
-import Demos from './Demos';
-import {createWrapper} from '../test/createWrapper';
+import Demos from './Demos.js';
+import {createWrapper} from '../test/createWrapper.js';
 
 // Test the local DemoParamsSchema
 const DemoParamsSchema = z.object({name: z.string().min(1).optional()});

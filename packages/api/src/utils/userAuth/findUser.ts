@@ -1,6 +1,6 @@
 import {z} from 'zod';
-import {get} from '../crud/db';
-import {sql} from '../sql';
+import {get} from '../crud/db.js';
+import {sql} from '../sql.js';
 import {UserWithPasswordRowSchema} from '@gitterdun/shared';
 
 type UserWithPasswordRow = z.infer<typeof UserWithPasswordRowSchema>;

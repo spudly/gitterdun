@@ -6,8 +6,8 @@ import {
   afterEach,
   jest,
 } from '@jest/globals';
-import {initializeDatabase} from './lib/initDb';
-import {logger} from './utils/logger';
+import {initializeDatabase} from './lib/initDb.js';
+import {logger} from './utils/logger.js';
 import {asError, withProperties} from '@gitterdun/shared';
 import dotenv from 'dotenv';
 
@@ -66,7 +66,7 @@ describe('server', () => {
     mockedInitializeDatabase.mockResolvedValue();
 
     // Import server module to trigger initialization
-    await import('./server');
+    await import('./server.js');
 
     // Verify dotenv.config was called during module import
     expect(mockedDotenv.config).toHaveBeenCalledWith();

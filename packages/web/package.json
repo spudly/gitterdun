@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start:dev": "vite",
-    "check:types": "tsc",
+    "check:ts": "tsc",
     "prebuild": "npm run i18n:extract",
     "build": "vite build",
     "preview": "vite preview",

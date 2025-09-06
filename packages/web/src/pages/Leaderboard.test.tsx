@@ -1,9 +1,9 @@
 import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import Leaderboard from './Leaderboard';
-import * as apiModule from '../lib/api';
-import {createWrapper} from '../test/createWrapper';
+import Leaderboard from './Leaderboard.js';
+import * as apiModule from '../lib/api.js';
+import {createWrapper} from '../test/createWrapper.js';
 
 jest.mock('../lib/api', () => ({
   leaderboardApi: {

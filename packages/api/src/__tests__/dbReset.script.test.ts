@@ -31,12 +31,12 @@ jest.mock('../utils/choreCrud', () => ({
 
 describe('dbReset script', () => {
   test('resetDb seeds only when --seed passed', async () => {
-    const mod = await import('../scripts/dbReset');
+    const mod = await import('../scripts/dbReset.js');
     const {resetDb} = mod as unknown as {
       resetDb: (opts?: {seed?: boolean}) => Promise<void>;
     };
 
-    const {createChoreInDb} = await import('../utils/choreCrud');
+    const {createChoreInDb} = await import('../utils/choreCrud.js');
 
     // Run without seed
     await resetDb({seed: false});

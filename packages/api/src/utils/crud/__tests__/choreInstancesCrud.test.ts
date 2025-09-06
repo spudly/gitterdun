@@ -8,7 +8,7 @@ describe('choreInstances CRUD', () => {
   });
 
   test('module compiles and exports functions', async () => {
-    const mod = await import('../choreInstances');
+    const mod = await import('../choreInstances.js');
     expect(typeof mod.upsertChoreInstance).toBe('function');
   });
 });

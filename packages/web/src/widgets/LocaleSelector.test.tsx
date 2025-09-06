@@ -1,8 +1,8 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {LocaleSelector} from './LocaleSelector';
-import {I18nProvider, useI18n} from '../i18n/I18nProvider';
+import {LocaleSelector} from './LocaleSelector.js';
+import {I18nProvider, useI18n} from '../i18n/I18nProvider.js';
 
 const Wrapper: React.FC<{children: React.ReactNode}> = ({children}) => (
   <I18nProvider>{children}</I18nProvider>

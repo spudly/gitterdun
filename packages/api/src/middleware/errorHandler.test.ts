@@ -15,7 +15,7 @@ import {
   handleErrorInstance,
   handleError,
   notFoundHandler,
-} from './errorHandler';
+} from './errorHandler.js';
 
 // Mock the logger
 jest.mock('../utils/logger', () => ({logger: {error: jest.fn()}}));
@@ -202,7 +202,9 @@ describe('errorHandler', () => {
 
     test('should not log for ZodError (400)', () => {
       const {logger} =
-        jest.requireMock<typeof import('../utils/logger')>('../utils/logger');
+        jest.requireMock<typeof import('../utils/logger.js')>(
+          '../utils/logger',
+        );
       const schema = z.object({name: z.string()});
       let zodError: ZodError;
       try {
@@ -219,7 +221,9 @@ describe('errorHandler', () => {
 
     test('should not log for expected 401 errors', () => {
       const {logger} =
-        jest.requireMock<typeof import('../utils/logger')>('../utils/logger');
+        jest.requireMock<typeof import('../utils/logger.js')>(
+          '../utils/logger',
+        );
       const error = new Error('Invalid credentials') as Error & {
         status: number;
       };
@@ -233,7 +237,9 @@ describe('errorHandler', () => {
 
     test('should log for 5xx errors', () => {
       const {logger} =
-        jest.requireMock<typeof import('../utils/logger')>('../utils/logger');
+        jest.requireMock<typeof import('../utils/logger.js')>(
+          '../utils/logger',
+        );
       const error = new Error('Boom');
 
       handleError(error, res as express.Response);

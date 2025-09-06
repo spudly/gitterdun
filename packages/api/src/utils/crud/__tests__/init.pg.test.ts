@@ -26,9 +26,9 @@ describe('init helpers in Postgres mode (native client)', () => {
   });
 
   test('execSchema uses pg client, not psql', async () => {
-    const {pgQuery} = await import('../../../lib/pgClient');
-    const {psqlExecFileInput} = await import('../../pg/psql');
-    const {execSchema} = await import('../init');
+    const {pgQuery} = await import('../../../lib/pgClient.js');
+    const {psqlExecFileInput} = await import('../../pg/psql.js');
+    const {execSchema} = await import('../init.js');
 
     await expect(
       (async () => {
@@ -44,14 +44,14 @@ describe('init helpers in Postgres mode (native client)', () => {
   });
 
   test('countAdmins queries via pg client single-row', async () => {
-    const {pgQuery} = await import('../../../lib/pgClient');
+    const {pgQuery} = await import('../../../lib/pgClient.js');
     jest
       .mocked(pgQuery)
       .mockResolvedValueOnce({
         rows: [{count: 2}],
       } as unknown as import('pg').QueryResult);
 
-    const {countAdmins} = await import('../init');
+    const {countAdmins} = await import('../init.js');
     const res = await countAdmins();
     expect(res.count).toBe(2);
     expect(jest.mocked(pgQuery)).toHaveBeenCalledWith(

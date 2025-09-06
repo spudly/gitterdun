@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {StatCard, getStatColorClass} from './StatCard';
+import {StatCard, getStatColorClass} from './StatCard.js';
 
 describe('statCard', () => {
   test('renders icon, label and value', () => {

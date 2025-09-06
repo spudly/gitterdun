@@ -1,14 +1,14 @@
 import crypto from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import {IdRowSchema, PasswordResetRowSchema} from '@gitterdun/shared';
-import {get, run} from './crud/db';
-import {logger} from './logger';
-import {sql} from './sql';
+import {get, run} from './crud/db.js';
+import {logger} from './logger.js';
+import {sql} from './sql.js';
 import {
   BCRYPT_SALT_ROUNDS,
   SECURE_TOKEN_BYTES,
   PASSWORD_RESET_EXPIRATION_MS,
-} from '../constants';
+} from '../constants.js';
 
 const createPasswordResetToken = async (userId: number) => {
   const token = crypto.randomBytes(SECURE_TOKEN_BYTES).toString('hex');

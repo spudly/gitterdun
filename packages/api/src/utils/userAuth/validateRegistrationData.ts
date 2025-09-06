@@ -1,5 +1,5 @@
 import {CreateUserSchema} from '@gitterdun/shared';
-import {checkUserExists} from './checkUserExists';
+import {checkUserExists} from './checkUserExists.js';
 
 export const validateRegistrationData = async (body: unknown) => {
   const validatedBody = CreateUserSchema.parse(body);

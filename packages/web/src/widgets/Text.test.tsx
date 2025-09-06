@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {Text} from './Text';
+import {Text} from './Text.js';
 
 describe('text', () => {
   test('renders with variants', () => {

@@ -1,8 +1,8 @@
 import {beforeEach, describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {createWrapper} from '../test/createWrapper';
-import AcceptInvitation from './AcceptInvitation';
-import {ToastProvider} from '../widgets/ToastProvider';
+import {createWrapper} from '../test/createWrapper.js';
+import AcceptInvitation from './AcceptInvitation.js';
+import {ToastProvider} from '../widgets/ToastProvider.js';
 
 jest.mock('../lib/api', () => ({
   invitationsApi: {accept: jest.fn(async () => ({success: true}))},

@@ -3,7 +3,7 @@ import {
   UpdateGoalSchema,
   IdParamSchema,
 } from '@gitterdun/shared';
-import type {RequestWithParamsAndBody} from '../types/http';
+import type {RequestWithParamsAndBody} from '../types/http.js';
 
 export const validateCreateGoalData = (body: unknown) => {
   const validatedBody = CreateGoalSchema.parse(body);

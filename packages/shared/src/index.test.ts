@@ -1,5 +1,5 @@
 import {describe, expect, test} from '@jest/globals';
-import {asError, UserSchema} from './index';
+import {asError, UserSchema} from './index.js';
 
 describe('@gitterdun/shared public API', () => {
   test('exports expected modules', () => {

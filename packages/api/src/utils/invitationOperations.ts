@@ -1,6 +1,6 @@
-import {run} from './crud/db';
-import {sql} from './sql';
-import {removeAllMembershipsForUser} from './familyMembership';
+import {run} from './crud/db.js';
+import {sql} from './sql.js';
+import {removeAllMembershipsForUser} from './familyMembership.js';
 
 type CreateInvitationParams = {
   token: string;

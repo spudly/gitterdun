@@ -1,10 +1,10 @@
 import {beforeAll, describe, expect, jest, test} from '@jest/globals';
 import {render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {createWrapper} from '../test/createWrapper';
+import {createWrapper} from '../test/createWrapper.js';
 import {z as zod} from 'zod';
 
-import Layout from './Layout';
+import Layout from './Layout.js';
 import type {FamilyMember, FamilySchema, User} from '@gitterdun/shared';
 
 const mockUser: User = {
@@ -69,7 +69,7 @@ describe('layout', () => {
 
   test('does not show Approvals link for non-parents', async () => {
     mockUserState = {...mockUser, id: 2};
-    const {familiesApi} = jest.mocked(await import('../lib/api'));
+    const {familiesApi} = jest.mocked(await import('../lib/api.js'));
     familiesApi.myFamily.mockResolvedValue({
       success: true,
       data: {id: 1, owner_id: 1} as zod.infer<typeof FamilySchema>,

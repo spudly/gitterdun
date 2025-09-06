@@ -1,7 +1,7 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
-import {MembersList} from './MembersList';
-import {createWrapper} from '../test/createWrapper';
+import {MembersList} from './MembersList.js';
+import {createWrapper} from '../test/createWrapper.js';
 
 describe('membersList', () => {
   test('renders items', () => {

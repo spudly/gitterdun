@@ -1,7 +1,7 @@
 import type {ReactNode} from 'react';
 import {FormattedMessage} from 'react-intl';
 import {clsx} from 'clsx';
-import {isReactNode} from '../utils/isReactNode';
+import {isReactNode} from '../utils/isReactNode.js';
 
 export type Column<T> = {
   key: string;

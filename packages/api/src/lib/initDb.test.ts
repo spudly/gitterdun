@@ -3,9 +3,9 @@ import {describe, expect, test, beforeEach, jest} from '@jest/globals';
 import fs from 'node:fs';
 import path from 'node:path';
 import {CountRowSchema, asError} from '@gitterdun/shared';
-import {initializeDatabase} from './initDb';
-import * as crudInit from '../utils/crud/init';
-import {logger} from '../utils/logger';
+import {initializeDatabase} from './initDb.js';
+import * as crudInit from '../utils/crud/init.js';
+import {logger} from '../utils/logger.js';
 
 // Mock dependencies before importing
 jest.mock('../utils/crud/init', () => ({
@@ -171,7 +171,9 @@ describe('initializeDatabase', () => {
     };
     jest.doMock('../utils/crud/init', () => crudInitMock);
 
-    const {initializeDatabase: initializeDatabasePg} = await import('./initDb');
+    const {initializeDatabase: initializeDatabasePg} = await import(
+      './initDb.js'
+    );
 
     await initializeDatabasePg();
 

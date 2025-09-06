@@ -2,10 +2,10 @@ import {describe, expect, jest, test} from '@jest/globals';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import Family from './Family';
-import {useUser} from '../hooks/useUser';
-import * as apiModule from '../lib/api';
-import {createWrapper} from '../test/createWrapper';
+import Family from './Family.js';
+import {useUser} from '../hooks/useUser.js';
+import * as apiModule from '../lib/api.js';
+import {createWrapper} from '../test/createWrapper.js';
 
 jest.mock('../hooks/useUser', () => ({
   useUser: jest.fn(() => ({user: {id: 1}})),

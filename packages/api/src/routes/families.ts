@@ -5,7 +5,7 @@ import type {
   RequestWithParams,
   RequestDefault,
   RequestWithParamsAndBody,
-} from '../types/http';
+} from '../types/http.js';
 import {StatusCodes} from 'http-status-codes';
 import {
   CreateFamilySchema,
@@ -13,16 +13,16 @@ import {
   CreateChildSchema,
   asError,
 } from '@gitterdun/shared';
-import {requireUserId} from '../utils/auth';
+import {requireUserId} from '../utils/auth.js';
 import {
   createFamily,
   getUserFamily,
   checkUserExists,
   createChildUser,
   addChildToFamily,
-} from '../utils/familyOperations';
-import {validateParentMembership} from '../utils/familyAuthUtils';
-import {logger} from '../utils/logger';
+} from '../utils/familyOperations.js';
+import {validateParentMembership} from '../utils/familyAuthUtils.js';
+import {logger} from '../utils/logger.js';
 
 // eslint-disable-next-line new-cap -- express.Router() is a factory function
 const router = express.Router();

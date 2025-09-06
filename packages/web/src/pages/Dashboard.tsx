@@ -11,9 +11,9 @@ import {Card} from '../widgets/Card.js';
 import {ListRow} from '../widgets/ListRow.js';
 import {Text} from '../widgets/Text.js';
 import {PageLoading} from '../widgets/PageLoading.js';
-import {CheckCircleIcon, ClockIcon, DocIcon} from '../widgets/icons';
+import {CheckCircleIcon, ClockIcon, DocIcon} from '../widgets/icons/index.js';
 import {FormattedMessage, useIntl} from 'react-intl';
-import {DUE_SOON_THRESHOLD_DAYS} from '../constants';
+import {DUE_SOON_THRESHOLD_DAYS} from '../constants.js';
 import {ONE_DAY_MS} from '@gitterdun/shared';
 
 const Dashboard: FC = () => {

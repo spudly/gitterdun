@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
-import {isJSXExpressionContainerNode} from './isJSXExpressionContainerNode';
-import type {JSXExpressionContainerNode} from './astTypes';
+import {isJSXExpressionContainerNode} from './isJSXExpressionContainerNode.js';
+import type {JSXExpressionContainerNode} from './astTypes.js';
 
 describe('isJSXExpressionContainerNode', () => {
   test('detects JSXExpressionContainer node', () => {

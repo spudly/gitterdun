@@ -1,7 +1,7 @@
 // Goals API functions
 import {z} from 'zod';
 import {GoalSchema} from '@gitterdun/shared';
-import {api} from './apiCore';
+import {api} from './apiCore.js';
 
 export const goalsApi = {
   getAll: async (params?: {

@@ -1,5 +1,5 @@
-import {sql} from '../../utils/sql';
-import {get} from '../../utils/crud/db';
+import {sql} from '../../utils/sql.js';
+import {get} from '../../utils/crud/db.js';
 import {ChoreWithUsernameSchema, CountRowSchema} from '@gitterdun/shared';
 
 export const DEFAULT_LIMIT = 10;

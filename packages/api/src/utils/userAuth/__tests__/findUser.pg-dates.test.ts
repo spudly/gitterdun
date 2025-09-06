@@ -19,7 +19,7 @@ describe('findUser returns ISO strings for timestamp fields in PG mode', () => {
 
   test('created_at/updated_at are strings, not Date', async () => {
     const now = new Date('2024-01-02T03:04:05.678Z');
-    const {pgQuery} = await import('../../../lib/pgClient');
+    const {pgQuery} = await import('../../../lib/pgClient.js');
     jest
       .mocked(pgQuery)
       .mockResolvedValueOnce({
@@ -38,7 +38,7 @@ describe('findUser returns ISO strings for timestamp fields in PG mode', () => {
         ],
       } as unknown as import('pg').QueryResult);
 
-    const {findUserByEmail} = await import('../findUser');
+    const {findUserByEmail} = await import('../findUser.js');
     const res = await findUserByEmail('u@example.com');
     expect(res).toBeDefined();
     expect(typeof res?.created_at).toBe('string');

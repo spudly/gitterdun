@@ -1,7 +1,7 @@
 import {describe, expect, test} from '@jest/globals';
 import {render, screen, within} from '@testing-library/react';
-import {createWrapper} from '../../test/createWrapper';
-import {SvgIconBase} from './common';
+import {createWrapper} from '../../test/createWrapper.js';
+import {SvgIconBase} from './common.js';
 
 describe('svgIconBase', () => {
   test('renders svg with title and dimensions', () => {

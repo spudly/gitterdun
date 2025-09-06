@@ -2,10 +2,10 @@ import {beforeEach, describe, expect, jest, test} from '@jest/globals';
 import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {useLocation} from 'react-router-dom';
-import Login from './Login';
-import {createWrapper} from '../test/createWrapper';
-import * as useUserModule from '../hooks/useUser';
-import {ToastProvider} from '../widgets/ToastProvider';
+import Login from './Login.js';
+import {createWrapper} from '../test/createWrapper.js';
+import * as useUserModule from '../hooks/useUser.js';
+import {ToastProvider} from '../widgets/ToastProvider.js';
 
 type UseUserReturn = ReturnType<typeof useUserModule.useUser>;
 
@@ -32,7 +32,7 @@ const createUseUserMock = (
   ...overrides,
 });
 
-jest.mock<typeof import('../hooks/useUser')>('../hooks/useUser', () => ({
+jest.mock<typeof import('../hooks/useUser.js')>('../hooks/useUser', () => ({
   useUser: jest.fn(() => createUseUserMock()),
 }));
 
