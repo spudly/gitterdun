@@ -15,5 +15,4 @@
 - [ ] Feature: disallow late chores
 - [ ] Feature: late penalty
 - [ ] add date-fns
-- [ ] remove build step from api package
-- [ ] esm all the packages
+- [ ] use `types.setTypeParser` to coerce dates instead of `normalizeRowValues`

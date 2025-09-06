@@ -1,6 +1,7 @@
 import {pgQuery} from '../../lib/pgClient.js';
 import {z} from 'zod';
 
+// TODO: we shouldn't have to do this. Let's use `types.setTypeParser` to coerce dates instead.
 const normalizeRowValues = (
   row: Record<string, unknown>,
 ): Record<string, unknown> => {
@@ -42,16 +43,6 @@ export const run = async (
   return {changes: 0};
 };
 
-export const get = async (
-  query: string,
-  ...params: Array<unknown>
-): Promise<Record<string, unknown> | undefined> => {
-  const {text} = toPgPlaceholders(query);
-  const res = await pgQuery(text, params);
-  const [first] = res.rows;
-  return first ? normalizeRowValues(first) : undefined;
-};
-
 export const all = async (
   query: string,
   ...params: Array<unknown>
@@ -60,6 +51,12 @@ export const all = async (
   const res = await pgQuery(text, params);
   return res.rows.map(row => normalizeRowValues(row));
 };
+
+export const get = async (
+  query: string,
+  ...params: Array<unknown>
+): Promise<Record<string, unknown> | undefined> =>
+  (await all(query, ...params)).at(0);
 
 export const pragma = (_pragmaCommand: string): void => {
   // No-op in Postgres-only mode

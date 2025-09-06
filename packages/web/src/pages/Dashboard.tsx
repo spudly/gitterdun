@@ -14,7 +14,7 @@ import {PageLoading} from '../widgets/PageLoading.js';
 import {CheckCircleIcon, ClockIcon, DocIcon} from '../widgets/icons/index.js';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {DUE_SOON_THRESHOLD_DAYS} from '../constants.js';
-import {ONE_DAY_MS} from '@gitterdun/shared';
+import {differenceInDays} from 'date-fns';
 
 const Dashboard: FC = () => {
   const {user} = useUser();
@@ -51,8 +51,7 @@ const Dashboard: FC = () => {
       }
       const dueDate = new Date(chore.due_date);
       const now = new Date();
-      const diffTime = dueDate.getTime() - now.getTime();
-      const diffDays = Math.ceil(diffTime / ONE_DAY_MS);
+      const diffDays = differenceInDays(dueDate, now);
       return diffDays <= DUE_SOON_THRESHOLD_DAYS && diffDays >= 0;
     }).length;
 

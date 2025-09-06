@@ -1,7 +1,7 @@
-import {FamilySchema, IdRowSchema} from '@gitterdun/shared';
+import {FamilySchema, IdRowSchema, FamilyMemberSchema} from '@gitterdun/shared';
 import type {Family} from '@gitterdun/shared';
 import bcrypt from 'bcryptjs';
-import {get, run} from './crud/db.js';
+import {get, run, all} from './crud/db.js';
 import {sql} from './sql.js';
 import {removeAllMembershipsForUser} from './familyMembership.js';
 import {BCRYPT_SALT_ROUNDS} from '../constants.js';
@@ -145,4 +145,28 @@ export const addChildToFamily = async (
     childId,
     'child',
   );
+};
+
+export const getFamilyMembers = async (familyId: number) => {
+  const rows = await all(
+    sql`
+      SELECT
+        fm.family_id,
+        fm.user_id,
+        fm.role,
+        u.username,
+        u.email
+      FROM
+        family_members fm
+        JOIN users u ON fm.user_id = u.id
+      WHERE
+        fm.family_id = ?
+      ORDER BY
+        fm.role ASC,
+        u.username ASC
+    `,
+    familyId,
+  );
+
+  return rows.map(row => FamilyMemberSchema.parse(row));
 };

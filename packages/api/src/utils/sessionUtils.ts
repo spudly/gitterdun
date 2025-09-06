@@ -5,7 +5,8 @@ import {z} from 'zod';
 import {get, run} from './crud/db.js';
 import {sql} from './sql.js';
 import {getCookie} from './cookieUtils.js';
-import {SECURE_TOKEN_BYTES, SESSION_EXPIRATION_MS} from '../constants.js';
+import {SECURE_TOKEN_BYTES, SESSION_EXPIRATION_DAYS} from '../constants.js';
+import {addDays, isPast, parseISO} from 'date-fns';
 
 type User = z.infer<typeof UserSchema>;
 
@@ -13,8 +14,7 @@ export const createSession = async (
   userId: number,
 ): Promise<{sessionId: string; expiresAt: Date}> => {
   const sessionId = crypto.randomBytes(SECURE_TOKEN_BYTES).toString('hex');
-  const now = new Date();
-  const expiresAt = new Date(now.getTime() + SESSION_EXPIRATION_MS);
+  const expiresAt = addDays(new Date(), SESSION_EXPIRATION_DAYS);
 
   await run(
     sql`
@@ -67,7 +67,7 @@ const validateSessionExpiry = async (
   session: {expires_at: string},
   sessionId: string,
 ): Promise<boolean> => {
-  if (new Date(session.expires_at).getTime() < Date.now()) {
+  if (isPast(parseISO(session.expires_at))) {
     await removeExpiredSession(sessionId);
     return false;
   }

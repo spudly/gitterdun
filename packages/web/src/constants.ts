@@ -121,3 +121,5 @@ export const SETTINGS_LANGUAGES: ReadonlyArray<{
 ];
 
 export const EMPTY_ARRAY = [] as const;
+
+export const DATE_FORMAT_FOR_INPUT_DATETIME = "yyyy-MM-dd'T'HH:mm";

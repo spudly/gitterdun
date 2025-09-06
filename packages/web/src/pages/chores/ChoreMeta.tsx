@@ -3,6 +3,7 @@ import type {ChoreWithUsername} from '@gitterdun/shared';
 import {InlineMeta} from '../../widgets/InlineMeta.js';
 import {useIntl} from 'react-intl';
 import {choresMessages as messages} from '../chores.messages.js';
+import {parseISO} from 'date-fns';
 
 type ChoreMetaProps = {readonly chore: ChoreWithUsername};
 
@@ -23,7 +24,7 @@ export const ChoreMeta: FC<ChoreMetaProps> = ({chore}) => {
     typeof chore.due_date === 'number'
       ? chore.due_date
       : typeof chore.due_date === 'string'
-        ? Date.parse(chore.due_date)
+        ? parseISO(chore.due_date).getTime()
         : undefined;
 
   return (
@@ -40,9 +41,7 @@ export const ChoreMeta: FC<ChoreMetaProps> = ({chore}) => {
       ) : null}
       {typeof dueMs === 'number' && Number.isFinite(dueMs) ? (
         <span>
-          {intl.formatMessage(messages.dueWithDate, {
-            date: new Date(dueMs).toLocaleDateString(),
-          })}
+          {intl.formatMessage(messages.dueWithDate, {date: new Date(dueMs)})}
         </span>
       ) : null}
     </InlineMeta>
